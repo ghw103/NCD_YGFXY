@@ -1,0 +1,14 @@
+*.o
+*.htm
+*.html
+*.d
+*.crf
+*.hex
+*.inp
+*.sct
+*.axf
+*.css
+*.js
+*.txt
+*.map
+*.lst
