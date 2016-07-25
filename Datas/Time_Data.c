@@ -21,6 +21,8 @@
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
 static MyTime_Def GB_TimeData;											//时间
+static RTC_TimeTypeDef S_RTC_TimeStruct;								//临时时间
+static RTC_DateTypeDef S_RTC_DateStruct;								//临时日期
 /***************************************************************************************************/
 /**************************************局部函数声明*************************************************/
 /***************************************************************************************************/
@@ -48,6 +50,14 @@ void GetGBTimeData(MyTime_Def * temp)
 
 void UpGBTimeData(void)
 {
-	RTC_GetTime(RTC_Format_BIN, &GB_TimeData.time);
-	RTC_GetDate(RTC_Format_BIN, &GB_TimeData.date);
+	
+	RTC_GetTime(RTC_Format_BIN, &S_RTC_TimeStruct);
+	RTC_GetDate(RTC_Format_BIN, &S_RTC_DateStruct);
+	
+	GB_TimeData.year = S_RTC_DateStruct.RTC_Year;
+	GB_TimeData.month = S_RTC_DateStruct.RTC_Month;
+	GB_TimeData.day = S_RTC_DateStruct.RTC_Date;
+	GB_TimeData.hour = S_RTC_TimeStruct.RTC_Hours;
+	GB_TimeData.min = S_RTC_TimeStruct.RTC_Minutes;
+	GB_TimeData.sec = S_RTC_TimeStruct.RTC_Seconds;
 }

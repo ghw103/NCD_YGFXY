@@ -170,8 +170,8 @@ static void ClientRXHandle(struct netconn *pxNetCon)
 				myrecvbuf.datalen = q->len;
 				
 				/*Õý³£*/
-				//if(pdPASS != SendDataToQueue(GetGBUserClientRXQueue(), GetGBUserClientRXMutex(), &myrecvbuf, 1, 10*portTICK_RATE_MS, NULL))
-				if(pdPASS != SendDataToQueue(GetGBUserClientTXQueue(), GetGBUserClientTXMutex(), &myrecvbuf, 1, 10*portTICK_RATE_MS, NULL))
+				if(pdPASS != SendDataToQueue(GetGBUserClientRXQueue(), GetGBUserClientRXMutex(), &myrecvbuf, 1, 10*portTICK_RATE_MS, NULL))
+				//if(pdPASS != SendDataToQueue(GetGBUserClientTXQueue(), GetGBUserClientTXMutex(), &myrecvbuf, 1, 10*portTICK_RATE_MS, NULL))
 					MyFree(myrecvbuf.data);
 			}
 		}

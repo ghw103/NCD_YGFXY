@@ -64,8 +64,12 @@ typedef enum
 #pragma pack(1)
 typedef struct
 {
-	RTC_DateTypeDef date;
-	RTC_TimeTypeDef time;
+	char year;
+	char month;
+	char day;
+	char hour;
+	char min;
+	char sec;
 }MyTime_Def;
 #pragma pack()
 /**********************************************************************************************************/

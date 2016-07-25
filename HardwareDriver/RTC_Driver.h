@@ -6,7 +6,7 @@
 
 
 MyState_TypeDef My_RTC_Init(void);
-MyState_TypeDef SetTime(unsigned char year, unsigned char month, unsigned char day, unsigned char week, unsigned char hour,
+MyState_TypeDef SetTime(unsigned char year, unsigned char month, unsigned char day, unsigned char hour,
 	unsigned char minute, unsigned char second);
 	
 #endif

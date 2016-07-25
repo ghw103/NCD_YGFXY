@@ -77,7 +77,7 @@ static void vWIFITask( void *pvParameters )
 			while(1)
 			{
 				/*获取wifi连接状态*/
-				if(My_Pass == WifiIsConnectted())
+/*				if(My_Pass == WifiIsConnectted())
 				{
 					SetGB_WifiState(Link_Up);
 					
@@ -91,7 +91,7 @@ static void vWIFITask( void *pvParameters )
 					if(Wifi_Mode == GetGB_NetCard())
 						SetGB_NetCard(NetNone);
 				}
-				
+	*/			
 	//			if(Wifi_Mode == GetGB_NetCard())
 				{
 					/*SocketA Handle*/
@@ -102,7 +102,7 @@ static void vWIFITask( void *pvParameters )
 					vTaskDelay(500 / portTICK_RATE_MS);
 				}
 	//			else
-					vTaskDelay(5000 / portTICK_RATE_MS);
+//					vTaskDelay(5000 / portTICK_RATE_MS);
 			}
 		}
 		
@@ -149,11 +149,11 @@ static void SocketAHandle(void)
 {
 	/*有数据发送*/
 //	if(pdPASS == ReceiveDataFromQueue(GetGBNCDClientTXQueue(), GetGBNCDClientTXMutex(), &S_MyNetBuf, 1, 50 / portTICK_RATE_MS))
-	if(pdPASS == ReceiveDataFromQueue(GetGBNCDClientRXQueue(), GetGBNCDClientRXMutex(), &S_MyNetBuf, 1, 50 / portTICK_RATE_MS))
+	if(pdPASS == ReceiveDataFromQueue(GetGBUserClientRXQueue(), GetGBUserClientRXMutex(), &S_MyNetBuf, 1, 50 / portTICK_RATE_MS))
 	{
 		SendDataBySocketA(&S_MyNetBuf);
 		
-		if(pdPASS != SendDataToQueue(GetGBNCDClientTXQueue(), GetGBNCDClientTXMutex(), &S_MyNetBuf, 1, 50*portTICK_RATE_MS, NULL))
+		if(pdPASS != SendDataToQueue(GetGBUserClientTXQueue(), GetGBUserClientTXMutex(), &S_MyNetBuf, 1, 50*portTICK_RATE_MS, NULL))
 			MyFree(S_MyNetBuf.data);
 		//MyFree(S_MyNetBuf.data);
 	}

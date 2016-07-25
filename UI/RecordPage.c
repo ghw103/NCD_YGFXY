@@ -175,7 +175,7 @@ static MyState_TypeDef PageInit(void *parm)
 	/*设置读取数据的文件时间问当前时间*/
 	GetGBTimeData(&(GB_RecordPageBuffer->time));
 		
-	sprintf(GB_RecordPageBuffer->filename, "0:/20%02d%02d%02d.ncd", GB_RecordPageBuffer->time.date.RTC_Year, GB_RecordPageBuffer->time.date.RTC_Month, GB_RecordPageBuffer->time.date.RTC_Date);
+	sprintf(GB_RecordPageBuffer->filename, "0:/20%02d%02d%02d.ncd", GB_RecordPageBuffer->time.year, GB_RecordPageBuffer->time.min, GB_RecordPageBuffer->time.day);
 	
 	GB_RecordPageBuffer->selectindex = 0;
 	GB_RecordPageBuffer->pageindex = 0;
@@ -231,7 +231,7 @@ static MyState_TypeDef ShowRecord(unsigned char pageindex)
 					memset(GB_RecordPageBuffer->buf, 0, 300);
 					sprintf(GB_RecordPageBuffer->buf, "%05d   %10s%15s  %8.2f%8.8s %02d:%02d:%02d %s ", pageindex*DataNumInPage+GB_RecordPageBuffer->tempvalue2+1, GB_RecordPageBuffer->tempdata->temperweima.ItemName,
 					GB_RecordPageBuffer->tempdata->sampleid, GB_RecordPageBuffer->tempdata->testline.AdjustResult, GB_RecordPageBuffer->tempdata->temperweima.ItemMeasure,
-					GB_RecordPageBuffer->tempdata->TestTime.time.RTC_Hours, GB_RecordPageBuffer->tempdata->TestTime.time.RTC_Minutes, GB_RecordPageBuffer->tempdata->TestTime.time.RTC_Seconds,
+					GB_RecordPageBuffer->tempdata->TestTime.hour, GB_RecordPageBuffer->tempdata->TestTime.min, GB_RecordPageBuffer->tempdata->TestTime.sec,
 					GB_RecordPageBuffer->tempdata->user.user_name);
 				
 					DisText(0x28e0+(GB_RecordPageBuffer->tempvalue2)*0x30, GB_RecordPageBuffer->buf, strlen(GB_RecordPageBuffer->buf));

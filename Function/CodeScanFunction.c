@@ -358,21 +358,21 @@ static MyState_TypeDef CheckCardIsTimeOut(CardCodeInfo * s_CardCodeInfo)
 	{
 		GetGBTimeData(temp);
 		
-		if(s_CardCodeInfo->CardBaoZhiQi.RTC_Year == temp->date.RTC_Year)
+		if(s_CardCodeInfo->CardBaoZhiQi.RTC_Year == temp->year)
 		{
-			if(s_CardCodeInfo->CardBaoZhiQi.RTC_Month == temp->date.RTC_Month)
+			if(s_CardCodeInfo->CardBaoZhiQi.RTC_Month == temp->month)
 			{
-				if(s_CardCodeInfo->CardBaoZhiQi.RTC_Date >= temp->date.RTC_Date)
+				if(s_CardCodeInfo->CardBaoZhiQi.RTC_Date >= temp->day)
 					return My_Pass;
 				else
 					return My_Fail;
 			}
-			else if(s_CardCodeInfo->CardBaoZhiQi.RTC_Month > temp->date.RTC_Month)
+			else if(s_CardCodeInfo->CardBaoZhiQi.RTC_Month > temp->month)
 				return My_Pass;
 			else
 				return My_Fail;
 		}
-		else if(s_CardCodeInfo->CardBaoZhiQi.RTC_Year > temp->date.RTC_Year)
+		else if(s_CardCodeInfo->CardBaoZhiQi.RTC_Year > temp->day)
 			return My_Pass;
 		else
 			return My_Fail;

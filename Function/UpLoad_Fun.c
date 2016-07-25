@@ -46,7 +46,7 @@ void UpLoadFunction(void)
 		if((count % 10) == 0)
 			UpLoadDeviceInfo();
 		
-//		count++;
+		count++;
 		vTaskDelay(1000 / portTICK_RATE_MS);
 	}
 }

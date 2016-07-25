@@ -380,8 +380,8 @@ void DspTimeAndTempData(void)
 		GetGBTimeData(time);
 		
 		/*显示时间*/
-		sprintf(buftime, "20%02d年%02d月%02d日 %02d:%02d:%02d  %2.1f xsx 度", time->date.RTC_Year, time->date.RTC_Month, time->date.RTC_Date,
-			time->time.RTC_Hours, time->time.RTC_Minutes, time->time.RTC_Seconds, GetEnviTemperature());
+		sprintf(buftime, "20%02d年%02d月%02d日 %02d:%02d:%02d  %2.1f xsx 度", time->year, time->month, time->day,
+			time->hour, time->min, time->sec, GetEnviTemperature());
 	
 		DisText(0x1000, buftime, strlen(buftime));
 	}

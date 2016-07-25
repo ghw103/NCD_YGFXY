@@ -269,12 +269,12 @@ MyState_TypeDef SaveTestData(TestData *tempdata)
 		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
 		memset(buf, 0, 100);
 
-		sprintf(buf, "0:/20%02d%02d%02d.ncd", tempdata->TestTime.date.RTC_Year, tempdata->TestTime.date.RTC_Month, tempdata->TestTime.date.RTC_Date);
-		myfile->res = f_open(&(myfile->file), buf, FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
+		myfile->res = f_open(&(myfile->file), "0:/TestData.ncd", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
 			
 		if(FR_OK == myfile->res)
 		{
-			f_lseek(&(myfile->file), f_size(&(myfile->file)));
+			myfile->size = f_size(&(myfile->file));
+			f_lseek(&(myfile->file), myfile->size);
 				
 			tempdata->crc = CalModbusCRC16Fun1(tempdata, sizeof(TestData)-2);
 			myfile->res = f_write(&(myfile->file), tempdata, sizeof(TestData), &(myfile->bw));
@@ -291,6 +291,10 @@ MyState_TypeDef SaveTestData(TestData *tempdata)
 	return statues;
 }
 
+MyState_TypeDef UpDataManegerFile(TestData *tempdata)
+{
+	
+}
 /***************************************************************************************************
 *FunctionName£∫ReadTestData
 *Description£∫∂¡»°≤‚ ‘ ˝æ›

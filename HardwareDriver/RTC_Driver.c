@@ -78,7 +78,7 @@ MyState_TypeDef My_RTC_Init(void)
 		RTC_InitStructure.RTC_HourFormat   = RTC_HourFormat_24;
 		RTC_Init(&RTC_InitStructure);
 		
-		SetTime(0, 1, 1, 1, 12, 12, 12);
+		SetTime(0, 1, 1, 12, 12, 12);
 		
 		RTC_WriteBackupRegister(RTC_BKP_DR0,0x5050);	//标记已经初始化过了
 	}
@@ -93,32 +93,23 @@ MyState_TypeDef My_RTC_Init(void)
 *Author：xsx
 *Data：2016年3月15日16:45:11
 ***************************************************************************************************/
-MyState_TypeDef SetTime(unsigned char year, unsigned char month, unsigned char day, unsigned char week, unsigned char hour,
+MyState_TypeDef SetTime(unsigned char year, unsigned char month, unsigned char day, unsigned char hour,
 	unsigned char minute, unsigned char second)
 {
-	MyTime_Def * temptime = MyMalloc(sizeof(MyTime_Def));
+	RTC_TimeTypeDef temptime;
+	RTC_DateTypeDef tempdata;
 	
-	if(temptime == NULL)
-		return My_Fail;
+	tempdata.RTC_Year = year;
+	tempdata.RTC_Month = month;
+	tempdata.RTC_Date = day;
+	temptime.RTC_Hours = hour;
+	temptime.RTC_Minutes = minute;
+	temptime.RTC_Seconds = second;
 	
-	temptime->date.RTC_Year = year;
-	temptime->date.RTC_Month = month;
-	temptime->date.RTC_Date = day;
-	temptime->date.RTC_WeekDay = week;
-	temptime->time.RTC_Hours = hour;
-	temptime->time.RTC_Minutes = minute;
-	temptime->time.RTC_Seconds = second;
-	
-	if((SUCCESS == RTC_SetDate(RTC_Format_BIN,&temptime->date))&&(SUCCESS == RTC_SetTime(RTC_Format_BIN,&temptime->time)))
-	{
-		MyFree(temptime);
+	if((SUCCESS == RTC_SetDate(RTC_Format_BIN,&tempdata))&&(SUCCESS == RTC_SetTime(RTC_Format_BIN,&temptime)))
 		return My_Pass;
-	}
 	else
-	{
-		MyFree(temptime);
 		return My_Fail;
-	}
 }
 
 

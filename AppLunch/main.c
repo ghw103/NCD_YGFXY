@@ -85,7 +85,7 @@ static void vStartTask(void * param)
 	StartvIwdgTask();
 
 	/*自检任务*/
-	StartSelfCheckTask();
+//	StartSelfCheckTask();
 	
 	/*LCD任务*/
 	StartvLcdInputTask();
@@ -97,22 +97,22 @@ static void vStartTask(void * param)
 	StartvOutModelTask();
 	
 	/*开启网络任务*/
-	StartEthernet();
+//	StartEthernet();
 	
 	/*开启wifi任务*/
 //	StartvWIFITask();
 
 	/*上传任务*/
-	StartvNormalUpLoadTask();
+//	StartvNormalUpLoadTask();
 	
 	/*开启读二维码任务*/
-	StartCodeScanTask();
+//	StartCodeScanTask();
 	
 	/*USB测试任务*/
-	StartUSBCMDTask();
+//	StartUSBCMDTask();
 	
 	/*开始采集样品ID任务*/
-	StartGetSampleIDTask();
+//	StartGetSampleIDTask();
 	
 	/*通用任务*/
 	StartvUniversalTask();

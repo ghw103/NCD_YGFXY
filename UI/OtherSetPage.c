@@ -153,7 +153,7 @@ static void SetGB_Time(char *buf, unsigned char len)
 			SendKeyCode(3);
 			return;
 		}
-		S_OtherSetPageBuffer->temptime.date.RTC_Year = temp - 2000;
+		S_OtherSetPageBuffer->temptime.year = temp - 2000;
 		
 		memset(S_OtherSetPageBuffer->buf, 0, 50);
 		memcpy(S_OtherSetPageBuffer->buf, buf+4, 2);
@@ -163,7 +163,7 @@ static void SetGB_Time(char *buf, unsigned char len)
 			SendKeyCode(3);
 			return;
 		}
-		S_OtherSetPageBuffer->temptime.date.RTC_Month = temp;
+		S_OtherSetPageBuffer->temptime.month = temp;
 		
 		memset(S_OtherSetPageBuffer->buf, 0, 50);
 		memcpy(S_OtherSetPageBuffer->buf, buf+6, 2);
@@ -173,7 +173,7 @@ static void SetGB_Time(char *buf, unsigned char len)
 			SendKeyCode(3);
 			return;
 		}
-		S_OtherSetPageBuffer->temptime.date.RTC_Date = temp;
+		S_OtherSetPageBuffer->temptime.day = temp;
 		
 		memset(S_OtherSetPageBuffer->buf, 0, 50);
 		memcpy(S_OtherSetPageBuffer->buf, buf+8, 2);
@@ -183,7 +183,7 @@ static void SetGB_Time(char *buf, unsigned char len)
 			SendKeyCode(3);
 			return;
 		}
-		S_OtherSetPageBuffer->temptime.time.RTC_Hours = temp;
+		S_OtherSetPageBuffer->temptime.hour = temp;
 		
 		memset(S_OtherSetPageBuffer->buf, 0, 50);
 		memcpy(S_OtherSetPageBuffer->buf, buf+10, 2);
@@ -193,7 +193,7 @@ static void SetGB_Time(char *buf, unsigned char len)
 			SendKeyCode(3);
 			return;
 		}
-		S_OtherSetPageBuffer->temptime.time.RTC_Minutes = temp;
+		S_OtherSetPageBuffer->temptime.min = temp;
 		
 		memset(S_OtherSetPageBuffer->buf, 0, 50);
 		memcpy(S_OtherSetPageBuffer->buf, buf+12, 2);
@@ -203,10 +203,10 @@ static void SetGB_Time(char *buf, unsigned char len)
 			SendKeyCode(3);
 			return;
 		}
-		S_OtherSetPageBuffer->temptime.time.RTC_Seconds = temp;
+		S_OtherSetPageBuffer->temptime.sec = temp;
 		
-		if(My_Pass == SetTime(S_OtherSetPageBuffer->temptime.date.RTC_Year, S_OtherSetPageBuffer->temptime.date.RTC_Month, S_OtherSetPageBuffer->temptime.date.RTC_Date, 
-			0, S_OtherSetPageBuffer->temptime.time.RTC_Hours, S_OtherSetPageBuffer->temptime.time.RTC_Minutes, S_OtherSetPageBuffer->temptime.time.RTC_Seconds)
+		if(My_Pass == SetTime(S_OtherSetPageBuffer->temptime.year, S_OtherSetPageBuffer->temptime.month, S_OtherSetPageBuffer->temptime.day, 
+			S_OtherSetPageBuffer->temptime.hour, S_OtherSetPageBuffer->temptime.min, S_OtherSetPageBuffer->temptime.sec)
 		)
 			/*ÐÞ¸Ä³É¹¦*/
 			SendKeyCode(1);
