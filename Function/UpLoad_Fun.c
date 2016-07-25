@@ -43,7 +43,11 @@ void UpLoadFunction(void)
 	static unsigned int count = 0;
 	while(1)
 	{
+<<<<<<< HEAD
 		if((Link_Up == GetGB_NCDServerLinkState()) & ((count % 10) == 0))
+=======
+		if((Link_Up == GetGB_NCDServerLinkState())&&((count % 10) == 0))
+>>>>>>> a184a2e9e634dfa3a78739b237c92c3f4624e830
 			UpLoadDeviceInfo();
 		
 		count++;
@@ -59,6 +63,7 @@ static void UpLoadDeviceInfo(void)
 	
 	deviceinfo = MyMalloc(sizeof(DeviceInfo));
 	buf = MyMalloc(2048);
+	
 	MyGetFreeHeapSize();
 	if(deviceinfo && buf)
 	{
