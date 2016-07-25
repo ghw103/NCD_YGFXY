@@ -182,7 +182,7 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	tempstr = strtok(NULL, "#");
 	if(tempstr)
 	{
-		datalen = strtol(tempstr , NULL , 0);
+		datalen = strtol(tempstr , NULL , 10);
 		basicrealbuf += (strlen(tempstr)+1);
 	}
 	else
@@ -198,7 +198,7 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	/*读取检测卡上的检测指标计算方式*/
 	tempstr = strtok(NULL , "#");
 	if(tempstr)
-		S_CardQRCodeInfo->TestType = strtol(tempstr , NULL , 0);
+		S_CardQRCodeInfo->TestType = strtol(tempstr , NULL , 10);
 	else
 		goto END;
 		
@@ -233,7 +233,7 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	/*读取检测卡T线位置*/
 	tempstr = strtok(NULL , "#");
 	if(tempstr)
-		//S_CardQRCodeInfo->ItemLocation = strtol(tempstr , NULL, 0);
+		//S_CardQRCodeInfo->ItemLocation = strtol(tempstr , NULL, 10);
 	S_CardQRCodeInfo->ItemLocation = 256;
 	else
 		goto END;
@@ -241,7 +241,7 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	/*读取检测卡标准曲线数目*/
 	tempstr = strtok(NULL , "#");
 	if(tempstr)
-		S_CardQRCodeInfo->ItemBiaoQuNum = strtol(tempstr , NULL, 0);
+		S_CardQRCodeInfo->ItemBiaoQuNum = strtol(tempstr , NULL, 10);
 	else
 		goto END;
 	
@@ -285,14 +285,14 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	/*读取检测卡反应时间*/
 	tempstr = strtok(NULL , "#");
 	if(tempstr)
-		S_CardQRCodeInfo->CardWaitTime = strtol(tempstr , NULL , 0);
+		S_CardQRCodeInfo->CardWaitTime = strtol(tempstr , NULL , 10);
 	else
 		goto END;
 		
 	/*读取检测卡C线位置*/
 	tempstr = strtok(NULL , "#");
 	if(tempstr)
-		S_CardQRCodeInfo->CLineLocation = 356;//strtol(tempstr , NULL , 0);
+		S_CardQRCodeInfo->CLineLocation = 356;//strtol(tempstr , NULL , 10);
 	else
 		goto END;
 
@@ -310,7 +310,7 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	{
 		static char year[10] ,month[10],day[10];
 		memcpy(year, tempstr, 4);
-		S_CardQRCodeInfo->CardBaoZhiQi.RTC_Year = strtol(year , NULL , 0) - 2000;
+		S_CardQRCodeInfo->CardBaoZhiQi.RTC_Year = strtol(year , NULL , 10) - 2000;
 
 		memcpy(month, &tempstr[4], 2);
 		S_CardQRCodeInfo->CardBaoZhiQi.RTC_Month = (unsigned char)strtod(month , NULL );
@@ -325,7 +325,7 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	tempstr = strtok(NULL , "#");
 	if(tempstr)
 	{
-		S_CardQRCodeInfo->CRC16 = strtol(tempstr , NULL , 0);
+		S_CardQRCodeInfo->CRC16 = strtol(tempstr , NULL , 10);
 			
 		datalen -= strlen(tempstr);
 		goto END;

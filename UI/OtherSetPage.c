@@ -147,7 +147,7 @@ static void SetGB_Time(char *buf, unsigned char len)
 		
 		memset(S_OtherSetPageBuffer->buf, 0, 50);
 		memcpy(S_OtherSetPageBuffer->buf, buf, 4);
-		temp = strtol(S_OtherSetPageBuffer->buf, NULL, 0);
+		temp = strtol(S_OtherSetPageBuffer->buf, NULL, 10);
 		if((temp < 2000)||(temp > 2100))
 		{
 			SendKeyCode(3);
@@ -157,7 +157,7 @@ static void SetGB_Time(char *buf, unsigned char len)
 		
 		memset(S_OtherSetPageBuffer->buf, 0, 50);
 		memcpy(S_OtherSetPageBuffer->buf, buf+4, 2);
-		temp = strtol(S_OtherSetPageBuffer->buf, NULL, 0);
+		temp = strtol(S_OtherSetPageBuffer->buf, NULL, 10);
 		if((temp < 1)||(temp > 12))
 		{
 			SendKeyCode(3);
@@ -167,7 +167,7 @@ static void SetGB_Time(char *buf, unsigned char len)
 		
 		memset(S_OtherSetPageBuffer->buf, 0, 50);
 		memcpy(S_OtherSetPageBuffer->buf, buf+6, 2);
-		temp = strtol(S_OtherSetPageBuffer->buf, NULL, 0);
+		temp = strtol(S_OtherSetPageBuffer->buf, NULL, 10);
 		if((temp < 1)||(temp > 31))
 		{
 			SendKeyCode(3);
@@ -177,7 +177,7 @@ static void SetGB_Time(char *buf, unsigned char len)
 		
 		memset(S_OtherSetPageBuffer->buf, 0, 50);
 		memcpy(S_OtherSetPageBuffer->buf, buf+8, 2);
-		temp = strtol(S_OtherSetPageBuffer->buf, NULL, 0);
+		temp = strtol(S_OtherSetPageBuffer->buf, NULL, 10);
 		if((temp < 0)||(temp > 23))
 		{
 			SendKeyCode(3);
@@ -187,7 +187,7 @@ static void SetGB_Time(char *buf, unsigned char len)
 		
 		memset(S_OtherSetPageBuffer->buf, 0, 50);
 		memcpy(S_OtherSetPageBuffer->buf, buf+10, 2);
-		temp = strtol(S_OtherSetPageBuffer->buf, NULL, 0);
+		temp = strtol(S_OtherSetPageBuffer->buf, NULL, 10);
 		if((temp < 0)||(temp > 59))
 		{
 			SendKeyCode(3);
@@ -197,7 +197,7 @@ static void SetGB_Time(char *buf, unsigned char len)
 		
 		memset(S_OtherSetPageBuffer->buf, 0, 50);
 		memcpy(S_OtherSetPageBuffer->buf, buf+12, 2);
-		temp = strtol(S_OtherSetPageBuffer->buf, NULL, 0);
+		temp = strtol(S_OtherSetPageBuffer->buf, NULL, 10);
 		if((temp < 0)||(temp > 59))
 		{
 			SendKeyCode(3);

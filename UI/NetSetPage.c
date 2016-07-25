@@ -209,7 +209,7 @@ static void SetTempIP(unsigned char *buf, unsigned char len)
 		{
 			memset(GB_NetSetPageBuffer->buf, 0, 100);
 			memcpy(GB_NetSetPageBuffer->buf, buf, 3);
-			temp = strtol(GB_NetSetPageBuffer->buf, NULL, 0);
+			temp = strtol(GB_NetSetPageBuffer->buf, NULL, 10);
 			if(temp > 255)
 			{
 				SendKeyCode(3);
@@ -219,7 +219,7 @@ static void SetTempIP(unsigned char *buf, unsigned char len)
 			
 			memset(GB_NetSetPageBuffer->buf, 0, 100);
 			memcpy(GB_NetSetPageBuffer->buf, buf+4, 3);
-			temp = strtol(GB_NetSetPageBuffer->buf, NULL, 0);
+			temp = strtol(GB_NetSetPageBuffer->buf, NULL, 10);
 			if(temp > 255)
 			{
 				SendKeyCode(3);
@@ -229,7 +229,7 @@ static void SetTempIP(unsigned char *buf, unsigned char len)
 			
 			memset(GB_NetSetPageBuffer->buf, 0, 100);
 			memcpy(GB_NetSetPageBuffer->buf, buf+8, 3);
-			temp = strtol(GB_NetSetPageBuffer->buf, NULL, 0);
+			temp = strtol(GB_NetSetPageBuffer->buf, NULL, 10);
 			if(temp > 255)
 			{
 				SendKeyCode(3);
@@ -239,7 +239,7 @@ static void SetTempIP(unsigned char *buf, unsigned char len)
 			
 			memset(GB_NetSetPageBuffer->buf, 0, 100);
 			memcpy(GB_NetSetPageBuffer->buf, buf+12, 3);
-			temp = strtol(GB_NetSetPageBuffer->buf, NULL, 0);
+			temp = strtol(GB_NetSetPageBuffer->buf, NULL, 10);
 			if(temp > 255)
 			{
 				SendKeyCode(3);

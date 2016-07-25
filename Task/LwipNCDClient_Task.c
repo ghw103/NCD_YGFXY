@@ -86,7 +86,7 @@ static void vLwipNCDClientTask( void *pvParameters )
 					tcp_clientconn = netconn_new(NETCONN_TCP);
 					netconn_bind(tcp_clientconn , IP_ADDR_ANY , 9601);
 					err = netconn_connect(tcp_clientconn,&server_ipaddr,80);
-					tcp_clientconn->recv_timeout = 10;											//接收超时时间10ms
+					tcp_clientconn->recv_timeout = 100;											//接收超时时间10ms
 					
 					if(err != ERR_OK)  
 					{
@@ -161,6 +161,7 @@ static void ClientRXHandle(struct netconn *pxNetCon)
 			myrecvbuf.data = MyMalloc(q->len);
 			if(myrecvbuf.data)
 			{
+				
 				/*保存数据*/
 				memcpy(myrecvbuf.data, q->payload, q->len);
 				/*保存数据长度*/

@@ -290,7 +290,7 @@ static void ProgressWifiListData(WIFI_Def *wifis, char *buf)
 							memcpy(wifis[i].encry, "AES", 3);
 					}
 					else if(j == 4)
-						wifis[i].indicator = strtol(tempbuf2 , NULL , 0);
+						wifis[i].indicator = strtol(tempbuf2 , NULL , 10);
 						
 					if(j == 4)
 					{
@@ -416,7 +416,7 @@ unsigned char GetWifiIndicator(void)
 					s = strtok(NULL, ",");
 					if(s)
 					{
-						ind = strtol(s, NULL, 0);
+						ind = strtol(s, NULL, 10);
 						if(ind == 0)
 							ind = 1;
 					}
