@@ -129,7 +129,7 @@ static void ClientTXHandle(struct netconn *pxNetCon)
 
 	memset(&sendbuf, 0, sizeof(mynetbuf));
 	
-	if(pdPASS == ReceiveDataFromQueue(GetGBUserClientTXQueue(), GetGBUserClientTXMutex(), &sendbuf, 1, 10*portTICK_RATE_MS))
+	if(pdPASS == ReceiveDataFromQueue(GetGBUserClientTXQueue(), NULL, &sendbuf, 1, 10*portTICK_RATE_MS))
 	{
 		netconn_write( pxNetCon, sendbuf.data, sendbuf.datalen, NETCONN_COPY );
 		
@@ -150,30 +150,30 @@ static void ClientRXHandle(struct netconn *pxNetCon)
 	err_t err;
 	struct netbuf *recvbuf;
 	struct pbuf *q;
-	
+	unsigned char *myp = NULL;
 	static mynetbuf myrecvbuf;
 
 	err = netconn_recv(pxNetCon,&recvbuf);
 	if(err == ERR_OK)
 	{
-		for(q=recvbuf->p; q!=NULL; q=q->next)
+		q=recvbuf->p;
+		myrecvbuf.data = MyMalloc(q->tot_len);
+		myrecvbuf.datalen = q->tot_len;
+		
+		if(myrecvbuf.data)
 		{
-			/*申请内存*/
-			myrecvbuf.data = MyMalloc(q->len);
-			if(myrecvbuf.data)
+			myp = myrecvbuf.data;
+			
+			for(; q!=NULL; q=q->next)
 			{
-				memset(myrecvbuf.data, 0, q->len);
-				
-				/*保存数据*/
-				memcpy(myrecvbuf.data, q->payload, q->len);
-				/*保存数据长度*/
-				myrecvbuf.datalen = q->len;
-				
-				/*正常*/
-				if(pdPASS != SendDataToQueue(GetGBUserClientRXQueue(), GetGBUserClientRXMutex(), &myrecvbuf, 1, 10*portTICK_RATE_MS, NULL))
-				//if(pdPASS != SendDataToQueue(GetGBUserClientTXQueue(), GetGBUserClientTXMutex(), &myrecvbuf, 1, 10*portTICK_RATE_MS, NULL))
-					MyFree(myrecvbuf.data);
+				memcpy(myp, q->payload, q->len);
+				myp += q->len;
 			}
+			
+			/*正常*/
+			if(pdPASS != SendDataToQueue(GetGBUserClientRXQueue(), NULL, &myrecvbuf, 1, 10 / portTICK_RATE_MS, NULL))
+			//if(pdPASS != SendDataToQueue(GetGBUserClientTXQueue(), GetGBUserClientTXMutex(), &myrecvbuf, 1, 10*portTICK_RATE_MS, NULL))
+				MyFree(myrecvbuf.data);
 		}
 		
 		netbuf_delete(recvbuf);

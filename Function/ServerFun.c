@@ -47,7 +47,7 @@ void SendDataToNCDServer(char *buf, unsigned short len)
 		memcpy(mybuf.data, buf, len);
 		mybuf.datalen = len;
 		
-		if(pdPASS != SendDataToQueue(GetGBNCDClientTXQueue(), GetGBNCDClientTXMutex(), &mybuf, 1, 10 / portTICK_RATE_MS, NULL))
+		if(pdPASS != SendDataToQueue(GetGBNCDClientTXQueue(), NULL, &mybuf, 1, 10 / portTICK_RATE_MS, NULL))
 			MyFree(mybuf.data);
 	}
 }
@@ -57,7 +57,7 @@ MyState_TypeDef RecvDataFromNCDServer(char *buf)
 	
 	if(buf)
 	{
-		if(pdPASS == ReceiveDataFromQueue(GetGBNCDClientRXQueue(), GetGBNCDClientRXMutex(), &mybuf, 1, 100/portTICK_RATE_MS))
+		if(pdPASS == ReceiveDataFromQueue(GetGBNCDClientRXQueue(), NULL, &mybuf, 1, 100/portTICK_RATE_MS))
 		{
 			memcpy(buf, mybuf.data, mybuf.datalen);
 			MyFree(mybuf.data);
@@ -79,7 +79,7 @@ void SendDataToUserServer(char *buf, unsigned short len)
 		memcpy(mybuf.data, buf, len);
 		mybuf.datalen = len;
 		
-		if(pdPASS != SendDataToQueue(GetGBUserClientTXQueue(), GetGBUserClientTXMutex(), &mybuf, 1, 10 / portTICK_RATE_MS, NULL))
+		if(pdPASS != SendDataToQueue(GetGBUserClientTXQueue(), NULL, &mybuf, 1, 10 / portTICK_RATE_MS, NULL))
 			MyFree(mybuf.data);
 	}
 }
@@ -104,7 +104,6 @@ MyState_TypeDef UpLoadData(char *URL, void * buf, unsigned short buflen)
 		memset(data, 0, buflen+1024);
 		sprintf(data, "POST %s HTTP/1.1\nHost: 123.57.94.39\nConnection: keep-alive\nContent-Length: %d\nContent-Type:application/x-www-form-urlencoded;charset=GBK\nReferer: %s\n\n%s", URL, buflen, URL, (char *)buf);
 		SendDataToNCDServer(data, strlen(data));
-		SendDataToUserServer(data, strlen(data));
 		
 		vTaskDelay(100 / portTICK_RATE_MS);
 		/*如果创建成功*/
