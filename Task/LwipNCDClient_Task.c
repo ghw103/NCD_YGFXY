@@ -168,7 +168,7 @@ static void ClientRXHandle(struct netconn *pxNetCon)
 				myrecvbuf.datalen = q->len;
 				
 				/*Õý³£*/
-				if(pdPASS != SendDataToQueue(GetGBNCDClientRXQueue(), GetGBNCDClientRXMutex(), &myrecvbuf, 1, 10*portTICK_RATE_MS, NULL))
+				if(pdPASS != SendDataToQueue(GetGBNCDClientRXQueue(), GetGBNCDClientRXMutex(), &myrecvbuf, 1, portMAX_DELAY, NULL))
 				//if(pdPASS != SendDataToQueue(GetGBUserClientTXQueue(), GetGBUserClientTXMutex(), &myrecvbuf, 1, 10*portTICK_RATE_MS, NULL))
 					MyFree(myrecvbuf.data);
 				//SendDataToQueue(GetGBNCDClientTXQueue(), GetGBNCDClientTXMutex(), &myrecvbuf, 1, 10*portTICK_RATE_MS, NULL)

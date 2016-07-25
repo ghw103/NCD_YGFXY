@@ -53,25 +53,16 @@ void SendDataToNCDServer(char *buf, unsigned short len)
 }
 MyState_TypeDef RecvDataFromNCDServer(char *buf)
 {
-	static unsigned char num = 0;
 	mynetbuf mybuf;
 	
 	if(buf)
 	{
-		num = 0;
-		while(1)
+		if(pdPASS == ReceiveDataFromQueue(GetGBNCDClientRXQueue(), GetGBNCDClientRXMutex(), &mybuf, 1, 100/portTICK_RATE_MS))
 		{
-			if(pdPASS == ReceiveDataFromQueue(GetGBNCDClientRXQueue(), GetGBNCDClientRXMutex(), &mybuf, 1, 1000/portTICK_RATE_MS))
-			{
-				memcpy(buf, mybuf.data, mybuf.datalen);
-				MyFree(mybuf.data);
+			memcpy(buf, mybuf.data, mybuf.datalen);
+			MyFree(mybuf.data);
 				
-				return My_Pass;
-			}
-			
-			num++;
-			if(num > 10)
-				break;
+			return My_Pass;
 		}
 	}
 	
@@ -114,6 +105,8 @@ MyState_TypeDef UpLoadData(char *URL, void * buf, unsigned short buflen)
 		sprintf(data, "POST %s HTTP/1.1\nHost: 123.57.94.39\nConnection: keep-alive\nContent-Length: %d\nContent-Type:application/x-www-form-urlencoded;charset=GBK\nReferer: %s\n\n%s", URL, buflen, URL, (char *)buf);
 		SendDataToNCDServer(data, strlen(data));
 		SendDataToUserServer(data, strlen(data));
+		
+		vTaskDelay(100 / portTICK_RATE_MS);
 		/*如果创建成功*/
 		memset(data, 0, buflen+1024);
 		if((My_Pass == RecvDataFromNCDServer(data)) && (strstr(data, "CREATED")))
