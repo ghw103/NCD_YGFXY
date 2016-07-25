@@ -43,10 +43,10 @@ void UpLoadFunction(void)
 	static unsigned int count = 0;
 	while(1)
 	{
-		if((count % 10) == 0)
+		if((Link_Up == GetGB_NCDServerLinkState())&&((count % 10) == 0))
 			UpLoadDeviceInfo();
 		
-//		count++;
+		count++;
 		vTaskDelay(1000 / portTICK_RATE_MS);
 	}
 }
@@ -59,6 +59,7 @@ static void UpLoadDeviceInfo(void)
 	
 	deviceinfo = MyMalloc(sizeof(DeviceInfo));
 	buf = MyMalloc(2048);
+	
 	MyGetFreeHeapSize();
 	if(deviceinfo && buf)
 	{
