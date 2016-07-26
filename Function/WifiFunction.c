@@ -85,8 +85,6 @@ static MyState_TypeDef ComWithWIFI(char * cmd, const char *strcmp, char *buf, un
 				
 				if(rxcount > 0)
 				{
-					//USB_PutStr(buf, 10);
-					//SendDataToNCDServer(buf, rxcount);
 					if(strcmp)
 					{
 						if(strstr(buf, strcmp))
@@ -501,7 +499,7 @@ MyState_TypeDef SendDataBySocketA(mynetbuf *netbuf)
 		sprintf(txbuf, "%s\r", (char *)(netbuf->data));
 		MyFree(netbuf->data);
 		
-		if(My_Pass == ComWithWIFI(txbuf, NULL, txbuf, 4000, 500 * portTICK_RATE_MS))
+		if(My_Pass == ComWithWIFI(txbuf, NULL, txbuf, 4000, 2000 * portTICK_RATE_MS))
 		{
 			netbuf->datalen = strlen(txbuf);
 			netbuf->data = MyMalloc(netbuf->datalen+10);

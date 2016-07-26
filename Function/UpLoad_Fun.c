@@ -43,11 +43,7 @@ void UpLoadFunction(void)
 	static unsigned int count = 0;
 	while(1)
 	{
-<<<<<<< HEAD
-		if((Link_Up == GetGB_NCDServerLinkState()) & ((count % 10) == 0))
-=======
 		if((Link_Up == GetGB_NCDServerLinkState())&&((count % 10) == 0))
->>>>>>> a184a2e9e634dfa3a78739b237c92c3f4624e830
 			UpLoadDeviceInfo();
 		
 		count++;
@@ -71,8 +67,9 @@ static void UpLoadDeviceInfo(void)
 			(deviceinfo->isfresh == 1))
 		{
 			memset(buf, 0, 2048);
-			sprintf(buf, "id1=%s&units=%s&manufacture=%s&manufacturetel=%s&status=1&responsibel_man=%s&use_state=0&maintain=1",
-				deviceinfo->deviceid, deviceinfo->deviceunit, deviceinfo->devicemaker, deviceinfo->devicemakerphone, deviceinfo->deviceuser.user_name);
+			
+			sprintf(buf, "id1=%s&name=荧光免疫分析仪&manufacture=武汉纽康度生物科技股份有限公司&tel=1234567890&status=在线&address=%s&needmainten=否",
+				deviceinfo->deviceid, deviceinfo->deviceunit);
 
 			if(My_Pass == UpLoadData("http://123.57.94.39/api/myFluorescenceInfo/", buf, strlen(buf)))
 			{

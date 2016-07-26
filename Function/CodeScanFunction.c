@@ -234,7 +234,7 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	tempstr = strtok(NULL , "#");
 	if(tempstr)
 		//S_CardQRCodeInfo->ItemLocation = strtol(tempstr , NULL, 10);
-	S_CardQRCodeInfo->ItemLocation = 256;
+	S_CardQRCodeInfo->ItemLocation = 236;
 	else
 		goto END;
 		
@@ -292,7 +292,7 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	/*¶ÁÈ¡¼ì²â¿¨CÏßÎ»ÖÃ*/
 	tempstr = strtok(NULL , "#");
 	if(tempstr)
-		S_CardQRCodeInfo->CLineLocation = 356;//strtol(tempstr , NULL , 10);
+		S_CardQRCodeInfo->CLineLocation = 326;//strtol(tempstr , NULL , 10);
 	else
 		goto END;
 

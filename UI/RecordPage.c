@@ -220,7 +220,7 @@ static MyState_TypeDef ShowRecord(unsigned char pageindex)
 	if(GB_RecordPageBuffer)
 	{
 		//¶ÁÈ¡Êý¾Ý
-		if(My_Pass == ReadTestData(GB_RecordPageBuffer->filename, GB_RecordPageBuffer->testdata, pageindex))
+/*		if(My_Pass == ReadTestData(GB_RecordPageBuffer->filename, GB_RecordPageBuffer->testdata, pageindex))
 		{
 			for(GB_RecordPageBuffer->tempvalue2=0; GB_RecordPageBuffer->tempvalue2<DataNumInPage; GB_RecordPageBuffer->tempvalue2++)
 			{
@@ -240,7 +240,7 @@ static MyState_TypeDef ShowRecord(unsigned char pageindex)
 					ClearText(0x28e0+(GB_RecordPageBuffer->tempvalue2)*0x30, 100);
 			}
 			return My_Pass;
-		}
+		}*/
 	}
 	
 	return My_Fail;

@@ -155,7 +155,7 @@ static void SocketAHandle(void)
 		
 		if(pdPASS != SendDataToQueue(GetGBUserClientTXQueue(), GetGBUserClientTXMutex(), &S_MyNetBuf, 1, 50*portTICK_RATE_MS, NULL))
 			MyFree(S_MyNetBuf.data);
-		//MyFree(S_MyNetBuf.data);
+//		MyFree(S_MyNetBuf.data);
 	}
 	
 /*	if(My_Pass == RevDataBySocketA(&S_MyNetBuf))

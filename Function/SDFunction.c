@@ -274,12 +274,19 @@ MyState_TypeDef SaveTestData(TestData *tempdata)
 		if(FR_OK == myfile->res)
 		{
 			myfile->size = f_size(&(myfile->file));
-			f_lseek(&(myfile->file), myfile->size);
+			if(myfile->size == 0)
+				myfile->res = f_write(&(myfile->file), &(myfile->size), sizeof(unsigned int), &(myfile->bw));
+			
+			myfile->size = f_size(&(myfile->file));
+			if(myfile->size < (MaxTestDataSaveNum*sizeof(TestData)))
+			{
+				f_lseek(&(myfile->file), myfile->size);
 				
-			tempdata->crc = CalModbusCRC16Fun1(tempdata, sizeof(TestData)-2);
-			myfile->res = f_write(&(myfile->file), tempdata, sizeof(TestData), &(myfile->bw));
-			if((FR_OK == myfile->res)&&(myfile->bw == sizeof(TestData)))
-				statues = My_Pass;
+				tempdata->crc = CalModbusCRC16Fun1(tempdata, sizeof(TestData)-2);
+				myfile->res = f_write(&(myfile->file), tempdata, sizeof(TestData), &(myfile->bw));
+				if((FR_OK == myfile->res)&&(myfile->bw == sizeof(TestData)))
+					statues = My_Pass;
+			}
 				
 			f_close(&(myfile->file));
 		}
@@ -291,21 +298,18 @@ MyState_TypeDef SaveTestData(TestData *tempdata)
 	return statues;
 }
 
-MyState_TypeDef UpDataManegerFile(TestData *tempdata)
-{
-	
-}
 /***************************************************************************************************
 *FunctionName：ReadTestData
 *Description：读取测试数据
 *Input：filename -- 待读取数据的文件名
-*		tempdata -- 存放地址，此地址至少包含一页数据的空间
-*		index -- 从第几个数据开始读取连续的一页数据
+*		tempdata -- 存放地址，此地址需能存放readnum个数据的空间
+*		index --  读取数据的索引（0开始）
+*		readnum -- 读取的个数
 *Output：None
 *Author：xsx
 *Data：
 ***************************************************************************************************/
-MyState_TypeDef ReadTestData(const char * filename, TestData *tempdata, unsigned short index)
+MyState_TypeDef ReadTestData(TestData *tempdata, unsigned short index, unsigned char readnum)
 {
 	FatfsFileInfo_Def * myfile = NULL;
 	MyState_TypeDef statues = My_Fail;
@@ -315,7 +319,7 @@ MyState_TypeDef ReadTestData(const char * filename, TestData *tempdata, unsigned
 	
 	if(myfile)
 	{
-		myfile->res = f_open(&(myfile->file), filename, FA_READ);
+		myfile->res = f_open(&(myfile->file), "0:/TestData.ncd", FA_READ);
 		if(FR_OK == myfile->res)
 		{
 			myfile->size = f_size(&(myfile->file));
@@ -323,14 +327,16 @@ MyState_TypeDef ReadTestData(const char * filename, TestData *tempdata, unsigned
 			/*如果读取到末尾*/
 			if(index*DataNumInPage*sizeof(TestData) < myfile->size)
 			{
-				myfile->res = f_lseek(&(myfile->file), index*DataNumInPage*sizeof(TestData));
+				/*防止数据量大后溢出*/
+				
+				myfile->res = f_lseek(&(myfile->file), index*sizeof(TestData));
 				if(FR_OK == myfile->res)
 				{
 					memset(tempdata, 0, sizeof(TestData)*DataNumInPage);
-					for(i=0; i<DataNumInPage; i++)
+					for(i=0; i<readnum; i++)
 					{
 						myfile->res = f_read(&(myfile->file), tempdata, sizeof(TestData), &(myfile->br));
-						if((FR_OK == myfile->res) && (sizeof(TestData) == myfile->br) && (tempdata->crc == CalModbusCRC16Fun1(tempdata, sizeof(TestData)-2)))
+						if((FR_OK == myfile->res) && (sizeof(TestData) == myfile->br))
 							tempdata++;
 						else
 							break;
@@ -349,6 +355,19 @@ MyState_TypeDef ReadTestData(const char * filename, TestData *tempdata, unsigned
 	return statues;
 }
 
+/***************************************************************************************************
+*FunctionName：写入一个未上传数据的id
+*Description：
+*Input：None
+*Output：None
+*Author：xsx
+*Data：
+***************************************************************************************************/
+MyState_TypeDef WriteIntoOneId(unsigned int num)
+{
+
+	return My_Pass;
+}
 
 /***************************************************************************************************/
 /***************************************************************************************************/
