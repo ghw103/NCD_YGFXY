@@ -926,9 +926,9 @@
               <FilePath>..\COM\MyQueue.c</FilePath>
             </File>
             <File>
-              <FileName>malloc.c</FileName>
+              <FileName>MyMem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\COM\malloc.c</FilePath>
+              <FilePath>..\COM\MyMem.c</FilePath>
             </File>
           </Files>
         </Group>

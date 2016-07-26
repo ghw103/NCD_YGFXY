@@ -8,7 +8,7 @@
 /*-----------------------------------------------------------------------*/
 
 #include "diskio.h"		/* FatFs lower layer API */
-#include "MMC_SD.h"
+#include "SD_SPI_Driver.h"
 
 
 
@@ -33,24 +33,16 @@ DSTATUS disk_initialize (
 	BYTE pdrv				/* Physical drive nmuber to identify the drive */
 )
 {
-	u8 res=0;	    
-	switch(pdrv)
+	if (pdrv) return STA_NOINIT;		/* Supports only single drive */
+	
+	if (SD_Init())
 	{
-		case 0://SD?
-			res = SD_Initialize();//SD_Initialize() 
-		 	if(res)//STM32 SPI?bug,?sd??????????????????,????SPI????
-			{
-				SD_SPI_ReadWriteByte(0xff);
-			}
-  			break;
-		case 1:
-			res=1;
- 			break;
-		default:
-			res=1; 
-	}		 
-	if(res)return  STA_NOINIT;
-	else return 0; //?????
+		return STA_NOINIT;
+	}
+	else
+	{
+		return RES_OK;
+	}
 }
 
 
@@ -66,26 +58,19 @@ DRESULT disk_read (
 	UINT count		/* Number of sectors to read */
 )
 {
-	u8 res=0; 
-    if (!count)return RES_PARERR;//count????0,????????		 	 
-	switch(pdrv)
+	if (SD_CardInfo.Type != SD_TYPE_SDHC) // SDHC 以 BLOCK 为单位，其他的以 BYTE 为单位
 	{
-		case 0://SD?
-			res=SD_ReadDisk(buff,sector,count);	 
-		 	if(res)//STM32 SPI?bug,?sd??????????????????,????SPI????
-			{
-				SD_SPI_ReadWriteByte(0xff);
-			}
-			break;
-		case 1:
-			res=1;
-			break;
-		default:
-			res=1; 
+		sector *= SD_BLOCK_SIZE;
 	}
-   //?????,?SPI_SD_driver.c??????ff.c????
-    if(res==0x00)return RES_OK;	 
-    else return RES_ERROR;
+	if (count == 1)
+	{
+		if (SD_ReadBlock(buff, sector, SD_BLOCK_SIZE)) return RES_ERROR;
+	}
+	else
+	{
+		if (SD_ReadMultiBlocks(buff, sector, SD_BLOCK_SIZE, count)) return RES_ERROR;
+	}
+	return RES_OK;
 }
 
 
@@ -101,22 +86,19 @@ DRESULT disk_write (
 	UINT count			/* Number of sectors to write */
 )
 {
-	u8 res=0;  
-    if (!count)return RES_PARERR;//count????0,????????		 	 
-	switch(pdrv)
+	if (SD_CardInfo.Type != SD_TYPE_SDHC) // SDHC 以 BLOCK 为单位，其他的以 BYTE 为单位
 	{
-		case 0://SD?
-			res=SD_WriteDisk((u8*)buff,sector,count);
-			break;
-		case 1:
-			res=1;
-			break;
-		default:
-			res=1; 
+		sector *= SD_BLOCK_SIZE;
 	}
-    //?????,?SPI_SD_driver.c??????ff.c????
-    if(res == 0x00)return RES_OK;	 
-    else return RES_ERROR;	
+	if (count == 1)
+	{
+		if (SD_WriteBlock((uint8_t *)buff, sector, SD_BLOCK_SIZE)) return RES_ERROR;
+	}
+	else
+	{
+		if (SD_WriteMultiBlocks((uint8_t *)buff, sector, SD_BLOCK_SIZE, count)) return RES_ERROR;
+	}
+	return RES_OK;
 }
 
 
@@ -131,7 +113,42 @@ DRESULT disk_ioctl (
 	void *buff		/* Buffer to send/receive control data */
 )
 {
-	return RES_OK;
+	DRESULT res = RES_OK;
+	switch (cmd)
+	{
+		#if !_FS_READONLY
+		case CTRL_SYNC:
+			if (SD_Assert())
+			{
+				res = RES_ERROR;
+			}
+			else
+			{
+				res = RES_OK;
+				SD_DeAssert();
+			}
+			break;
+		#endif
+		#if _USE_MKFS && !_FS_READONLY
+		case GET_SECTOR_COUNT:
+			*(DWORD*)buff = (DWORD)((SD_CardInfo.Capacity) >> 9);
+			//SD_TYPE_MMC3 / SD_TYPE_SDV1 算法不一样
+			res = RES_OK;
+			break;
+		case GET_BLOCK_SIZE:
+			*(DWORD*)buff = SD_CardInfo.BlockSize;
+			res = RES_OK;
+			break;
+		#endif
+		#if _MAX_SS != _MIN_SS
+		case GET_SECTOR_SIZE:
+			res = RES_OK;
+			break;
+		#endif
+		default:
+			res = RES_PARERR;
+	}
+	return res;
 }
 
 DWORD get_fattime (void)

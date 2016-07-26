@@ -131,6 +131,8 @@ void MySystemBSPInit(void)
 	TM1623_Init();						//排队模块初始化
 	delay_ms(50);
 	
+	FatfsInit();						//文件系统初始化
+	
 	IWDG_Init(3, 2000);					//看门狗初始化,超时时间2S
 	delay_ms(50);
 }
@@ -144,8 +146,7 @@ void MySystemBSPInit(void)
 *Data：2016年6月1日14:03:27
 ***************************************************************************************************/
 void MySystemDataInit(void)
-{
-	FatfsInit();						//文件系统初始化
+{	
 	
 	CreateNetQueue();					//网络数据初始化
 	
