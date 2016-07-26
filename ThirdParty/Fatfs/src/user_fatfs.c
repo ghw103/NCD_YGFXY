@@ -29,13 +29,14 @@ void testdat(void)
 {
 	static FIL file;
 	unsigned int bw = 0;
+	FRESULT res;
 	
-	f_open(&file, "0:/xsx.txt", FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
+	res = f_open(&file, "0:/xsx.txt", FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
 	
-	f_write(&file, "12345678901234567890", 20, &bw);
+	res = f_write(&file, "12345678901234567890", 20, &bw);
 	
-	f_lseek(&file, 10);
+	res = f_lseek(&file, 10);
 	
-	f_write(&file, "abc", 3, &bw);
+	res = f_write(&file, "abc", 3, &bw);
 	f_close(&file);
 }

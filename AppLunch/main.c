@@ -24,7 +24,7 @@
 #include	"WIFI_Task.h"
 #include	"PlaySong_Task.h"
 #include	"NormalUpLoad_Task.h"
-
+#include	"user_fatfs.h"
 #include	"WelcomePage.h"
 #include	"UI_Data.h"
 
@@ -80,7 +80,7 @@ static void vStartTask(void * param)
 {
 	/*加载系统数据*/
 	MySystemDataInit();
-	
+
 	/*开启看门狗任务*/
 	StartvIwdgTask();
 
