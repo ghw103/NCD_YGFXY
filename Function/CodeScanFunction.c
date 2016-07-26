@@ -372,7 +372,7 @@ static MyState_TypeDef CheckCardIsTimeOut(CardCodeInfo * s_CardCodeInfo)
 			else
 				return My_Fail;
 		}
-		else if(s_CardCodeInfo->CardBaoZhiQi.RTC_Year > temp->day)
+		else if(s_CardCodeInfo->CardBaoZhiQi.RTC_Year > temp->year)
 			return My_Pass;
 		else
 			return My_Fail;

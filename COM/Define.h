@@ -34,6 +34,16 @@ typedef struct
 	FSIZE_t size;
 }FatfsDirInfo_Def; 
 
+#pragma pack(1)
+typedef struct
+{
+	unsigned char year;
+	unsigned char month;
+	unsigned char day;
+	unsigned int num;
+	unsigned int index;
+}TestDateInfo_Def;
+#pragma pack()
 /**********************************************************************************************************/
 /**********************************************************************************************************/
 
@@ -64,12 +74,12 @@ typedef enum
 #pragma pack(1)
 typedef struct
 {
-	char year;
-	char month;
-	char day;
-	char hour;
-	char min;
-	char sec;
+	unsigned char year;
+	unsigned char month;
+	unsigned char day;
+	unsigned char hour;
+	unsigned char min;
+	unsigned char sec;
 }MyTime_Def;
 #pragma pack()
 /**********************************************************************************************************/

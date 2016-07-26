@@ -16,7 +16,8 @@ void ReadUserData(User_Type * user);
 
 /*²âÊÔÊı¾İ*/
 MyState_TypeDef SaveTestData(TestData *tempdata);
-MyState_TypeDef ReadTestData(TestData *tempdata, unsigned short index, unsigned char readnum);
+MyState_TypeDef ReadTestData(TestData *tempdata, unsigned char *realreadnum, unsigned int index, unsigned char readnum);
+MyState_TypeDef SaveDateInfo(TestData *tempdata, unsigned int index);
 
 /*ipÉèÖÃ*/
 MyState_TypeDef SaveNetData(NetData * netdata);

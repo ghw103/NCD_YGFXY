@@ -62,27 +62,35 @@
 MyState_TypeDef CheckSDFunction(void)
 {
 	FatfsFileInfo_Def * myfile = NULL;
+	unsigned char *buf = NULL;
 	MyState_TypeDef statues = My_Fail;
 	
 	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
-
-	if(myfile)
+	buf = MyMalloc(100);
+	
+	if(myfile && buf)
 	{
 		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
+		memset(buf, 0, 100);
 
-		myfile->res = f_open(&(myfile->file), "0:/SDCheck.ncd", FA_READ);
+		myfile->res = f_open(&(myfile->file), "0:/SDCheck.ncd", FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
 			
 		if(FR_OK == myfile->res)
 		{
-			myfile->size = f_size(&(myfile->file));
-			
-			if(myfile->size == 4078)
-				statues = My_Pass;
+			myfile->res = f_write(&(myfile->file), "0123456789", 10, &(myfile->bw));
+			if(FR_OK == myfile->res)
+			{
+				f_lseek(&(myfile->file), 0);
+				myfile->res = f_read(&(myfile->file), buf, 10, &(myfile->br));
+				if((FR_OK == myfile->res) && (0 == memcmp(buf, "0123456789", 10)))
+					statues = My_Pass;
+			}
 
 			f_close(&(myfile->file));
 		}
 	}
 	
+	MyFree(buf);
 	MyFree(myfile);
 	
 	return statues;
@@ -258,16 +266,13 @@ void ReadUserData(User_Type * user)
 MyState_TypeDef SaveTestData(TestData *tempdata)
 {
 	FatfsFileInfo_Def * myfile = NULL;
-	char *buf = NULL;
 	MyState_TypeDef statues = My_Fail;
 	
 	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
-	buf = MyMalloc(100);
 	
-	if(myfile && buf)
+	if(myfile)
 	{
 		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
-		memset(buf, 0, 100);
 
 		myfile->res = f_open(&(myfile->file), "0:/TestData.ncd", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
 			
@@ -278,14 +283,16 @@ MyState_TypeDef SaveTestData(TestData *tempdata)
 				myfile->res = f_write(&(myfile->file), &(myfile->size), sizeof(unsigned int), &(myfile->bw));
 			
 			myfile->size = f_size(&(myfile->file));
-			if(myfile->size < (MaxTestDataSaveNum*sizeof(TestData)))
-			{
-				f_lseek(&(myfile->file), myfile->size);
+			
+			f_lseek(&(myfile->file), myfile->size);
 				
-				tempdata->crc = CalModbusCRC16Fun1(tempdata, sizeof(TestData)-2);
-				myfile->res = f_write(&(myfile->file), tempdata, sizeof(TestData), &(myfile->bw));
-				if((FR_OK == myfile->res)&&(myfile->bw == sizeof(TestData)))
-					statues = My_Pass;
+			tempdata->crc = CalModbusCRC16Fun1(tempdata, sizeof(TestData)-2);
+			myfile->res = f_write(&(myfile->file), tempdata, sizeof(TestData), &(myfile->bw));
+			if(FR_OK == myfile->res)
+			{
+				myfile->size = f_size(&(myfile->file));
+				SaveDateInfo(tempdata, myfile->size/sizeof(TestData));
+				statues = My_Pass;
 			}
 				
 			f_close(&(myfile->file));
@@ -293,7 +300,6 @@ MyState_TypeDef SaveTestData(TestData *tempdata)
 	}
 	
 	MyFree(myfile);
-	MyFree(buf);
 	
 	return statues;
 }
@@ -309,7 +315,7 @@ MyState_TypeDef SaveTestData(TestData *tempdata)
 *Author：xsx
 *Data：
 ***************************************************************************************************/
-MyState_TypeDef ReadTestData(TestData *tempdata, unsigned short index, unsigned char readnum)
+MyState_TypeDef ReadTestData(TestData *tempdata, unsigned char *realreadnum, unsigned int index, unsigned char readnum)
 {
 	FatfsFileInfo_Def * myfile = NULL;
 	MyState_TypeDef statues = My_Fail;
@@ -324,26 +330,21 @@ MyState_TypeDef ReadTestData(TestData *tempdata, unsigned short index, unsigned 
 		{
 			myfile->size = f_size(&(myfile->file));
 			
-			/*如果读取到末尾*/
-			if(index*DataNumInPage*sizeof(TestData) < myfile->size)
+			myfile->res = f_lseek(&(myfile->file), index*sizeof(TestData)+4);
+			if(FR_OK == myfile->res)
 			{
-				/*防止数据量大后溢出*/
-				
-				myfile->res = f_lseek(&(myfile->file), index*sizeof(TestData));
-				if(FR_OK == myfile->res)
+				for(i=0; i<readnum; i++)
 				{
-					memset(tempdata, 0, sizeof(TestData)*DataNumInPage);
-					for(i=0; i<readnum; i++)
-					{
-						myfile->res = f_read(&(myfile->file), tempdata, sizeof(TestData), &(myfile->br));
-						if((FR_OK == myfile->res) && (sizeof(TestData) == myfile->br))
-							tempdata++;
-						else
-							break;
-					}
-					if(i > 0)
-						statues = My_Pass;
+					myfile->res = f_read(&(myfile->file), tempdata, sizeof(TestData), &(myfile->br));
+					if((FR_OK == myfile->res) && (sizeof(TestData) == myfile->br))
+						tempdata++;
+					else
+						break;
 				}
+				if(i > 0)
+					statues = My_Pass;
+				
+				*realreadnum = i;
 			}
 			
 			f_close(&(myfile->file));
@@ -363,10 +364,55 @@ MyState_TypeDef ReadTestData(TestData *tempdata, unsigned short index, unsigned 
 *Author：xsx
 *Data：
 ***************************************************************************************************/
-MyState_TypeDef WriteIntoOneId(unsigned int num)
+MyState_TypeDef SaveDateInfo(TestData *tempdata, unsigned int index)
 {
+	FatfsFileInfo_Def * myfile = NULL;
+	MyState_TypeDef statues = My_Fail;
+	TestDateInfo_Def *my_TestDateInfo = NULL;
+	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
+	
+	if(myfile)
+	{
+		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
 
-	return My_Pass;
+		myfile->res = f_open(&(myfile->file), "0:/TestDateInfo.ncd", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
+			
+		if(FR_OK == myfile->res)
+		{
+			myfile->size = f_size(&(myfile->file));
+			
+			my_TestDateInfo = MyMalloc(sizeof(TestDateInfo_Def));
+			if(my_TestDateInfo)
+			{
+				myfile->res = f_read(&(myfile->file), my_TestDateInfo, sizeof(TestDateInfo_Def), &(myfile->br));
+				if(FR_OK == myfile->res)
+				{
+					if(0 == memcmp(&(my_TestDateInfo->year), &(tempdata->TestTime.year), 3))
+					{
+						my_TestDateInfo->num += 1;
+					}
+					else
+					{
+						my_TestDateInfo->year = tempdata->TestTime.year;
+						my_TestDateInfo->month = tempdata->TestTime.month;
+						my_TestDateInfo->day = tempdata->TestTime.day;
+						my_TestDateInfo->index = index;
+						my_TestDateInfo->num = 1;
+					}
+					
+					myfile->res = f_write(&(myfile->file), my_TestDateInfo, sizeof(TestDateInfo_Def), &(myfile->bw));
+					if(FR_OK == myfile->res)
+						statues = My_Pass;
+				}
+			}
+			MyFree(my_TestDateInfo);
+			f_close(&(myfile->file));
+		}
+	}
+	
+	MyFree(myfile);
+	
+	return statues;
 }
 
 /***************************************************************************************************/
