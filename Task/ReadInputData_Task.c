@@ -9,8 +9,9 @@
 /******************************************头文件***************************************************/
 /***************************************************************************************************/
 
-#include	"LcdInput_Task.h"
+#include	"ReadInputData_Task.h"
 #include	"GetLCDInputFun.h"
+#include	"GetSampleIDFun.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -21,13 +22,13 @@
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
 
-#define LcdInputTask_PRIORITY			2			//看门狗任务优先级
-const char * LcdInputTaskName = "vLcdInputTask";		//看门狗任务名
+#define ReadInDataTask_PRIORITY			2			//看门狗任务优先级
+const char * ReadInDataTaskName = "vReadInDataTask";		//看门狗任务名
 /***************************************************************************************************/
 /**************************************局部函数声明*************************************************/
 /***************************************************************************************************/
 
-static void vLcdInputTask( void *pvParameters );	//看门狗任务
+static void vReadInDataTask( void *pvParameters );	//看门狗任务
 
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -44,9 +45,9 @@ static void vLcdInputTask( void *pvParameters );	//看门狗任务
 *Author：xsx
 *Data：2015年8月26日16:58:13
 ***************************************************************************************************/
-void StartvLcdInputTask(void)
+void StartvReadInDataTask(void)
 {
-	xTaskCreate( vLcdInputTask, LcdInputTaskName, configMINIMAL_STACK_SIZE, NULL, LcdInputTask_PRIORITY, NULL );
+	xTaskCreate( vReadInDataTask, ReadInDataTaskName, configMINIMAL_STACK_SIZE, NULL, ReadInDataTask_PRIORITY, NULL );
 }
 
 /***************************************************************************************************
@@ -57,10 +58,11 @@ void StartvLcdInputTask(void)
 *Author：xsx
 *Data：2015年8月26日16:58:46
 ***************************************************************************************************/
-static void vLcdInputTask( void *pvParameters )
+static void vReadInDataTask( void *pvParameters )
 {
 	while(1)
 	{
 		GetLCDInputData();
+		GetOutScanerData();
 	}
 }

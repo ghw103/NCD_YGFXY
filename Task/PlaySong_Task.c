@@ -131,7 +131,7 @@ static void vPlaySongTask( void *pvParameters )
 	unsigned char tempdata;
 	while(1)
 	{
-		if(pdPASS == xQueueReceive( SongListQueue, &tempdata, 200*portTICK_RATE_MS ))
+		if(pdPASS == xQueueReceive( SongListQueue, &tempdata, 200/portTICK_RATE_MS ))
 		{
 			GB_PlayStatues = 1;
 			AudioPlay(wavfilename[tempdata]);

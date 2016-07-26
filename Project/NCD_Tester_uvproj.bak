@@ -441,11 +441,6 @@
               <FilePath>..\HardwareDriver\Led_Driver.c</FilePath>
             </File>
             <File>
-              <FileName>MMC_SD.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\MMC_SD.c</FilePath>
-            </File>
-            <File>
               <FileName>SPI1_Driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HardwareDriver\SPI1_Driver.c</FilePath>
@@ -544,6 +539,11 @@
               <FileName>Timer4_Driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HardwareDriver\Timer4_Driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>SD_SPI_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\SD_SPI_Driver.c</FilePath>
             </File>
           </Files>
         </Group>

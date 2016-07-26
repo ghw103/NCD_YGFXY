@@ -60,20 +60,6 @@
 #define SD_CS_GPIO        GPIOB
 #define SD_CS_RCC         RCC_AHB1Periph_GPIOB
 
-//如无法控制SD卡电源则忽略
-#define SD_POWER_PIN      GPIO_Pin_7
-#define SD_POWER_GPIO     GPIOC
-#define SD_POWER_RCC      RCC_AHB1Periph_GPIOC
-
-#define SD_DETECT_PIN     GPIO_Pin_6
-#define SD_DETECT_GPIO    GPIOD
-#define SD_DETECT_RCC     RCC_AHB1Periph_GPIOD
-/*
-#define SD_DETECT_EXTI_LINE          EXTI_Line6
-#define SD_DETECT_EXTI_PIN_SOURCE    EXTI_PinSource6
-#define SD_DETECT_EXTI_PORT_SOURCE   EXTI_PortSourceGPIOD
-#define SD_DETECT_EXTI_IRQn          EXTI9_5_IRQn
-*/
 
 #define SD_CS_LOW()     SD_CS_GPIO->BSRRH = SD_CS_PIN
 #define SD_CS_HIGH()    SD_CS_GPIO->BSRRL = SD_CS_PIN

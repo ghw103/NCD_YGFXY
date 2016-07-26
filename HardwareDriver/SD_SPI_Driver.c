@@ -238,17 +238,7 @@ void SD_SpeedSet(uint16_t speed)
 uint8_t SD_Detect(void)
 {
 	__IO uint8_t status = SD_PRESENT;
-	//低电平表示SD卡插入
-	//if (GPIO_ReadInputDataBit(SD_DETECT_GPIO, SD_DETECT_PIN))
-	if ((uint16_t)(SD_DETECT_GPIO->IDR) & SD_DETECT_PIN)
-	{
-		status = SD_NOT_PRESENT;
-		SD_CardInfo.Status |= STA_NODISK;
-	}
-	else
-	{
-		SD_CardInfo.Status &= ~STA_NODISK;
-	}
+
 	return status;
 }
 

@@ -11,11 +11,10 @@
 #include	"SystemInit.h"
 
 #include 	"netconf.h"
-#include	"GetSampleID_Task.h"
+#include	"ReadInputData_Task.h"
 #include	"CodeScan_Task.h"
 #include	"USBCMD_Task.h"
 #include	"SelfCheck_Task.h"
-#include	"LcdInput_Task.h"
 #include	"SystemUI_Task.h"
 #include	"Iwdg_Task.h"
 #include	"Universal_Task.h"
@@ -87,14 +86,11 @@ static void vStartTask(void * param)
 	/*自检任务*/
 	StartSelfCheckTask();
 	
-	/*LCD任务*/
-	StartvLcdInputTask();
+	/*读取输入数据任务*/
+	StartvReadInDataTask();
 	
 	/*开启测试任务*/
 	StartvTestTask();
-	
-	/*开启排队功能*/
-	StartvOutModelTask();
 	
 	/*开启网络任务*/
 	StartEthernet();
@@ -103,16 +99,13 @@ static void vStartTask(void * param)
 //	StartvWIFITask();
 
 	/*上传任务*/
-//	StartvNormalUpLoadTask();
+	StartvNormalUpLoadTask();
 	
 	/*开启读二维码任务*/
 	StartCodeScanTask();
 	
 	/*USB测试任务*/
 	StartUSBCMDTask();
-	
-	/*开始采集样品ID任务*/
-	StartGetSampleIDTask();
 	
 	/*通用任务*/
 	StartvUniversalTask();
@@ -124,7 +117,7 @@ static void vStartTask(void * param)
 	/*显示欢迎界面*/
 	DspWelcomePage(NULL);
 	
-	StartvSystemUITask();
+//	StartvSystemUITask();
 
 	vTaskDelete(NULL);
 }

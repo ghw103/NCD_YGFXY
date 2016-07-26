@@ -35,6 +35,7 @@
 #include	"TLV5617_Driver.h"
 
 #include	"WifiFunction.h"
+#include	"OutModel_Fun.h"
 #include	"Net_Data.h"
 #include	"Motor_Fun.h"
 
@@ -147,6 +148,7 @@ void MySystemBSPInit(void)
 ***************************************************************************************************/
 void MySystemDataInit(void)
 {	
+	OutModel_Init();					//排队模块数据初始化
 	
 	CreateNetQueue();					//网络数据初始化
 	

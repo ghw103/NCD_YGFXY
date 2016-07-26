@@ -75,44 +75,39 @@ static void vLwipNCDClientTask( void *pvParameters )
 	
 	while(1)
 	{
-		if(SelfCheck_OK == GetGB_SelfCheckResult())
+		IP4_ADDR(&server_ipaddr,123,57,94,39);
+		
+		while(1)
 		{
-			IP4_ADDR(&server_ipaddr,123,57,94,39);
-		
-			while(1)
+			if(Line_Mode == GetGB_NetCard())
 			{
-				if(Line_Mode == GetGB_NetCard())
-				{
-					tcp_clientconn = netconn_new(NETCONN_TCP);
-					netconn_bind(tcp_clientconn , IP_ADDR_ANY , 9601);
-					err = netconn_connect(tcp_clientconn,&server_ipaddr,80);
-					tcp_clientconn->recv_timeout = 100;											//接收超时时间10ms
+				tcp_clientconn = netconn_new(NETCONN_TCP);
+				netconn_bind(tcp_clientconn , IP_ADDR_ANY , 9601);
+				err = netconn_connect(tcp_clientconn,&server_ipaddr,80);
+				tcp_clientconn->recv_timeout = 100;											//接收超时时间10ms
 					
-					if(err != ERR_OK)  
-					{
-						netconn_close( tcp_clientconn );
-						netconn_delete(tcp_clientconn);
-					}
-					else if (err == ERR_OK)
-					{
-						SetGB_NCDServerLinkState(Link_Up);
-						while(ESTABLISHED == tcp_clientconn->pcb.tcp->state)									//正常连接后任务挂起
-						{
-							ClientTXHandle(tcp_clientconn);
-							ClientRXHandle(tcp_clientconn);
-						}
-						
-						SetGB_NCDServerLinkState(Link_Down);
-						netconn_close( tcp_clientconn );
-						netconn_delete(tcp_clientconn);
-					}
+				if(err != ERR_OK)  
+				{
+					netconn_close( tcp_clientconn );
+					netconn_delete(tcp_clientconn);
 				}
-				
-				vTaskDelay(10 / portTICK_RATE_MS);
+				else if (err == ERR_OK)
+				{
+					SetGB_NCDServerLinkState(Link_Up);
+					while(ESTABLISHED == tcp_clientconn->pcb.tcp->state)									//正常连接后任务挂起
+					{
+						ClientTXHandle(tcp_clientconn);
+						ClientRXHandle(tcp_clientconn);
+					}
+						
+					SetGB_NCDServerLinkState(Link_Down);
+					netconn_close( tcp_clientconn );
+					netconn_delete(tcp_clientconn);
+				}
 			}
+				
+			vTaskDelay(10 / portTICK_RATE_MS);
 		}
-		
-		vTaskDelay(1000 / portTICK_RATE_MS);
 	}
 }
 

@@ -17,6 +17,7 @@
 #include	"DRV8825_Driver.h"
 #include	"Led_Driver.h"
 
+#include	"OutModel_Fun.h"
 #include	"Universal_Fun.h"
 #include	"WifiFunction.h"
 #include	"Net_Data.h"
@@ -82,14 +83,18 @@ static void vUniversalTask( void *pvParameters )
 		if(count % 50 == 0)
 			UpGBTimeData();
 		
-		/*¼ì²â¿¨×´Ì¬£¬100ms¼ä¸ô*/
-		if(count % 10 == 0)
+		/*¼ì²â¿¨×´Ì¬£¬500ms¼ä¸ô*/
+		if(count % 50 == 0)
 			CheckCardStatues();
 		
 		/*ÏµÍ³×´Ì¬µÆ*/
-		if(count % 50 == 0)
+		if(count % 10 == 0)
 			LedToggle();
-
+		
+		/*¿ØÖÆÅÅ¶ÓÄ£¿é×´Ì¬*/
+		if(count % 10 == 0)
+			ChangeOutModelStatues();
+		
 		count++;
 		
 		vTaskDelay(10 * portTICK_RATE_MS);
