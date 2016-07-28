@@ -117,7 +117,7 @@ static void vStartTask(void * param)
 	/*œ‘ æª∂”≠ΩÁ√Ê*/
 	DspWelcomePage(NULL);
 	
-//	StartvSystemUITask();
+	StartvSystemUITask();
 
 	vTaskDelete(NULL);
 }

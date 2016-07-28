@@ -239,8 +239,6 @@ static void AnalysisTestData(void)
 				S_TempCalData->peakdata[S_TempCalData->peaknum].EndValue = S_TestData->testline.TestPoint[i];
 				S_TempCalData->peakdata[S_TempCalData->peaknum].DownWidth = i - S_TempCalData->peakdata[S_TempCalData->peaknum].PeakLocation;
 				S_TempCalData->peakdata[S_TempCalData->peaknum].PeakWidth = i - S_TempCalData->peakdata[S_TempCalData->peaknum].StartLocation;
-				S_TempCalData->peakdata[S_TempCalData->peaknum].PeakScale = S_TempCalData->peakdata[S_TempCalData->peaknum].UpWidth;
-				S_TempCalData->peakdata[S_TempCalData->peaknum].PeakScale /= S_TempCalData->peakdata[S_TempCalData->peaknum].DownWidth;
 				S_TempCalData->peakdata[S_TempCalData->peaknum].step = 3;
 				
 				/*一个峰找完，对这个峰进行判断*/
@@ -249,12 +247,6 @@ static void AnalysisTestData(void)
 				{
 					S_TempCalData->peakdata[S_TempCalData->peaknum].step = 0;
 				}
-				/*如果起峰宽度大于落峰，且大于2倍，则峰为假*/
-				else if(S_TempCalData->peakdata[S_TempCalData->peaknum].PeakScale > 1.5)
-					S_TempCalData->peakdata[S_TempCalData->peaknum].step = 0;
-				/*如果起峰宽度小于落峰，且小于0.5，则峰为假*/
-				else if(S_TempCalData->peakdata[S_TempCalData->peaknum].PeakScale < 0.5)
-					S_TempCalData->peakdata[S_TempCalData->peaknum].step = 0;
 				/*如果判断条件都通过，则峰为真*/
 				else
 				{				

@@ -315,7 +315,7 @@ MyState_TypeDef SaveTestData(TestData *tempdata)
 *Author£∫xsx
 *Data£∫
 ***************************************************************************************************/
-MyState_TypeDef ReadTestData(TestData *tempdata, unsigned char *realreadnum, unsigned int index, unsigned char readnum)
+MyState_TypeDef ReadTestData(TestData *tempdata, unsigned int index, unsigned char readnum)
 {
 	FatfsFileInfo_Def * myfile = NULL;
 	MyState_TypeDef statues = My_Fail;
@@ -343,8 +343,6 @@ MyState_TypeDef ReadTestData(TestData *tempdata, unsigned char *realreadnum, uns
 				}
 				if(i > 0)
 					statues = My_Pass;
-				
-				*realreadnum = i;
 			}
 			
 			f_close(&(myfile->file));
@@ -384,12 +382,18 @@ MyState_TypeDef SaveDateInfo(TestData *tempdata, unsigned int index)
 			my_TestDateInfo = MyMalloc(sizeof(TestDateInfo_Def));
 			if(my_TestDateInfo)
 			{
+				if(myfile->size < sizeof(TestDateInfo_Def))
+					f_lseek(&(myfile->file), 0);
+				else
+					f_lseek(&(myfile->file), myfile->size - sizeof(TestDateInfo_Def));
+				
 				myfile->res = f_read(&(myfile->file), my_TestDateInfo, sizeof(TestDateInfo_Def), &(myfile->br));
 				if(FR_OK == myfile->res)
 				{
 					if(0 == memcmp(&(my_TestDateInfo->year), &(tempdata->TestTime.year), 3))
 					{
 						my_TestDateInfo->num += 1;
+						f_lseek(&(myfile->file), myfile->size - sizeof(TestDateInfo_Def));
 					}
 					else
 					{
@@ -414,7 +418,48 @@ MyState_TypeDef SaveDateInfo(TestData *tempdata, unsigned int index)
 	
 	return statues;
 }
+MyState_TypeDef ReadDateInfo(TestDateInfo_Def *tempdata, MyTime_Def *testtime)
+{
+	FatfsFileInfo_Def * myfile = NULL;
+	MyState_TypeDef statues = My_Fail;
+	unsigned char i=0, j=0;
 
+	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
+	
+	if(myfile)
+	{
+		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
+
+		myfile->res = f_open(&(myfile->file), "0:/TestDateInfo.ncd", FA_READ);
+			
+		if(FR_OK == myfile->res)
+		{
+			f_lseek(&(myfile->file), 0);
+			for(i=0; i<0xff; i++)
+			{
+				myfile->res = f_read(&(myfile->file), tempdata, sizeof(TestDateInfo_Def), &(myfile->br));
+				if((FR_OK != myfile->res) || (sizeof(TestDateInfo_Def) != myfile->br))
+					break;
+				
+				if(0 == memcmp(&(tempdata->year), &(testtime->year), 3))
+				{
+					tempdata++;			
+					j++;
+					if(j >= TestDataDateRepeatNum)
+						break;
+				}
+				else
+					memset(tempdata, 0, sizeof(TestDateInfo_Def));
+			}
+			
+			f_close(&(myfile->file));
+		}
+	}
+	
+	MyFree(myfile);
+	
+	return statues;
+}
 /***************************************************************************************************/
 /***************************************************************************************************/
 /*************************************IP…Ë÷√********************************************************/

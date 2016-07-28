@@ -12,3 +12,6 @@
 *.txt
 *.map
 *.lst
+*.Administrator
+*.bak
+*.uvopt

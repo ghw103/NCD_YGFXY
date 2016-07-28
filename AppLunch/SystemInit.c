@@ -91,10 +91,7 @@ void MySystemBSPInit(void)
 	
 	Usart1_Init();						//串口2初始化
 	delay_ms(50);
-	
-/*	SPI1_Init();						//串口3初始化
-	delay_ms(50);
-*/
+
 	ADS_IO_Init();						//ADC IO初始化
 	delay_ms(50);
 	
@@ -134,7 +131,7 @@ void MySystemBSPInit(void)
 	
 	FatfsInit();						//文件系统初始化
 	
-	IWDG_Init(3, 2000);					//看门狗初始化,超时时间2S
+//	IWDG_Init(3, 2000);					//看门狗初始化,超时时间2S
 	delay_ms(50);
 }
 
