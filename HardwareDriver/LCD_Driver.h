@@ -21,6 +21,7 @@ void SetChartSize(unsigned short add , unsigned char num);
 void DspNum(unsigned short addr , unsigned short num);
 void ClearLine(unsigned char Command);
 void BasicUI(unsigned short addr , unsigned short cmd, unsigned short datapacknum, void *data , unsigned short strlen);
+void SetLEDLight(unsigned char num);
 #endif
 
 

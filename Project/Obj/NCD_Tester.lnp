@@ -78,6 +78,7 @@
 ".\obj\showresultpage.o"
 ".\obj\serversetpage.o"
 ".\obj\othersetpage.o"
+".\obj\sleeppage.o"
 ".\obj\temperature_data.o"
 ".\obj\ui_data.o"
 ".\obj\time_data.o"

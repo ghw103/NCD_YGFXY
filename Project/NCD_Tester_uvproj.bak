@@ -631,11 +631,6 @@
               <FilePath>..\Task\LwipDHCP_Task.c</FilePath>
             </File>
             <File>
-              <FileName>GetSampleID_Task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Task\GetSampleID_Task.c</FilePath>
-            </File>
-            <File>
               <FileName>CodeScan_Task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Task\CodeScan_Task.c</FilePath>
@@ -649,11 +644,6 @@
               <FileName>SelfCheck_Task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Task\SelfCheck_Task.c</FilePath>
-            </File>
-            <File>
-              <FileName>LcdInput_Task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Task\LcdInput_Task.c</FilePath>
             </File>
             <File>
               <FileName>SystemUI_Task.c</FileName>
@@ -674,11 +664,6 @@
               <FileName>Test_Task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Task\Test_Task.c</FilePath>
-            </File>
-            <File>
-              <FileName>OutModel_Task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Task\OutModel_Task.c</FilePath>
             </File>
             <File>
               <FileName>BasicWEB_Task.c</FileName>
@@ -709,6 +694,11 @@
               <FileName>NormalUpLoad_Task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Task\NormalUpLoad_Task.c</FilePath>
+            </File>
+            <File>
+              <FileName>ReadInputData_Task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Task\ReadInputData_Task.c</FilePath>
             </File>
           </Files>
         </Group>

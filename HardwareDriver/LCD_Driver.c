@@ -517,4 +517,37 @@ void ClearLine(unsigned char Command)
 
 }
 
+/************************************************************************
+** 函数名:SetLEDLight
+** 功  能:num -- 屏幕亮度，1 -- 1%， 100--100%
+** 输  入:无
+** 输  出:无
+** 返  回：无
+** 备  注：无
+** 时  间:  
+** 作  者：xsx                                                 
+************************************************************************/
+void SetLEDLight(unsigned char num)
+{
+	char *q = NULL;
+	
+	txdat = MyMalloc(50);
+	if(txdat == NULL)
+		return;
+	
+	memset(txdat, 0, 50);
+	q = txdat;
+	
+	*q++ = LCD_Head_1;
+	*q++ = LCD_Head_2;
+	*q++ = 5;
+	*q++ = W_REGSITER;
+	*q++ = 0x01;
+	*q++ = (num);
 
+	CalModbusCRC16Fun2(txdat+3, 3, q);
+	
+	SendStrToQueue(GetUsart6TXQueue(), GetUsart6TXMutex(), txdat, txdat[2]+3, 50 * portTICK_RATE_MS, EnableUsart6TXInterrupt);
+
+	MyFree(txdat);
+}

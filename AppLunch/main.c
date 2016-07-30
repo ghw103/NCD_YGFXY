@@ -96,16 +96,16 @@ static void vStartTask(void * param)
 	StartEthernet();
 	
 	/*开启wifi任务*/
-//	StartvWIFITask();
+	StartvWIFITask();
 
 	/*上传任务*/
-	StartvNormalUpLoadTask();
+//	StartvNormalUpLoadTask();
 	
 	/*开启读二维码任务*/
 	StartCodeScanTask();
 	
 	/*USB测试任务*/
-	StartUSBCMDTask();
+//	StartUSBCMDTask();
 	
 	/*通用任务*/
 	StartvUniversalTask();

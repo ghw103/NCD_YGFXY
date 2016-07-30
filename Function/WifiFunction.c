@@ -485,7 +485,7 @@ MyState_TypeDef SendDataBySocketA(mynetbuf *netbuf)
 	MyState_TypeDef statues = My_Fail;
 	
 	/*发送数据缓冲区*/
-	txbuf = MyMalloc(4000);
+	txbuf = MyMalloc(1000);
 	if(txbuf)
 	{
 /*		sprintf(txbuf, (const char *)"AT+SEND=%d\r", netbuf->datalen);
@@ -495,11 +495,13 @@ MyState_TypeDef SendDataBySocketA(mynetbuf *netbuf)
 			ComWithWIFI(txbuf, NULL, NULL, 0, 100 / portTICK_RATE_MS);
 				statues = My_Pass;
 		}*/
-		
-		sprintf(txbuf, "%s\r", (char *)(netbuf->data));
+		memset(txbuf, 0, 1000);
+		memcpy(txbuf, netbuf->data, netbuf->datalen);
+		strcat(txbuf, "\r");
+
 		MyFree(netbuf->data);
 		
-		if(My_Pass == ComWithWIFI(txbuf, NULL, txbuf, 4000, 2000 * portTICK_RATE_MS))
+		if(My_Pass == ComWithWIFI(txbuf, NULL, txbuf, 1000, 4000 / portTICK_RATE_MS))
 		{
 			netbuf->datalen = strlen(txbuf);
 			netbuf->data = MyMalloc(netbuf->datalen+10);

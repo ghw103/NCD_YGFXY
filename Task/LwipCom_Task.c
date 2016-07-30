@@ -71,7 +71,7 @@ static void vLwipComTask( void *pvParameters )
 		if((Link_Down == GetGB_LinkState())&&(netif_is_link_up(tempnetif)))
 		{
 			netif_set_link_down(tempnetif);
-			SetGB_NetCard(NetNone);
+			SetGB_NetCard(Line_Mode);//NetNone);
 		}
 		else if((Link_Up == GetGB_LinkState())&&(!netif_is_link_up(tempnetif)))
 		{

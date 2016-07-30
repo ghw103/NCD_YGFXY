@@ -56,12 +56,6 @@ err_t sys_mbox_new(sys_mbox_t *mbox, int size)
 	
 	*mbox = xQueueCreate( archMESG_QUEUE_LENGTH, sizeof( void * ) );
 
-#if SYS_STATS
-      ++lwip_stats.sys.mbox.used;
-      if (lwip_stats.sys.mbox.max < lwip_stats.sys.mbox.used) {
-         lwip_stats.sys.mbox.max = lwip_stats.sys.mbox.used;
-	  }
-#endif /* SYS_STATS */
  if (*mbox == NULL)
   return ERR_MEM;
  
@@ -77,21 +71,10 @@ err_t sys_mbox_new(sys_mbox_t *mbox, int size)
 void sys_mbox_free(sys_mbox_t *mbox)
 {
 	if( uxQueueMessagesWaiting( *mbox ) )
-	{
-		/* Line for breakpoint.  Should never break here! */
-		portNOP();
-#if SYS_STATS
-	    lwip_stats.sys.mbox.err++;
-#endif /* SYS_STATS */
-			
-		// TODO notify the user of failure.
-	}
+		;	
 
 	vQueueDelete( *mbox );
 
-#if SYS_STATS
-     --lwip_stats.sys.mbox.used;
-#endif /* SYS_STATS */
 }
 
 /*-----------------------------------------------------------------------------------*/
@@ -109,18 +92,10 @@ err_t sys_mbox_trypost(sys_mbox_t *mbox, void *msg)
 err_t result;
 
    if ( xQueueSend( *mbox, &msg, 0 ) == pdPASS )
-   {
       result = ERR_OK;
-   }
-   else {
+   else
       // could not post, queue must be full
-      result = ERR_MEM;
-			
-#if SYS_STATS
-      lwip_stats.sys.mbox.err++;
-#endif /* SYS_STATS */
-			
-   }
+      result = ERR_MEM;		
 
    return result;
 }
@@ -189,18 +164,12 @@ u32_t sys_arch_mbox_tryfetch(sys_mbox_t *mbox, void **msg)
 void *dummyptr;
 
 	if ( msg == NULL )
-	{
 		msg = &dummyptr;
-	}
 
    if ( pdTRUE == xQueueReceive( *mbox, &(*msg), 0 ) )
-   {
       return ERR_OK;
-   }
    else
-   {
       return SYS_MBOX_EMPTY;
-   }
 }
 /*----------------------------------------------------------------------------------*/
 int sys_mbox_valid(sys_mbox_t *mbox)          
@@ -223,24 +192,10 @@ err_t sys_sem_new(sys_sem_t *sem, u8_t count)
 {
 	vSemaphoreCreateBinary(*sem );
 	if(*sem == NULL)
-	{
-#if SYS_STATS
-      ++lwip_stats.sys.sem.err;
-#endif /* SYS_STATS */	
 		return ERR_MEM;
-	}
 	
 	if(count == 0)	// Means it can't be taken
-	{
 		xSemaphoreTake(*sem,1);
-	}
-
-#if SYS_STATS
-	++lwip_stats.sys.sem.used;
- 	if (lwip_stats.sys.sem.max < lwip_stats.sys.sem.used) {
-		lwip_stats.sys.sem.max = lwip_stats.sys.sem.used;
-	}
-#endif /* SYS_STATS */
 		
 	return ERR_OK;
 }
@@ -269,7 +224,7 @@ portTickType StartTime, EndTime, Elapsed;
 
 	if(	timeout != 0)
 	{
-		if( xSemaphoreTake( *sem, timeout * portTICK_RATE_MS ) == pdTRUE )
+		if( xSemaphoreTake( *sem, timeout / portTICK_RATE_MS ) == pdTRUE )
 		{
 			EndTime = xTaskGetTickCount();
 			Elapsed = (EndTime - StartTime) * portTICK_RATE_MS;
@@ -302,11 +257,7 @@ void sys_sem_signal(sys_sem_t *sem)
 /*-----------------------------------------------------------------------------------*/
 // Deallocates a semaphore
 void sys_sem_free(sys_sem_t *sem)
-{
-#if SYS_STATS
-      --lwip_stats.sys.sem.used;
-#endif /* SYS_STATS */
-			
+{	
 	vQueueDelete(*sem);
 }
 /*-----------------------------------------------------------------------------------*/
@@ -342,28 +293,14 @@ err_t sys_mutex_new(sys_mutex_t *mutex) {
   *mutex = xSemaphoreCreateMutex();
 		if(*mutex == NULL)
 	{
-#if SYS_STATS
-      ++lwip_stats.sys.mutex.err;
-#endif /* SYS_STATS */	
 		return ERR_MEM;
 	}
-
-#if SYS_STATS
-	++lwip_stats.sys.mutex.used;
- 	if (lwip_stats.sys.mutex.max < lwip_stats.sys.mutex.used) {
-		lwip_stats.sys.mutex.max = lwip_stats.sys.mutex.used;
-	}
-#endif /* SYS_STATS */
         return ERR_OK;
 }
 /*-----------------------------------------------------------------------------------*/
 /* Deallocate a mutex*/
 void sys_mutex_free(sys_mutex_t *mutex)
-{
-#if SYS_STATS
-      --lwip_stats.sys.mutex.used;
-#endif /* SYS_STATS */
-			
+{	
 	vQueueDelete(*mutex);
 }
 /*-----------------------------------------------------------------------------------*/

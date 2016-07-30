@@ -315,7 +315,7 @@ MyState_TypeDef SaveTestData(TestData *tempdata)
 *Author£ºxsx
 *Data£º
 ***************************************************************************************************/
-MyState_TypeDef ReadTestData(TestData *tempdata, unsigned int index, unsigned char readnum)
+MyState_TypeDef ReadTestData(TestData *tempdata, unsigned int index, unsigned char readnum, unsigned short *br)
 {
 	FatfsFileInfo_Def * myfile = NULL;
 	MyState_TypeDef statues = My_Fail;
@@ -341,8 +341,9 @@ MyState_TypeDef ReadTestData(TestData *tempdata, unsigned int index, unsigned ch
 					else
 						break;
 				}
-				if(i > 0)
-					statues = My_Pass;
+				statues = My_Pass;
+				if(br)
+					*br = i;
 			}
 			
 			f_close(&(myfile->file));
@@ -452,6 +453,66 @@ MyState_TypeDef ReadDateInfo(TestDateInfo_Def *tempdata, MyTime_Def *testtime)
 					memset(tempdata, 0, sizeof(TestDateInfo_Def));
 			}
 			
+			f_close(&(myfile->file));
+		}
+	}
+	
+	MyFree(myfile);
+	
+	return statues;
+}
+
+MyState_TypeDef WriteUpLoadIndex(unsigned int index)
+{
+	FatfsFileInfo_Def * myfile = NULL;
+	MyState_TypeDef statues = My_Fail;
+
+	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
+	
+	if(myfile)
+	{
+		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
+
+		myfile->res = f_open(&(myfile->file), "0:/TestData.ncd", FA_WRITE | FA_READ);
+			
+		if(FR_OK == myfile->res)
+		{
+			f_lseek(&(myfile->file), 0);
+			
+			myfile->res = f_write(&(myfile->file), &index, sizeof(unsigned int), &(myfile->bw));
+			if((FR_OK == myfile->res) && (myfile->bw == sizeof(unsigned int)))
+				statues = My_Pass;
+
+			f_close(&(myfile->file));
+		}
+	}
+	
+	MyFree(myfile);
+	
+	return statues;
+}
+
+MyState_TypeDef ReadUpLoadIndex(unsigned int *index)
+{
+	FatfsFileInfo_Def * myfile = NULL;
+	MyState_TypeDef statues = My_Fail;
+
+	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
+	
+	if(myfile)
+	{
+		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
+
+		myfile->res = f_open(&(myfile->file), "0:/TestData.ncd", FA_READ);
+			
+		if(FR_OK == myfile->res)
+		{
+			f_lseek(&(myfile->file), 0);
+			
+			myfile->res = f_read(&(myfile->file), index, sizeof(unsigned int), &(myfile->br));
+			if((FR_OK == myfile->res) && (myfile->br == sizeof(unsigned int)))
+				statues = My_Pass;
+
 			f_close(&(myfile->file));
 		}
 	}

@@ -84,12 +84,27 @@ void StartUSBCMDTask(void)
 ************************************************************************/
 static void vUSBCMDTask( void *pvParameters )
 {
-
-
+	unsigned short count = 0;
+	mynetbuf netbuf;
 	while(1)
 	{
-
-		vTaskDelay(1000/portTICK_RATE_MS);
+		netbuf.data = MyMalloc(4096);
+		if(netbuf.data)
+		{
+			netbuf.datalen =0 ;
+			while(pdPASS == USB_GetChar(((unsigned char *)netbuf.data)+netbuf.datalen, 10 / portTICK_RATE_MS))
+				netbuf.datalen++;
+			
+			if(netbuf.datalen > 0)
+			{
+				SendDataBySocketA(&netbuf);
+				USB_PutStr(netbuf.data, netbuf.datalen);
+				MyFree(netbuf.data);
+			}
+			else
+				MyFree(netbuf.data);
+		}
+		vTaskDelay(100);
 	}
 
 }

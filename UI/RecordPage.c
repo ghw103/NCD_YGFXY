@@ -258,7 +258,7 @@ static MyState_TypeDef ShowRecord(unsigned char pageindex)
 				if((GB_RecordPageBuffer->tempvalue2 >= GB_RecordPageBuffer->tempvalue1) && 
 				(GB_RecordPageBuffer->tempvalue2 < (GB_RecordPageBuffer->tempvalue1 + DataNumInPage)))
 				{
-					ReadTestData(&(GB_RecordPageBuffer->testdata[num]), GB_RecordPageBuffer->testdatainfo[i].index+j-1, 1);
+					ReadTestData(&(GB_RecordPageBuffer->testdata[num]), GB_RecordPageBuffer->testdatainfo[i].index+j-1, 1, NULL);
 					num++;
 					if(num > DataNumInPage)
 						goto END;
