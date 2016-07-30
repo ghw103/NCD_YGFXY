@@ -120,7 +120,7 @@ static void prvweb_ParseHTMLRequest( struct netconn *pxNetCon )
 				strcat( cDynamicPage, "<p><pre>Task            State   Priority    Stack	#<br>************************************************<br>" );
 
 				/* ... Then the list of tasks and their status... */
-				vTaskList(cDynamicPage + strlen( cDynamicPage ) );
+				//vTaskList(cDynamicPage + strlen( cDynamicPage ) );
 
 				if(Link_Up == GetGB_WifiState())
 					strcat( cDynamicPage, "Wifi_LinkUP<br>" );

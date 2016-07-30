@@ -215,14 +215,12 @@ unsigned char SendStrToQueue(xQueueHandle queue, xSemaphoreHandle mutex, void *s
 *Author：xsx
 *Data：2016年4月22日15:35:40
 ***************************************************************************************************/
-unsigned char ReceiveDataFromQueue(xQueueHandle queue, xSemaphoreHandle mutex, void *receivedstr , unsigned short len , 
-	portTickType xBlockTime)
+unsigned char ReceiveDataFromQueue(xQueueHandle queue, xSemaphoreHandle mutex, void *receivedstr , unsigned short len ,
+	unsigned short itemsize, portTickType xBlockTime)
 {
 	unsigned short i=0;
 	unsigned char *pdata = (unsigned char *)receivedstr;
 	unsigned char statues = pdFAIL;
-	
-	Queue_t * const pxQueue = ( Queue_t * ) queue;
 	
 	if(queue == NULL)
 		return pdFAIL;
@@ -237,7 +235,7 @@ unsigned char ReceiveDataFromQueue(xQueueHandle queue, xSemaphoreHandle mutex, v
 	{
 		if(pdPASS == xQueueReceive(queue, pdata , xBlockTime))
 		{
-			pdata += pxQueue->uxItemSize;
+			pdata += itemsize;
 			statues = pdPASS;
 		}
 		else
@@ -265,12 +263,11 @@ unsigned char ReceiveDataFromQueue(xQueueHandle queue, xSemaphoreHandle mutex, v
 *Data：2016年4月22日15:33:38
 ***************************************************************************************************/
 unsigned char SendDataToQueue(xQueueHandle queue, xSemaphoreHandle mutex, void *sendstr , unsigned short len ,  
-	portTickType xBlockTime, void (*fun)(void))
+	unsigned short itemsize, portTickType xBlockTime, void (*fun)(void))
 {
 	unsigned short i=0;
 	unsigned char *pdata = (unsigned char *)sendstr;
 	unsigned char statues = pdFAIL;
-	Queue_t * const pxQueue = ( Queue_t * ) queue;
 	
 	if(queue == NULL)
 		return pdFAIL;
@@ -285,7 +282,7 @@ unsigned char SendDataToQueue(xQueueHandle queue, xSemaphoreHandle mutex, void *
 	{
 		if(pdPASS == xQueueSend(queue, pdata , xBlockTime))
 		{
-			pdata += pxQueue->uxItemSize;
+			pdata += itemsize;
 			statues = pdPASS;
 		}
 		else

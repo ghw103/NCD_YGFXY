@@ -13,10 +13,10 @@ unsigned char ReceiveStrFromQueue(xQueueHandle queue, xSemaphoreHandle mutex, vo
 unsigned char SendStrToQueue(xQueueHandle queue, xSemaphoreHandle mutex, void *sendstr , unsigned short len ,  
 	portTickType xBlockTime, void (*fun)(void));
 
-unsigned char ReceiveDataFromQueue(xQueueHandle queue, xSemaphoreHandle mutex, void *receivedstr , unsigned short len , 
-	portTickType xBlockTime);
+unsigned char ReceiveDataFromQueue(xQueueHandle queue, xSemaphoreHandle mutex, void *receivedstr , unsigned short len ,
+	unsigned short itemsize, portTickType xBlockTime);
 unsigned char SendDataToQueue(xQueueHandle queue, xSemaphoreHandle mutex, void *sendstr , unsigned short len ,  
-	portTickType xBlockTime, void (*fun)(void));
+	unsigned short itemsize, portTickType xBlockTime, void (*fun)(void));
 
 #endif
 

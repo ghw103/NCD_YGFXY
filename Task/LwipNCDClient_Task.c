@@ -123,7 +123,7 @@ static void ClientTXHandle(struct netconn *pxNetCon)
 {
 	mynetbuf sendbuf;
 
-	if(pdPASS == ReceiveDataFromQueue(GetGBNCDClientTXQueue(), NULL, &sendbuf, 1, 10*portTICK_RATE_MS))
+	if(pdPASS == ReceiveDataFromQueue(GetGBNCDClientTXQueue(), NULL, &sendbuf, 1, sizeof(mynetbuf), 10*portTICK_RATE_MS))
 	{
 		netconn_write( pxNetCon, sendbuf.data, sendbuf.datalen, NETCONN_COPY );
 		
@@ -166,7 +166,7 @@ static void ClientRXHandle(struct netconn *pxNetCon)
 			}
 			
 			/*Õý³£*/
-			if(pdPASS != SendDataToQueue(GetGBNCDClientRXQueue(), NULL, &myrecvbuf, 1, 10 / portTICK_RATE_MS, NULL))
+			if(pdPASS != SendDataToQueue(GetGBNCDClientRXQueue(), NULL, &myrecvbuf, 1, sizeof(mynetbuf), 10 / portTICK_RATE_MS, NULL))
 			//if(pdPASS != SendDataToQueue(GetGBUserClientTXQueue(), GetGBUserClientTXMutex(), &myrecvbuf, 1, 10*portTICK_RATE_MS, NULL))
 				MyFree(myrecvbuf.data);
 			//SendDataToQueue(GetGBNCDClientTXQueue(), GetGBNCDClientTXMutex(), &myrecvbuf, 1, 10*portTICK_RATE_MS, NULL)

@@ -149,11 +149,11 @@ static void SocketAHandle(void)
 {
 	/*有数据发送*/
 //	if(pdPASS == ReceiveDataFromQueue(GetGBNCDClientTXQueue(), GetGBNCDClientTXMutex(), &S_MyNetBuf, 1, 50 / portTICK_RATE_MS))
-	if(pdPASS == ReceiveDataFromQueue(GetGBUserClientRXQueue(), GetGBUserClientRXMutex(), &S_MyNetBuf, 1, 50 / portTICK_RATE_MS))
+	if(pdPASS == ReceiveDataFromQueue(GetGBUserClientRXQueue(), GetGBUserClientRXMutex(), &S_MyNetBuf, 1, sizeof(mynetbuf), 50 / portTICK_RATE_MS))
 	{
 		SendDataBySocketA(&S_MyNetBuf);
 		
-		if(pdPASS != SendDataToQueue(GetGBUserClientTXQueue(), GetGBUserClientTXMutex(), &S_MyNetBuf, 1, 50*portTICK_RATE_MS, NULL))
+		if(pdPASS != SendDataToQueue(GetGBUserClientTXQueue(), GetGBUserClientTXMutex(), &S_MyNetBuf, 1, sizeof(mynetbuf), 50*portTICK_RATE_MS, NULL))
 			MyFree(S_MyNetBuf.data);
 //		MyFree(S_MyNetBuf.data);
 	}

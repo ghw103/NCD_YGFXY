@@ -47,7 +47,7 @@ void SendDataToNCDServer(char *buf, unsigned short len)
 		memcpy(mybuf.data, buf, len);
 		mybuf.datalen = len;
 		
-		if(pdPASS != SendDataToQueue(GetGBNCDClientTXQueue(), NULL, &mybuf, 1, 10 / portTICK_RATE_MS, NULL))
+		if(pdPASS != SendDataToQueue(GetGBNCDClientTXQueue(), NULL, &mybuf, 1, sizeof(mynetbuf),10 / portTICK_RATE_MS, NULL))
 			MyFree(mybuf.data);
 	}
 }
@@ -57,7 +57,7 @@ MyState_TypeDef RecvDataFromNCDServer(char *buf)
 	
 	if(buf)
 	{
-		if(pdPASS == ReceiveDataFromQueue(GetGBNCDClientRXQueue(), NULL, &mybuf, 1, 100/portTICK_RATE_MS))
+		if(pdPASS == ReceiveDataFromQueue(GetGBNCDClientRXQueue(), NULL, &mybuf, 1, sizeof(mynetbuf), 100/portTICK_RATE_MS))
 		{
 			memcpy(buf, mybuf.data, mybuf.datalen);
 			MyFree(mybuf.data);
@@ -79,7 +79,7 @@ void SendDataToUserServer(char *buf, unsigned short len)
 		memcpy(mybuf.data, buf, len);
 		mybuf.datalen = len;
 		
-		if(pdPASS != SendDataToQueue(GetGBUserClientTXQueue(), NULL, &mybuf, 1, 10 / portTICK_RATE_MS, NULL))
+		if(pdPASS != SendDataToQueue(GetGBUserClientTXQueue(), NULL, &mybuf, 1, sizeof(mynetbuf), 10 / portTICK_RATE_MS, NULL))
 			MyFree(mybuf.data);
 	}
 }
