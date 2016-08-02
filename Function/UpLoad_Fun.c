@@ -50,8 +50,8 @@ void UpLoadFunction(void)
 			if((count % 10) == 0)
 				UpLoadDeviceInfo();
 			
-			//if(My_Pass != UpLoadTestData())
-			//	vTaskDelay(10000);
+			if(My_Pass != UpLoadTestData())
+				vTaskDelay(10000);
 		}
 		count++;
 		vTaskDelay(1000 / portTICK_RATE_MS);
@@ -127,7 +127,7 @@ static MyState_TypeDef UpLoadTestData(void)
 				
 				if(tempbuf)
 				{
-					sprintf(sendbuf, "test_reaction_time=%d&temperature=%2.1f&temperature2=%2.1f&fluorescence_data=%s&Cposition=%d&Baseposition=%d&Tposition=%d&resultratio=%.3f&resultprimitive=%.3f&resultcalibration=%.3f&testSampleID=%s&DeviceID=%s&testCardID=%s",
+					sprintf(sendbuf, "test_reaction_time=%d&temperature=%2.1f&temperature2=%2.1f&fluorescence_data=%s&Cposition=%d&Baseposition=%d&Tposition=%d&resultratio=%.3f&resultprimitive=%.3f&resultcalibration=%.3f&testSampleID=%s&DeviceID=%.5s&testCardID=%.5s",
 						testdata->time, testdata->TestTemp.E_Temperature, testdata->TestTemp.O_Temperature, tempbuf, testdata->testline.C_Point[1], testdata->testline.B_Point[1],
 						testdata->testline.T_Point[1],testdata->testline.BasicBili, testdata->testline.BasicResult, testdata->testline.AdjustResult, testdata->sampleid, deviceinfo->deviceid, testdata->temperweima.CardPiCi);
 

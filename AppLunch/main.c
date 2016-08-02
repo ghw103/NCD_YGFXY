@@ -99,7 +99,7 @@ static void vStartTask(void * param)
 	StartvWIFITask();
 
 	/*上传任务*/
-//	StartvNormalUpLoadTask();
+	StartvNormalUpLoadTask();
 	
 	/*开启读二维码任务*/
 	StartCodeScanTask();

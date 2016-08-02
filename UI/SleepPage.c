@@ -96,7 +96,7 @@ static MyState_TypeDef PageInit(void *  parm)
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
 	
-	SetLEDLight(1);
+	SetLEDLight(10);
 	
 	SelectPage(115);
 	

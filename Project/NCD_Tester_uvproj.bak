@@ -820,6 +820,11 @@
               <FileType>1</FileType>
               <FilePath>..\UI\OtherSetPage.c</FilePath>
             </File>
+            <File>
+              <FileName>SleepPage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\UI\SleepPage.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

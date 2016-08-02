@@ -103,14 +103,16 @@ MyState_TypeDef UpLoadData(char *URL, void * buf, unsigned short buflen)
 	{
 		memset(data, 0, buflen+1024);
 		sprintf(data, "POST %s HTTP/1.1\nHost: 123.57.94.39\nConnection: keep-alive\nContent-Length: %d\nContent-Type:application/x-www-form-urlencoded;charset=GBK\nReferer: %s\n\n%s", URL, buflen, URL, (char *)buf);
-//		SendDataToNCDServer(data, strlen(data));
-		SendDataToUserServer(data, strlen(data));
+		SendDataToNCDServer(data, strlen(data));
+//		SendDataToUserServer(data, strlen(data));
 		
 		vTaskDelay(100 / portTICK_RATE_MS);
 		/*如果创建成功*/
 		memset(data, 0, buflen+1024);
 		if((My_Pass == RecvDataFromNCDServer(data)) && (strstr(data, "CREATED")))
 			statues = My_Pass;
+		
+//		SendDataToUserServer(data, strlen(data));
 	}
 	MyFree(data);
 	
