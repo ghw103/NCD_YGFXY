@@ -12,7 +12,6 @@
 #include 	"MLX90614_Driver.h"
 #include	"RTC_Driver.h"
 #include	"TLV5617_Driver.h"
-#include	"DeviceInfo_Data.h"
 #include 	"Usart4_Driver.h"
 #include	"WifiFunction.h"
 #include	"CardLimit_Driver.h"

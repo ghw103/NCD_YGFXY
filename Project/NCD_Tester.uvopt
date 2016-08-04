@@ -587,8 +587,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\HardwareDriver\Timer4_Driver.c</PathWithFileName>
-      <FilenameWithoutPath>Timer4_Driver.c</FilenameWithoutPath>
+      <PathWithFileName>..\HardwareDriver\SD_SPI_Driver.c</PathWithFileName>
+      <FilenameWithoutPath>SD_SPI_Driver.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -600,8 +600,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\HardwareDriver\SD_SPI_Driver.c</PathWithFileName>
-      <FilenameWithoutPath>SD_SPI_Driver.c</FilenameWithoutPath>
+      <PathWithFileName>..\HardwareDriver\Timer4_Driver.c</PathWithFileName>
+      <FilenameWithoutPath>Timer4_Driver.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -738,19 +738,6 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Function\Motor_Fun.c</PathWithFileName>
-      <FilenameWithoutPath>Motor_Fun.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>38</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
       <PathWithFileName>..\Function\Universal_Fun.c</PathWithFileName>
       <FilenameWithoutPath>Universal_Fun.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
@@ -758,7 +745,7 @@
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
-      <FileNumber>39</FileNumber>
+      <FileNumber>38</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -771,7 +758,7 @@
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
-      <FileNumber>40</FileNumber>
+      <FileNumber>39</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -779,6 +766,19 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\Function\UpLoad_Fun.c</PathWithFileName>
       <FilenameWithoutPath>UpLoad_Fun.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>3</GroupNumber>
+      <FileNumber>40</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\Function\Motor_Fun.c</PathWithFileName>
+      <FilenameWithoutPath>Motor_Fun.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1572,7 +1572,7 @@
 
   <Group>
     <GroupName>FreertOS</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1593,7 +1593,7 @@
       <GroupNumber>8</GroupNumber>
       <FileNumber>100</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>

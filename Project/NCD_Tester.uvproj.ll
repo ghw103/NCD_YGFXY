@@ -428,16 +428,6 @@
           <GroupName>Drivers</GroupName>
           <Files>
             <File>
-              <FileName>ADS8325_Driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\ADS8325_Driver.c</FilePath>
-            </File>
-            <File>
-              <FileName>DRV8825_Driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\DRV8825_Driver.c</FilePath>
-            </File>
-            <File>
               <FileName>Led_Driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HardwareDriver\Led_Driver.c</FilePath>
@@ -453,14 +443,9 @@
               <FilePath>..\HardwareDriver\SPI2_Driver.c</FilePath>
             </File>
             <File>
-              <FileName>TLV5617_Driver.c</FileName>
+              <FileName>Usart1_Driver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\TLV5617_Driver.c</FilePath>
-            </File>
-            <File>
-              <FileName>Usart3_Driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\Usart3_Driver.c</FilePath>
+              <FilePath>..\HardwareDriver\Usart1_Driver.c</FilePath>
             </File>
             <File>
               <FileName>Usart2_Driver.c</FileName>
@@ -468,9 +453,34 @@
               <FilePath>..\HardwareDriver\Usart2_Driver.c</FilePath>
             </File>
             <File>
-              <FileName>Usart1_Driver.c</FileName>
+              <FileName>Usart3_Driver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\Usart1_Driver.c</FilePath>
+              <FilePath>..\HardwareDriver\Usart3_Driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>Usart4_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\Usart4_Driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>Usart6_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\Usart6_Driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>TLV5617_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\TLV5617_Driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>DRV8825_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\DRV8825_Driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>ADS8325_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\ADS8325_Driver.c</FilePath>
             </File>
             <File>
               <FileName>CodeScanner_Driver.c</FileName>
@@ -488,11 +498,6 @@
               <FilePath>..\HardwareDriver\RTC_Driver.c</FilePath>
             </File>
             <File>
-              <FileName>Usart6_Driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\Usart6_Driver.c</FilePath>
-            </File>
-            <File>
               <FileName>LCD_Driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HardwareDriver\LCD_Driver.c</FilePath>
@@ -506,11 +511,6 @@
               <FileName>CardLimit_Driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HardwareDriver\CardLimit_Driver.c</FilePath>
-            </File>
-            <File>
-              <FileName>Usart4_Driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\Usart4_Driver.c</FilePath>
             </File>
             <File>
               <FileName>Wifi_Driver.c</FileName>
@@ -541,6 +541,11 @@
               <FileName>Timer4_Driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HardwareDriver\Timer4_Driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>SD_SPI_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\SD_SPI_Driver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -661,11 +666,6 @@
               <FileName>Test_Task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Task\Test_Task.c</FilePath>
-            </File>
-            <File>
-              <FileName>OutModel_Task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Task\OutModel_Task.c</FilePath>
             </File>
             <File>
               <FileName>BasicWEB_Task.c</FileName>
@@ -838,11 +838,6 @@
               <FilePath>..\Datas\Temperature_Data.c</FilePath>
             </File>
             <File>
-              <FileName>UI_Data.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Datas\UI_Data.c</FilePath>
-            </File>
-            <File>
               <FileName>Time_Data.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Datas\Time_Data.c</FilePath>
@@ -876,6 +871,11 @@
               <FileName>SelfCheck_Data.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Datas\SelfCheck_Data.c</FilePath>
+            </File>
+            <File>
+              <FileName>UI_Data.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Datas\UI_Data.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -935,27 +935,27 @@
             <File>
               <FileName>list.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\ThirdParty\FreeRTOS\src\list.c</FilePath>
-            </File>
-            <File>
-              <FileName>port.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\FreeRTOS\src\port.c</FilePath>
+              <FilePath>..\ThirdParty\FreeRTOS\list.c</FilePath>
             </File>
             <File>
               <FileName>queue.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\ThirdParty\FreeRTOS\src\queue.c</FilePath>
+              <FilePath>..\ThirdParty\FreeRTOS\queue.c</FilePath>
             </File>
             <File>
               <FileName>tasks.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\ThirdParty\FreeRTOS\src\tasks.c</FilePath>
+              <FilePath>..\ThirdParty\FreeRTOS\tasks.c</FilePath>
+            </File>
+            <File>
+              <FileName>port.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ThirdParty\FreeRTOS\portable\RVDS\ARM_CM3\port.c</FilePath>
             </File>
             <File>
               <FileName>heap_4.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\ThirdParty\FreeRTOS\src\heap_4.c</FilePath>
+              <FilePath>..\ThirdParty\FreeRTOS\portable\MemMang\heap_4.c</FilePath>
             </File>
           </Files>
         </Group>

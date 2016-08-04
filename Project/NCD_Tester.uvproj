@@ -538,14 +538,14 @@
               <FilePath>..\HardwareDriver\Timer3_Driver.c</FilePath>
             </File>
             <File>
-              <FileName>Timer4_Driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\Timer4_Driver.c</FilePath>
-            </File>
-            <File>
               <FileName>SD_SPI_Driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HardwareDriver\SD_SPI_Driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>Timer4_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\Timer4_Driver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -598,11 +598,6 @@
               <FilePath>..\Function\PlaySong_Function.c</FilePath>
             </File>
             <File>
-              <FileName>Motor_Fun.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Function\Motor_Fun.c</FilePath>
-            </File>
-            <File>
               <FileName>Universal_Fun.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Function\Universal_Fun.c</FilePath>
@@ -616,6 +611,11 @@
               <FileName>UpLoad_Fun.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Function\UpLoad_Fun.c</FilePath>
+            </File>
+            <File>
+              <FileName>Motor_Fun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Function\Motor_Fun.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -7,7 +7,6 @@
 #include	"UI_Data.h"
 #include	"SystemSetPage.h"
 #include	"MyMem.h"
-#include	"DeviceInfo_Data.h"
 #include	"TimeDownNorPage.h"
 
 #include	"TM1623_Driver.h"
