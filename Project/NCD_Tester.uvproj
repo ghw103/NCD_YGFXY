@@ -72,6 +72,8 @@
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
+            <nStopB1X>0</nStopB1X>
+            <nStopB2X>0</nStopB2X>
           </BeforeMake>
           <AfterMake>
             <RunUserProg1>0</RunUserProg1>
@@ -426,16 +428,6 @@
           <GroupName>Drivers</GroupName>
           <Files>
             <File>
-              <FileName>ADS8325_Driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\ADS8325_Driver.c</FilePath>
-            </File>
-            <File>
-              <FileName>DRV8825_Driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\DRV8825_Driver.c</FilePath>
-            </File>
-            <File>
               <FileName>Led_Driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HardwareDriver\Led_Driver.c</FilePath>
@@ -451,14 +443,9 @@
               <FilePath>..\HardwareDriver\SPI2_Driver.c</FilePath>
             </File>
             <File>
-              <FileName>TLV5617_Driver.c</FileName>
+              <FileName>Usart1_Driver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\TLV5617_Driver.c</FilePath>
-            </File>
-            <File>
-              <FileName>Usart3_Driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\Usart3_Driver.c</FilePath>
+              <FilePath>..\HardwareDriver\Usart1_Driver.c</FilePath>
             </File>
             <File>
               <FileName>Usart2_Driver.c</FileName>
@@ -466,9 +453,34 @@
               <FilePath>..\HardwareDriver\Usart2_Driver.c</FilePath>
             </File>
             <File>
-              <FileName>Usart1_Driver.c</FileName>
+              <FileName>Usart3_Driver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\Usart1_Driver.c</FilePath>
+              <FilePath>..\HardwareDriver\Usart3_Driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>Usart4_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\Usart4_Driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>Usart6_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\Usart6_Driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>TLV5617_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\TLV5617_Driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>DRV8825_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\DRV8825_Driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>ADS8325_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\ADS8325_Driver.c</FilePath>
             </File>
             <File>
               <FileName>CodeScanner_Driver.c</FileName>
@@ -486,11 +498,6 @@
               <FilePath>..\HardwareDriver\RTC_Driver.c</FilePath>
             </File>
             <File>
-              <FileName>Usart6_Driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\Usart6_Driver.c</FilePath>
-            </File>
-            <File>
               <FileName>LCD_Driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HardwareDriver\LCD_Driver.c</FilePath>
@@ -504,11 +511,6 @@
               <FileName>CardLimit_Driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HardwareDriver\CardLimit_Driver.c</FilePath>
-            </File>
-            <File>
-              <FileName>Usart4_Driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\Usart4_Driver.c</FilePath>
             </File>
             <File>
               <FileName>Wifi_Driver.c</FileName>
@@ -836,11 +838,6 @@
               <FilePath>..\Datas\Temperature_Data.c</FilePath>
             </File>
             <File>
-              <FileName>UI_Data.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Datas\UI_Data.c</FilePath>
-            </File>
-            <File>
               <FileName>Time_Data.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Datas\Time_Data.c</FilePath>
@@ -874,6 +871,11 @@
               <FileName>SelfCheck_Data.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Datas\SelfCheck_Data.c</FilePath>
+            </File>
+            <File>
+              <FileName>UI_Data.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Datas\UI_Data.c</FilePath>
             </File>
           </Files>
         </Group>

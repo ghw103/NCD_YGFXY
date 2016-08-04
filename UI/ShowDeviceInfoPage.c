@@ -29,11 +29,11 @@ static DeviceInfo *gb_deviceinfo = NULL;
 static void showDeviceInfo(void);
 static void ClearPageText(void);
 
-static void PageInit(void);
+static MyState_TypeDef PageInit(void *  parm);
 static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpData(void);
-static void PageBufferMalloc(void);
-static void PageBufferFree(void);
+static void PageUpDate(void);
+static MyState_TypeDef PageBufferMalloc(void);
+static MyState_TypeDef PageBufferFree(void);
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -43,17 +43,9 @@ static void PageBufferFree(void);
 
 unsigned char DspShowDeviceInfoPage(void *  parm)
 {
-	SysPage * myPage = GetSysPage();
-
-	myPage->CurrentPage = DspShowDeviceInfoPage;
-	myPage->LCDInput = Input;
-	myPage->PageUpData = PageUpData;
-	myPage->ParentPage = DspSystemSetPage;
-	myPage->ChildPage = DspSetDeviceInfoPage;
-
-	PageInit();
+	SetGBSysPage(DspShowDeviceInfoPage, DspSystemSetPage, DspSetDeviceInfoPage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
 	
-	SelectPage(70);
+	GBPageInit(parm);
 	
 	return 0;
 }
@@ -62,7 +54,6 @@ unsigned char DspShowDeviceInfoPage(void *  parm)
 static void Input(unsigned char *pbuf , unsigned short len)
 {
 	unsigned short *pdata = NULL;
-	SysPage * myPage = GetSysPage();
 	
 	pdata = MyMalloc((len/2)*sizeof(unsigned short));
 	if(pdata == NULL)
@@ -95,8 +86,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		{
 			if(pdPASS == CheckStrIsSame(&pbuf[7] , (void *)GB_Password ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
 			{
-				myPage->ChildPage = DspSetDeviceIDPage;
-				myPage->ChildPage(gb_deviceinfo);
+				SetGBChildPage(DspSetDeviceIDPage);
+				GotoGBChildPage(gb_deviceinfo);
 			}
 			else
 				SendKeyCode(2);
@@ -105,30 +96,32 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	/*·µ»Ø*/
 	else if(pdata[0] == 0x2207)
 	{
-		PageBufferFree();
-		myPage->ParentPage(NULL);
+		GBPageBufferFree();
+		GotoGBParentPage(NULL);
 	}
 	/*ÐÞ¸Ä*/
 	else if(pdata[0] == 0x2208)
 	{
 		if(gb_deviceinfo)
 		{
-			myPage->ChildPage = DspSetDeviceInfoPage;
-			myPage->ChildPage(gb_deviceinfo);
+			SetGBChildPage(DspSetDeviceInfoPage);
+			GotoGBChildPage(gb_deviceinfo);
 		}
 	}
 	
 	MyFree(pdata);
 }
 
-static void PageUpData(void)
+static void PageUpDate(void)
 {
 
 }
 
-static void PageInit(void)
+static MyState_TypeDef PageInit(void *  parm)
 {
 	PageBufferMalloc();
+	
+	SelectPage(70);
 	
 	ClearPageText();
 	
@@ -138,25 +131,33 @@ static void PageInit(void)
 		
 		showDeviceInfo();
 	}
+	
+	return My_Pass;
 }
 
-static void PageBufferMalloc(void)
+static MyState_TypeDef PageBufferMalloc(void)
 {
 	if(gb_deviceinfo == NULL)
 	{
 		gb_deviceinfo = MyMalloc(sizeof(DeviceInfo));
 		if(gb_deviceinfo)
 			memset(gb_deviceinfo, 0, sizeof(DeviceInfo));
+		else
+			return My_Fail;
 	}
+	
+	return My_Pass;
 }
 
-static void PageBufferFree(void)
+static MyState_TypeDef PageBufferFree(void)
 {
 	if(gb_deviceinfo)
 	{
 		MyFree(gb_deviceinfo);
 		gb_deviceinfo = NULL;
 	}
+	
+	return My_Pass;
 }
 
 static void showDeviceInfo(void)

@@ -26,9 +26,7 @@ static UserMPageBuffer * GB_UserMPageBuffer = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpData(void);
-
-
+static void PageUpDate(void);
 static MyState_TypeDef PageInit(void * parm);
 static MyState_TypeDef PageBufferMalloc(void);
 static MyState_TypeDef PageBufferFree(void);
@@ -47,20 +45,9 @@ static void DeleteAUser(void);
 
 unsigned char DspUserMPage(void *  parm)
 {
-	SysPage * myPage = GetSysPage();
-
-	myPage->CurrentPage = DspUserMPage;
-	myPage->LCDInput = Input;
-	myPage->PageUpData = PageUpData;
-	myPage->ParentPage = DspSystemSetPage;
-	myPage->ChildPage = NULL;
-	myPage->PageInit = PageInit;
-	myPage->PageBufferMalloc = PageBufferMalloc;
-	myPage->PageBufferFree = PageBufferFree;
+	SetGBSysPage(DspUserMPage, DspSystemSetPage, NULL, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
 	
-	SelectPage(76);
-	
-	myPage->PageInit(NULL);
+	GBPageInit(parm);
 
 	return 0;
 }
@@ -69,7 +56,6 @@ unsigned char DspUserMPage(void *  parm)
 static void Input(unsigned char *pbuf , unsigned short len)
 {
 	unsigned short *pdata = NULL;
-	SysPage * myPage = GetSysPage();
 	
 	pdata = MyMalloc((len/2)*sizeof(unsigned short));
 	if(pdata == NULL)
@@ -82,8 +68,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	/*返回*/
 	if(pdata[0] == 0x2400)
 	{
-		PageBufferFree();
-		myPage->ParentPage(NULL);
+		GBPageBufferFree();
+		GotoGBParentPage(NULL);
 	}
 	
 	/*上翻也*/
@@ -207,7 +193,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	MyFree(pdata);
 }
 
-static void PageUpData(void)
+static void PageUpDate(void)
 {
 
 }
@@ -216,6 +202,8 @@ static MyState_TypeDef PageInit(void * parm)
 {
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
+	
+	SelectPage(76);
 	
 	/*读取所有操作人*/
 	ReadUserData(GB_UserMPageBuffer->user);

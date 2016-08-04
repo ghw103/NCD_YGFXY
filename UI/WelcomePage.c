@@ -9,20 +9,13 @@
 #include	"PlaySong_Task.h"
 #include	"SelfCheckPage.h"
 
-#include 	"FreeRTOS.h"
-#include 	"task.h"
-#include 	"queue.h"
-
-#include	<string.h>
-#include	"stdio.h"
-
 /******************************************************************************************/
 /*****************************************局部变量声明*************************************/
 
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpData(void);
+static void PageUpDate(void);
 static MyState_TypeDef PageInit(void *  parm);
 static MyState_TypeDef PageBufferMalloc(void);
 static MyState_TypeDef PageBufferFree(void);
@@ -43,20 +36,9 @@ static MyState_TypeDef PageBufferFree(void);
 ***************************************************************************************************/
 unsigned char DspWelcomePage(void *  parm)
 {
-	SysPage * myPage = GetSysPage();
-
-	myPage->CurrentPage = DspWelcomePage;
-	myPage->LCDInput = Input;
-	myPage->PageUpData = PageUpData;
-	myPage->ParentPage = NULL;
-	myPage->ChildPage = NULL;
-	myPage->PageInit = PageInit;
-	myPage->PageBufferMalloc = PageBufferMalloc;
-	myPage->PageBufferFree = PageBufferFree;
-
-	SelectPage(50);
+	SetGBSysPage(DspWelcomePage, NULL, DspSelfCheckPage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
 	
-	myPage->PageInit(NULL);
+	GBPageInit(parm);
 	
 	return 0;
 }
@@ -84,7 +66,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 *Author：xsx
 *Data：2016年6月27日08:55:02
 ***************************************************************************************************/
-static void PageUpData(void)
+static void PageUpDate(void)
 {
 	static unsigned short timecount = 0;
 	
@@ -93,7 +75,7 @@ static void PageUpData(void)
 	if(timecount >= 500)
 	{
 		timecount = 0;
-		DspSelfCheckPage(NULL);
+		GotoGBChildPage(NULL);
 	}
 }
 
@@ -107,6 +89,10 @@ static void PageUpData(void)
 ***************************************************************************************************/
 static MyState_TypeDef PageInit(void *  parm)
 {
+	SetLEDLight(100);
+	
+	SelectPage(50);
+	
 	AddNumOfSongToList(52, 0);
 	
 	return My_Pass;

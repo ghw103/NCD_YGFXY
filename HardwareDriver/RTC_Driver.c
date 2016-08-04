@@ -43,17 +43,20 @@ MyState_TypeDef My_RTC_Init(void)
 	
 	RTC_InitTypeDef RTC_InitStructure;
 	/* Enable the PWR clock */
+	
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
-
+		
 	/* Allow access to RTC */
 	PWR_BackupAccessCmd(ENABLE);
-
+	
 	/* Reset RTC Domain */
 //	RCC_BackupResetCmd(ENABLE);
 //	RCC_BackupResetCmd(DISABLE);
 
 	if(RTC_ReadBackupRegister(RTC_BKP_DR0)!=0x5050)
 	{
+		
+		
 		/* Enable the LSE OSC */
 		RCC_LSEConfig(RCC_LSE_ON);
 
@@ -70,7 +73,11 @@ MyState_TypeDef My_RTC_Init(void)
 
 		/* Select the RTC Clock Source */
 		RCC_RTCCLKConfig(RCC_RTCCLKSource_LSE);
-		RCC_RTCCLKCmd(ENABLE);	//使能RTC时钟 
+		RCC_RTCCLKCmd(ENABLE);	//使能RTC时钟
+		
+		/* Wait for RTC APB registers synchronisation */
+		RTC_WaitForSynchro();
+		
 		/* Configure the RTC data register and RTC prescaler */
 		/* ck_spre(1Hz) = RTCCLK(LSI) /(AsynchPrediv + 1)*(SynchPrediv + 1)*/
 		RTC_InitStructure.RTC_AsynchPrediv = 0x7F;
@@ -81,6 +88,11 @@ MyState_TypeDef My_RTC_Init(void)
 		SetTime(0, 1, 1, 12, 12, 12);
 		
 		RTC_WriteBackupRegister(RTC_BKP_DR0,0x5050);	//标记已经初始化过了
+	}
+	else
+	{
+		/* Wait for RTC APB registers synchronisation */
+		RTC_WaitForSynchro();
 	}
 	
 	return My_Pass;

@@ -7,6 +7,7 @@
 typedef struct TimeDownPage_tag {
 	Timer *S_Timer;
 	ItemData * currenttestdata;
+	unsigned short time;
 }TimeDownPageData;
 
 

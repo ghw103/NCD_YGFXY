@@ -8,7 +8,6 @@
 #define	Led_GpioGroup	GPIOE
 #define	Led_Rcc			RCC_AHB1Periph_GPIOE
 
-
 typedef enum
 { 
 	ON = Bit_RESET,			//LED POWER ON

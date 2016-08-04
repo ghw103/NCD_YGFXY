@@ -25,7 +25,7 @@ static TimeDownPageData *S_TimeDownPageData = NULL;
 /*****************************************局部函数声明*************************************/
 static void RefreshTimeText(void);
 static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpData(void);
+static void PageUpDate(void);
 
 static MyState_TypeDef PageInit(void *  parm);
 static MyState_TypeDef PageBufferMalloc(void);
@@ -39,20 +39,9 @@ static MyState_TypeDef PageBufferFree(void);
 
 unsigned char DspTimeDownNorPage(void *  parm)
 {
-	SysPage * myPage = GetSysPage();   
-
-	myPage->CurrentPage = DspTimeDownNorPage;
-	myPage->LCDInput = Input;
-	myPage->PageUpData = PageUpData;
-	myPage->ParentPage = NULL;
-	myPage->ChildPage = DspTestPage;
-	myPage->PageInit = PageInit;
-	myPage->PageBufferMalloc = PageBufferMalloc;
-	myPage->PageBufferFree = PageBufferFree;
+	SetGBSysPage(DspTimeDownNorPage, NULL, DspTestPage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
 	
-	myPage->PageInit(parm);
-	
-	SelectPage(65);
+	GBPageInit(parm);
 	
 	return 0;
 }
@@ -71,21 +60,20 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	pdata[0] = (pdata[0]<<8) + pbuf[5];
 	
 
-	
 	MyFree(pdata);
 }
 
-static void PageUpData(void)
+static void PageUpDate(void)
 {
 	static unsigned char count = 0;
 	
-	if(count % 50 == 0)
+	if(count % 5 == 0)
 	{
 		RefreshTimeText();
 		if((S_TimeDownPageData)&&(TimeOut == timer_expired(S_TimeDownPageData->S_Timer)))
 		{
-			PageBufferFree();
-			GetSysPage()->ChildPage(NULL);
+			GBPageBufferFree();
+			GotoGBChildPage(NULL);
 		}
 	}
 	
@@ -96,6 +84,8 @@ static MyState_TypeDef PageInit(void *  parm)
 {
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
+	
+	SelectPage(65);
 	
 	S_TimeDownPageData->currenttestdata = GetCurrentTestItem();
 	
@@ -128,18 +118,11 @@ static MyState_TypeDef PageBufferFree(void)
 
 static void RefreshTimeText(void)
 {
-	char *buf = NULL;
-	buf = MyMalloc(50);
-	if(buf && S_TimeDownPageData)
+	if(S_TimeDownPageData)
 	{
-		memset(buf, 0, 50);
-		
-		ClearText(0x2000, 30);
-		sprintf(buf, "%d", timer_surplus(S_TimeDownPageData->S_Timer));
-		DisText(0x2000, buf, strlen(buf));
+		S_TimeDownPageData->time = timer_surplus(S_TimeDownPageData->S_Timer);
+		DspNum(0x2000 , S_TimeDownPageData->time);
 	}
-	
-	MyFree(buf);
 }
 
 

@@ -78,7 +78,7 @@ static void vLwipUserClientTask( void *pvParameters )
 //		if(SelfCheck_OK == GetGB_SelfCheckResult())
 		{
 			//IP4_ADDR(&server_ipaddr,GetGB_NetData()->serverip.ip_1,GetGB_NetData()->serverip.ip_2,GetGB_NetData()->serverip.ip_3,GetGB_NetData()->serverip.ip_4);
-			IP4_ADDR(&server_ipaddr, 192,168,2,102);
+			IP4_ADDR(&server_ipaddr, 192,168,0,35);
 			while(1)
 			{
 				if(Line_Mode == GetGB_NetCard())														//当前网卡是有线网时
@@ -100,6 +100,7 @@ static void vLwipUserClientTask( void *pvParameters )
 						{
 							ClientTXHandle(tcp_clientconn);
 							ClientRXHandle(tcp_clientconn);
+							//vTaskDelay(10 / portTICK_RATE_MS);
 						}
 						
 						SetGB_UserServerLinkState(Link_Down);

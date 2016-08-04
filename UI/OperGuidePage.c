@@ -24,7 +24,10 @@
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpData(void);
+static void PageUpDate(void);
+static MyState_TypeDef PageInit(void *  parm);
+static MyState_TypeDef PageBufferMalloc(void);
+static MyState_TypeDef PageBufferFree(void);
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -34,17 +37,9 @@ static void PageUpData(void);
 
 unsigned char DspOperGuidePage(void *  parm)
 {
-	SysPage * myPage = GetSysPage();
-
-	myPage->CurrentPage = DspOperGuidePage;
-	myPage->LCDInput = Input;
-	myPage->PageUpData = PageUpData;
-	myPage->ParentPage = DspWaittingCardPage;
-	myPage->ChildPage = DspWaittingCardPage;
+	SetGBSysPage(DspOperGuidePage, DspWaittingCardPage, DspWaittingCardPage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
 	
-	SelectPage(60);
-	
-	AddNumOfSongToList(48, 0);
+	GBPageInit(parm);
 	
 	return 0;
 }
@@ -53,7 +48,6 @@ unsigned char DspOperGuidePage(void *  parm)
 static void Input(unsigned char *pbuf , unsigned short len)
 {
 	unsigned short *pdata = NULL;
-	SysPage * myPage = GetSysPage();
 	
 	pdata = MyMalloc((len/2)*sizeof(unsigned short));
 	if(pdata == NULL)
@@ -66,14 +60,57 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	/*返回*/
 	if(pdata[0] == 0x1e02)
 	{
-		myPage->ParentPage(NULL);
+		GBPageBufferFree();
+		GotoGBParentPage(NULL);
 	}
 
 	MyFree(pdata);
 }
 
-static void PageUpData(void)
+static void PageUpDate(void)
 {
 
 }
 
+/***************************************************************************************************
+*FunctionName：PageInit
+*Description：当前界面初始化
+*Input：None
+*Output：None
+*Author：xsx
+*Data：2016年6月27日08:55:25
+***************************************************************************************************/
+static MyState_TypeDef PageInit(void *  parm)
+{
+	SelectPage(60);
+	
+	AddNumOfSongToList(48, 0);
+	
+	return My_Pass;
+}
+
+/***************************************************************************************************
+*FunctionName：PageBufferMalloc
+*Description：当前界面临时缓存申请
+*Input：None
+*Output：MyState_TypeDef -- 返回成功与否
+*Author：xsx
+*Data：2016年6月27日08:56:02
+***************************************************************************************************/
+static MyState_TypeDef PageBufferMalloc(void)
+{
+	return My_Pass;
+}
+
+/***************************************************************************************************
+*FunctionName：PageBufferFree
+*Description：当前界面临时缓存释放
+*Input：None
+*Output：None
+*Author：xsx
+*Data：2016年6月27日08:56:21
+***************************************************************************************************/
+static MyState_TypeDef PageBufferFree(void)
+{
+	return My_Pass;
+}

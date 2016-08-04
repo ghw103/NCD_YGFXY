@@ -26,7 +26,7 @@ static WifiPageBuffer * S_WifiPageBuffer = NULL;
 static MyState_TypeDef RefreshWifi(void);
 static void DisListText(void);
 static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpData(void);
+static void PageUpDate(void);
 static void CheckIsNeedKey(void);
 
 static MyState_TypeDef PageInit(void *  parm);
@@ -41,20 +41,9 @@ static MyState_TypeDef PageBufferFree(void);
 
 unsigned char DspWifiSetPage(void *  parm)
 {
-	SysPage * myPage = GetSysPage();
-
-	myPage->CurrentPage = DspWifiSetPage;
-	myPage->LCDInput = Input;
-	myPage->PageUpData = PageUpData;
-	myPage->ParentPage = DspNetPreSetPage;
-	myPage->ChildPage = NULL;
-	myPage->PageInit = PageInit;
-	myPage->PageBufferMalloc = PageBufferMalloc;
-	myPage->PageBufferFree = PageBufferFree;
+	SetGBSysPage(DspWifiSetPage, DspNetPreSetPage, NULL, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
 	
-	SelectPage(82);
-
-	myPage->PageInit(parm);
+	GBPageInit(parm);
 	
 	return 0;
 }
@@ -63,7 +52,6 @@ unsigned char DspWifiSetPage(void *  parm)
 static void Input(unsigned char *pbuf , unsigned short len)
 {
 	unsigned short *pdata = NULL;
-	SysPage * myPage = GetSysPage();
 	
 	pdata = MyMalloc((len/2)*sizeof(unsigned short));
 	if(pdata == NULL)
@@ -133,10 +121,10 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	/*·µ»Ø*/
 	else if(pdata[0] == 0x2d09)
 	{
-		PageBufferFree();
+		GBPageBufferFree();
 		SetGB_WifiState(Link_Up);
 		
-		myPage->ParentPage(NULL);
+		GotoGBParentPage(NULL);
 	}
 	/*Ë¢ÐÂ*/
 	else if(pdata[0] == 0x2d0a)
@@ -166,7 +154,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	MyFree(pdata);
 }
 
-static void PageUpData(void)
+static void PageUpDate(void)
 {
 	
 }
@@ -175,7 +163,8 @@ static MyState_TypeDef PageInit(void *  parm)
 {
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
-//	S_WifiPageBuffer = &GB_WifiPageBuffer;
+	
+	SelectPage(82);
 	
 	BasicPic(0x2d30, 0, 111, 13, 569, 253, 599, 392, 124);
 	

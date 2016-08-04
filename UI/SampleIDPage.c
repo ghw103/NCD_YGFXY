@@ -26,7 +26,7 @@ static SampleIDPage *S_SampleIDPage = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpData(void);
+static void PageUpDate(void);
 
 static MyState_TypeDef PageInit(void *  parm);
 static MyState_TypeDef PageBufferMalloc(void);
@@ -42,20 +42,10 @@ static void RefreshSampleID(void);
 
 unsigned char DspSampleIDPage(void *  parm)
 {
-	SysPage * myPage = GetSysPage();
-
-	myPage->CurrentPage = DspSampleIDPage;
-	myPage->LCDInput = Input;
-	myPage->PageUpData = PageUpData;
-	myPage->ParentPage = DspSelectUserPage;
-	myPage->ChildPage = DspWaittingCardPage;
-	myPage->PageInit = PageInit;
-	myPage->PageBufferMalloc = PageBufferMalloc;
-	myPage->PageBufferFree = PageBufferFree;
 	
-	SelectPage(56);
-
-	myPage->PageInit(parm);
+	SetGBSysPage(DspSampleIDPage, DspSelectUserPage, DspWaittingCardPage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
+	
+	GBPageInit(parm);
 
 	return 0;
 }
@@ -76,7 +66,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	/*返回*/
 	if(pdata[0] == 0x1d00)
 	{
-		DspSelectUserPage(NULL);
+		GBPageBufferFree();
+		GotoGBParentPage(NULL);
 	}
 	
 	/*确定*/
@@ -92,8 +83,9 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			else
 			{
 				memcpy(S_SampleIDPage->currenttestdata->testdata.sampleid, S_SampleIDPage->tempid, MaxSampleIDLen);
-				PageBufferFree();
-				DspWaittingCardPage(NULL);
+				
+				GBPageBufferFree();
+				GotoGBChildPage(NULL);
 			}
 		}
 	}
@@ -114,7 +106,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	MyFree(pdata);
 }
 
-static void PageUpData(void)
+static void PageUpDate(void)
 {
 	if(My_Pass == TakeSampleIDData(&(S_SampleIDPage->tempbuf)))
 	{
@@ -129,6 +121,8 @@ static MyState_TypeDef PageInit(void *  parm)
 {
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
+	
+	SelectPage(56);
 	
 	S_SampleIDPage->currenttestdata = GetCurrentTestItem();
 	/*清空文本*/

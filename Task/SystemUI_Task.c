@@ -62,15 +62,14 @@ void StartvSystemUITask(void)
 ***************************************************************************************************/
 static void vSystemUITask( void *pvParameters )
 {
-	SysPage * myPage = GetSysPage();
 	static unsigned int count = 0;
 	
 	while(1)
 	{
-		myPage->PageUpData();
+		GBPageUpDate();
 		
 		/*500ms更新一次时间和环境温度*/
-		if(count % 50 == 0)
+		if(count % 10 == 0)
 			DspTimeAndTempData();
 		
 		if(count % 100 == 0)

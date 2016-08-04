@@ -4,7 +4,11 @@
 #include	"stm32f4xx.h"
 #include	"ff.h"
 
-
+#define		NormalCode	0											//正常程序
+#define		DebugCode	1											//测试程序
+#define		TestCode	2											//测试程序
+	
+#define		CodeType	DebugCode									//程序分类
 /***************************************************************************************************/
 /***************************************************************************************************/
 /*****************************************软件版本**************************************************/
@@ -190,7 +194,7 @@ typedef struct SysPage_Tag
 {
 	unsigned char (*CurrentPage)(void * pram);
 	void (*LCDInput)(unsigned char *pbuf , unsigned short len);
-	void (*PageUpData)(void);
+	void (*PageUpDate)(void);
 	MyState_TypeDef (*PageInit)(void * pram);
 	MyState_TypeDef (*PageBufferMalloc)(void);
 	MyState_TypeDef (*PageBufferFree)(void);

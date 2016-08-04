@@ -48,7 +48,7 @@ const char selfcheckpicinfo[19] = {5, 10, 10, 15, 20, 20,25,30,30, 35, 45, 45, 5
 /*****************************************局部函数声明*************************************/
 
 static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpData(void);
+static void PageUpDate(void);
 static MyState_TypeDef PageInit(void *  parm);
 static MyState_TypeDef PageBufferMalloc(void);
 static MyState_TypeDef PageBufferFree(void);
@@ -64,20 +64,9 @@ static void RefreshPageValue(void);
 
 unsigned char DspSelfCheckPage(void *  parm)
 {
-	SysPage * myPage = GetSysPage();
-
-	myPage->CurrentPage = DspSelfCheckPage;
-	myPage->LCDInput = Input;
-	myPage->PageUpData = PageUpData;
-	myPage->ParentPage = NULL;
-	myPage->ChildPage = DspLunchPage;
-	myPage->PageInit = PageInit;
-	myPage->PageBufferMalloc = PageBufferMalloc;
-	myPage->PageBufferFree = PageBufferFree;
+	SetGBSysPage(DspSelfCheckPage, NULL, DspLunchPage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
 	
-	SelectPage(51);
-	
-	myPage->PageInit(NULL);
+	GBPageInit(parm);
 	
 	return 0;
 }
@@ -128,13 +117,15 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	MyFree(pdata);
 }
 
-static void PageUpData(void)
+static void PageUpDate(void)
 {
 	RefreshPageValue();
 }
 
 static MyState_TypeDef PageInit(void *  parm)
 {
+	SelectPage(51);
+	
 	/*清空当前页面*/
 	PageClear();
 	

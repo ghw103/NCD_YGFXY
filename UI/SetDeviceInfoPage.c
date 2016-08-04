@@ -24,7 +24,7 @@ static SetDeviceInfoPageBuffer * S_SetDeviceInfoPageBuffer = NULL;
 /*****************************************局部函数声明*************************************/
 
 static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpData(void);
+static void PageUpDate(void);
 
 static MyState_TypeDef PageInit(void *  parm);
 static MyState_TypeDef PageBufferMalloc(void);
@@ -38,20 +38,9 @@ static MyState_TypeDef PageBufferFree(void);
 
 unsigned char DspSetDeviceInfoPage(void *  parm)
 {
-	SysPage * myPage = GetSysPage();
+	SetGBSysPage(DspSetDeviceInfoPage, DspShowDeviceInfoPage, NULL, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
 	
-	myPage->CurrentPage = DspSetDeviceInfoPage;
-	myPage->LCDInput = Input;
-	myPage->PageUpData = PageUpData;
-	myPage->ParentPage = DspShowDeviceInfoPage;
-	myPage->ChildPage = NULL;
-	myPage->PageInit = PageInit;
-	myPage->PageBufferMalloc = PageBufferMalloc;
-	myPage->PageBufferFree = PageBufferFree;
-
-	myPage->PageInit(parm);
-	
-	SelectPage(72);
+	GBPageInit(parm);
 	
 	return 0;
 }
@@ -72,8 +61,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	/*返回*/
 	if(pdata[0] == 0x2300)
 	{
-		PageBufferFree();
-		DspShowDeviceInfoPage(NULL);
+		GBPageBufferFree();
+		GotoGBParentPage(NULL);
 	}
 	/*确认*/
 	else if(pdata[0] == 0x2301)
@@ -161,7 +150,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	MyFree(pdata);
 }
 
-static void PageUpData(void)
+static void PageUpDate(void)
 {
 
 }
@@ -170,6 +159,8 @@ static MyState_TypeDef PageInit(void *  parm)
 {
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
+	
+	SelectPage(72);
 	
 	if(parm)
 	{

@@ -29,7 +29,7 @@ static WaitPageData * S_WaitPageData = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpData(void);
+static void PageUpDate(void);
 
 static MyState_TypeDef PageInit(void *  parm);
 static MyState_TypeDef PageBufferMalloc(void);
@@ -43,20 +43,9 @@ static MyState_TypeDef PageBufferFree(void);
 
 unsigned char DspWaittingCardPage(void *  parm)
 {
-	SysPage * myPage = GetSysPage();
-
-	myPage->CurrentPage = DspWaittingCardPage;
-	myPage->LCDInput = Input;
-	myPage->PageUpData = PageUpData;
-	myPage->ParentPage = DspSampleIDPage;
-	myPage->ChildPage = DspOperGuidePage;
-	myPage->PageInit = PageInit;
-	myPage->PageBufferMalloc = PageBufferMalloc;
-	myPage->PageBufferFree = PageBufferFree;
+	SetGBSysPage(DspWaittingCardPage, DspSampleIDPage, DspOperGuidePage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
 	
-	SelectPage(58);
-	
-	myPage->PageInit(parm);
+	GBPageInit(parm);
 
 	return 0;
 }
@@ -77,36 +66,39 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	/*返回*/
 	if(pdata[0] == 0x1e00)
 	{
-		PageBufferFree();
-		DspSampleIDPage(NULL);
+		GBPageBufferFree();
+		SetGBChildPage(DspSampleIDPage);
+		GotoGBChildPage(NULL);
 	}
 	
 	/*查看操作规程*/
 	else if(pdata[0] == 0x1e01)
 	{
-		PageBufferFree();
-		DspOperGuidePage(NULL);
+		GBPageBufferFree();
+		SetGBChildPage(DspOperGuidePage);
+		GotoGBChildPage(NULL);
 	}
 
 	MyFree(pdata);
 }
 
-static void PageUpData(void)
+static void PageUpDate(void)
 {
 	/*是否插卡*/
 	if(GetCardState() == CardIN)
 	{
-		//if((S_WaitPageData->currenttestdata)&& (S_WaitPageData->currenttestdata->statues == NotStart))
-		PageBufferFree();
-		DspPreReadCardPage(NULL);
+		GBPageBufferFree();
+		SetGBChildPage(DspPreReadCardPage);
+		GotoGBChildPage(NULL);
 	}
 	/*时间到，未插卡，返回*/
 	else if(TimeOut == timer_expired(&(S_WaitPageData->timer)))
 	{
 		AddNumOfSongToList(8, 0);
-		PageBufferFree();
-		DeleteCurrentTest();
-		DspLunchPage(NULL);
+		
+		GBPageBufferFree();
+		SetGBParentPage(DspLunchPage);
+		GotoGBParentPage(NULL);
 		return;
 	}
 	
@@ -122,6 +114,8 @@ static MyState_TypeDef PageInit(void *  parm)
 {
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
+	
+	SelectPage(58);
 	
 	MotorMoveTo(WaittingCardLocation, 1);
 	

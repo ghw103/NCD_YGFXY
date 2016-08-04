@@ -33,7 +33,7 @@ static PreReadPageBuffer * S_PreReadPageBuffer = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpData(void);
+static void PageUpDate(void);
 static void ShowCardInfo(void);
 static void ShowTemp(void);
 
@@ -52,20 +52,9 @@ static void CheckPreTestCard(void);
 
 unsigned char DspPreReadCardPage(void *  parm)
 {
-	SysPage * myPage = GetSysPage();
-
-	myPage->CurrentPage = DspPreReadCardPage;
-	myPage->LCDInput = Input;
-	myPage->PageUpData = PageUpData;
-	myPage->ParentPage = DspWaittingCardPage;
-	myPage->ChildPage = DspTimeDownNorPage;
-	myPage->PageInit = PageInit;
-	myPage->PageBufferMalloc = PageBufferMalloc;
-	myPage->PageBufferFree = PageBufferFree;
+	SetGBSysPage(DspPreReadCardPage, DspWaittingCardPage, DspTimeDownNorPage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
 	
-	SelectPage(62);
-	
-	myPage->PageInit(parm);
+	GBPageInit(parm);
 	
 	return 0;
 }
@@ -93,15 +82,17 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		/*更换检测卡*/
 		if(pdata[1] == 0x0002)
 		{
-			PageBufferFree();
-			DspWaittingCardPage(NULL);
+			GBPageBufferFree();
+			GotoGBParentPage(NULL);
 		}
 		/*退出*/
 		else if(pdata[1] == 0x0001)
 		{
-			PageBufferFree();
 			DeleteCurrentTest();
-			DspLunchPage(NULL);
+			
+			GBPageBufferFree();
+			SetGBParentPage(DspLunchPage);
+			GotoGBParentPage(NULL);
 		}
 	}
 	/*排队模式，与之前注册的卡id不同*/
@@ -114,23 +105,27 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		/*取消测试*/
 		if(pdata[1] == 0x0001)
 		{
-			PageBufferFree();
 			DeleteCurrentTest();
-			DspLunchPage(NULL);
+			
+			GBPageBufferFree();
+			SetGBParentPage(DspLunchPage);
+			GotoGBParentPage(NULL);
 		}
 		/*继续测试*/
 		else if(pdata[1] == 0x0002)
 		{
-			PageBufferFree();
 			DeleteCurrentTest();
-			DspLunchPage(NULL);
+			
+			GBPageBufferFree();
+			SetGBParentPage(DspLunchPage);
+			GotoGBParentPage(NULL);
 		}
 	}
 
 	MyFree(pdata);
 }
 
-static void PageUpData(void)
+static void PageUpDate(void)
 {
 	CheckQRCode();
 	
@@ -147,6 +142,8 @@ static MyState_TypeDef PageInit(void *  parm)
 {
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
+	
+	SelectPage(62);
 	
 	/*清除界面*/
 	ClearText(0x1f20, 30);
@@ -224,12 +221,14 @@ static void CheckPreTestCard(void)
 {
 	if((S_PreReadPageBuffer) && (My_Pass == TakeTestResult(&(S_PreReadPageBuffer->cardpretestresult))))
 	{
+#if (NormalCode == CodeType)
 		if(S_PreReadPageBuffer->cardpretestresult == TestInterrupt)
 		{
 			SendKeyCode(5);
 			MotorMoveTo(MaxLocation, 1);
 			AddNumOfSongToList(22, 0);
 		}
+
 		else if((S_PreReadPageBuffer->cardpretestresult == PeakNumError)||(S_PreReadPageBuffer->cardpretestresult == ResultIsOK))
 		{
 			SendKeyCode(3);
@@ -237,6 +236,7 @@ static void CheckPreTestCard(void)
 			AddNumOfSongToList(22, 0);
 		}
 		else if(S_PreReadPageBuffer->cardpretestresult == PeakNumZero)
+#endif
 		{
 			//如果是排队模式，则进入排队界面
 			if((S_PreReadPageBuffer->currenttestdata->testlocation > 0)&&(S_PreReadPageBuffer->currenttestdata->testlocation < PaiDuiWeiNum))

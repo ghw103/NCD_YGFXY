@@ -31,10 +31,12 @@ static LunchPageBuffer * S_LunchPageBuffer = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpData(void);
+static void PageUpDate(void);
 static MyState_TypeDef PageInit(void *  parm);
 static MyState_TypeDef PageBufferMalloc(void);
 static MyState_TypeDef PageBufferFree(void);
+
+static void DspPageText(void);
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -44,20 +46,9 @@ static MyState_TypeDef PageBufferFree(void);
 
 unsigned char DspLunchPage(void *  parm)
 {
-	SysPage * myPage = GetSysPage();
-
-	myPage->CurrentPage = DspLunchPage;
-	myPage->LCDInput = Input;
-	myPage->PageUpData = PageUpData;
-	myPage->ParentPage = NULL;
-	myPage->ChildPage = NULL;
-	myPage->PageInit = PageInit;
-	myPage->PageBufferMalloc = PageBufferMalloc;
-	myPage->PageBufferFree = PageBufferFree;
+	SetGBSysPage(DspLunchPage, NULL, NULL, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
 	
-	SelectPage(52);
-	
-	myPage->PageInit(parm);
+	GBPageInit(parm);
 	
 	return 0;
 }
@@ -67,7 +58,6 @@ static void Input(unsigned char *pbuf , unsigned short len)
 {
 	unsigned short *pdata = NULL;
 	unsigned char error = 0;
-	SysPage * myPage = GetSysPage();
 	
 	pdata = MyMalloc((len/2)*sizeof(unsigned short));
 	if(pdata == NULL)
@@ -80,9 +70,9 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	/*设置*/
 	if(pdata[0] == 0x1b04)
 	{
-		myPage->PageBufferFree();
-		myPage->ChildPage = DspSystemSetPage;
-		myPage->ChildPage(NULL);
+		GBPageBufferFree();
+		SetGBChildPage(DspSystemSetPage);
+		GotoGBChildPage(NULL);
 	}
 	/*常规测试*/
 	else if(pdata[0] == 0x1b00)
@@ -91,8 +81,9 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		/*创建成功*/
 		if(0 == error)
 		{
-			myPage->PageBufferFree();
-			DspSelectUserPage(NULL);
+			GBPageBufferFree();
+			SetGBChildPage(DspSelectUserPage);
+			GotoGBChildPage(NULL);
 		}
 		/*禁止常规测试*/
 		else if(1 == error)
@@ -124,8 +115,9 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			/*查看排队状态*/
 			if(S_LunchPageBuffer->presscount > 20)
 			{
-				myPage->PageBufferFree();
-				DspPaiDuiPage(NULL);
+				GBPageBufferFree();
+				SetGBChildPage(DspPaiDuiPage);
+				GotoGBChildPage(NULL);
 			}
 			/*批量测试*/
 			else
@@ -134,8 +126,9 @@ static void Input(unsigned char *pbuf , unsigned short len)
 				/*创建成功*/
 				if(0 == error)
 				{
-					myPage->PageBufferFree();
-					DspSelectUserPage(NULL);
+					GBPageBufferFree();
+					SetGBChildPage(DspSelectUserPage);
+					GotoGBChildPage(NULL);
 				}
 				/*排队位置满，不允许*/
 				else if(1 == error)
@@ -162,7 +155,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	MyFree(pdata);
 }
 
-static void PageUpData(void)
+static void PageUpDate(void)
 {
 	if(TimeOut == timer_expired(&(S_LunchPageBuffer->timer)))
 	{
@@ -176,7 +169,11 @@ static MyState_TypeDef PageInit(void *  parm)
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
 	
+	SelectPage(52);
+	
 	timer_set(&(S_LunchPageBuffer->timer), 30);
+	
+	DspPageText();
 	
 	return My_Pass;
 }
@@ -203,5 +200,18 @@ static MyState_TypeDef PageBufferFree(void)
 	return My_Pass;
 }
 
-
+/***************************************************************************************************/
+/***************************************************************************************************/
+/***************************************************************************************************/
+/***************************************************************************************************/
+/***************************************************************************************************/
+static void DspPageText(void)
+{
+	if(S_LunchPageBuffer)
+	{
+		memset(S_LunchPageBuffer->buf, 0, 100);
+		sprintf(S_LunchPageBuffer->buf, "V %d.%d.%02d", GB_SoftVersion_1, GB_SoftVersion_2, GB_SoftVersion_3);
+		DisText(0x1b10, S_LunchPageBuffer->buf, strlen(S_LunchPageBuffer->buf));
+	}
+}
 

@@ -31,7 +31,7 @@ const unsigned int TestLineHigh = 77010;	//´ËÊý¾ÝÓëÇúÏßÏÔÊ¾ÇøÓò¸ß¶ÈÓÐ¹Ø£¬Èç¹û½çÃ
 /*****************************************¾Ö²¿º¯ÊýÉùÃ÷*************************************/
 static void RefreshCurve(void);
 static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpData(void);
+static void PageUpDate(void);
 static void AddDataToLine(unsigned short data);
 static void RefreshPageText(void);
 
@@ -47,20 +47,9 @@ static MyState_TypeDef PageBufferFree(void);
 
 unsigned char DspTestPage(void *  parm)
 {
-	SysPage * myPage = GetSysPage();
-
-	myPage->CurrentPage = DspTestPage;
-	myPage->LCDInput = Input;
-	myPage->PageUpData = PageUpData;
-	myPage->ParentPage = NULL;
-	myPage->ChildPage = DspLunchPage;
-	myPage->PageInit = PageInit;
-	myPage->PageBufferMalloc = PageBufferMalloc;
-	myPage->PageBufferFree = PageBufferFree;
+	SetGBSysPage(DspTestPage, NULL, DspLunchPage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
 	
-	SelectPage(66);
-	
-	myPage->PageInit(parm);
+	GBPageInit(parm);
 	
 	return 0;
 }
@@ -69,7 +58,6 @@ unsigned char DspTestPage(void *  parm)
 static void Input(unsigned char *pbuf , unsigned short len)
 {
 	unsigned short *pdata = NULL;
-	SysPage * myPage = GetSysPage();
 	
 	pdata = MyMalloc((len/2)*sizeof(unsigned short));
 	if(pdata == NULL)
@@ -87,8 +75,9 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			if(GB_TestPageBuffer->cardpretestresult != NoResult)
 			{
 				DeleteCurrentTest();
-				PageBufferFree();
-				myPage->ChildPage(NULL);
+
+				GBPageBufferFree();
+				GotoGBChildPage(NULL);
 			}
 			else
 				SendKeyCode(7);
@@ -102,7 +91,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	MyFree(pdata);
 }
 
-static void PageUpData(void)
+static void PageUpDate(void)
 {
 	if(GB_TestPageBuffer)
 		RefreshCurve();
@@ -112,6 +101,8 @@ static MyState_TypeDef PageInit(void *  parm)
 {
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
+	
+	SelectPage(66);
 	
 	/*Çå¿ÕÇúÏß*/
 	ClearLine(0x56);

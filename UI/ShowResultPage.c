@@ -31,7 +31,7 @@ static unsigned int TestLineHigh = 76800;	//此数据与曲线显示区域高度有关，如果界
 /*****************************************局部函数声明*************************************/
 
 static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpData(void);
+static void PageUpDate(void);
 
 static void ClearPage(void);
 static void RefreshText(void);
@@ -49,21 +49,10 @@ static MyState_TypeDef PageBufferFree(void);
 /******************************************************************************************/
 
 unsigned char DspShowResultPage(void *  parm)
-{
-	SysPage * myPage = GetSysPage();
-
-	myPage->CurrentPage = DspShowResultPage;
-	myPage->LCDInput = Input;
-	myPage->PageUpData = PageUpData;
-	myPage->ParentPage = DspRecordPage;
-	myPage->ChildPage = NULL;
-	myPage->PageInit = PageInit;
-	myPage->PageBufferMalloc = PageBufferMalloc;
-	myPage->PageBufferFree = PageBufferFree;
+{	
+	SetGBSysPage(DspShowResultPage, DspRecordPage, NULL, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
 	
-	SelectPage(110);
-	
-	myPage->PageInit(parm);
+	GBPageInit(parm);
 
 	return 0;
 }
@@ -72,7 +61,6 @@ unsigned char DspShowResultPage(void *  parm)
 static void Input(unsigned char *pbuf , unsigned short len)
 {
 	unsigned short *pdata = NULL;
-	SysPage * myPage = GetSysPage();
 	
 	pdata = MyMalloc((len/2)*sizeof(unsigned short));
 	if(pdata == NULL)
@@ -85,8 +73,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	/*退出*/
 	if(0x2b01 == pdata[0])
 	{
-		PageBufferFree();
-		myPage->ParentPage(NULL);
+		GBPageBufferFree();
+		GotoGBParentPage(NULL);
 	}
 	/*打印*/
 	else if(0x2b00 == pdata[0])
@@ -97,7 +85,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	MyFree(pdata);
 }
 
-static void PageUpData(void)
+static void PageUpDate(void)
 {
 
 }
@@ -106,6 +94,8 @@ static MyState_TypeDef PageInit(void *  parm)
 {
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
+	
+	SelectPage(110);
 	
 	ClearPage();
 

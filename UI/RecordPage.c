@@ -30,7 +30,7 @@ static RecordPageBuffer * GB_RecordPageBuffer = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpData(void);
+static void PageUpDate(void);
 
 static MyState_TypeDef PageInit(void *parm);
 static MyState_TypeDef PageBufferMalloc(void);
@@ -49,22 +49,20 @@ static MyState_TypeDef ReadFileSaveDateInfo(void);
 
 unsigned char DspRecordPage(void *  parm)
 {
-	SysPage * myPage = GetSysPage();
+	SetGBParentPage(DspSystemSetPage);
+	SetGBChildPage(DspShowResultPage);
+	SetGBPageUpDate(PageUpDate);
+	SetGBGBPageInput(Input);
+	SetGBPageInit(PageInit);
+	SetGBPageBufferMalloc(PageBufferMalloc);
+	SetGBPageBufferFree(PageBufferFree);
 	
-	myPage->LCDInput = Input;
-	myPage->PageUpData = PageUpData;
-	myPage->ParentPage = DspSystemSetPage;
-	myPage->ChildPage = DspShowResultPage;
-	myPage->PageInit = PageInit;
-	myPage->PageBufferMalloc = PageBufferMalloc;
-	myPage->PageBufferFree = PageBufferFree;
-	
-	if(DspSystemSetPage == myPage->CurrentPage)
-		myPage->PageInit(parm);
-	
-	myPage->CurrentPage = DspRecordPage;
+	if(DspSystemSetPage == GetGBCurrentPage())
+		GBPageInit(parm);
 	
 	SelectPage(86);
+	
+	SetGBCurrentPage(DspRecordPage);
 	
 	return 0;
 }
@@ -73,12 +71,11 @@ unsigned char DspRecordPage(void *  parm)
 static void Input(unsigned char *pbuf , unsigned short len)
 {
 	unsigned short *pdata = NULL;
-	SysPage * myPage = GetSysPage();
 	
 	pdata = MyMalloc((len/2 + 2)*sizeof(unsigned short));
 	if(pdata == NULL)
 		return;
-	
+
 	/*命令*/
 	pdata[0] = pbuf[4];
 	pdata[0] = (pdata[0]<<8) + pbuf[5];
@@ -86,8 +83,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	/*返回*/
 	if(pdata[0] == 0x2801)
 	{
-		myPage->PageBufferFree();
-		myPage->ParentPage(NULL);
+		GBPageBufferFree();
+		GotoGBParentPage(NULL);
 	}
 	/*打印*/
 	else if(pdata[0] == 0x2800)
@@ -139,11 +136,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	{
 		if(GB_RecordPageBuffer)
 		{
-			if(GB_RecordPageBuffer->testdata[(pdata[0] - 0x280e)].crc == CalModbusCRC16Fun1(&(GB_RecordPageBuffer->testdata[(pdata[0] - 0x280e)]), sizeof(TestData)-2))
-			{
-				if(GB_RecordPageBuffer->longpresscount > 15)
-				myPage->ChildPage(&GB_RecordPageBuffer->testdata[GB_RecordPageBuffer->selectindex]);
-			}
+			if(GB_RecordPageBuffer->longpresscount > 5)
+				GotoGBChildPage(&GB_RecordPageBuffer->testdata[GB_RecordPageBuffer->selectindex]);
 		}
 	}
 	/*选择其他文件*/
@@ -164,7 +158,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	MyFree(pdata);
 }
 
-static void PageUpData(void)
+static void PageUpDate(void)
 {
 
 }

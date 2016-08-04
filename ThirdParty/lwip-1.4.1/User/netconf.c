@@ -111,10 +111,10 @@ void StartEthernet(void)
 	
 	StartvLwipComTask(&xnetif);
 
-//	StartBasicWebTask();
+	StartBasicWebTask();
 	
 	{
-		StartvLwipNCDClientTask();
+//		StartvLwipNCDClientTask();
 	
 		StartvLwipUserClientTask();
 	}

@@ -294,7 +294,7 @@ static void AnalysisTestData(void)
 					return;
 				}
 			}
-		
+#if (NormalCode == CodeType)			
 			for(i=0; i<S_TempCalData->peaknum; i++)
 			{
 				S_TempCalData->tempvalue2 = S_TempCalData->peakdata[i].PeakLocation - S_TestData->temperweima.ItemLocation;
@@ -313,7 +313,7 @@ static void AnalysisTestData(void)
 					}
 				}	
 			}
-			
+
 			/*找到t和c线，找基线*/
 			S_TestData->testline.B_Point[0] = 0xffff;
 			if((S_TestData->testline.T_Point[1] != 0) && (S_TestData->testline.C_Point[1] != 0) && (S_TestData->testline.C_Point[1] != S_TestData->testline.T_Point[1]))
@@ -363,6 +363,54 @@ static void AnalysisTestData(void)
 				S_TempCalData->resultstatues = PeakNumError;
 				return;
 			}
+#else
+			S_TestData->testline.T_Point[0] = S_TempCalData->peakdata[S_TempCalData->peaknum-2].PeakValue;
+			S_TestData->testline.T_Point[1] = S_TempCalData->peakdata[S_TempCalData->peaknum-2].PeakLocation;
+			
+			S_TestData->testline.C_Point[0] = S_TempCalData->peakdata[S_TempCalData->peaknum-1].PeakValue;
+			S_TestData->testline.C_Point[1] = S_TempCalData->peakdata[S_TempCalData->peaknum-1].PeakLocation;
+			
+			S_TestData->testline.B_Point[0] = 0xffff;
+			for(i=S_TestData->testline.T_Point[1]; i<S_TestData->testline.C_Point[1]; i++)
+			{
+				if(S_TestData->testline.B_Point[0] > S_TestData->testline.TestPoint[i])
+				{
+					S_TestData->testline.B_Point[0] = S_TestData->testline.TestPoint[i];
+					S_TestData->testline.B_Point[1] = i;
+				}
+			}
+			
+			/*计算结果*/
+			S_TempCalData->tempvalue2 = (S_TestData->testline.T_Point[0] - S_TestData->testline.B_Point[0]);
+			S_TempCalData->tempvalue2 /= (S_TestData->testline.C_Point[0] - S_TestData->testline.B_Point[0]);
+				
+			/*原始峰高比*/
+			S_TestData->testline.BasicBili = S_TempCalData->tempvalue2;
+				
+			/*根据分段，计算原始结果*/
+			if(S_TestData->testline.BasicBili < S_TestData->temperweima.ItemFenDuan)
+			{
+				S_TestData->testline.BasicResult = S_TestData->testline.BasicBili * S_TestData->testline.BasicBili;
+				S_TestData->testline.BasicResult *= S_TestData->temperweima.ItemBiaoQu[0][0];
+					
+				S_TestData->testline.BasicResult += (S_TestData->testline.BasicBili * S_TestData->temperweima.ItemBiaoQu[0][1]);
+					
+				S_TestData->testline.BasicResult += S_TestData->temperweima.ItemBiaoQu[0][2];
+			}
+			else
+			{
+				S_TestData->testline.BasicResult = S_TestData->testline.BasicBili * S_TestData->testline.BasicBili;
+				S_TestData->testline.BasicResult *= S_TestData->temperweima.ItemBiaoQu[1][0];
+					
+				S_TestData->testline.BasicResult += (S_TestData->testline.BasicBili * S_TestData->temperweima.ItemBiaoQu[1][1]);
+					
+				S_TestData->testline.BasicResult += S_TestData->temperweima.ItemBiaoQu[1][2];
+			}
+				
+			S_TestData->testline.AdjustResult =  S_TestData->testline.BasicResult;
+				
+			S_TempCalData->resultstatues = ResultIsOK;
+#endif
 		}
 	}		
 }

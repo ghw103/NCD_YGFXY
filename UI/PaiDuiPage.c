@@ -32,10 +32,10 @@ static PaiDuiPageBuffer * S_PaiDuiPageBuffer = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpData(void);
+static void PageUpDate(void);
 static void UpData(void);
 
-static MyState_TypeDef PageInit(void);
+static MyState_TypeDef PageInit(void *pram);
 static MyState_TypeDef PageBufferMalloc(void);
 static MyState_TypeDef PageBufferFree(void);
 /******************************************************************************************/
@@ -47,17 +47,9 @@ static MyState_TypeDef PageBufferFree(void);
 
 unsigned char DspPaiDuiPage(void *  parm)
 {
-	SysPage * myPage = GetSysPage();
-
-	myPage->CurrentPage = DspPaiDuiPage;
-	myPage->LCDInput = Input;
-	myPage->PageUpData = PageUpData;
-	myPage->ParentPage = DspLunchPage;
-	myPage->ChildPage = DspTimeDownNorPage;
+	SetGBSysPage(DspPaiDuiPage, DspLunchPage, DspTimeDownNorPage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
 	
-	PageInit();
-	
-	SelectPage(63);
+	GBPageInit(parm);
 	
 	return 0;
 }
@@ -66,7 +58,6 @@ unsigned char DspPaiDuiPage(void *  parm)
 static void Input(unsigned char *pbuf , unsigned short len)
 {
 	unsigned short *pdata = NULL;
-	SysPage * myPage = GetSysPage();
 	
 	pdata = MyMalloc((len/2)*sizeof(unsigned short));
 	if(pdata == NULL)
@@ -79,8 +70,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	/*返回*/
 	if(pdata[0] == 0x2600)
 	{
-		PageBufferFree();
-		myPage->ParentPage(NULL);
+		GBPageBufferFree();
+		GotoGBParentPage(NULL);
 	}
 	/*等待插卡*/
 	else if(pdata[0] == 0x00a1)
@@ -91,7 +82,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	MyFree(pdata);
 }
 
-static void PageUpData(void)
+static void PageUpDate(void)
 {
 	static unsigned short count = 0;
 	
@@ -101,11 +92,12 @@ static void PageUpData(void)
 	count++;
 }
 
-static MyState_TypeDef PageInit(void)
+static MyState_TypeDef PageInit(void *pram)
 {
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
 
+	SelectPage(63);
 	
 	return My_Pass;
 }
@@ -261,7 +253,6 @@ void CheckTime(void)
 	CardState_Def tempCardState;
 	KeyChange_Def tempkey;
 	ItemData * temp = NULL;
-	SysPage * myPage = GetSysPage();
 	unsigned short tempvalue = 0;
 	
 	//检测测试位置的卡拔插动作
@@ -427,7 +418,7 @@ void CheckTime(void)
 				{
 					if(tempvalue < 30)
 					{
-						if((DspPaiDuiPage != myPage->CurrentPage) && (GetCurrentTestItem() == NULL))
+						if((DspPaiDuiPage != GetGBCurrentPage()) && (GetCurrentTestItem() == NULL))
 							DspPaiDuiPage(NULL);
 					}
 					

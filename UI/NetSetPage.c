@@ -24,7 +24,7 @@ static NetSetPageBuffer *GB_NetSetPageBuffer = NULL;
 /*****************************************局部函数声明*************************************/
 
 static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpData(void);
+static void PageUpDate(void);
 
 static MyState_TypeDef PageInit(void *  parm);
 static MyState_TypeDef PageBufferMalloc(void);
@@ -41,19 +41,9 @@ static void SetTempIP(unsigned char *buf, unsigned char len);
 
 unsigned char DspNetSetPage(void *  parm)
 {
-	SysPage * myPage = GetSysPage();
-
-	myPage->CurrentPage = DspNetSetPage;
-	myPage->LCDInput = Input;
-	myPage->PageUpData = PageUpData;
-	myPage->ParentPage = DspNetPreSetPage;
-	myPage->ChildPage = NULL;
-	myPage->PageInit = PageInit;
-	myPage->PageBufferMalloc = PageBufferMalloc;
-	myPage->PageBufferFree = PageBufferFree;
+	SetGBSysPage(DspNetSetPage, DspNetPreSetPage, NULL, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
 	
-	myPage->PageInit(parm);
-	SelectPage(80);
+	GBPageInit(parm);
 	
 	return 0;
 }
@@ -119,14 +109,14 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	/*返回*/
 	else if(pdata[0] == 0x2d05)
 	{
-		PageBufferFree();
-		GetSysPage()->ParentPage(NULL);
+		GBPageBufferFree();
+		GotoGBParentPage(NULL);
 	}
 	
 	MyFree(pdata);
 }
 
-static void PageUpData(void)
+static void PageUpDate(void)
 {
 
 }
@@ -136,6 +126,8 @@ static MyState_TypeDef PageInit(void *  parm)
 {
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
+	
+	SelectPage(80);
 	
 	ReadNetData(&(GB_NetSetPageBuffer->myNetData));
 

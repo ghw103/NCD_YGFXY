@@ -24,7 +24,7 @@ static OtherSetPageBuffer *S_OtherSetPageBuffer = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpData(void);
+static void PageUpDate(void);
 static MyState_TypeDef PageInit(void *  parm);
 static MyState_TypeDef PageBufferMalloc(void);
 static MyState_TypeDef PageBufferFree(void);
@@ -39,20 +39,9 @@ static void SetGB_Time(char *buf, unsigned char len);
 
 unsigned char DspOtherSetPage(void *  parm)
 {
-	SysPage * myPage = GetSysPage();
-
-	myPage->CurrentPage = DspOtherSetPage;
-	myPage->LCDInput = Input;
-	myPage->PageUpData = PageUpData;
-	myPage->ParentPage = DspSystemSetPage;
-	myPage->ChildPage = NULL;
-	myPage->PageInit = PageInit;
-	myPage->PageBufferMalloc = PageBufferMalloc;
-	myPage->PageBufferFree = PageBufferFree;
+	SetGBSysPage(DspOtherSetPage, DspSystemSetPage, NULL, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
 	
-	SelectPage(94);
-	
-	myPage->PageInit(parm);
+	GBPageInit(parm);
 	
 	return 0;
 }
@@ -61,7 +50,6 @@ unsigned char DspOtherSetPage(void *  parm)
 static void Input(unsigned char *pbuf , unsigned short len)
 {
 	unsigned short *pdata = NULL;
-	SysPage * myPage = GetSysPage();
 	
 	pdata = MyMalloc((len/2)*sizeof(unsigned short));
 	if(pdata == NULL)
@@ -79,8 +67,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	/*返回*/
 	else if(pdata[0] == 0x2c01)
 	{
-		myPage->ChildPage = DspSystemSetPage;
-		myPage->ChildPage(NULL);
+		GBPageBufferFree();
+		GotoGBParentPage(NULL);
 	}
 	/*设置时间*/
 	else if(pdata[0] == 0x2c20)
@@ -92,7 +80,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	MyFree(pdata);
 }
 
-static void PageUpData(void)
+static void PageUpDate(void)
 {
 
 }
@@ -101,6 +89,8 @@ static MyState_TypeDef PageInit(void *  parm)
 {
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
+	
+	SelectPage(94);
 	
 	return My_Pass;
 }

@@ -29,7 +29,7 @@ static UserPageBuffer * GB_UserPageBuffer = NULL;
 /*****************************************局部函数声明*************************************/
 
 static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpData(void);
+static void PageUpDate(void);
 
 static MyState_TypeDef PageInit(void *  parm);
 static MyState_TypeDef PageBufferMalloc(void);
@@ -53,20 +53,9 @@ static void SelectUser(unsigned char index);
 ***************************************************************************************************/
 unsigned char DspSelectUserPage(void *  parm)
 {
-	SysPage * myPage = GetSysPage();
-
-	myPage->CurrentPage = DspSelectUserPage;
-	myPage->LCDInput = Input;
-	myPage->PageUpData = PageUpData;
-	myPage->ParentPage = DspLunchPage;
-	myPage->ChildPage = DspSampleIDPage;
-	myPage->PageInit = PageInit;
-	myPage->PageBufferMalloc = PageBufferMalloc;
-	myPage->PageBufferFree = PageBufferFree;
+	SetGBSysPage(DspSelectUserPage, DspLunchPage, DspSampleIDPage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
 	
-	SelectPage(54);
-	
-	myPage->PageInit(NULL);
+	GBPageInit(parm);
 
 	return 0;
 }
@@ -83,7 +72,6 @@ unsigned char DspSelectUserPage(void *  parm)
 static void Input(unsigned char *pbuf , unsigned short len)
 {
 	unsigned short *pdata = NULL;
-	SysPage * myPage = GetSysPage();
 	
 	pdata = MyMalloc((len/2)*sizeof(unsigned short));
 	if(pdata == NULL)
@@ -98,8 +86,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	{
 		DeleteCurrentTest();
 		
-		PageBufferFree();
-		myPage->ParentPage(NULL);
+		GBPageBufferFree();
+		GotoGBParentPage(NULL);
 	}
 	
 	/*上翻也*/
@@ -147,8 +135,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			/*以当前选择的操作人作为本次测试数据的操作人*/
 			memcpy(&(GB_UserPageBuffer->currenttestdata->testdata.user), GB_UserPageBuffer->user, sizeof(User_Type));
 		
-			PageBufferFree();
-			myPage->ChildPage(NULL);
+			GBPageBufferFree();
+			GotoGBChildPage(NULL);
 		}
 		else
 		{
@@ -179,15 +167,15 @@ static void Input(unsigned char *pbuf , unsigned short len)
 *Author：xsx
 *Data：2016年6月29日08:40:47
 ***************************************************************************************************/
-static void PageUpData(void)
+static void PageUpDate(void)
 {
 	if(TimeOut == timer_expired(&(GB_UserPageBuffer->timer)))
 	{
 		AddNumOfSongToList(8, 0);
 		DeleteCurrentTest();
 		
-		PageBufferFree();
-		GetSysPage()->ParentPage(NULL);
+		GBPageBufferFree();
+		GotoGBParentPage(NULL);
 	}
 }
 
@@ -203,6 +191,8 @@ static MyState_TypeDef PageInit(void * parm)
 {
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
+	
+	SelectPage(54);
 	
 	/*重置倒计时30s，如果超时，则取消此次测试*/
 	timer_set(&(GB_UserPageBuffer->timer), 10);
