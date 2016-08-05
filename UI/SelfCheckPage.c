@@ -43,6 +43,8 @@ const char selfchecktextinfo[19][50] = {
 	"自检结束",
 };
 const char selfcheckpicinfo[19] = {5, 10, 10, 15, 20, 20,25,30,30, 35, 45, 45, 55, 75, 75, 80,85, 85,100};
+	
+static SelCheckPage * S_SelCheckPage = NULL;								//自检页面缓存
 
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
@@ -74,47 +76,41 @@ unsigned char DspSelfCheckPage(void *  parm)
 
 static void Input(unsigned char *pbuf , unsigned short len)
 {
-	unsigned short *pdata = NULL;
-	
-	pdata = MyMalloc((len/2)*sizeof(unsigned short));
-	if(pdata == NULL)
-		return;
-	
-	/*命令*/
-	pdata[0] = pbuf[4];
-	pdata[0] = (pdata[0]<<8) + pbuf[5];
-	
-	/*如果是错误，弹出菜单*/
-	if(pdata[0] == 0x1a30)
+	if(S_SelCheckPage)
 	{
-		/*数据*/
-		pdata[1] = pbuf[7];
-		pdata[1] = (pdata[1]<<8) + pbuf[8];
+		/*命令*/
+		S_SelCheckPage->lcdinput[0] = pbuf[4];
+		S_SelCheckPage->lcdinput[0] = (S_SelCheckPage->lcdinput[0]<<8) + pbuf[5];
 		
-		/*重启*/
-		if(pdata[1] == 0x0001)
-			while(1);
-	}
-	/*如果是告警，弹出菜单*/
-	else if(pdata[0] == 0x1a31)
-	{
-		/*数据*/
-		pdata[1] = pbuf[7];
-		pdata[1] = (pdata[1]<<8) + pbuf[8];
-		
-		/*重启*/
-		if(pdata[1] == 0x0001)
-			while(1);
-		/*忽略*/
-		else if(pdata[1] == 0x0002)
+		/*如果是错误，弹出菜单*/
+		if(S_SelCheckPage->lcdinput[0] == 0x1a30)
 		{
-			SetGB_SelfCheckResult(SelfCheck_OK);
-			DspLunchPage(NULL);
+			/*数据*/
+			S_SelCheckPage->lcdinput[1] = pbuf[7];
+			S_SelCheckPage->lcdinput[1] = (S_SelCheckPage->lcdinput[1]<<8) + pbuf[8];
+			
+			/*重启*/
+			if(S_SelCheckPage->lcdinput[1] == 0x0001)
+				while(1);
+		}
+		/*如果是告警，弹出菜单*/
+		else if(S_SelCheckPage->lcdinput[0] == 0x1a31)
+		{
+			/*数据*/
+			S_SelCheckPage->lcdinput[1] = pbuf[7];
+			S_SelCheckPage->lcdinput[1] = (S_SelCheckPage->lcdinput[1]<<8) + pbuf[8];
+			
+			/*重启*/
+			if(S_SelCheckPage->lcdinput[1] == 0x0001)
+				while(1);
+			/*忽略*/
+			else if(S_SelCheckPage->lcdinput[1] == 0x0002)
+			{
+				SetGB_SelfCheckResult(SelfCheck_OK);
+				GotoGBChildPage(NULL);
+			}
 		}
 	}
-	
-	
-	MyFree(pdata);
 }
 
 static void PageUpDate(void)
@@ -124,6 +120,9 @@ static void PageUpDate(void)
 
 static MyState_TypeDef PageInit(void *  parm)
 {
+	if(My_Fail == PageBufferMalloc())
+		return My_Fail;
+	
 	SelectPage(51);
 	
 	/*清空当前页面*/
@@ -140,11 +139,23 @@ static MyState_TypeDef PageInit(void *  parm)
 
 static MyState_TypeDef PageBufferMalloc(void)
 {
+	if(NULL == S_SelCheckPage)
+	{
+		S_SelCheckPage = MyMalloc(sizeof(SelCheckPage));
+		if(NULL == S_SelCheckPage)
+			return My_Fail;
+	}
+	
+	memset(S_SelCheckPage, 0, sizeof(SelCheckPage));
+	
 	return My_Pass;
 }
 
 static MyState_TypeDef PageBufferFree(void)
 {
+	MyFree(S_SelCheckPage);
+	S_SelCheckPage = NULL;
+	
 	return My_Pass;
 }
 

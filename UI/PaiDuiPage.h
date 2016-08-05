@@ -12,6 +12,7 @@ typedef struct PaiDuiPageBuffer_tag {
 	float tempvalue;
 	char buf[100];
 	char buf2[100];
+	unsigned short lcdinput[100];
 }PaiDuiPageBuffer;
 
 

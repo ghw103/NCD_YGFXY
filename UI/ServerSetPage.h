@@ -6,6 +6,7 @@
 typedef struct ServerPageBuffer_tag {
 	NetData myNetData;
 	char buf[100];
+	unsigned short lcdinput[100];
 	unsigned char ischanged;
 }ServerPageBuffer;
 

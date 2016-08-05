@@ -26,7 +26,7 @@
 
 /******************************************************************************************/
 /*****************************************局部变量声明*************************************/
-static RecordPageBuffer * GB_RecordPageBuffer = NULL;
+static RecordPageBuffer * S_RecordPageBuffer = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 static void Input(unsigned char *pbuf , unsigned short len);
@@ -70,92 +70,71 @@ unsigned char DspRecordPage(void *  parm)
 
 static void Input(unsigned char *pbuf , unsigned short len)
 {
-	unsigned short *pdata = NULL;
-	
-	pdata = MyMalloc((len/2 + 2)*sizeof(unsigned short));
-	if(pdata == NULL)
-		return;
-
-	/*命令*/
-	pdata[0] = pbuf[4];
-	pdata[0] = (pdata[0]<<8) + pbuf[5];
-	
-	/*返回*/
-	if(pdata[0] == 0x2801)
+	if(S_RecordPageBuffer)
 	{
-		GBPageBufferFree();
-		GotoGBParentPage(NULL);
-	}
-	/*打印*/
-	else if(pdata[0] == 0x2800)
-	{
-	}
-	/*上一页*/
-	else if(pdata[0] == 0x2802)
-	{
-		if(GB_RecordPageBuffer)
+		/*命令*/
+		S_RecordPageBuffer->lcdinput[0] = pbuf[4];
+		S_RecordPageBuffer->lcdinput[0] = (S_RecordPageBuffer->lcdinput[0]<<8) + pbuf[5];
+		
+		/*返回*/
+		if(S_RecordPageBuffer->lcdinput[0] == 0x2801)
 		{
-			if(GB_RecordPageBuffer->pageindex > 0)
-				GB_RecordPageBuffer->pageindex -= 1;
-			
-			ShowRecord(GB_RecordPageBuffer->pageindex);
+			GBPageBufferFree();
+			GotoGBParentPage(NULL);
 		}
-	}
-	/*下一页*/
-	else if(pdata[0] == 0x2803)
-	{
-		if(GB_RecordPageBuffer)
+		/*打印*/
+		else if(S_RecordPageBuffer->lcdinput[0] == 0x2800)
 		{
-			if((GB_RecordPageBuffer->pageindex + 1) < GB_RecordPageBuffer->maxpagenum)
-				GB_RecordPageBuffer->pageindex += 1;
-			
-			ShowRecord(GB_RecordPageBuffer->pageindex);
 		}
-	}
-	/*选择数据长按 -- 按下*/
-	else if((pdata[0] >= 0x2805)&&(pdata[0] <= 0x280d))
-	{
-		if(GB_RecordPageBuffer)
+		/*上一页*/
+		else if(S_RecordPageBuffer->lcdinput[0] == 0x2802)
 		{
-			GB_RecordPageBuffer->longpresscount = 0;
-			if(GB_RecordPageBuffer->testdata[(pdata[0] - 0x2805)].crc == CalModbusCRC16Fun1(&(GB_RecordPageBuffer->testdata[(pdata[0] - 0x2805)]), sizeof(TestData)-2))
+			if(S_RecordPageBuffer->pageindex > 0)
+				S_RecordPageBuffer->pageindex -= 1;
+				
+			ShowRecord(S_RecordPageBuffer->pageindex);
+		}
+		/*下一页*/
+		else if(S_RecordPageBuffer->lcdinput[0] == 0x2803)
+		{
+			if((S_RecordPageBuffer->pageindex + 1) < S_RecordPageBuffer->maxpagenum)
+				S_RecordPageBuffer->pageindex += 1;
+				
+			ShowRecord(S_RecordPageBuffer->pageindex);
+		}
+		/*选择数据长按 -- 按下*/
+		else if((S_RecordPageBuffer->lcdinput[0] >= 0x2805)&&(S_RecordPageBuffer->lcdinput[0] <= 0x280d))
+		{
+			S_RecordPageBuffer->longpresscount = 0;
+			if(S_RecordPageBuffer->testdata[(S_RecordPageBuffer->lcdinput[0] - 0x2805)].crc == CalModbusCRC16Fun1(&(S_RecordPageBuffer->testdata[(S_RecordPageBuffer->lcdinput[0] - 0x2805)]), sizeof(TestData)-2))
 			{
-				GB_RecordPageBuffer->selectindex = (pdata[0] - 0x2805);
-				BasicPic(0x28c0, 1, 100, 39, 522, 968, 556, 39, 140+(GB_RecordPageBuffer->selectindex)*36);
+				S_RecordPageBuffer->selectindex = (S_RecordPageBuffer->lcdinput[0] - 0x2805);
+				BasicPic(0x28c0, 1, 100, 39, 522, 968, 556, 39, 140+(S_RecordPageBuffer->selectindex)*36);
 			}
 		}
-	}
-	/*选择数据长按 -- 持续按下*/
-	else if(pdata[0] == 0x2804)
-	{
-		if(GB_RecordPageBuffer)
-			GB_RecordPageBuffer->longpresscount++;
-	}
-	/*选择数据长按 -- 松开*/
-	else if((pdata[0] >= 0x280e)&&(pdata[0] <= 0x2816))
-	{
-		if(GB_RecordPageBuffer)
+		/*选择数据长按 -- 持续按下*/
+		else if(S_RecordPageBuffer->lcdinput[0] == 0x2804)
 		{
-			if(GB_RecordPageBuffer->longpresscount > 5)
-				GotoGBChildPage(&GB_RecordPageBuffer->testdata[GB_RecordPageBuffer->selectindex]);
+			S_RecordPageBuffer->longpresscount++;
 		}
-	}
-	/*选择其他文件*/
-	else if(pdata[0] == 0x28d0)
-	{
-		if(GB_RecordPageBuffer)
+		/*选择数据长按 -- 松开*/
+		else if((S_RecordPageBuffer->lcdinput[0] >= 0x280e)&&(S_RecordPageBuffer->lcdinput[0] <= 0x2816))
+		{
+			if(S_RecordPageBuffer->longpresscount > 5)
+				GotoGBChildPage(&S_RecordPageBuffer->testdata[S_RecordPageBuffer->selectindex]);
+		}
+		/*选择其他文件*/
+		else if(S_RecordPageBuffer->lcdinput[0] == 0x28d0)
 		{
 			ClearPage();
 			ParseInputTimeStr((char *)(&pbuf[7]), GetBufLen(&pbuf[7] , 2*pbuf[6]));
 
 			ReadFileSaveDateInfo();
-			GB_RecordPageBuffer->selectindex = 0;
-			GB_RecordPageBuffer->pageindex = 0;
-			ShowRecord(GB_RecordPageBuffer->pageindex);
+			S_RecordPageBuffer->selectindex = 0;
+			S_RecordPageBuffer->pageindex = 0;
+			ShowRecord(S_RecordPageBuffer->pageindex);
 		}
 	}
-
-	MyFree(pdata);
 }
 
 static void PageUpDate(void)
@@ -170,39 +149,35 @@ static MyState_TypeDef PageInit(void *parm)
 	
 	ClearPage();
 	/*设置读取数据的文件时间问当前时间*/
-	GetGBTimeData(&(GB_RecordPageBuffer->datatime));
+	GetGBTimeData(&(S_RecordPageBuffer->datatime));
 	
 	ReadFileSaveDateInfo();
 	
-	GB_RecordPageBuffer->selectindex = 0;
-	GB_RecordPageBuffer->pageindex = 0;
-	ShowRecord(GB_RecordPageBuffer->pageindex);
+	S_RecordPageBuffer->selectindex = 0;
+	S_RecordPageBuffer->pageindex = 0;
+	ShowRecord(S_RecordPageBuffer->pageindex);
 
 	return My_Pass;
 }
 
 static MyState_TypeDef PageBufferMalloc(void)
 {	
-	if(NULL == GB_RecordPageBuffer)
+	if(NULL == S_RecordPageBuffer)
 	{
-		GB_RecordPageBuffer = (RecordPageBuffer *)MyMalloc(sizeof(RecordPageBuffer));
+		S_RecordPageBuffer = (RecordPageBuffer *)MyMalloc(sizeof(RecordPageBuffer));
 		
-		if(GB_RecordPageBuffer)
-		{
-			memset(GB_RecordPageBuffer, 0, sizeof(RecordPageBuffer));
-			return My_Pass;
-		}
-		else
+		if(NULL == S_RecordPageBuffer)
 			return My_Fail;
 	}
 	
+	memset(S_RecordPageBuffer, 0, sizeof(RecordPageBuffer));
 	return My_Pass;
 }
 
 static MyState_TypeDef PageBufferFree(void)
 {
-	MyFree(GB_RecordPageBuffer);
-	GB_RecordPageBuffer = NULL;
+	MyFree(S_RecordPageBuffer);
+	S_RecordPageBuffer = NULL;
 	
 	return My_Pass;
 }
@@ -214,19 +189,19 @@ static MyState_TypeDef PageBufferFree(void)
 /***************************************************************************************************/
 static MyState_TypeDef ReadFileSaveDateInfo(void)
 {
-	if(GB_RecordPageBuffer)
+	if(S_RecordPageBuffer)
 	{
-		GB_RecordPageBuffer->maxdatanum = 0;
-		memset(GB_RecordPageBuffer->testdatainfo, 0, TestDataDateRepeatNum*sizeof(TestDateInfo_Def));
+		S_RecordPageBuffer->maxdatanum = 0;
+		memset(S_RecordPageBuffer->testdatainfo, 0, TestDataDateRepeatNum*sizeof(TestDateInfo_Def));
 		
 		//读取数据的日期索引
-		ReadDateInfo(GB_RecordPageBuffer->testdatainfo, &(GB_RecordPageBuffer->datatime));
+		ReadDateInfo(S_RecordPageBuffer->testdatainfo, &(S_RecordPageBuffer->datatime));
 		
-		for(GB_RecordPageBuffer->tempvalue2=0; GB_RecordPageBuffer->tempvalue2<TestDataDateRepeatNum; GB_RecordPageBuffer->tempvalue2++)
-			GB_RecordPageBuffer->maxdatanum += GB_RecordPageBuffer->testdatainfo[GB_RecordPageBuffer->tempvalue2].num;
+		for(S_RecordPageBuffer->tempvalue2=0; S_RecordPageBuffer->tempvalue2<TestDataDateRepeatNum; S_RecordPageBuffer->tempvalue2++)
+			S_RecordPageBuffer->maxdatanum += S_RecordPageBuffer->testdatainfo[S_RecordPageBuffer->tempvalue2].num;
 		
-		GB_RecordPageBuffer->maxpagenum = ((GB_RecordPageBuffer->maxdatanum % DataNumInPage) == 0)?(GB_RecordPageBuffer->maxdatanum / DataNumInPage):
-		((GB_RecordPageBuffer->maxdatanum / DataNumInPage)+1);
+		S_RecordPageBuffer->maxpagenum = ((S_RecordPageBuffer->maxdatanum % DataNumInPage) == 0)?(S_RecordPageBuffer->maxdatanum / DataNumInPage):
+		((S_RecordPageBuffer->maxdatanum / DataNumInPage)+1);
 	}
 	
 	return My_Pass;
@@ -236,48 +211,48 @@ static MyState_TypeDef ShowRecord(unsigned char pageindex)
 {
 	unsigned short i=0, j=0;
 	unsigned char num = 0;
-	if(GB_RecordPageBuffer)
+	if(S_RecordPageBuffer)
 	{
-		memset(GB_RecordPageBuffer->testdata, 0, DataNumInPage*sizeof(TestData));
+		memset(S_RecordPageBuffer->testdata, 0, DataNumInPage*sizeof(TestData));
 		
-		GB_RecordPageBuffer->tempvalue1 = pageindex;
-		GB_RecordPageBuffer->tempvalue1 *= DataNumInPage;
+		S_RecordPageBuffer->tempvalue1 = pageindex;
+		S_RecordPageBuffer->tempvalue1 *= DataNumInPage;
 		
-		GB_RecordPageBuffer->tempvalue2 = 0;
+		S_RecordPageBuffer->tempvalue2 = 0;
 		
 		for(i=0; i<TestDataDateRepeatNum; i++)
 		{
-			for(j=0; j<GB_RecordPageBuffer->testdatainfo[i].num; j++)
+			for(j=0; j<S_RecordPageBuffer->testdatainfo[i].num; j++)
 			{
-				if((GB_RecordPageBuffer->tempvalue2 >= GB_RecordPageBuffer->tempvalue1) && 
-				(GB_RecordPageBuffer->tempvalue2 < (GB_RecordPageBuffer->tempvalue1 + DataNumInPage)))
+				if((S_RecordPageBuffer->tempvalue2 >= S_RecordPageBuffer->tempvalue1) && 
+				(S_RecordPageBuffer->tempvalue2 < (S_RecordPageBuffer->tempvalue1 + DataNumInPage)))
 				{
-					ReadTestData(&(GB_RecordPageBuffer->testdata[num]), GB_RecordPageBuffer->testdatainfo[i].index+j-1, 1, NULL);
+					ReadTestData(&(S_RecordPageBuffer->testdata[num]), S_RecordPageBuffer->testdatainfo[i].index+j-1, 1, NULL);
 					num++;
 					if(num > DataNumInPage)
 						goto END;
 				}
-				GB_RecordPageBuffer->tempvalue2++;
+				S_RecordPageBuffer->tempvalue2++;
 			}			
 		}
 		
 		END:
-		for(GB_RecordPageBuffer->tempvalue2=0; GB_RecordPageBuffer->tempvalue2<DataNumInPage; GB_RecordPageBuffer->tempvalue2++)
+		for(S_RecordPageBuffer->tempvalue2=0; S_RecordPageBuffer->tempvalue2<DataNumInPage; S_RecordPageBuffer->tempvalue2++)
 		{
-			GB_RecordPageBuffer->tempdata = &(GB_RecordPageBuffer->testdata[GB_RecordPageBuffer->tempvalue2]);
+			S_RecordPageBuffer->tempdata = &(S_RecordPageBuffer->testdata[S_RecordPageBuffer->tempvalue2]);
 				
-			if(GB_RecordPageBuffer->tempdata->crc == CalModbusCRC16Fun1(GB_RecordPageBuffer->tempdata, sizeof(TestData)-2))
+			if(S_RecordPageBuffer->tempdata->crc == CalModbusCRC16Fun1(S_RecordPageBuffer->tempdata, sizeof(TestData)-2))
 			{
-				memset(GB_RecordPageBuffer->buf, 0, 300);
-				sprintf(GB_RecordPageBuffer->buf, "%05d   %10s%15s  %8.2f%8.8s %02d:%02d:%02d %s ", pageindex*DataNumInPage+GB_RecordPageBuffer->tempvalue2+1, GB_RecordPageBuffer->tempdata->temperweima.ItemName,
-				GB_RecordPageBuffer->tempdata->sampleid, GB_RecordPageBuffer->tempdata->testline.AdjustResult, GB_RecordPageBuffer->tempdata->temperweima.ItemMeasure,
-				GB_RecordPageBuffer->tempdata->TestTime.hour, GB_RecordPageBuffer->tempdata->TestTime.min, GB_RecordPageBuffer->tempdata->TestTime.sec,
-				GB_RecordPageBuffer->tempdata->user.user_name);
+				memset(S_RecordPageBuffer->buf, 0, 300);
+				sprintf(S_RecordPageBuffer->buf, "%05d   %10s%15s  %8.2f%8.8s %02d:%02d:%02d %s ", pageindex*DataNumInPage+S_RecordPageBuffer->tempvalue2+1, S_RecordPageBuffer->tempdata->temperweima.ItemName,
+				S_RecordPageBuffer->tempdata->sampleid, S_RecordPageBuffer->tempdata->testline.AdjustResult, S_RecordPageBuffer->tempdata->temperweima.ItemMeasure,
+				S_RecordPageBuffer->tempdata->TestTime.hour, S_RecordPageBuffer->tempdata->TestTime.min, S_RecordPageBuffer->tempdata->TestTime.sec,
+				S_RecordPageBuffer->tempdata->user.user_name);
 				
-				DisText(0x28e0+(GB_RecordPageBuffer->tempvalue2)*0x30, GB_RecordPageBuffer->buf, strlen(GB_RecordPageBuffer->buf));
+				DisText(0x28e0+(S_RecordPageBuffer->tempvalue2)*0x30, S_RecordPageBuffer->buf, strlen(S_RecordPageBuffer->buf));
 			}
 			else
-				ClearText(0x28e0+(GB_RecordPageBuffer->tempvalue2)*0x30, 100);
+				ClearText(0x28e0+(S_RecordPageBuffer->tempvalue2)*0x30, 100);
 		}
 		return My_Pass;
 	}
@@ -287,10 +262,10 @@ static MyState_TypeDef ShowRecord(unsigned char pageindex)
 
 static void ClearPage(void)
 {
-	if(GB_RecordPageBuffer)
+	if(S_RecordPageBuffer)
 	{
-		for(GB_RecordPageBuffer->tempvalue2=0; GB_RecordPageBuffer->tempvalue2<DataNumInPage; GB_RecordPageBuffer->tempvalue2++)
-			ClearText(0x28e0+(GB_RecordPageBuffer->tempvalue2)*0x30, 100);
+		for(S_RecordPageBuffer->tempvalue2=0; S_RecordPageBuffer->tempvalue2<DataNumInPage; S_RecordPageBuffer->tempvalue2++)
+			ClearText(0x28e0+(S_RecordPageBuffer->tempvalue2)*0x30, 100);
 		
 		BasicPic(0x28c0, 0, 100, 39, 522, 968, 556, 39, 140);
 	}
@@ -299,35 +274,35 @@ static void ParseInputTimeStr(char *buf, unsigned char len)
 {
 	short temp = 0;
 	
-	if(GB_RecordPageBuffer)
+	if(S_RecordPageBuffer)
 	{
 		if(len < 8)
 			goto END;
 		
-		memset(GB_RecordPageBuffer->buf, 0, 50);
-		memcpy(GB_RecordPageBuffer->buf, buf, 4);
-		temp = strtol(GB_RecordPageBuffer->buf, NULL, 10);
+		memset(S_RecordPageBuffer->buf, 0, 50);
+		memcpy(S_RecordPageBuffer->buf, buf, 4);
+		temp = strtol(S_RecordPageBuffer->buf, NULL, 10);
 		if((temp < 2000)||(temp > 2100))
 			goto END;
-		GB_RecordPageBuffer->datatime.year = temp - 2000;
+		S_RecordPageBuffer->datatime.year = temp - 2000;
 		
-		memset(GB_RecordPageBuffer->buf, 0, 50);
-		memcpy(GB_RecordPageBuffer->buf, buf+4, 2);
-		temp = strtol(GB_RecordPageBuffer->buf, NULL, 10);
+		memset(S_RecordPageBuffer->buf, 0, 50);
+		memcpy(S_RecordPageBuffer->buf, buf+4, 2);
+		temp = strtol(S_RecordPageBuffer->buf, NULL, 10);
 		if((temp < 1)||(temp > 12))
 			goto END;
-		GB_RecordPageBuffer->datatime.month = temp;
+		S_RecordPageBuffer->datatime.month = temp;
 		
-		memset(GB_RecordPageBuffer->buf, 0, 50);
-		memcpy(GB_RecordPageBuffer->buf, buf+6, 2);
-		temp = strtol(GB_RecordPageBuffer->buf, NULL, 10);
+		memset(S_RecordPageBuffer->buf, 0, 50);
+		memcpy(S_RecordPageBuffer->buf, buf+6, 2);
+		temp = strtol(S_RecordPageBuffer->buf, NULL, 10);
 		if((temp < 1)||(temp > 31))
 			goto END;
-		GB_RecordPageBuffer->datatime.day = temp;
+		S_RecordPageBuffer->datatime.day = temp;
 		
 		return;
 		
 		END:
-			memset(&(GB_RecordPageBuffer->datatime), 0, sizeof(MyTime_Def));
+			memset(&(S_RecordPageBuffer->datatime), 0, sizeof(MyTime_Def));
 	}
 }

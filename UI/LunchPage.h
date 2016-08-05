@@ -7,6 +7,8 @@ typedef struct LunchPageBuffer_tag {
 	Timer timer;
 	unsigned char presscount;
 	char buf[100];
+	unsigned short lcdinput[100];
+	unsigned char error;
 }LunchPageBuffer;
 
 unsigned char DspLunchPage(void *  parm);

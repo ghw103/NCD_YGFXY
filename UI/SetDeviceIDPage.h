@@ -7,6 +7,7 @@ typedef struct SetDeviceIDPage_tag {
 	DeviceInfo temp_deviceinfo;							//临时数据
 	char *tempbuf;								//临时指针
 	unsigned char ismodify;
+	unsigned short lcdinput[100];
 }SetDeviceIDPage;
 
 unsigned char DspSetDeviceIDPage(void *  parm);

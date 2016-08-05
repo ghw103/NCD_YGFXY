@@ -49,18 +49,7 @@ unsigned char DspTimeDownNorPage(void *  parm)
 
 static void Input(unsigned char *pbuf , unsigned short len)
 {
-	unsigned short *pdata = NULL;
-	
-	pdata = MyMalloc((len/2)*sizeof(unsigned short));
-	if(pdata == NULL)
-		return;
-	
-	/*√¸¡Ó*/
-	pdata[0] = pbuf[4];
-	pdata[0] = (pdata[0]<<8) + pbuf[5];
-	
 
-	MyFree(pdata);
 }
 
 static void PageUpDate(void)

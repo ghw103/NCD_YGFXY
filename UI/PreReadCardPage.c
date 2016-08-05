@@ -62,67 +62,62 @@ unsigned char DspPreReadCardPage(void *  parm)
 
 static void Input(unsigned char *pbuf , unsigned short len)
 {
-	unsigned short *pdata = NULL;
-	
-	pdata = MyMalloc((len/2)*sizeof(unsigned short));
-	if(pdata == NULL)
-		return;
-	
-	/*命令*/
-	pdata[0] = pbuf[4];
-	pdata[0] = (pdata[0]<<8) + pbuf[5];
-	
-	/*二维码读取失败，过期，已使用*/
-	if((pdata[0] == 0x1f10) || (pdata[0] == 0x1f11) || (pdata[0] == 0x1f12))
+	if(S_PreReadPageBuffer)
 	{
-		/*数据*/
-		pdata[1] = pbuf[7];
-		pdata[1] = (pdata[1]<<8) + pbuf[8];
+		/*命令*/
+		S_PreReadPageBuffer->lcdinput[0] = pbuf[4];
+		S_PreReadPageBuffer->lcdinput[0] = (S_PreReadPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
-		/*更换检测卡*/
-		if(pdata[1] == 0x0002)
+		/*二维码读取失败，过期，已使用*/
+		if((S_PreReadPageBuffer->lcdinput[0] == 0x1f10) || (S_PreReadPageBuffer->lcdinput[0] == 0x1f11) || (S_PreReadPageBuffer->lcdinput[0] == 0x1f12))
 		{
-			GBPageBufferFree();
-			GotoGBParentPage(NULL);
-		}
-		/*退出*/
-		else if(pdata[1] == 0x0001)
-		{
-			DeleteCurrentTest();
+			/*数据*/
+			S_PreReadPageBuffer->lcdinput[1] = pbuf[7];
+			S_PreReadPageBuffer->lcdinput[1] = (S_PreReadPageBuffer->lcdinput[1]<<8) + pbuf[8];
 			
-			GBPageBufferFree();
-			SetGBParentPage(DspLunchPage);
-			GotoGBParentPage(NULL);
+			/*更换检测卡*/
+			if(S_PreReadPageBuffer->lcdinput[1] == 0x0002)
+			{
+				GBPageBufferFree();
+				GotoGBParentPage(NULL);
+			}
+			/*退出*/
+			else if(S_PreReadPageBuffer->lcdinput[1] == 0x0001)
+			{
+				DeleteCurrentTest();
+				
+				GBPageBufferFree();
+				SetGBParentPage(DspLunchPage);
+				GotoGBParentPage(NULL);
+			}
+		}
+		/*排队模式，与之前注册的卡id不同*/
+		else if(S_PreReadPageBuffer->lcdinput[0] == 0x1f13)
+		{
+			/*数据*/
+			S_PreReadPageBuffer->lcdinput[1] = pbuf[7];
+			S_PreReadPageBuffer->lcdinput[1] = (S_PreReadPageBuffer->lcdinput[1]<<8) + pbuf[8];
+			
+			/*取消测试*/
+			if(S_PreReadPageBuffer->lcdinput[1] == 0x0001)
+			{
+				DeleteCurrentTest();
+				
+				GBPageBufferFree();
+				SetGBParentPage(DspLunchPage);
+				GotoGBParentPage(NULL);
+			}
+			/*继续测试*/
+			else if(S_PreReadPageBuffer->lcdinput[1] == 0x0002)
+			{
+				DeleteCurrentTest();
+				
+				GBPageBufferFree();
+				SetGBParentPage(DspLunchPage);
+				GotoGBParentPage(NULL);
+			}
 		}
 	}
-	/*排队模式，与之前注册的卡id不同*/
-	else if(pdata[0] == 0x1f13)
-	{
-		/*数据*/
-		pdata[1] = pbuf[7];
-		pdata[1] = (pdata[1]<<8) + pbuf[8];
-		
-		/*取消测试*/
-		if(pdata[1] == 0x0001)
-		{
-			DeleteCurrentTest();
-			
-			GBPageBufferFree();
-			SetGBParentPage(DspLunchPage);
-			GotoGBParentPage(NULL);
-		}
-		/*继续测试*/
-		else if(pdata[1] == 0x0002)
-		{
-			DeleteCurrentTest();
-			
-			GBPageBufferFree();
-			SetGBParentPage(DspLunchPage);
-			GotoGBParentPage(NULL);
-		}
-	}
-
-	MyFree(pdata);
 }
 
 static void PageUpDate(void)

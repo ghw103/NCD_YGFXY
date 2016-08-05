@@ -13,6 +13,7 @@ typedef struct SleepPageBuffer_tag {
 	unsigned int count;
 	MyTime_Def time;
 	char buf[50];
+	unsigned short lcdinput[20];
 }SleepPageBuffer;
 
 

@@ -53,33 +53,28 @@ unsigned char DspWaittingCardPage(void *  parm)
 
 static void Input(unsigned char *pbuf , unsigned short len)
 {
-	unsigned short *pdata = NULL;
-	
-	pdata = MyMalloc((len/2)*sizeof(unsigned short));
-	if(pdata == NULL)
-		return;
-	
-	/*命令*/
-	pdata[0] = pbuf[4];
-	pdata[0] = (pdata[0]<<8) + pbuf[5];
-	
-	/*返回*/
-	if(pdata[0] == 0x1e00)
+	if(S_WaitPageData)
 	{
-		GBPageBufferFree();
-		SetGBChildPage(DspSampleIDPage);
-		GotoGBChildPage(NULL);
+		/*命令*/
+		S_WaitPageData->lcdinput[0] = pbuf[4];
+		S_WaitPageData->lcdinput[0] = (S_WaitPageData->lcdinput[0]<<8) + pbuf[5];
+		
+		/*返回*/
+		if(S_WaitPageData->lcdinput[0] == 0x1e00)
+		{
+			GBPageBufferFree();
+			SetGBChildPage(DspSampleIDPage);
+			GotoGBChildPage(NULL);
+		}
+		
+		/*查看操作规程*/
+		else if(S_WaitPageData->lcdinput[0] == 0x1e01)
+		{
+			GBPageBufferFree();
+			SetGBChildPage(DspOperGuidePage);
+			GotoGBChildPage(NULL);
+		}
 	}
-	
-	/*查看操作规程*/
-	else if(pdata[0] == 0x1e01)
-	{
-		GBPageBufferFree();
-		SetGBChildPage(DspOperGuidePage);
-		GotoGBChildPage(NULL);
-	}
-
-	MyFree(pdata);
 }
 
 static void PageUpDate(void)

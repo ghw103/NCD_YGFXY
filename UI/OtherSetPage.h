@@ -6,6 +6,7 @@
 typedef struct OtherSetPageBuffer_tag {
 	MyTime_Def temptime;
 	char buf[50];
+	unsigned short lcdinput[100];
 }OtherSetPageBuffer;
 
 unsigned char DspOtherSetPage(void *  parm);

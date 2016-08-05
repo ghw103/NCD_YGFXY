@@ -4,7 +4,6 @@
 #include	"LunchPage.h"
 
 #include	"LCD_Driver.h"
-
 #include	"Define.h"
 #include	"MyMem.h"
 
@@ -12,8 +11,6 @@
 #include	"SelectUserPage.h"
 #include	"PaiDuiPage.h"
 #include	"SleepPage.h"
-#include	"WifiFunction.h"
-#include	"Net_Data.h"
 #include	"PlaySong_Task.h"
 #include	"UI_Data.h"
 #include	"MyTest_Data.h"
@@ -56,61 +53,52 @@ unsigned char DspLunchPage(void *  parm)
 
 static void Input(unsigned char *pbuf , unsigned short len)
 {
-	unsigned short *pdata = NULL;
-	unsigned char error = 0;
-	
-	pdata = MyMalloc((len/2)*sizeof(unsigned short));
-	if(pdata == NULL)
-		return;
-	
-	/*命令*/
-	pdata[0] = pbuf[4];
-	pdata[0] = (pdata[0]<<8) + pbuf[5];
-	
-	/*设置*/
-	if(pdata[0] == 0x1b04)
+	if(S_LunchPageBuffer)
 	{
-		GBPageBufferFree();
-		SetGBChildPage(DspSystemSetPage);
-		GotoGBChildPage(NULL);
-	}
-	/*常规测试*/
-	else if(pdata[0] == 0x1b00)
-	{	
-		error = CreateANewTest(0);
-		/*创建成功*/
-		if(0 == error)
+		/*命令*/
+		S_LunchPageBuffer->lcdinput[0] = pbuf[4];
+		S_LunchPageBuffer->lcdinput[0] = (S_LunchPageBuffer->lcdinput[0]<<8) + pbuf[5];
+		
+		/*设置*/
+		if(S_LunchPageBuffer->lcdinput[0] == 0x1b04)
 		{
 			GBPageBufferFree();
-			SetGBChildPage(DspSelectUserPage);
+			SetGBChildPage(DspSystemSetPage);
 			GotoGBChildPage(NULL);
 		}
-		/*禁止常规测试*/
-		else if(1 == error)
-		{
-			SendKeyCode(2);
-			AddNumOfSongToList(45, 0);
+		/*常规测试*/
+		else if(S_LunchPageBuffer->lcdinput[0] == 0x1b00)
+		{	
+			S_LunchPageBuffer->error = CreateANewTest(0);
+			/*创建成功*/
+			if(0 == S_LunchPageBuffer->error)
+			{
+				GBPageBufferFree();
+				SetGBChildPage(DspSelectUserPage);
+				GotoGBChildPage(NULL);
+			}
+			/*禁止常规测试*/
+			else if(1 == S_LunchPageBuffer->error)
+			{
+				SendKeyCode(2);
+				AddNumOfSongToList(45, 0);
+			}
+			/*创建失败*/
+			else if(3 == S_LunchPageBuffer->error)
+			{
+				SendKeyCode(3);
+				AddNumOfSongToList(41, 0);
+			}
 		}
-		/*创建失败*/
-		else if(3 == error)
+		else if(S_LunchPageBuffer->lcdinput[0] == 0x1b01)
 		{
-			SendKeyCode(3);
-			AddNumOfSongToList(41, 0);
-		}
-	}
-	else if(pdata[0] == 0x1b01)
-	{
-		if(S_LunchPageBuffer)
 			S_LunchPageBuffer->presscount = 0;
-	}
-	else if(pdata[0] == 0x1b02)
-	{
-		if(S_LunchPageBuffer)
+		}
+		else if(S_LunchPageBuffer->lcdinput[0] == 0x1b02)
+		{
 			S_LunchPageBuffer->presscount++;
-	}
-	else if(pdata[0] == 0x1b03)
-	{
-		if(S_LunchPageBuffer)
+		}
+		else if(S_LunchPageBuffer->lcdinput[0] == 0x1b03)
 		{
 			/*查看排队状态*/
 			if(S_LunchPageBuffer->presscount > 20)
@@ -122,28 +110,28 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			/*批量测试*/
 			else
 			{
-				error = CreateANewTest(111);
+				S_LunchPageBuffer->error = CreateANewTest(111);
 				/*创建成功*/
-				if(0 == error)
+				if(0 == S_LunchPageBuffer->error)
 				{
 					GBPageBufferFree();
 					SetGBChildPage(DspSelectUserPage);
 					GotoGBChildPage(NULL);
 				}
 				/*排队位置满，不允许*/
-				else if(1 == error)
+				else if(1 == S_LunchPageBuffer->error)
 				{
 					SendKeyCode(1);
 					AddNumOfSongToList(40, 0);
 				}
 				/*创建失败*/
-				else if(2 == error)
+				else if(2 == S_LunchPageBuffer->error)
 				{
 					SendKeyCode(3);
 					AddNumOfSongToList(41, 0);
 				}
 				/*有卡即将测试*/
-				else if(3 == error)
+				else if(3 == S_LunchPageBuffer->error)
 				{
 					SendKeyCode(4);
 					AddNumOfSongToList(61, 0);
@@ -151,8 +139,6 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			}
 		}
 	}
-	
-	MyFree(pdata);
 }
 
 static void PageUpDate(void)
@@ -183,14 +169,13 @@ static MyState_TypeDef PageBufferMalloc(void)
 	if(NULL == S_LunchPageBuffer)
 	{
 		S_LunchPageBuffer = MyMalloc(sizeof(LunchPageBuffer));
-		if(S_LunchPageBuffer)
-		{
-			memset(S_LunchPageBuffer, 0, sizeof(LunchPageBuffer));
-			return My_Pass;
-		}
+		if(NULL == S_LunchPageBuffer)	
+			return My_Fail;
 	}
 	
-	return My_Fail;
+	memset(S_LunchPageBuffer, 0, sizeof(LunchPageBuffer));
+	
+	return My_Pass;
 }
 
 static MyState_TypeDef PageBufferFree(void)

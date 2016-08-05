@@ -18,6 +18,7 @@ typedef struct Record_tag {
 	unsigned int tempvalue1;
 	unsigned int tempvalue2;
 	TestData *tempdata;
+	unsigned short lcdinput[100];
 }RecordPageBuffer;
 
 unsigned char DspRecordPage(void *  parm);

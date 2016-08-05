@@ -7,6 +7,7 @@ typedef struct NetSetPageBuffer_tag {
 	NetData myNetData;
 	char buf[100];
 	unsigned char ischanged;
+	unsigned short lcdinput[100];
 }NetSetPageBuffer;
 
 

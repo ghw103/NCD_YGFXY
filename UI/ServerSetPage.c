@@ -51,29 +51,20 @@ unsigned char DspServerSetPage(void *  parm)
 
 static void Input(unsigned char *pbuf , unsigned short len)
 {
-	unsigned short *pdata = NULL;
-	
-	pdata = MyMalloc((len/2)*sizeof(unsigned short));
-	if(pdata == NULL)
-		return;
-	
-	/*命令*/
-	pdata[0] = pbuf[4];
-	pdata[0] = (pdata[0]<<8) + pbuf[5];
-	
-	/*获取服务器ip*/
-	if(pdata[0] == 0x2e30)
+	if(S_ServerPageBuffer)
 	{
-		if(S_ServerPageBuffer)
+		/*命令*/
+		S_ServerPageBuffer->lcdinput[0] = pbuf[4];
+		S_ServerPageBuffer->lcdinput[0] = (S_ServerPageBuffer->lcdinput[0]<<8) + pbuf[5];
+		
+		/*获取服务器ip*/
+		if(S_ServerPageBuffer->lcdinput[0] == 0x2e30)
 		{
 			SetTempIP(&pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			S_ServerPageBuffer->ischanged = 1;
 		}
-	}
-	/*确认修改*/
-	else if(pdata[0] == 0x2e21)
-	{
-		if(S_ServerPageBuffer)
+		/*确认修改*/
+		else if(S_ServerPageBuffer->lcdinput[0] == 0x2e21)
 		{
 			if(1 == S_ServerPageBuffer->ischanged)
 			{
@@ -86,16 +77,14 @@ static void Input(unsigned char *pbuf , unsigned short len)
 					SendKeyCode(2);
 			}
 		}
+		/*返回*/
+		else if(S_ServerPageBuffer->lcdinput[0] == 0x2e20)
+		{
+			GBPageBufferFree();
+			
+			GotoGBParentPage(NULL);
+		}
 	}
-	/*返回*/
-	else if(pdata[0] == 0x2e20)
-	{
-		GBPageBufferFree();
-		
-		GotoGBParentPage(NULL);
-	}
-
-	MyFree(pdata);
 }
 
 static void PageUpDate(void)
@@ -119,16 +108,17 @@ static MyState_TypeDef PageInit(void *  parm)
 
 static MyState_TypeDef PageBufferMalloc(void)
 {	
-	S_ServerPageBuffer = (ServerPageBuffer *)MyMalloc(sizeof(ServerPageBuffer));
-			
-	if(S_ServerPageBuffer)
+	if(NULL == S_ServerPageBuffer)
 	{
-		memset(S_ServerPageBuffer, 0, sizeof(ServerPageBuffer));
-		
-		return My_Pass;
+		S_ServerPageBuffer = (ServerPageBuffer *)MyMalloc(sizeof(ServerPageBuffer));
+			
+		if(NULL == S_ServerPageBuffer)
+			return My_Fail;
 	}
-	else
-		return My_Fail;
+	
+	memset(S_ServerPageBuffer, 0, sizeof(ServerPageBuffer));
+		
+	return My_Pass;
 }
 
 static MyState_TypeDef PageBufferFree(void)

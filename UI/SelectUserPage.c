@@ -22,7 +22,7 @@
 
 /******************************************************************************************/
 /*****************************************局部变量声明*************************************/
-static UserPageBuffer * GB_UserPageBuffer = NULL;
+static UserPageBuffer * S_UserPageBuffer = NULL;
 
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
@@ -70,92 +70,81 @@ unsigned char DspSelectUserPage(void *  parm)
 ***************************************************************************************************/
 static void Input(unsigned char *pbuf , unsigned short len)
 {
-	unsigned short *pdata = NULL;
-	
-	pdata = MyMalloc((len/2)*sizeof(unsigned short));
-	if(pdata == NULL)
-		return;
-	
-	/*命令*/
-	pdata[0] = pbuf[4];
-	pdata[0] = (pdata[0]<<8) + pbuf[5];
-	
-	/*返回*/
-	if(pdata[0] == 0x1c00)
+	if(S_UserPageBuffer)
 	{
-		DeleteCurrentTest();
+		/*命令*/
+		S_UserPageBuffer->lcdinput[0] = pbuf[4];
+		S_UserPageBuffer->lcdinput[0] = (S_UserPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
-		GBPageBufferFree();
-		GotoGBParentPage(NULL);
-	}
-	
-	/*上翻也*/
-	else if(pdata[0] == 0x1c02)
-	{
-		if(GB_UserPageBuffer)
+		/*返回*/
+		if(S_UserPageBuffer->lcdinput[0] == 0x1c00)
 		{
-			if(GB_UserPageBuffer->pageindex > 1)
+			DeleteCurrentTest();
+			
+			GBPageBufferFree();
+			GotoGBParentPage(NULL);
+		}
+		
+		/*上翻也*/
+		else if(S_UserPageBuffer->lcdinput[0] == 0x1c02)
+		{
+			if(S_UserPageBuffer->pageindex > 1)
 			{
-				GB_UserPageBuffer->pageindex--;
-					
-				GB_UserPageBuffer->selectindex = 0;
-					
+				S_UserPageBuffer->pageindex--;
+						
+				S_UserPageBuffer->selectindex = 0;
+						
 				ShowList();
-				SelectUser(GB_UserPageBuffer->selectindex);
+				SelectUser(S_UserPageBuffer->selectindex);
 			}
 		}
-	}
-	/*下翻页*/
-	else if(pdata[0] == 0x1c03)
-	{
-		if(GB_UserPageBuffer)
+		/*下翻页*/
+		else if(S_UserPageBuffer->lcdinput[0] == 0x1c03)
 		{
-			if(GB_UserPageBuffer->pageindex < (MaxUserNum / MaxPageShowNum))
+			if(S_UserPageBuffer->pageindex < (MaxUserNum / MaxPageShowNum))
 			{
-				GB_UserPageBuffer->tempuser = &GB_UserPageBuffer->user[(GB_UserPageBuffer->pageindex)*MaxPageShowNum];
-		
-				if(GB_UserPageBuffer->tempuser->crc == CalModbusCRC16Fun1(GB_UserPageBuffer->tempuser, sizeof(User_Type)-2))
+				S_UserPageBuffer->tempuser = &S_UserPageBuffer->user[(S_UserPageBuffer->pageindex)*MaxPageShowNum];
+			
+				if(S_UserPageBuffer->tempuser->crc == CalModbusCRC16Fun1(S_UserPageBuffer->tempuser, sizeof(User_Type)-2))
 				{
-					GB_UserPageBuffer->pageindex++;
-					
-					GB_UserPageBuffer->selectindex = 0;
-					
+					S_UserPageBuffer->pageindex++;
+						
+					S_UserPageBuffer->selectindex = 0;
+						
 					ShowList();
-					SelectUser(GB_UserPageBuffer->selectindex);
+					SelectUser(S_UserPageBuffer->selectindex);
 				}
 			}
 		}
-	}
-	/*确定*/
-	else if(pdata[0] == 0x1c01)
-	{
-		if(GB_UserPageBuffer->selectindex != 0)
+		/*确定*/
+		else if(S_UserPageBuffer->lcdinput[0] == 0x1c01)
 		{
-			/*以当前选择的操作人作为本次测试数据的操作人*/
-			memcpy(&(GB_UserPageBuffer->currenttestdata->testdata.user), GB_UserPageBuffer->user, sizeof(User_Type));
-		
-			GBPageBufferFree();
-			GotoGBChildPage(NULL);
+			if(S_UserPageBuffer->selectindex != 0)
+			{
+				/*以当前选择的操作人作为本次测试数据的操作人*/
+				memcpy(&(S_UserPageBuffer->currenttestdata->testdata.user), S_UserPageBuffer->user, sizeof(User_Type));
+			
+				GBPageBufferFree();
+				GotoGBChildPage(NULL);
+			}
+			else
+			{
+				AddNumOfSongToList(45, 0);
+				SendKeyCode(1);
+			}
 		}
-		else
+		/*选择操作人*/
+		else if((S_UserPageBuffer->lcdinput[0] >= 0x1c04)&&(S_UserPageBuffer->lcdinput[0] <= 0x1c0e))
 		{
-			AddNumOfSongToList(45, 0);
-			SendKeyCode(1);
+			S_UserPageBuffer->tempuser = &S_UserPageBuffer->user[(S_UserPageBuffer->pageindex - 1)*MaxPageShowNum + S_UserPageBuffer->lcdinput[0] - 0x1c04];
+			
+			if(S_UserPageBuffer->tempuser->crc == CalModbusCRC16Fun1(S_UserPageBuffer->tempuser, sizeof(User_Type)-2))
+			{
+				S_UserPageBuffer->selectindex = S_UserPageBuffer->lcdinput[0] - 0x1c04+1;
+				SelectUser(S_UserPageBuffer->selectindex);
+			}
 		}
 	}
-	/*选择操作人*/
-	else if((pdata[0] >= 0x1c04)&&(pdata[0] <= 0x1c0e))
-	{
-		GB_UserPageBuffer->tempuser = &GB_UserPageBuffer->user[(GB_UserPageBuffer->pageindex - 1)*MaxPageShowNum + pdata[0] - 0x1c04];
-		
-		if(GB_UserPageBuffer->tempuser->crc == CalModbusCRC16Fun1(GB_UserPageBuffer->tempuser, sizeof(User_Type)-2))
-		{
-			GB_UserPageBuffer->selectindex = pdata[0] - 0x1c04+1;
-			SelectUser(GB_UserPageBuffer->selectindex);
-		}
-	}
-
-	MyFree(pdata);
 }
 
 /***************************************************************************************************
@@ -168,7 +157,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void PageUpDate(void)
 {
-	if(TimeOut == timer_expired(&(GB_UserPageBuffer->timer)))
+	if(TimeOut == timer_expired(&(S_UserPageBuffer->timer)))
 	{
 		AddNumOfSongToList(8, 0);
 		DeleteCurrentTest();
@@ -194,19 +183,19 @@ static MyState_TypeDef PageInit(void * parm)
 	SelectPage(54);
 	
 	/*重置倒计时30s，如果超时，则取消此次测试*/
-	timer_set(&(GB_UserPageBuffer->timer), 10);
+	timer_set(&(S_UserPageBuffer->timer), 10);
 	
 	/*获取当前测试的数据指针*/
-	GB_UserPageBuffer->currenttestdata = GetCurrentTestItem();
+	S_UserPageBuffer->currenttestdata = GetCurrentTestItem();
 	
 	/*读取所有操作人*/
-	ReadUserData(GB_UserPageBuffer->user);
+	ReadUserData(S_UserPageBuffer->user);
 	
-	GB_UserPageBuffer->pageindex = 1;
-	GB_UserPageBuffer->selectindex = 0;
+	S_UserPageBuffer->pageindex = 1;
+	S_UserPageBuffer->selectindex = 0;
 	
 	ShowList();
-	SelectUser(GB_UserPageBuffer->selectindex);
+	SelectUser(S_UserPageBuffer->selectindex);
 	
 	AddNumOfSongToList(45, 0);
 	
@@ -223,19 +212,17 @@ static MyState_TypeDef PageInit(void * parm)
 ***************************************************************************************************/
 static MyState_TypeDef PageBufferMalloc(void)
 {	
-	if(GB_UserPageBuffer)
-		return My_Fail;
-	
-	GB_UserPageBuffer = (UserPageBuffer *)MyMalloc(sizeof(UserPageBuffer));
-			
-	if(GB_UserPageBuffer)
+	if(NULL == S_UserPageBuffer)
 	{
-		memset(GB_UserPageBuffer, 0, sizeof(UserPageBuffer));
-		
-		return My_Pass;
+		S_UserPageBuffer = (UserPageBuffer *)MyMalloc(sizeof(UserPageBuffer));
+			
+		if(NULL == S_UserPageBuffer)
+			return My_Fail;
 	}
-	else
-		return My_Fail;
+	
+	memset(S_UserPageBuffer, 0, sizeof(UserPageBuffer));
+		
+	return My_Pass;
 }
 
 /***************************************************************************************************
@@ -248,8 +235,8 @@ static MyState_TypeDef PageBufferMalloc(void)
 ***************************************************************************************************/
 static MyState_TypeDef PageBufferFree(void)
 {
-	MyFree(GB_UserPageBuffer);
-	GB_UserPageBuffer = NULL;
+	MyFree(S_UserPageBuffer);
+	S_UserPageBuffer = NULL;
 	
 	return My_Pass;
 }
@@ -272,19 +259,19 @@ static void ShowList(void)
 {
 	unsigned char i = 0;
 	
-	i = (GB_UserPageBuffer->pageindex-1)*MaxPageShowNum;
+	i = (S_UserPageBuffer->pageindex-1)*MaxPageShowNum;
 	
-	GB_UserPageBuffer->tempuser = &(GB_UserPageBuffer->user[i]);
+	S_UserPageBuffer->tempuser = &(S_UserPageBuffer->user[i]);
 	
 	/*显示列表数据*/
 	for(i=0; i<MaxPageShowNum; i++)
 	{
 		ClearText(0x1c10+i*16, 32);
 		
-		if(GB_UserPageBuffer->tempuser->crc != 0)
-			DisText(0x1c10+i*16, GB_UserPageBuffer->tempuser->user_name, strlen(GB_UserPageBuffer->tempuser->user_name));
+		if(S_UserPageBuffer->tempuser->crc != 0)
+			DisText(0x1c10+i*16, S_UserPageBuffer->tempuser->user_name, strlen(S_UserPageBuffer->tempuser->user_name));
 		
-		GB_UserPageBuffer->tempuser++;
+		S_UserPageBuffer->tempuser++;
 	}
 }
 
@@ -300,16 +287,16 @@ static void SelectUser(unsigned char index)
 {
 	unsigned char i = 0;
 	
-	BasicPic(0x1cb0, 0, 54, 600, 1, 840, 31, 392, 123+(GB_UserPageBuffer->selectindex-1)*34);
+	BasicPic(0x1cb0, 0, 54, 600, 1, 840, 31, 392, 123+(S_UserPageBuffer->selectindex-1)*34);
 	
-	if((GB_UserPageBuffer->selectindex > 0) && (GB_UserPageBuffer->selectindex <= MaxPageShowNum))
+	if((S_UserPageBuffer->selectindex > 0) && (S_UserPageBuffer->selectindex <= MaxPageShowNum))
 	{
-		i = (GB_UserPageBuffer->pageindex-1)*MaxPageShowNum + GB_UserPageBuffer->selectindex-1;
+		i = (S_UserPageBuffer->pageindex-1)*MaxPageShowNum + S_UserPageBuffer->selectindex-1;
 		
-		GB_UserPageBuffer->tempuser = &(GB_UserPageBuffer->user[i]);
+		S_UserPageBuffer->tempuser = &(S_UserPageBuffer->user[i]);
 		
-		if(GB_UserPageBuffer->tempuser->crc == CalModbusCRC16Fun1(GB_UserPageBuffer->tempuser, sizeof(User_Type)-2))
-			BasicPic(0x1cb0, 1, 54, 600, 1, 840, 31, 392, 123+(GB_UserPageBuffer->selectindex-1)*34);
+		if(S_UserPageBuffer->tempuser->crc == CalModbusCRC16Fun1(S_UserPageBuffer->tempuser, sizeof(User_Type)-2))
+			BasicPic(0x1cb0, 1, 54, 600, 1, 840, 31, 392, 123+(S_UserPageBuffer->selectindex-1)*34);
 	}
 }
 

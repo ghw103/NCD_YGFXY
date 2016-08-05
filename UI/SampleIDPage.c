@@ -53,27 +53,21 @@ unsigned char DspSampleIDPage(void *  parm)
 
 static void Input(unsigned char *pbuf , unsigned short len)
 {
-	unsigned short *pdata = NULL;
-	
-	pdata = MyMalloc((len/2)*sizeof(unsigned short));
-	if(pdata == NULL)
-		return;
-	
-	/*命令*/
-	pdata[0] = pbuf[4];
-	pdata[0] = (pdata[0]<<8) + pbuf[5];
-	
-	/*返回*/
-	if(pdata[0] == 0x1d00)
+	if(S_SampleIDPage)
 	{
-		GBPageBufferFree();
-		GotoGBParentPage(NULL);
-	}
-	
-	/*确定*/
-	else if(pdata[0] == 0x1d01)
-	{
-		if(S_SampleIDPage)
+		/*命令*/
+		S_SampleIDPage->lcdinput[0] = pbuf[4];
+		S_SampleIDPage->lcdinput[0] = (S_SampleIDPage->lcdinput[0]<<8) + pbuf[5];
+		
+		/*返回*/
+		if(S_SampleIDPage->lcdinput[0] == 0x1d00)
+		{
+			GBPageBufferFree();
+			GotoGBParentPage(NULL);
+		}
+		
+		/*确定*/
+		else if(S_SampleIDPage->lcdinput[0] == 0x1d01)
 		{
 			if(strlen(S_SampleIDPage->tempid) == 0)
 			{
@@ -83,27 +77,22 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			else
 			{
 				memcpy(S_SampleIDPage->currenttestdata->testdata.sampleid, S_SampleIDPage->tempid, MaxSampleIDLen);
-				
+					
 				GBPageBufferFree();
 				GotoGBChildPage(NULL);
 			}
 		}
-	}
-	
-	else if(pdata[0] == 0x1d10)
-	{
-		if(S_SampleIDPage)
+		
+		else if(S_SampleIDPage->lcdinput[0] == 0x1d10)
 		{
 			memset(S_SampleIDPage->tempid, 0 , MaxSampleIDLen);
-		
+			
 			if(MaxSampleIDLen >= GetBufLen(&pbuf[7] , 2*pbuf[6]))
 				memcpy(S_SampleIDPage->tempid, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			else
 				memcpy(S_SampleIDPage->tempid, &pbuf[7], MaxSampleIDLen);
 		}
 	}
-
-	MyFree(pdata);
 }
 
 static void PageUpDate(void)

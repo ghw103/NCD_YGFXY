@@ -49,35 +49,30 @@ unsigned char DspOtherSetPage(void *  parm)
 
 static void Input(unsigned char *pbuf , unsigned short len)
 {
-	unsigned short *pdata = NULL;
-	
-	pdata = MyMalloc((len/2)*sizeof(unsigned short));
-	if(pdata == NULL)
-		return;
-	
-	/*命令*/
-	pdata[0] = pbuf[4];
-	pdata[0] = (pdata[0]<<8) + pbuf[5];
-	
-	/*重启*/
-	if(pdata[0] == 0x2c00)
+	if(S_OtherSetPageBuffer)
 	{
-		while(1);
+		/*命令*/
+		S_OtherSetPageBuffer->lcdinput[0] = pbuf[4];
+		S_OtherSetPageBuffer->lcdinput[0] = (S_OtherSetPageBuffer->lcdinput[0]<<8) + pbuf[5];
+		
+		/*重启*/
+		if(S_OtherSetPageBuffer->lcdinput[0] == 0x2c00)
+		{
+			while(1);
+		}
+		/*返回*/
+		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2c01)
+		{
+			GBPageBufferFree();
+			GotoGBParentPage(NULL);
+		}
+		/*设置时间*/
+		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2c20)
+		{
+			if(S_OtherSetPageBuffer)
+				SetGB_Time((char *)(&pbuf[7]), GetBufLen(&pbuf[7] , 2*pbuf[6]));
+		}
 	}
-	/*返回*/
-	else if(pdata[0] == 0x2c01)
-	{
-		GBPageBufferFree();
-		GotoGBParentPage(NULL);
-	}
-	/*设置时间*/
-	else if(pdata[0] == 0x2c20)
-	{
-		if(S_OtherSetPageBuffer)
-			SetGB_Time((char *)(&pbuf[7]), GetBufLen(&pbuf[7] , 2*pbuf[6]));
-	}
-	
-	MyFree(pdata);
 }
 
 static void PageUpDate(void)
@@ -100,14 +95,12 @@ static MyState_TypeDef PageBufferMalloc(void)
 	if(NULL == S_OtherSetPageBuffer)
 	{
 		S_OtherSetPageBuffer = MyMalloc(sizeof(OtherSetPageBuffer));
-		if(S_OtherSetPageBuffer)
-		{
-			memset(S_OtherSetPageBuffer, 0, sizeof(OtherSetPageBuffer));
-			return My_Pass;
-		}
+		if(NULL == S_OtherSetPageBuffer)
+			return My_Fail;
 	}
 	
-	return My_Fail;
+	memset(S_OtherSetPageBuffer, 0, sizeof(OtherSetPageBuffer));
+	return My_Pass;
 }
 
 static MyState_TypeDef PageBufferFree(void)

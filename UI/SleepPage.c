@@ -54,25 +54,20 @@ unsigned char DspSleepPage(void *  parm)
 
 static void Input(unsigned char *pbuf , unsigned short len)
 {
-	unsigned short *pdata = NULL;
-	
-	pdata = MyMalloc((len/2)*sizeof(unsigned short));
-	if(pdata == NULL)
-		return;
-	
-	/*√¸¡Ó*/
-	pdata[0] = pbuf[4];
-	pdata[0] = (pdata[0]<<8) + pbuf[5];
-	
-	/*…Ë÷√*/
-	if(pdata[0] == 0x2f00)
+	if(S_SleepPageBuffer)
 	{
-		SetLEDLight(100);
-		GBPageBufferFree();
-		GotoGBParentPage(NULL);
+		/*√¸¡Ó*/
+		S_SleepPageBuffer->lcdinput[0] = pbuf[4];
+		S_SleepPageBuffer->lcdinput[0] = (S_SleepPageBuffer->lcdinput[0]<<8) + pbuf[5];
+		
+		/*…Ë÷√*/
+		if(S_SleepPageBuffer->lcdinput[0] == 0x2f00)
+		{
+			SetLEDLight(100);
+			GBPageBufferFree();
+			GotoGBParentPage(NULL);
+		}
 	}
-	
-	MyFree(pdata);
 }
 
 static void PageUpDate(void)
@@ -103,14 +98,11 @@ static MyState_TypeDef PageBufferMalloc(void)
 	if(NULL == S_SleepPageBuffer)
 	{
 		S_SleepPageBuffer = MyMalloc(sizeof(SleepPageBuffer));
-		if(S_SleepPageBuffer)
-		{
-			memset(S_SleepPageBuffer, 0, sizeof(SleepPageBuffer));
-			return My_Pass;
-		}
+		if(NULL == S_SleepPageBuffer)
+			return My_Fail;
 	}
-	
-	return My_Fail;
+	memset(S_SleepPageBuffer, 0, sizeof(SleepPageBuffer));
+	return My_Pass;
 }
 
 static MyState_TypeDef PageBufferFree(void)

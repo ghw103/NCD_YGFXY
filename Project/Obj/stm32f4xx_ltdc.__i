@@ -1,0 +1,6 @@
+-c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc
+-I "D:\Program Files\Keil5\ARM\RV31\INC"
+-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"
+-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"
+-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx
+-o .\obj\stm32f4xx_ltdc.o --omf_browse .\obj\stm32f4xx_ltdc.crf --depend .\obj\stm32f4xx_ltdc.d "..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_ltdc.c"

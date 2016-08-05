@@ -8,6 +8,7 @@ typedef struct ShowPageBuffer_tag {
 	Basic_ICO myico[3];
 	TestData * testdata;
 	LineInfo lineinfo;
+	unsigned short lcdinput[100];
 }ShowPageBuffer;
 
 unsigned char DspShowResultPage(void *  parm);

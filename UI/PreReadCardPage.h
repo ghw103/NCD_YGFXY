@@ -11,6 +11,7 @@ typedef struct PreReadPageBuffer_tag {
 	ScanCodeResult scancode;
 	Timer timer2;
 	char buf[100];
+	unsigned short lcdinput[100];
 }PreReadPageBuffer;
 
 unsigned char DspPreReadCardPage(void *  parm);

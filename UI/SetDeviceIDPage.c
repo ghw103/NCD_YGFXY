@@ -49,58 +49,50 @@ unsigned char DspSetDeviceIDPage(void *  parm)
 
 static void Input(unsigned char *pbuf , unsigned short len)
 {
-	unsigned short *pdata = NULL;
-	
-	pdata = MyMalloc((len/2)*sizeof(unsigned short));
-	if(pdata == NULL)
-		return;
-	
-	/*命令*/
-	pdata[0] = pbuf[4];
-	pdata[0] = (pdata[0]<<8) + pbuf[5];
-	
+	if(S_SetDeviceIDPage)
+	{
+		/*命令*/
+		S_SetDeviceIDPage->lcdinput[0] = pbuf[4];
+		S_SetDeviceIDPage->lcdinput[0] = (S_SetDeviceIDPage->lcdinput[0]<<8) + pbuf[5];
+		
 
-	/*修改设备id*/
-	/*返回*/
-	if(pdata[0] == 0x2390)
-	{
-		GBPageBufferFree();
-		GotoGBParentPage(NULL);
-	}
-	/*确认*/
-	else if(pdata[0] == 0x2391)
-	{
-		if((S_SetDeviceIDPage) && (S_SetDeviceIDPage->ismodify == 1))
+		/*修改设备id*/
+		/*返回*/
+		if(S_SetDeviceIDPage->lcdinput[0] == 0x2390)
 		{
-			S_SetDeviceIDPage->temp_deviceinfo.isfresh = 1;
-			if(My_Pass == SaveDeviceInfo(&(S_SetDeviceIDPage->temp_deviceinfo)))
-				SendKeyCode(2);
-			else
-				SendKeyCode(1);
+			GBPageBufferFree();
+			GotoGBParentPage(NULL);
 		}
-	}
-	/*id输入*/
-	else if(pdata[0] == 0x23a0)
-	{
-		if(S_SetDeviceIDPage)
+		/*确认*/
+		else if(S_SetDeviceIDPage->lcdinput[0] == 0x2391)
+		{
+			if(S_SetDeviceIDPage->ismodify == 1)
+			{
+				S_SetDeviceIDPage->temp_deviceinfo.isfresh = 1;
+				if(My_Pass == SaveDeviceInfo(&(S_SetDeviceIDPage->temp_deviceinfo)))
+					SendKeyCode(2);
+				else
+					SendKeyCode(1);
+			}
+		}
+		/*id输入*/
+		else if(S_SetDeviceIDPage->lcdinput[0] == 0x23a0)
 		{
 			memset(S_SetDeviceIDPage->temp_deviceinfo.deviceid, 0 , MaxDeviceIDLen);
-		
+			
 			if(MaxDeviceIDLen >= GetBufLen(&pbuf[7] , 2*pbuf[6]))
 				memcpy(S_SetDeviceIDPage->temp_deviceinfo.deviceid, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			else
 				memcpy(S_SetDeviceIDPage->temp_deviceinfo.deviceid, &pbuf[7], MaxDeviceIDLen);
-			
+				
 			S_SetDeviceIDPage->ismodify = 1;
 		}
 	}
-
-	MyFree(pdata);
 }
 
 static void PageUpDate(void)
 {
-	if(My_Pass == TakeSampleIDData(&(S_SetDeviceIDPage->tempbuf)))
+	if((S_SetDeviceIDPage) && (My_Pass == TakeSampleIDData(&(S_SetDeviceIDPage->tempbuf))))
 	{
 		memcpy(S_SetDeviceIDPage->temp_deviceinfo.deviceid, S_SetDeviceIDPage->tempbuf, MaxDeviceIDLen);
 		MyFree(S_SetDeviceIDPage->tempbuf);
@@ -149,11 +141,8 @@ static MyState_TypeDef PageBufferMalloc(void)
 
 static MyState_TypeDef PageBufferFree(void)
 {
-	if(S_SetDeviceIDPage)
-	{
-		MyFree(S_SetDeviceIDPage);
-		S_SetDeviceIDPage = NULL;
-	}
+	MyFree(S_SetDeviceIDPage);
+	S_SetDeviceIDPage = NULL;
 	
 	return My_Pass;
 }

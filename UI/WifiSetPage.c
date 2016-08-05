@@ -19,7 +19,6 @@
 
 /******************************************************************************************/
 /*****************************************局部变量声明*************************************/
-//WifiPageBuffer GB_WifiPageBuffer;
 static WifiPageBuffer * S_WifiPageBuffer = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
@@ -51,107 +50,102 @@ unsigned char DspWifiSetPage(void *  parm)
 
 static void Input(unsigned char *pbuf , unsigned short len)
 {
-	unsigned short *pdata = NULL;
-	
-	pdata = MyMalloc((len/2)*sizeof(unsigned short));
-	if(pdata == NULL)
-		return;
-	
-	/*命令*/
-	pdata[0] = pbuf[4];
-	pdata[0] = (pdata[0]<<8) + pbuf[5];
-	
-	/*获得密码连接wifi*/
-	if(pdata[0] == 0x2de0)
+	if(S_WifiPageBuffer)
 	{
-		if(S_WifiPageBuffer)
+		/*命令*/
+		S_WifiPageBuffer->lcdinput[0] = pbuf[4];
+		S_WifiPageBuffer->lcdinput[0] = (S_WifiPageBuffer->lcdinput[0]<<8) + pbuf[5];
+		
+		/*获得密码连接wifi*/
+		if(S_WifiPageBuffer->lcdinput[0] == 0x2de0)
 		{
-			SendKeyCode(6);
-			vTaskDelay(1000/portTICK_RATE_MS);
-			memcpy(S_WifiPageBuffer->wifip->key, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
-			if(My_Fail == ConnectWifi(S_WifiPageBuffer->wifip))
+			if(S_WifiPageBuffer)
 			{
-				SendKeyCode(7);
-				vTaskDelay(100/portTICK_RATE_MS);
-				SendKeyCode(2);
-			}
-			else
-			{
-				RestartWifi();
-				vTaskDelay(2000/portTICK_RATE_MS);
-				SendKeyCode(7);
-				vTaskDelay(100/portTICK_RATE_MS);
-				SendKeyCode(1);
-				SaveWifiData(S_WifiPageBuffer->wifip);
-			}
-		}
-	}
-	/*上一页*/
-	else if(pdata[0] == 0x2d0d)
-	{
-		if(S_WifiPageBuffer)
-		{
-			if(S_WifiPageBuffer->pageindex > 0)
-			{
-				S_WifiPageBuffer->pageindex--;
-				DisListText();
-			}
-		}
-	}
-	/*下一页*/
-	else if(pdata[0] == 0x2d0e)
-	{
-		if(S_WifiPageBuffer)
-		{
-			if(S_WifiPageBuffer->pageindex < (MaxWifiListNum/PageWifiNum-1))
-			{
-				if(strlen(S_WifiPageBuffer->wifilist[(S_WifiPageBuffer->pageindex+1)*PageWifiNum].ssid) > 0)
+				SendKeyCode(6);
+				vTaskDelay(1000/portTICK_RATE_MS);
+				memcpy(S_WifiPageBuffer->wifip->key, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
+				if(My_Fail == ConnectWifi(S_WifiPageBuffer->wifip))
 				{
-					S_WifiPageBuffer->pageindex++;
+					SendKeyCode(7);
+					vTaskDelay(100/portTICK_RATE_MS);
+					SendKeyCode(2);
+				}
+				else
+				{
+					RestartWifi();
+					vTaskDelay(2000/portTICK_RATE_MS);
+					SendKeyCode(7);
+					vTaskDelay(100/portTICK_RATE_MS);
+					SendKeyCode(1);
+					SaveWifiData(S_WifiPageBuffer->wifip);
+				}
+			}
+		}
+		/*上一页*/
+		else if(S_WifiPageBuffer->lcdinput[0] == 0x2d0d)
+		{
+			if(S_WifiPageBuffer)
+			{
+				if(S_WifiPageBuffer->pageindex > 0)
+				{
+					S_WifiPageBuffer->pageindex--;
 					DisListText();
 				}
 			}
 		}
-	}
-	/*连接wifi成功的弹出菜单*/
-	else if(pdata[0] == 0x2d0b)
-	{
-	
-	}
-	/*返回*/
-	else if(pdata[0] == 0x2d09)
-	{
-		GBPageBufferFree();
-		SetGB_WifiState(Link_Up);
-		
-		GotoGBParentPage(NULL);
-	}
-	/*刷新*/
-	else if(pdata[0] == 0x2d0a)
-	{
-		RefreshWifi();
-		DisListText();
-	}
-	/*选择wifi*/
-	else if((pdata[0] >= 0x2d10)&&(pdata[0] <= 0x2d19))
-	{
-		if(S_WifiPageBuffer)
+		/*下一页*/
+		else if(S_WifiPageBuffer->lcdinput[0] == 0x2d0e)
 		{
-			/*判断选择的wifi是否超出了有效列表*/
-			if(strlen(S_WifiPageBuffer->wifilist[(S_WifiPageBuffer->pageindex)*PageWifiNum+(pdata[0] - 0x2d10)].ssid) > 0)
+			if(S_WifiPageBuffer)
 			{
-				S_WifiPageBuffer->selectindex = (pdata[0] - 0x2d10)+1;
-				BasicPic(0x2d30, 1, 111, 13, 569, 253, 599, 392, 124+(S_WifiPageBuffer->selectindex-1)*30);
-				CheckIsNeedKey();
+				if(S_WifiPageBuffer->pageindex < (MaxWifiListNum/PageWifiNum-1))
+				{
+					if(strlen(S_WifiPageBuffer->wifilist[(S_WifiPageBuffer->pageindex+1)*PageWifiNum].ssid) > 0)
+					{
+						S_WifiPageBuffer->pageindex++;
+						DisListText();
+					}
+				}
 			}
 		}
-	}
-	else if(pdata[0] == 0x2d1e)
-	{
+		/*连接wifi成功的弹出菜单*/
+		else if(S_WifiPageBuffer->lcdinput[0] == 0x2d0b)
+		{
 		
+		}
+		/*返回*/
+		else if(S_WifiPageBuffer->lcdinput[0] == 0x2d09)
+		{
+			GBPageBufferFree();
+			SetGB_WifiState(Link_Up);
+			
+			GotoGBParentPage(NULL);
+		}
+		/*刷新*/
+		else if(S_WifiPageBuffer->lcdinput[0] == 0x2d0a)
+		{
+			RefreshWifi();
+			DisListText();
+		}
+		/*选择wifi*/
+		else if((S_WifiPageBuffer->lcdinput[0] >= 0x2d10)&&(S_WifiPageBuffer->lcdinput[0] <= 0x2d19))
+		{
+			if(S_WifiPageBuffer)
+			{
+				/*判断选择的wifi是否超出了有效列表*/
+				if(strlen(S_WifiPageBuffer->wifilist[(S_WifiPageBuffer->pageindex)*PageWifiNum+(S_WifiPageBuffer->lcdinput[0] - 0x2d10)].ssid) > 0)
+				{
+					S_WifiPageBuffer->selectindex = (S_WifiPageBuffer->lcdinput[0] - 0x2d10)+1;
+					BasicPic(0x2d30, 1, 111, 13, 569, 253, 599, 392, 124+(S_WifiPageBuffer->selectindex-1)*30);
+					CheckIsNeedKey();
+				}
+			}
+		}
+		else if(S_WifiPageBuffer->lcdinput[0] == 0x2d1e)
+		{
+			
+		}
 	}
-
-	MyFree(pdata);
 }
 
 static void PageUpDate(void)
@@ -175,17 +169,18 @@ static MyState_TypeDef PageInit(void *  parm)
 }
 
 static MyState_TypeDef PageBufferMalloc(void)
-{	
-	S_WifiPageBuffer = MyMalloc(sizeof(WifiPageBuffer));
-			
-	if(S_WifiPageBuffer)
+{
+	if(NULL == S_WifiPageBuffer)
 	{
-		memset(S_WifiPageBuffer, 0, sizeof(WifiPageBuffer));
-		
-		return My_Pass;
+		S_WifiPageBuffer = MyMalloc(sizeof(WifiPageBuffer));
+			
+		if(NULL == S_WifiPageBuffer)
+			return My_Fail;
 	}
-	else
-		return My_Fail;
+	
+	memset(S_WifiPageBuffer, 0, sizeof(WifiPageBuffer));
+		
+	return My_Pass;
 }
 
 static MyState_TypeDef PageBufferFree(void)

@@ -11,6 +11,7 @@ typedef struct WifiPageBuffer_tag {
 	WIFI_Def * wifip;
 	unsigned short wifinum;
 	Basic_ICO myico[PageWifiNum];
+	unsigned short lcdinput[100];
 }WifiPageBuffer;
 
 unsigned char DspWifiSetPage(void *  parm);

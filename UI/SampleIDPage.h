@@ -10,6 +10,7 @@ typedef struct SampleIDPage_tag {
 	char *tempbuf;								//临时指针
 	Timer timer;				//一个计时器
 	ItemData * currenttestdata;												//当前测试数据
+	unsigned short lcdinput[100];
 }SampleIDPage;
 
 unsigned char DspSampleIDPage(void *  parm);
