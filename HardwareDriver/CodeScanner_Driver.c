@@ -127,10 +127,10 @@ MyState_TypeDef ErWeiMaSelfTest(void)
 
 	for(i=0; i<3; i++)
 	{
-		if(pdPASS == SendStrToQueue(GetUsart2TXQueue(), GetUsart2TXMutex(),temp1, 9, 500/portTICK_RATE_MS, EnableUsart2TXInterrupt))
+		if(pdPASS == SendDataToQueue(GetUsart2TXQueue(), GetUsart2TXMutex(),temp1, 9, 1, 500/portTICK_RATE_MS, EnableUsart2TXInterrupt))
 		{
 			p = temp2;
-			while(pdPASS == ReceiveCharFromQueue(GetUsart2RXQueue(), GetUsart2RXMutex(), p+j, 50/portTICK_RATE_MS))
+			while(pdPASS == ReceiveDataFromQueue(GetUsart2RXQueue(), GetUsart2RXMutex(), p+j, 1, 1, 50/portTICK_RATE_MS))
 					j++;
 			
 			if(j > 0)

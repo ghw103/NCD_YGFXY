@@ -23,6 +23,7 @@ typedef struct TestData_tag {
 	User_Type user;
 	char sampleid[MaxSampleIDLen];
 	CardCodeInfo temperweima;
+	AdjustData tempadjust;
 	TestLine testline;
 	MyTime_Def TestTime;
 	MyTemp_Def TestTemp;

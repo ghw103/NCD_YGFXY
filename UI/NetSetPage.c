@@ -173,7 +173,7 @@ static void UpPageValue(void)
 		else
 			S_NetSetPageBuffer->buf[0] = 0x00;
 
-		WriteData(0x2d04, S_NetSetPageBuffer->buf, 2);
+		WriteRadioData(0x2d04, S_NetSetPageBuffer->buf, 2);
 		
 		/*¸üÐÂip*/
 		if(S_NetSetPageBuffer->myNetData.ipmode == User_Mode)

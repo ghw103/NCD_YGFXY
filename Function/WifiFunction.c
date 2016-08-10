@@ -75,12 +75,12 @@ static MyState_TypeDef ComWithWIFI(char * cmd, const char *strcmp, char *buf, un
 	
 	if(pdPASS == WaitWifiFree(100/portTICK_RATE_MS))
 	{
-		if(pdPASS == SendStrToQueue(GetUsart4TXQueue(), GetUsart4TXMutex(), cmd, strlen(cmd), 50 * portTICK_RATE_MS, EnableUsart4TXInterrupt))
+		if(pdPASS == SendDataToQueue(GetUsart4TXQueue(), GetUsart4TXMutex(), cmd, strlen(cmd), 1, 50 * portTICK_RATE_MS, EnableUsart4TXInterrupt))
 		{
 			if(buf)
 			{
 				memset(buf, 0, buflen);
-				while(pdPASS == ReceiveCharFromQueue(GetUsart4RXQueue(), GetUsart4RXMutex(), buf+rxcount, xBlockTime))
+				while(pdPASS == ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4RXMutex(), buf+rxcount, 1, 1, xBlockTime))
 					rxcount++;
 				
 				if(rxcount > 0)

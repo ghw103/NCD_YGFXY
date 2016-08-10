@@ -212,7 +212,7 @@ static void RefreshPageText(void)
 			sprintf(buf, "%s", S_TestPageBuffer->currenttestdata->testdata.temperweima.CardPiCi);
 			DisText(0x2130, buf, strlen(buf));
 			
-			sprintf(buf, "%2.3f", S_TestPageBuffer->currenttestdata->testdata.testline.BasicBili);
+			sprintf(buf, "%2.3f", S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult);
 			DisText(0x2140, buf, strlen(buf));
 		}
 	}

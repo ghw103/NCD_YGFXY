@@ -8,6 +8,7 @@
 #include	"MyMem.h"
 #include	"LunchPage.h"
 #include	"ShowDeviceInfoPage.h"
+#include	"AdjustPage.h"
 #include	"UserMPage.h"
 #include	"NetPreSetPage.h"
 #include	"RecordPage.h"
@@ -87,7 +88,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	/*校准功能*/
 	else if(pdata[0] == 0x2204)
 	{
-		SetGBChildPage(DspSystemSetPage);
+		SetGBChildPage(DspAdjustPage);
 		GotoGBChildPage(NULL);
 	}
 	/*其他设置*/

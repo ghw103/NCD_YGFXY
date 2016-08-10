@@ -364,7 +364,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F4XX,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\AppLunch;..\COM;..\Datas;..\Function;..\HardwareDriver;..\Libraries\CMSIS\Device\ST\STM32F4xx\Include;..\Libraries\STM32F4x7_ETH_Driver\inc;..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\Task;..\ThirdParty\Fatfs\src;..\ThirdParty\FreeRTOS\include;..\ThirdParty\lwip-1.4.1\src\include;..\ThirdParty\lwip-1.4.1\src\include\ipv4;..\ThirdParty\lwip-1.4.1\src\include\netif;..\ThirdParty\lwip-1.4.1\src\include\lwip;..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS;..\ThirdParty\lwip-1.4.1\port\STM32F4x7;..\ThirdParty\lwip-1.4.1\User;..\ThirdParty\USB\USB_User;..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc;..\ThirdParty\cJSON-master;..\UI;..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc;..\ThirdParty\USB\STM32_USB_OTG_Driver\inc;..\ThirdParty\FreeRTOS\portable\RVDS\ARM_CM3</IncludePath>
+              <IncludePath>..\AppLunch;..\COM;..\Datas;..\Function;..\HardwareDriver;..\Libraries\CMSIS\Device\ST\STM32F4xx\Include;..\Libraries\STM32F4x7_ETH_Driver\inc;..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\Task;..\ThirdParty\Fatfs\src;..\ThirdParty\lwip-1.4.1\src\include;..\ThirdParty\lwip-1.4.1\src\include\ipv4;..\ThirdParty\lwip-1.4.1\src\include\netif;..\ThirdParty\lwip-1.4.1\src\include\lwip;..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS;..\ThirdParty\lwip-1.4.1\port\STM32F4x7;..\ThirdParty\lwip-1.4.1\User;..\ThirdParty\USB\USB_User;..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc;..\ThirdParty\cJSON-master;..\UI;..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc;..\ThirdParty\USB\STM32_USB_OTG_Driver\inc;..\ThirdParty\FreeRTOS\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -428,16 +428,6 @@
           <GroupName>Drivers</GroupName>
           <Files>
             <File>
-              <FileName>ADS8325_Driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\ADS8325_Driver.c</FilePath>
-            </File>
-            <File>
-              <FileName>DRV8825_Driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\DRV8825_Driver.c</FilePath>
-            </File>
-            <File>
               <FileName>Led_Driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HardwareDriver\Led_Driver.c</FilePath>
@@ -453,14 +443,9 @@
               <FilePath>..\HardwareDriver\SPI2_Driver.c</FilePath>
             </File>
             <File>
-              <FileName>TLV5617_Driver.c</FileName>
+              <FileName>Usart1_Driver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\TLV5617_Driver.c</FilePath>
-            </File>
-            <File>
-              <FileName>Usart3_Driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\Usart3_Driver.c</FilePath>
+              <FilePath>..\HardwareDriver\Usart1_Driver.c</FilePath>
             </File>
             <File>
               <FileName>Usart2_Driver.c</FileName>
@@ -468,9 +453,34 @@
               <FilePath>..\HardwareDriver\Usart2_Driver.c</FilePath>
             </File>
             <File>
-              <FileName>Usart1_Driver.c</FileName>
+              <FileName>Usart3_Driver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\Usart1_Driver.c</FilePath>
+              <FilePath>..\HardwareDriver\Usart3_Driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>Usart4_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\Usart4_Driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>Usart6_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\Usart6_Driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>TLV5617_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\TLV5617_Driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>DRV8825_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\DRV8825_Driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>ADS8325_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\ADS8325_Driver.c</FilePath>
             </File>
             <File>
               <FileName>CodeScanner_Driver.c</FileName>
@@ -488,11 +498,6 @@
               <FilePath>..\HardwareDriver\RTC_Driver.c</FilePath>
             </File>
             <File>
-              <FileName>Usart6_Driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\Usart6_Driver.c</FilePath>
-            </File>
-            <File>
               <FileName>LCD_Driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HardwareDriver\LCD_Driver.c</FilePath>
@@ -506,11 +511,6 @@
               <FileName>CardLimit_Driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HardwareDriver\CardLimit_Driver.c</FilePath>
-            </File>
-            <File>
-              <FileName>Usart4_Driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HardwareDriver\Usart4_Driver.c</FilePath>
             </File>
             <File>
               <FileName>Wifi_Driver.c</FileName>
@@ -536,6 +536,11 @@
               <FileName>Timer3_Driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HardwareDriver\Timer3_Driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>SD_SPI_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\SD_SPI_Driver.c</FilePath>
             </File>
             <File>
               <FileName>Timer4_Driver.c</FileName>
@@ -593,11 +598,6 @@
               <FilePath>..\Function\PlaySong_Function.c</FilePath>
             </File>
             <File>
-              <FileName>Motor_Fun.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Function\Motor_Fun.c</FilePath>
-            </File>
-            <File>
               <FileName>Universal_Fun.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Function\Universal_Fun.c</FilePath>
@@ -611,6 +611,11 @@
               <FileName>UpLoad_Fun.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Function\UpLoad_Fun.c</FilePath>
+            </File>
+            <File>
+              <FileName>Motor_Fun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Function\Motor_Fun.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -661,11 +666,6 @@
               <FileName>Test_Task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Task\Test_Task.c</FilePath>
-            </File>
-            <File>
-              <FileName>OutModel_Task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Task\OutModel_Task.c</FilePath>
             </File>
             <File>
               <FileName>BasicWEB_Task.c</FileName>
@@ -838,11 +838,6 @@
               <FilePath>..\Datas\Temperature_Data.c</FilePath>
             </File>
             <File>
-              <FileName>UI_Data.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Datas\UI_Data.c</FilePath>
-            </File>
-            <File>
               <FileName>Time_Data.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Datas\Time_Data.c</FilePath>
@@ -876,6 +871,71 @@
               <FileName>SelfCheck_Data.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Datas\SelfCheck_Data.c</FilePath>
+            </File>
+            <File>
+              <FileName>UI_Data.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Datas\UI_Data.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>LwipUser</GroupName>
+          <Files>
+            <File>
+              <FileName>ethernetif.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS\ethernetif.c</FilePath>
+            </File>
+            <File>
+              <FileName>sys_arch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS\sys_arch.c</FilePath>
+            </File>
+            <File>
+              <FileName>etharp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ThirdParty\lwip-1.4.1\src\netif\etharp.c</FilePath>
+            </File>
+            <File>
+              <FileName>netconf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ThirdParty\lwip-1.4.1\User\netconf.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4x7_eth_bsp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ThirdParty\lwip-1.4.1\User\stm32f4x7_eth_bsp.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4x7_eth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Libraries\STM32F4x7_ETH_Driver\src\stm32f4x7_eth.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>USB_User</GroupName>
+          <Files>
+            <File>
+              <FileName>usb_bsp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ThirdParty\USB\USB_User\usb_bsp.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_cdc_vcp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ThirdParty\USB\USB_User\usbd_cdc_vcp.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_desc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ThirdParty\USB\USB_User\usbd_desc.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_usr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ThirdParty\USB\USB_User\usbd_usr.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -933,6 +993,11 @@
           <GroupName>FreertOS</GroupName>
           <Files>
             <File>
+              <FileName>heap_4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ThirdParty\FreeRTOS\src\heap_4.c</FilePath>
+            </File>
+            <File>
               <FileName>list.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\ThirdParty\FreeRTOS\src\list.c</FilePath>
@@ -951,11 +1016,6 @@
               <FileName>tasks.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\ThirdParty\FreeRTOS\src\tasks.c</FilePath>
-            </File>
-            <File>
-              <FileName>heap_4.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\FreeRTOS\src\heap_4.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -983,74 +1043,9 @@
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\misc.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_adc.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_can.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_can.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_cec.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_cec.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_crc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_crc.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_cryp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_cryp.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_cryp_aes.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_cryp_aes.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_cryp_des.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_cryp_des.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_cryp_tdes.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_cryp_tdes.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_dac.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_dbgmcu.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dbgmcu.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_dcmi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dcmi.c</FilePath>
-            </File>
-            <File>
               <FileName>stm32f4xx_dma.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_dma2d.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma2d.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_dsi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dsi.c</FilePath>
             </File>
             <File>
               <FileName>stm32f4xx_exti.c</FileName>
@@ -1063,16 +1058,6 @@
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_flash.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_flash_ramfunc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_flash_ramfunc.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_fmpi2c.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_fmpi2c.c</FilePath>
-            </File>
-            <File>
               <FileName>stm32f4xx_fsmc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_fsmc.c</FilePath>
@@ -1081,21 +1066,6 @@
               <FileName>stm32f4xx_gpio.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_gpio.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_hash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_hash.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_hash_md5.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_hash_md5.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_hash_sha1.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_hash_sha1.c</FilePath>
             </File>
             <File>
               <FileName>stm32f4xx_i2c.c</FileName>
@@ -1108,24 +1078,9 @@
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_iwdg.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_lptim.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_lptim.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_ltdc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_ltdc.c</FilePath>
-            </File>
-            <File>
               <FileName>stm32f4xx_pwr.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_pwr.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_qspi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_qspi.c</FilePath>
             </File>
             <File>
               <FileName>stm32f4xx_rcc.c</FileName>
@@ -1133,24 +1088,9 @@
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_rcc.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_rng.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_rng.c</FilePath>
-            </File>
-            <File>
               <FileName>stm32f4xx_rtc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_rtc.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_sai.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_sai.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_sdio.c</FilePath>
             </File>
             <File>
               <FileName>stm32f4xx_spdifrx.c</FileName>
@@ -1396,66 +1336,6 @@
               <FileName>README.txt</FileName>
               <FileType>5</FileType>
               <FilePath>..\DOC\README.txt</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>LwipUser</GroupName>
-          <Files>
-            <File>
-              <FileName>ethernetif.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS\ethernetif.c</FilePath>
-            </File>
-            <File>
-              <FileName>sys_arch.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS\sys_arch.c</FilePath>
-            </File>
-            <File>
-              <FileName>etharp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\lwip-1.4.1\src\netif\etharp.c</FilePath>
-            </File>
-            <File>
-              <FileName>netconf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\lwip-1.4.1\User\netconf.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4x7_eth_bsp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\lwip-1.4.1\User\stm32f4x7_eth_bsp.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4x7_eth.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\STM32F4x7_ETH_Driver\src\stm32f4x7_eth.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>USB_User</GroupName>
-          <Files>
-            <File>
-              <FileName>usb_bsp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\USB\USB_User\usb_bsp.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_cdc_vcp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\USB\USB_User\usbd_cdc_vcp.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_desc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\USB\USB_User\usbd_desc.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_usr.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\USB\USB_User\usbd_usr.c</FilePath>
             </File>
           </Files>
         </Group>

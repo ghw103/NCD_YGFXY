@@ -61,7 +61,7 @@ void GetOutScanerData(void)
 	
 	memset(buf, 0, 100);
 
-	while(pdPASS == ReceiveCharFromQueue(GetUsart1RXQueue(), GetUsart1RXMutex(), (buf+RXCount) , 100 * portTICK_RATE_MS))	
+	while(pdPASS == ReceiveDataFromQueue(GetUsart1RXQueue(), GetUsart1RXMutex(), (buf+RXCount), 1, 1, 100 * portTICK_RATE_MS))	
 		RXCount++;
 
 	

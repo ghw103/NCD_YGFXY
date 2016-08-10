@@ -87,6 +87,9 @@ static void vTestTask( void *pvParameters )
 	{
 		if(pdPASS == xQueueReceive( xStartTestQueue, &parm, portMAX_DELAY))
 		{
+			while(pdPASS == TakeTestResult(&testresult))
+				;
+			
 			testresult = TestFunction(parm);
 			
 			/*·¢ËÍ²âÊÔ½á¹û*/

@@ -15,10 +15,11 @@
 #include	"MAX4051_Driver.h"
 #include	"DRV8825_Driver.h"
 #include	"Motor_Fun.h"
-
+#include	"SDFunction.h"
 #include	"Motor_Data.h"
 #include	"CardStatues_Data.h"
 #include	"MyTest_Data.h"
+#include	"CRC16.h"
 
 #include	"MyMem.h"
 
@@ -354,7 +355,10 @@ static void AnalysisTestData(void)
 					S_TestData->testline.BasicResult += S_TestData->temperweima.ItemBiaoQu[1][2];
 				}
 				
-				S_TestData->testline.AdjustResult =  S_TestData->testline.BasicResult;
+				if(S_TestData->tempadjust.crc == CalModbusCRC16Fun1(&(S_TestData->tempadjust), sizeof(AdjustData)-2) )
+					S_TestData->testline.AdjustResult =  S_TestData->testline.BasicResult * S_TestData->tempadjust.parm;
+				else
+					S_TestData->testline.AdjustResult =  S_TestData->testline.BasicResult;
 				
 				S_TempCalData->resultstatues = ResultIsOK;
 			}
@@ -386,9 +390,9 @@ static void AnalysisTestData(void)
 				
 			/*原始峰高比*/
 			S_TestData->testline.BasicBili = S_TempCalData->tempvalue2;
-				
+			
 			/*根据分段，计算原始结果*/
-			if(S_TestData->testline.BasicBili < S_TestData->temperweima.ItemFenDuan)
+			if((S_TestData->testline.BasicBili < S_TestData->temperweima.ItemFenDuan) || (S_TestData->temperweima.ItemBiaoQuNum == 1))
 			{
 				S_TestData->testline.BasicResult = S_TestData->testline.BasicBili * S_TestData->testline.BasicBili;
 				S_TestData->testline.BasicResult *= S_TestData->temperweima.ItemBiaoQu[0][0];
@@ -406,8 +410,11 @@ static void AnalysisTestData(void)
 					
 				S_TestData->testline.BasicResult += S_TestData->temperweima.ItemBiaoQu[1][2];
 			}
-				
-			S_TestData->testline.AdjustResult =  S_TestData->testline.BasicResult;
+			
+			if(S_TestData->tempadjust.crc == CalModbusCRC16Fun1(&(S_TestData->tempadjust), sizeof(AdjustData)-2) )
+				S_TestData->testline.AdjustResult =  S_TestData->testline.BasicResult * S_TestData->tempadjust.parm;
+			else
+				S_TestData->testline.AdjustResult =  S_TestData->testline.BasicResult;
 				
 			S_TempCalData->resultstatues = ResultIsOK;
 #endif

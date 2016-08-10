@@ -29,6 +29,8 @@
 /*****************************************局部变量声明*************************************/
 static CardCodeInfo * S_CardQRCodeInfo = NULL;
 static ScanCodeResult S_ScanCodeResult = CardCodeScanning;
+static char buf[100];
+static unsigned short rxcount = 0;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 static void ReadBasicCodeData(void);
@@ -58,7 +60,7 @@ ScanCodeResult ScanCodeFun(void * parm)
 		
 	OpenCodeScanner();
 		
-	while(pdPASS == ReceiveCharFromQueue(GetUsart2RXQueue(), GetUsart2RXMutex(), &dir , 50 * portTICK_RATE_MS))
+	while(pdPASS == ReceiveDataFromQueue(GetUsart2RXQueue(), GetUsart2RXMutex(), &dir , 1, 1, 50 * portTICK_RATE_MS))
 		;
 		
 	dir = 0;
@@ -108,24 +110,13 @@ ScanCodeResult ScanCodeFun(void * parm)
 ***************************************************************************************************/
 static void ReadBasicCodeData(void)
 {
-	char *buf = NULL;
-	unsigned short RXCount = 0;
+	rxcount = 0;
 	
-	buf = MyMalloc(CodeMaxLen);
-	if(buf == NULL)
-		return;
-	
-	memset(buf, 0, CodeMaxLen);
-	
-	while(pdPASS == ReceiveCharFromQueue(GetUsart2RXQueue(), GetUsart2RXMutex(), (buf+RXCount) , 10 / portTICK_RATE_MS))
-		
-		RXCount++;
+	while(pdPASS == ReceiveDataFromQueue(GetUsart2RXQueue(), GetUsart2RXMutex(), (buf+rxcount) , 1, 1, 10 / portTICK_RATE_MS))	
+		rxcount++;
 
-	
-	if(RXCount > 0)
-		AnalysisCode(buf, RXCount);
-	
-	MyFree(buf);
+	if(rxcount > 0)
+		AnalysisCode(buf, rxcount);
 }
 
 /***************************************************************************************************

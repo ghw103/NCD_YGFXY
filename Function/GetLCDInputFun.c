@@ -29,7 +29,8 @@
 /***************************************************************************************************/
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
-
+static char buf[100];
+static unsigned short rxcount = 0;
 /***************************************************************************************************/
 /**************************************局部函数声明*************************************************/
 /***************************************************************************************************/
@@ -51,22 +52,13 @@ static void AnalysisCode(void * pbuf, unsigned short len);
 ***************************************************************************************************/
 void GetLCDInputData(void)
 {
-	char *buf = NULL;
-	unsigned short RXCount = 0;
+	rxcount = 0;
 	
-	buf = MyMalloc(100);
-	if(buf)
-	{
-		memset(buf, 0, 100);
-
-		while(pdPASS == ReceiveCharFromQueue(GetUsart6RXQueue(), GetUsart6RXMutex(), (buf+RXCount) , 10 * portTICK_RATE_MS))
-			RXCount++;
+	while(pdPASS == ReceiveDataFromQueue(GetUsart6RXQueue(), GetUsart6RXMutex(), (buf+rxcount), 1, 1, 10 / portTICK_RATE_MS))
+		rxcount++;
 	
-		if(RXCount > 0)
-			AnalysisCode(buf, RXCount);
-	}
-	
-	MyFree(buf);
+	if(rxcount > 0)
+		AnalysisCode(buf, rxcount);
 }
 
 /***************************************************************************************************

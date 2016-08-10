@@ -116,7 +116,7 @@ void StartEthernet(void)
 	{
 //		StartvLwipNCDClientTask();
 	
-		StartvLwipUserClientTask();
+//		StartvLwipUserClientTask();
 	}
 }
 
