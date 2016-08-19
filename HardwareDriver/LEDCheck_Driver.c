@@ -1,111 +1,66 @@
 /***************************************************************************************************
-*FileName:
-*Description:
+*FileName: LEDCheck_Driver
+*Description:光学模块的发光led检测
 *Author: xsx_kair
-*Data:
+*Data:2016年8月19日11:09:51
 ***************************************************************************************************/
 
 /***************************************************************************************************/
 /******************************************Header List********************************************/
 /***************************************************************************************************/
-#include	"Motor_Fun.h"
-#include	"Motor_Data.h"
-#include	"Timer4_Driver.h"
-#include	"CardLimit_Driver.h"
-#include	"DRV8825_Driver.h"
+#include	"LEDCheck_Driver.h"
+/***************************************************************************************************/
+/***************************************************************************************************/
+/***************************************************************************************************/
 
+/***************************************************************************************************/
+/***************************************************************************************************/
+/***************************************************************************************************/
 
-#include 	"task.h"
-#include 	"queue.h"
-#include	"semphr.h"
-
-#include	<string.h>
-#include	"stdio.h"
-#include 	"stdlib.h"
-/***************************************************************************************************/
-/***************************************************************************************************/
-/***************************************************************************************************/
-static xSemaphoreHandle xMotorMutex = NULL;	
-unsigned char motorstautes = 0;
-/***************************************************************************************************/
-/***************************************************************************************************/
-/***************************************************************************************************/
-static BaseType_t TakeMotorMutex(portTickType xBlockTime);
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
 /****************************************File Start*************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
-MyState_TypeDef ClearMotorMutex(void)
-{
-	if(xMotorMutex)
-	{
-		while(pdPASS == TakeMotorMutex(0))
-			;
-	}
-	
-	return My_Pass;
-}
-
-void InitMotorData(void)
-{
-	if(xMotorMutex == NULL)
-	{
-		xMotorMutex = xSemaphoreCreateBinary();
-	}
-	
-}
 /***************************************************************************************************
-*FunctionName:GiveMotorMutex, TakeMotorMutex
-*Description:??????
-*Input:None
-*Output:None
-*Author:xsx
-*Data:2016?5?11?19:24:37
+*FunctionName: LEDCheck_Init
+*Description: 发光模块的发光二极管io初始化
+*Input: none
+*Output: none
+*Author: xsx
+*Date: 2016年8月19日11:18:30
 ***************************************************************************************************/
-BaseType_t GiveMotorMutex(void)
+void LEDCheck_Init(void)
 {
-	portBASE_TYPE     xHigherPriorityTaskWoken = pdFALSE;
+	GPIO_InitTypeDef GPIO_InitStructure;
 	
-	if(xMotorMutex)
-		return xSemaphoreGiveFromISR(xMotorMutex, &xHigherPriorityTaskWoken);		
+	RCC_AHB1PeriphClockCmd(LEDCheck_RCC, ENABLE); /*使能LED灯使用的GPIO时钟*/
+	
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+
+  	GPIO_InitStructure.GPIO_Pin = LEDCheck_Pin; 
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_Init(LEDCheck_Group, &GPIO_InitStructure);
+}
+
+/***************************************************************************************************
+*FunctionName: ReadLEDStatus
+*Description: 读取发光模块的发光二极管的状态
+*Input: none
+*Output: MyLEDCheck_TypeDef -- 状态
+*Author: xsx
+*Date: 2016年8月19日11:19:11
+***************************************************************************************************/
+MyLEDCheck_TypeDef ReadLEDStatus(void)
+{
+	if(GPIO_ReadInputDataBit(LEDCheck_Group, LEDCheck_Pin))
+		return LED_OK;
 	else
-		return My_Pass;
+		return LED_Error;
 }
 
-static BaseType_t TakeMotorMutex(portTickType xBlockTime)
-{
-	return xSemaphoreTake(xMotorMutex , xBlockTime);		
-}
-
-
-void MotorMoveTo(unsigned int location, unsigned char mode)
-{
-	if(location > MaxLocation)
-			location = MaxLocation;
-
-//	ClearMotorMutex();
-	
-	SetGB_MotorTargetLocation(location);
-	
-	if(GetGB_MotorTargetLocation() > GetGB_MotorLocation())
-		SetDRVDir(Forward);
-	else
-		SetDRVDir(Reverse);
-	
-	motorstautes = 1;
-	StartTimer4();
-	if(mode == 0)
-	{
-		while(1 == motorstautes)
-			vTaskDelay(1 / portTICK_RATE_MS);;
-	}
-}
-
-void StopMotor(void)
-{
-	StopTimer4();
-}
 /****************************************end of file************************************************/
-

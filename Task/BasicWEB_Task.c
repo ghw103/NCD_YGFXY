@@ -6,6 +6,7 @@
 #include	"BasicWEB_Task.h"
 #include	"Net_Data.h"
 #include	"MyMem.h"
+
 /* Scheduler includes. */
 #include "FreeRTOS.h"
 #include "task.h"
@@ -16,8 +17,6 @@
 #include "tcpip.h"
 
 
-/*! The size of the buffer in which the dynamic WEB page is created. */
-#define webMAX_PAGE_SIZE	100
 
 /*! Standard GET response. */
 #define webHTTP_OK	"HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n"
@@ -94,6 +93,8 @@ static void prvweb_ParseHTMLRequest( struct netconn *pxNetCon )
 	unsigned portSHORT usLength;
 	struct netbuf *pxRxBuffer;
 	err_t err;
+	static char buf[100];
+	unsigned char i=0;
 
 	/* We expect to immediately get data. */
 	err = netconn_recv( pxNetCon, &pxRxBuffer);
@@ -116,28 +117,10 @@ static void prvweb_ParseHTMLRequest( struct netconn *pxNetCon )
 				
 				/* Generate the dynamic page... First the page header. */
 				strcpy( cDynamicPage, webHTML_START );
-
-				strcat( cDynamicPage, "<p><pre>Task            State   Priority    Stack	#<br>************************************************<br>" );
-
-				/* ... Then the list of tasks and their status... */
-				vTaskList(cDynamicPage + strlen( cDynamicPage ) );
-
-				if(Link_Up == GetGB_WifiState())
-					strcat( cDynamicPage, "Wifi_LinkUP<br>" );
-				else
-					strcat( cDynamicPage, "Wifi_LinkDown<br>" );
 				
-				if(Link_Up == GetGB_LinkState())
-					strcat( cDynamicPage, "Net_LinkUP<br>" );
-				else
-					strcat( cDynamicPage, "Net_LinkDown<br>" );
-				
-				if(NetNone == GetGB_NetCard())
-					strcat( cDynamicPage, "NetNone<br>" );
-				else if(Line_Mode == GetGB_NetCard())
-					strcat( cDynamicPage, "Line_Mode<br>" );
-				else
-					strcat( cDynamicPage, "Wifi_Mode<br>" );
+				sprintf(buf, "ok</br>");
+				strcat(cDynamicPage, buf);
+
 				/* ... Finally the page footer. */
 				strcat( cDynamicPage, webHTML_END );
 

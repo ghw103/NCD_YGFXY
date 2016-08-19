@@ -196,7 +196,8 @@ static void CheckQRCode(void)
 {
 	if((S_AdjustPageBuffer) && (My_Pass == TakeScanQRCodeResult(&(S_AdjustPageBuffer->scancode))))
 	{
-		if(S_AdjustPageBuffer->scancode == CardCodeScanFail)
+		if((S_AdjustPageBuffer->scancode == CardCodeScanFail) || (S_AdjustPageBuffer->scancode == CardCodeCardOut) ||
+			(S_AdjustPageBuffer->scancode == CardCodeScanTimeOut) || (S_AdjustPageBuffer->scancode == CardCodeCRCError))
 		{
 			GBPageBufferFree();
 			GotoGBParentPage(NULL);

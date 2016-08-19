@@ -342,11 +342,15 @@ void SetChartSize(unsigned short add , unsigned short num)
 	WriteLCDData(add+0x08, tempbuf, 2);
 }
 
-void DspNum(unsigned short addr , unsigned short num)
+void DspNum(unsigned short addr , unsigned int num, unsigned char len)
 {
-	tempbuf[0] = num>>8;
-	tempbuf[1] = num;
-	WriteLCDData(addr, tempbuf, 2);
+	unsigned char i=0;
+	for(i=0; i<len; i++)
+	{
+		tempbuf[i] = (num >> ((len-i-1)*8));
+	}
+
+	WriteLCDData(addr, tempbuf, len);
 }
 
 

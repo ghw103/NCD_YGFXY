@@ -390,7 +390,7 @@ void CollecteTemperature(void)
 	temp = SMBus_ReadMemory(SA, RAM_ACCESS|0x07);
 	temp *= 0.02;
 	temp -= 273.15;
-	SetEnviTemperature(temp);
+	SetInnerTemperature(temp);
 }
 
 /*********************************END OF FILE*********************************/

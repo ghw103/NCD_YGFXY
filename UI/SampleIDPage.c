@@ -77,9 +77,10 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			else
 			{
 				memcpy(S_SampleIDPage->currenttestdata->testdata.sampleid, S_SampleIDPage->tempid, MaxSampleIDLen);
-					
+				
 				GBPageBufferFree();
 				GotoGBChildPage(NULL);
+				
 			}
 		}
 		

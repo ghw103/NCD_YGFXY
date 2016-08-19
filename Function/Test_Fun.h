@@ -26,20 +26,7 @@ typedef struct PeakData_tag {
 	unsigned char step;														//’“∑Â≤Ω÷Ë
 }PeakData;
 
-typedef enum
-{
-	NoResult = 0,
-	ValueIsTooLarge = 1,
-	ValueIsTooSmall = 2,
-	BValueIsTooLarge = 3,
-	BValueIsTooSmall = 6,
-	PeakNumError = 4,
-	ErrorCountOut = 5,
-	MemError = 6,
-	PeakNumZero = 7,									//Œﬁ∑Â
-	TestInterrupt = 8,
-	ResultIsOK = 99,
-}ResultState;
+
 
 typedef struct TempCalData_tag{
 	unsigned short tempvalue;

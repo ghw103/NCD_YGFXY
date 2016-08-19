@@ -6,31 +6,7 @@
 #include	"Timer_Data.h"
 #include	"Temperature_Data.h"
 
-#pragma pack(1)
-typedef struct TestLine_tag {
-	unsigned short TestPoint[MaxPointLen];
-	unsigned short C_Point[2];
-	unsigned short T_Point[2];
-	unsigned short B_Point[2];
-	float BasicBili;
-	float BasicResult;
-	float AdjustResult;
-} TestLine;
-#pragma pack()
 
-#pragma pack(1)
-typedef struct TestData_tag {
-	User_Type user;
-	char sampleid[MaxSampleIDLen];
-	CardCodeInfo temperweima;
-	AdjustData tempadjust;
-	TestLine testline;
-	MyTime_Def TestTime;
-	MyTemp_Def TestTemp;
-	unsigned short time;					//³¬Ê±Ê±¼ä
-	unsigned short crc;
-}TestData;
-#pragma pack()
 
 typedef struct ItemData_tag {
 	TestData testdata;

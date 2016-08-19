@@ -145,8 +145,8 @@ static void ClearPage(void)
 	
 	ClearText(0x2b50, 30);
 
-	DspNum(0x2b70 , 0);
-	DspNum(0x2b78 , 0);	
+	DspNum(0x2b70 , 0, 2);
+	DspNum(0x2b78 , 0, 2);	
 
 }
 static void RefreshText(void)
@@ -214,8 +214,8 @@ static void DspLine(void)
 		
 		SetChartSize(0x2b80 , S_ShowPageBuffer->lineinfo.MUL_Y);
 
-		DspNum(0x2b78 , S_ShowPageBuffer->lineinfo.Y_Scale);
-		DspNum(0x2b70 , S_ShowPageBuffer->lineinfo.Y_Scale*2);
+		DspNum(0x2b78 , S_ShowPageBuffer->lineinfo.Y_Scale, 2);
+		DspNum(0x2b70 , S_ShowPageBuffer->lineinfo.Y_Scale*2, 2);
 
 }
 

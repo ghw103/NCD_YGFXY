@@ -8,6 +8,10 @@
 #include 	"task.h"
 #include 	"queue.h"
 #include	"semphr.h"
+
+#include	<string.h>
+#include	"stdio.h"
+#include 	"stdlib.h"
 /******************************************************************************************/
 /*****************************************局部变量声明*************************************/
 
@@ -16,6 +20,7 @@ const char * CodeScanTaskName = "vCodeScanTask";
 
 static xQueueHandle xStartScanQueue = NULL ;			//互斥量，如果接收到数据，则开始扫描二维码，接收的数据为二维码存放地址
 static xQueueHandle xScanResultQueue = NULL;											//发送扫描结果
+static ScanQRTaskData S_ScanQRTaskData;					//二维码扫描任务数据
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 
@@ -69,24 +74,20 @@ MyState_TypeDef StartCodeScanTask(void)
 ************************************************************************/
 static void vCodeScanTask( void *pvParameters )
 {
-	void * parm;
-	ScanCodeResult scanresult;
-	
 	while(1)
 	{
-		if(pdPASS == xQueueReceive( xStartScanQueue, &parm, portMAX_DELAY))
+		if(pdPASS == xQueueReceive( xStartScanQueue, (void *)(&(S_ScanQRTaskData.cardQR)), portMAX_DELAY))
 		{
+			TakeScanQRCodeResult(&(S_ScanQRTaskData.scanresult));
 			vTaskDelay(1000 * portTICK_RATE_MS);
-			scanresult = ScanCodeFun(parm);										//读取二维码
+			ScanCodeFun(&S_ScanQRTaskData);										//读取二维码
 			vTaskDelay(1000 * portTICK_RATE_MS);
 			
 			/*发送测试结果*/
-			xQueueSend( xScanResultQueue, &scanresult, 10000/portTICK_RATE_MS );
+			xQueueSend( xScanResultQueue, &(S_ScanQRTaskData.scanresult), 10000/portTICK_RATE_MS );
 				
-			parm = NULL;
+			memset(&S_ScanQRTaskData, 0, sizeof(ScanQRTaskData));
 		}
-		
-		vTaskDelay(1000 * portTICK_RATE_MS);
 	}
 }
 
@@ -104,6 +105,12 @@ MyState_TypeDef StartScanQRCode(void * parm)
 		return My_Pass;
 	else
 		return My_Fail;	
+}
+
+MyState_TypeDef StopScanQRCode(void)
+{
+	S_ScanQRTaskData.scanresult = CardCodeScanFail;
+	return My_Pass;
 }
 
 MyState_TypeDef TakeScanQRCodeResult(ScanCodeResult *scanresult)

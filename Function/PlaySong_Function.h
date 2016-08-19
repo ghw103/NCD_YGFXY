@@ -6,7 +6,7 @@
 #include 	"FreeRTOS.h"
 #include	"semphr.h"
 
-#define	DataBlockSize	4096
+#define	DataBlockSize	10240
 
 /* Audio Parsing Constants */
 #define  RIFFChunkID         0x46464952  /* correspond to the letters 'RIFF' */
@@ -21,7 +21,7 @@ typedef __packed struct
     unsigned int ChunkID;
     unsigned int ChunkSize;
     unsigned int Format;
-}ChunkRIFF ;
+}ChunkRIFF;
 //fmt¿é
 typedef __packed struct
 {

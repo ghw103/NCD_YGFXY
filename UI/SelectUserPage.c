@@ -134,7 +134,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			}
 		}
 		/*Ñ¡Ôñ²Ù×÷ÈË*/
-		else if((S_UserPageBuffer->lcdinput[0] >= 0x1c04)&&(S_UserPageBuffer->lcdinput[0] <= 0x1c0e))
+		else if((S_UserPageBuffer->lcdinput[0] >= 0x1c04)&&(S_UserPageBuffer->lcdinput[0] <= 0x1c0d))
 		{
 			S_UserPageBuffer->tempuser = &S_UserPageBuffer->user[(S_UserPageBuffer->pageindex - 1)*MaxPageShowNum + S_UserPageBuffer->lcdinput[0] - 0x1c04];
 			

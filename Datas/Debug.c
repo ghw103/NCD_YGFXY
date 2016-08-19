@@ -4,108 +4,65 @@
 *Author: xsx_kair
 *Data:
 ***************************************************************************************************/
-
+#if (DebugCode == CodeType)
 /***************************************************************************************************/
 /******************************************Header List********************************************/
 /***************************************************************************************************/
-#include	"Motor_Fun.h"
-#include	"Motor_Data.h"
-#include	"Timer4_Driver.h"
-#include	"CardLimit_Driver.h"
-#include	"DRV8825_Driver.h"
+#include	"Debug.h"
+/***************************************************************************************************/
+/***************************************************************************************************/
+/***************************************************************************************************/
+static unsigned short GB_DebugCount = 0;
+static unsigned short GB_DebugQRErrorCount = 0;
+static float GB_DebugResult[100];
+/***************************************************************************************************/
+/***************************************************************************************************/
+/***************************************************************************************************/
 
-
-#include 	"task.h"
-#include 	"queue.h"
-#include	"semphr.h"
-
-#include	<string.h>
-#include	"stdio.h"
-#include 	"stdlib.h"
-/***************************************************************************************************/
-/***************************************************************************************************/
-/***************************************************************************************************/
-static xSemaphoreHandle xMotorMutex = NULL;	
-unsigned char motorstautes = 0;
-/***************************************************************************************************/
-/***************************************************************************************************/
-/***************************************************************************************************/
-static BaseType_t TakeMotorMutex(portTickType xBlockTime);
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
 /****************************************File Start*************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
-MyState_TypeDef ClearMotorMutex(void)
+
+void SetGB_DebugCount(unsigned short count)
 {
-	if(xMotorMutex)
-	{
-		while(pdPASS == TakeMotorMutex(0))
-			;
-	}
-	
-	return My_Pass;
+	GB_DebugCount = count;
+}
+unsigned short GetGB_DebugCount(void)
+{
+	return GB_DebugCount;
 }
 
-void InitMotorData(void)
+void SetGB_DebugQRErrorCount(unsigned short count)
 {
-	if(xMotorMutex == NULL)
-	{
-		xMotorMutex = xSemaphoreCreateBinary();
-	}
-	
+	GB_DebugQRErrorCount = count;
 }
-/***************************************************************************************************
-*FunctionName:GiveMotorMutex, TakeMotorMutex
-*Description:??????
-*Input:None
-*Output:None
-*Author:xsx
-*Data:2016?5?11?19:24:37
-***************************************************************************************************/
-BaseType_t GiveMotorMutex(void)
+unsigned short GetGB_DebugQRErrorCount(void)
 {
-	portBASE_TYPE     xHigherPriorityTaskWoken = pdFALSE;
-	
-	if(xMotorMutex)
-		return xSemaphoreGiveFromISR(xMotorMutex, &xHigherPriorityTaskWoken);		
-	else
-		return My_Pass;
+	return GB_DebugQRErrorCount;
 }
 
-static BaseType_t TakeMotorMutex(portTickType xBlockTime)
+void SetGB_DebugResult(float result)
 {
-	return xSemaphoreTake(xMotorMutex , xBlockTime);		
+	GB_DebugResult[GB_DebugCount-1] = result;
+}
+float GetGB_DebugResult(unsigned char index)
+{
+	return GB_DebugResult[index];
 }
 
-
-void MotorMoveTo(unsigned int location, unsigned char mode)
+void ClearDebugData(void)
 {
-	if(location > MaxLocation)
-			location = MaxLocation;
-
-//	ClearMotorMutex();
+	unsigned char i=0;
 	
-	SetGB_MotorTargetLocation(location);
+	SetGB_DebugCount(0);
+	SetGB_DebugQRErrorCount(0);
 	
-	if(GetGB_MotorTargetLocation() > GetGB_MotorLocation())
-		SetDRVDir(Forward);
-	else
-		SetDRVDir(Reverse);
-	
-	motorstautes = 1;
-	StartTimer4();
-	if(mode == 0)
-	{
-		while(1 == motorstautes)
-			vTaskDelay(1 / portTICK_RATE_MS);;
-	}
+	for(i=0; i<100; i++)
+		GB_DebugResult[i] = 0;
 }
 
-void StopMotor(void)
-{
-	StopTimer4();
-}
+#endif
 /****************************************end of file************************************************/
-

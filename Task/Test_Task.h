@@ -1,16 +1,18 @@
-#ifndef _TEST_T_H__
-#define _TEST_T_H__
+/****************************************file start****************************************************/
+#ifndef	_TEST_T_H
+#define	_TEST_T_H
 
 #include	"Define.h"
-#include	"Test_Fun.h"
+
+
 
 MyState_TypeDef StartvTestTask(void);
 
 MyState_TypeDef StartTest(void * parm);
 
 MyState_TypeDef TakeTestResult(ResultState *testsult);
+MyState_TypeDef StopTest(void);
+
 #endif
 
-
-
-
+/****************************************end of file************************************************/

@@ -6,13 +6,12 @@
 #include	"LCD_Driver.h"
 #include	"UI_Data.h"
 #include	"MyMem.h"
-
+#include	"WaittingCardPage.h"
 #include	"MyTest_Data.h"
 
 #include	"Temperature_Data.h"
 #include	"Time_Data.h"
 #include	"SDFunction.h"
-
 #include	"Test_Task.h"
 #include	"LunchPage.h"
 
@@ -106,8 +105,8 @@ static MyState_TypeDef PageInit(void *  parm)
 	
 	SetChartSize(0x1870 , S_TestPageBuffer->line.MUL_Y);
 	
-	DspNum(0x1860 , S_TestPageBuffer->line.Y_Scale);
-	DspNum(0x1850 , S_TestPageBuffer->line.Y_Scale*2);
+	DspNum(0x1860 , S_TestPageBuffer->line.Y_Scale, 2);
+	DspNum(0x1850 , S_TestPageBuffer->line.Y_Scale*2, 2);
 	
 	/*获取当前测试数据的地址*/
 	S_TestPageBuffer->currenttestdata = GetCurrentTestItem();
@@ -159,13 +158,13 @@ static void RefreshCurve(void)
 				
 			SetChartSize(0x1870 , S_TestPageBuffer->line.MUL_Y);
 				
-			DspNum(0x1860 , S_TestPageBuffer->line.Y_Scale);
-			DspNum(0x1850 , S_TestPageBuffer->line.Y_Scale*2);
+			DspNum(0x1860 , S_TestPageBuffer->line.Y_Scale, 2);
+			DspNum(0x1850 , S_TestPageBuffer->line.Y_Scale*2, 2);
 		}
 		else
 			AddDataToLine(temp);
 	}
-	
+	 
 	if(My_Pass == TakeTestResult(&(S_TestPageBuffer->cardpretestresult)))
 	{
 		if(S_TestPageBuffer->cardpretestresult == ResultIsOK)
@@ -182,7 +181,7 @@ static void RefreshCurve(void)
 		}
 		else
 		{
-			SendKeyCode(1);
+			SendKeyCode(1);			
 		}
 	}
 }
@@ -212,7 +211,7 @@ static void RefreshPageText(void)
 			sprintf(buf, "%s", S_TestPageBuffer->currenttestdata->testdata.temperweima.CardPiCi);
 			DisText(0x2130, buf, strlen(buf));
 			
-			sprintf(buf, "%2.3f", S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult);
+			sprintf(buf, "%.3f", S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult);
 			DisText(0x2140, buf, strlen(buf));
 		}
 	}
@@ -289,8 +288,8 @@ static void AddDataToLine(unsigned short data)
 		
 		SetChartSize(0x2160 , S_TestPageBuffer->line.MUL_Y);
 
-		DspNum(0x2180 , S_TestPageBuffer->line.Y_Scale);
-		DspNum(0x2170 , S_TestPageBuffer->line.Y_Scale*2);
+		DspNum(0x2180 , S_TestPageBuffer->line.Y_Scale, 2);
+		DspNum(0x2170 , S_TestPageBuffer->line.Y_Scale*2, 2);
 
 	}
 	DisPlayLine(0 , &tempdata , 1);

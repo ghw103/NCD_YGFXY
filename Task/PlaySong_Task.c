@@ -7,8 +7,7 @@
 
 #include	"PlaySong_Task.h"
 #include	"PlaySong_Function.h"
-#include	"Define.h"
-
+#include	"QueueUnits.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -16,7 +15,7 @@
 #include	"stdio.h"
 /******************************************************************************************/
 /*****************************************局部变量声明*************************************/
-const char wavfilename[62][40]=
+const char wavfilename[63][40]=
 {
 	"0:/Sound/1TimeSone.wav",
 	"0:/Sound/2TimeSone.wav",
@@ -80,12 +79,14 @@ const char wavfilename[62][40]=
 	"0:/Sound/7Ready.wav",
 	"0:/Sound/8Ready.wav",						//60
 	"0:/Sound/TestBusyWait.wav",
+	"0:/清晨.wav",
 };
 #define vPlaySongTask_PRIORITY			( ( unsigned portBASE_TYPE ) 2U )
 
 #define	SongListSize	20							//播放列表可保持100个音频
 static xQueueHandle SongListQueue = NULL;			//播放音频的队列
-static unsigned char GB_PlayStatues = 0;			//0空闲，1播放
+static xQueueHandle AudioStatusQueue = NULL;		//播放音频的状态
+static unsigned char S_PlayStatus = 0;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 
@@ -113,6 +114,9 @@ void StartvPlaySongTask(void)
 	if(SongListQueue == NULL)
 		SongListQueue = xQueueCreate( SongListSize, ( unsigned portBASE_TYPE ) sizeof( unsigned char ) );
 	
+	if(AudioStatusQueue == NULL)
+		AudioStatusQueue = xQueueCreate( 10, ( unsigned portBASE_TYPE ) sizeof( unsigned char ) );
+	
 	xTaskCreate( vPlaySongTask, ( const char * ) "vPlaySongTask ", configMINIMAL_STACK_SIZE*2, NULL, vPlaySongTask_PRIORITY, NULL );
 }
 
@@ -131,11 +135,17 @@ static void vPlaySongTask( void *pvParameters )
 	unsigned char tempdata;
 	while(1)
 	{
-		if(pdPASS == xQueueReceive( SongListQueue, &tempdata, 200/portTICK_RATE_MS ))
+		if(pdPASS == xQueueReceive( SongListQueue, &tempdata, portMAX_DELAY ))
 		{
-			GB_PlayStatues = 1;
+			//发出开始播放信号
+			S_PlayStatus = 1;
+			SendDataToQueue(AudioStatusQueue, NULL, &S_PlayStatus , 1 , 1, 10 / portTICK_RATE_MS, NULL);
+			
 			AudioPlay(wavfilename[tempdata]);
-			GB_PlayStatues = 0;
+			
+			//发出停止播放信号
+			S_PlayStatus = 0;
+			SendDataToQueue(AudioStatusQueue, NULL, &S_PlayStatus , 1 , 1, 10 / portTICK_RATE_MS, NULL);
 		}
 	}
 }
@@ -158,14 +168,12 @@ unsigned char AddNumOfSongToList(unsigned char num, unsigned char mode)
 	/*模式1， 终止正在播放，播放新音频*/
 	if(mode == 0)
 	{
-		if(GB_PlayStatues == 1)
-			StopMyPlay();
+		StopMyPlay();
 	}
 	/*模式2，如果正在播放，则取消新音频*/
 	else if(mode == 1)
 	{
-		if(GB_PlayStatues == 1)
-			return pdPASS;
+		return pdPASS;
 	}
 	/*模式3，无论什么状态，都添加新音频，等待播放*/
 	else if(mode == 2)
@@ -181,7 +189,10 @@ unsigned char AddNumOfSongToList(unsigned char num, unsigned char mode)
 	return pdPASS;
 }
 
-unsigned char GetPlayStatues(void)
+MyState_TypeDef TakeAudioPlayStatus(unsigned char *status)
 {
-	return GB_PlayStatues;
+	if(pdPASS == xQueueReceive( AudioStatusQueue, status,  10/portTICK_RATE_MS))
+		return My_Pass;
+	else
+		return My_Fail;
 }

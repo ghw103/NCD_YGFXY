@@ -9,10 +9,12 @@
 #include	"LunchPage.h"
 #include	"ShowDeviceInfoPage.h"
 #include	"AdjustPage.h"
+#include	"ReTestPage.h"
 #include	"UserMPage.h"
 #include	"NetPreSetPage.h"
 #include	"RecordPage.h"
 #include	"OtherSetPage.h"
+#include	"MyTools.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -90,6 +92,26 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	{
 		SetGBChildPage(DspAdjustPage);
 		GotoGBChildPage(NULL);
+	}
+	else if(pdata[0] == 0x2230)
+	{
+		if(GetBufLen(&pbuf[7] , 2*pbuf[6]) == 6)
+		{
+			if(pdPASS == CheckStrIsSame(&pbuf[7] , AdjustPassWord ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
+			{
+				SetGBChildPage(DspAdjustPage);
+				GotoGBChildPage(NULL);
+			}
+			else if(pdPASS == CheckStrIsSame(&pbuf[7] , TestPassWord ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
+			{
+				SetGBChildPage(DspReTestPage);
+				GotoGBChildPage(NULL);
+			}
+			else
+				SendKeyCode(1);
+		}
+		else
+				SendKeyCode(1);
 	}
 	/*∆‰À˚…Ë÷√*/
 	else if(pdata[0] == 0x2205)

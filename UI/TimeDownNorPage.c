@@ -110,7 +110,7 @@ static void RefreshTimeText(void)
 	if(S_TimeDownPageData)
 	{
 		S_TimeDownPageData->time = timer_surplus(S_TimeDownPageData->S_Timer);
-		DspNum(0x2000 , S_TimeDownPageData->time);
+		DspNum(0x2000 , S_TimeDownPageData->time, 2);
 	}
 }
 

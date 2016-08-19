@@ -69,8 +69,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		/*ÉèÖÃÊ±¼ä*/
 		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2c20)
 		{
-			if(S_OtherSetPageBuffer)
-				SetGB_Time((char *)(&pbuf[7]), GetBufLen(&pbuf[7] , 2*pbuf[6]));
+			SetGB_Time((char *)(&pbuf[7]), GetBufLen(&pbuf[7] , 2*pbuf[6]));
 		}
 	}
 }

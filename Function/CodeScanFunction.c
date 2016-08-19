@@ -27,8 +27,7 @@
 
 /******************************************************************************************/
 /*****************************************局部变量声明*************************************/
-static CardCodeInfo * S_CardQRCodeInfo = NULL;
-static ScanCodeResult S_ScanCodeResult = CardCodeScanning;
+static ScanQRTaskData * S_ScanQRTaskData;					//二维码扫描任务数据
 static char buf[100];
 static unsigned short rxcount = 0;
 /******************************************************************************************/
@@ -51,9 +50,9 @@ ScanCodeResult ScanCodeFun(void * parm)
 	if(parm == NULL)
 		return CardCodeScanFail;
 	
-	S_CardQRCodeInfo = parm;
+	S_ScanQRTaskData = parm;
 	
-	memset(S_CardQRCodeInfo, 0, sizeof(CardCodeInfo));
+	memset(S_ScanQRTaskData->cardQR, 0, sizeof(CardCodeInfo));
 		
 	MotorMoveTo(0, 0);
 	MotorMoveTo(500, 0);
@@ -64,13 +63,13 @@ ScanCodeResult ScanCodeFun(void * parm)
 		;
 		
 	dir = 0;
-	S_ScanCodeResult = CardCodeScanning;
+	S_ScanQRTaskData->scanresult = CardCodeScanning;
 	
-	while(S_ScanCodeResult == CardCodeScanning)
+	while(S_ScanQRTaskData->scanresult == CardCodeScanning)
 	{
 		if(GetCardState() == NoCard)				//卡被拔出
 		{
-			S_ScanCodeResult = CardCodeScanFail;
+			S_ScanQRTaskData->scanresult = CardCodeCardOut;
 			break;
 		}
 		else
@@ -90,14 +89,14 @@ ScanCodeResult ScanCodeFun(void * parm)
 			
 			vTaskDelay(2 / portTICK_RATE_MS);
 			if(count >= (ScanOutTime*1000/2))
-				S_ScanCodeResult = CardCodeScanFail;				
+				S_ScanQRTaskData->scanresult = CardCodeScanTimeOut;				
 			
 		}
 	}
 
 	CloseCodeScanner();
 	
-	return S_ScanCodeResult;
+	return S_ScanQRTaskData->scanresult;
 }
 
 /***************************************************************************************************
@@ -154,7 +153,7 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	p = q;
 	
 	/*获取检测卡二维码信息存放地址*/
-	if(NULL == S_CardQRCodeInfo)
+	if(NULL == S_ScanQRTaskData->cardQR)
 		goto END;
 	
 	/*获取数据头*/
@@ -182,42 +181,42 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	/*获取测试项目名称*/
 	tempstr = strtok(NULL, "#");
 	if(tempstr)
-		memcpy(S_CardQRCodeInfo->ItemName, tempstr ,strlen(tempstr));
+		memcpy(S_ScanQRTaskData->cardQR->ItemName, tempstr ,strlen(tempstr));
 	else
 		goto END;
 		
 	/*读取检测卡上的检测指标计算方式*/
 	tempstr = strtok(NULL , "#");
 	if(tempstr)
-		S_CardQRCodeInfo->TestType = strtol(tempstr , NULL , 10);
+		S_ScanQRTaskData->cardQR->TestType = strtol(tempstr , NULL , 10);
 	else
 		goto END;
 		
 	/*读取检测卡上的检测指标正常范围*/
 	tempstr = strtok(NULL , "#");
 	if(tempstr)
-		S_CardQRCodeInfo->NormalResult = strtod(tempstr , NULL );
+		S_ScanQRTaskData->cardQR->NormalResult = strtod(tempstr , NULL );
 	else
 		goto END;
 		
 	/*读取检测卡上的最低检测值*/
 	tempstr = strtok(NULL , "#");
 	if(tempstr)
-		S_CardQRCodeInfo->LowstResult = strtod(tempstr , NULL );
+		S_ScanQRTaskData->cardQR->LowstResult = strtod(tempstr , NULL );
 	else
 		goto END;
 		
 	/*读取检测卡上的最高检测值*/
 	tempstr = strtok(NULL , "#");
 	if(tempstr)
-		S_CardQRCodeInfo->HighestResult = strtod(tempstr , NULL );
+		S_ScanQRTaskData->cardQR->HighestResult = strtod(tempstr , NULL );
 	else
 		goto END;	
 		
 	/*读取测试项目的单位*/
 	tempstr = strtok(NULL , "#");
 	if(tempstr)
-		memcpy(S_CardQRCodeInfo->ItemMeasure, tempstr ,strlen(tempstr));
+		memcpy(S_ScanQRTaskData->cardQR->ItemMeasure, tempstr ,strlen(tempstr));
 	else
 		goto END;
 		
@@ -225,30 +224,30 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	tempstr = strtok(NULL , "#");
 	if(tempstr)
 		//S_CardQRCodeInfo->ItemLocation = strtol(tempstr , NULL, 10);
-	S_CardQRCodeInfo->ItemLocation = 172;
+	S_ScanQRTaskData->cardQR->ItemLocation = 172;
 	else
 		goto END;
 		
 	/*读取检测卡标准曲线数目*/
 	tempstr = strtok(NULL , "#");
 	if(tempstr)
-		S_CardQRCodeInfo->ItemBiaoQuNum = strtol(tempstr , NULL, 10);
+		S_ScanQRTaskData->cardQR->ItemBiaoQuNum = strtol(tempstr , NULL, 10);
 	else
 		goto END;
 	
-	if(S_CardQRCodeInfo->ItemBiaoQuNum > 1)
+	if(S_ScanQRTaskData->cardQR->ItemBiaoQuNum > 1)
 	{
 		/*读取检测卡标准曲线临界浓度*/
 		tempstr = strtok(NULL , "#");
 		if(tempstr)
-			S_CardQRCodeInfo->ItemFenDuan = strtod(tempstr , NULL);
+			S_ScanQRTaskData->cardQR->ItemFenDuan = strtod(tempstr , NULL);
 		else
 			goto END;
 	}
 	
 		
 	/*标准曲线*/
-	for(j=0; j<S_CardQRCodeInfo->ItemBiaoQuNum; j++)
+	for(j=0; j<S_ScanQRTaskData->cardQR->ItemBiaoQuNum; j++)
 	{
 		char *index = MyMalloc(50);
 		
@@ -257,11 +256,11 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 		if(tempstr && index)
 		{
 			memset(index, 0, 50);
-			S_CardQRCodeInfo->ItemBiaoQu[j][0] = strtod(tempstr , &index );
+			S_ScanQRTaskData->cardQR->ItemBiaoQu[j][0] = strtod(tempstr , &index );
 				
-			S_CardQRCodeInfo->ItemBiaoQu[j][1] = strtod(index , &index );
+			S_ScanQRTaskData->cardQR->ItemBiaoQu[j][1] = strtod(index , &index );
 				
-			S_CardQRCodeInfo->ItemBiaoQu[j][2] = strtod(index , &index );
+			S_ScanQRTaskData->cardQR->ItemBiaoQu[j][2] = strtod(index , &index );
 
 			MyFree(index);
 		}
@@ -276,14 +275,14 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	/*读取检测卡反应时间*/
 	tempstr = strtok(NULL , "#");
 	if(tempstr)
-		S_CardQRCodeInfo->CardWaitTime = strtol(tempstr , NULL , 10);
+		S_ScanQRTaskData->cardQR->CardWaitTime = strtol(tempstr , NULL , 10);
 	else
 		goto END;
 		
 	/*读取检测卡C线位置*/
 	tempstr = strtok(NULL , "#");
 	if(tempstr)
-		S_CardQRCodeInfo->CLineLocation = 264;//strtol(tempstr , NULL , 10);
+		S_ScanQRTaskData->cardQR->CLineLocation = 264;//strtol(tempstr , NULL , 10);
 	else
 		goto END;
 
@@ -291,7 +290,7 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	/*读取检测卡批号*/
 	tempstr = strtok(NULL , "#");
 	if(tempstr)
-		memcpy(S_CardQRCodeInfo->CardPiCi, tempstr, strlen(tempstr));
+		memcpy(S_ScanQRTaskData->cardQR->CardPiCi, tempstr, strlen(tempstr));
 	else
 		goto END;
 
@@ -301,13 +300,13 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	{
 		static char year[10] ,month[10],day[10];
 		memcpy(year, tempstr, 4);
-		S_CardQRCodeInfo->CardBaoZhiQi.RTC_Year = strtol(year , NULL , 10) - 2000;
+		S_ScanQRTaskData->cardQR->CardBaoZhiQi.RTC_Year = strtol(year , NULL , 10) - 2000;
 
 		memcpy(month, &tempstr[4], 2);
-		S_CardQRCodeInfo->CardBaoZhiQi.RTC_Month = (unsigned char)strtod(month , NULL );
+		S_ScanQRTaskData->cardQR->CardBaoZhiQi.RTC_Month = (unsigned char)strtod(month , NULL );
 
 		memcpy(day, &tempstr[6], 2);
-		S_CardQRCodeInfo->CardBaoZhiQi.RTC_Date = (unsigned char)strtod(day , NULL );
+		S_ScanQRTaskData->cardQR->CardBaoZhiQi.RTC_Date = (unsigned char)strtod(day , NULL );
 	}
 	else
 		goto END;
@@ -316,7 +315,7 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	tempstr = strtok(NULL , "#");
 	if(tempstr)
 	{
-		S_CardQRCodeInfo->CRC16 = strtol(tempstr , NULL , 10);
+		S_ScanQRTaskData->cardQR->CRC16 = strtol(tempstr , NULL , 10);
 			
 		datalen -= strlen(tempstr);
 		goto END;
@@ -325,12 +324,12 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 		goto END;
 	
 	END:
-		if(S_CardQRCodeInfo->CRC16 != CalModbusCRC16Fun1(basicrealbuf , datalen))
-			S_ScanCodeResult = CardCodeScanFail;		
-		else if(My_Fail == CheckCardIsTimeOut(S_CardQRCodeInfo))
-			S_ScanCodeResult = CardCodeTimeOut;
+		if(S_ScanQRTaskData->cardQR->CRC16 != CalModbusCRC16Fun1(basicrealbuf , datalen))
+			S_ScanQRTaskData->scanresult = CardCodeCRCError;		
+		else if(My_Fail == CheckCardIsTimeOut(S_ScanQRTaskData->cardQR))
+			S_ScanQRTaskData->scanresult = CardCodeTimeOut;
 		else
-			S_ScanCodeResult = CardCodeScanOK;
+			S_ScanQRTaskData->scanresult = CardCodeScanOK;
 		
 		MyFree(basicrealbuf);
 		basicrealbuf = NULL;

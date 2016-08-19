@@ -88,3 +88,28 @@ void SetEnviTemperature(float temp)
 		GB_TempData.E_Temperature = temp;
 
 }
+
+/***************************************************************************************************
+*FunctionName：GetEnviTemperature  SetEnviTemperature
+*Description：读写机壳内温度
+*Input：None
+*Output：None
+*Author：xsx
+*Data：2016年4月27日18:19:30
+***************************************************************************************************/
+float GetInnerTemperature(void)
+{
+	float temp = 0;
+	
+
+		temp = GB_TempData.I_Temperature;
+	
+
+	return temp;
+}
+void SetInnerTemperature(float temp)
+{
+
+		GB_TempData.I_Temperature = temp;
+
+}

@@ -200,7 +200,7 @@ static void AudioDataSend(void)
 			
 			f_lseek (&(myAudioPlayInfo->myfile.file), myAudioPlayInfo->audioinfo.datastart);				//跳过头文件信息，定位到wav数据区
 		
-			myAudioPlayInfo->playstatues = 2;
+			myAudioPlayInfo->playstatues = 1;
 			myAudioPlayInfo->sourcestatues = 0;
 			
 			if(My_Pass == wav_filldata(myAudioPlayInfo->source1, DataBlockSize))
@@ -259,6 +259,8 @@ void AudioPlay(const char *fname)
 	if(myAudioPlayInfo)
 	{
 		memset(myAudioPlayInfo, 0, sizeof(AudioPlayInfo));
+		
+		myAudioPlayInfo->playstatues = 1;
 		
 		myAudioPlayInfo->myfile.res = f_open(&(myAudioPlayInfo->myfile.file) , (TCHAR*)fname, FA_READ);
 		

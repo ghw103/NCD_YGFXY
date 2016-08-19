@@ -14,5 +14,8 @@ float GetCardTemperature(void);
 void SetEnviTemperature(float temp);
 float GetEnviTemperature(void);
 
+float GetInnerTemperature(void);
+void SetInnerTemperature(float temp);
+	
 #endif
 

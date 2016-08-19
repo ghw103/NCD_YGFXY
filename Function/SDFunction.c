@@ -847,3 +847,70 @@ MyState_TypeDef ReadAdjustData(AdjustData *adjustdata)
 	
 	return statues;
 }
+
+/*********************************************************************************************/
+/*********************************************************************************************/
+/************************************写入老化数据*********************************************/
+/*********************************************************************************************/
+/*********************************************************************************************/
+
+MyState_TypeDef SaveReTestData(ReTestData *retestdata, unsigned char type)
+{
+	FatfsFileInfo_Def * myfile = NULL;
+	char *buf;
+	MyState_TypeDef statues = My_Fail;
+	unsigned char i=0;
+
+	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
+	buf = MyMalloc(1024);
+	
+	if(myfile && retestdata && buf)
+	{
+		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
+		
+		myfile->res = f_open(&(myfile->file), "0:/老化测试数据.csv", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
+			
+		if(FR_OK == myfile->res)
+		{
+			myfile->size = f_size(&(myfile->file));
+			f_lseek(&(myfile->file), myfile->size);
+			
+			if(myfile->size == 0)
+			{
+				memset(buf, 0, 1024);
+				sprintf(buf, "测试次数,测试时间,测试时长(秒),结果描述,[DA-AD],[DA-AD],[DA-AD],LED状态,环境温度,机壳内温度,检测卡温度,[T值-T位置],[C值-C位置],[B值-B位置],峰高比,原始结果,校准结果,当前音频起始时间,当前音频结束时间,当前音频时长,音频总时长,音频播放次数\r");
+				myfile->res = f_write(&(myfile->file), buf, strlen(buf), &(myfile->bw));
+			}
+			
+			//保存测试数据
+			if(type == 0)
+			{
+				memset(buf, 0, 1024);
+				sprintf(buf, "%d/%d,%d-%d-%d %d:%d:%d,%d,%s,[100-%.3f],[200-%.3f],[300-%.3f],%d,%.1f,%.1f,%.1f,[%d-%d],[%d-%d],[%d-%d],%.3f,%.3f,%.3f\r", retestdata->retestedcount, retestdata->retestcount, retestdata->testdata.TestTime.year
+					, retestdata->testdata.TestTime.month, retestdata->testdata.TestTime.day, retestdata->testdata.TestTime.hour, retestdata->testdata.TestTime.min, retestdata->testdata.TestTime.sec
+					, timer_Count(&(retestdata->oneretesttimer)), retestdata->result, retestdata->advalue1, retestdata->advalue2, retestdata->advalue3, retestdata->ledstatus, retestdata->testdata.TestTemp.E_Temperature, retestdata->testdata.TestTemp.I_Temperature
+					, retestdata->testdata.TestTemp.O_Temperature, retestdata->testdata.testline.T_Point[0], retestdata->testdata.testline.T_Point[1], retestdata->testdata.testline.C_Point[0]
+					, retestdata->testdata.testline.C_Point[1], retestdata->testdata.testline.B_Point[0], retestdata->testdata.testline.B_Point[1], retestdata->testdata.testline.BasicBili
+					, retestdata->testdata.testline.BasicResult, retestdata->testdata.testline.AdjustResult);
+				myfile->res = f_write(&(myfile->file), buf, strlen(buf), &(myfile->bw));
+			}
+			//保存音频测试数据
+			else
+			{
+				memset(buf, 0, 1024);
+				sprintf(buf, ",,,,,,,,,,,,,%d-%d-%d %d:%d:%d,%d-%d-%d %d:%d:%d,%d,%d,%d\r", retestdata->startplayTime.year, retestdata->startplayTime.month, retestdata->startplayTime.day
+					,retestdata->startplayTime.hour, retestdata->startplayTime.min, retestdata->startplayTime.sec, retestdata->endplayTime.year, retestdata->endplayTime.month
+					, retestdata->endplayTime.day, retestdata->endplayTime.hour, retestdata->endplayTime.min, retestdata->endplayTime.sec, timer_Count(&(retestdata->oneplaytimer))
+					, timer_Count(&(retestdata->playtimer)), retestdata->playcount);
+				myfile->res = f_write(&(myfile->file), buf, strlen(buf), &(myfile->bw));
+			}
+			f_close(&(myfile->file));
+		}
+	}
+	
+	MyFree(myfile);
+	MyFree(buf);
+	
+	return statues;
+}
+

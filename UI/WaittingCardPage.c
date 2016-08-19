@@ -85,6 +85,7 @@ static void PageUpDate(void)
 		GBPageBufferFree();
 		SetGBChildPage(DspPreReadCardPage);
 		GotoGBChildPage(NULL);
+		
 	}
 	/*时间到，未插卡，返回*/
 	else if(TimeOut == timer_expired(&(S_WaitPageData->timer)))

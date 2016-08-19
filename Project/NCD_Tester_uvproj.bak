@@ -663,11 +663,6 @@
               <FilePath>..\Task\Universal_Task.c</FilePath>
             </File>
             <File>
-              <FileName>Test_Task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Task\Test_Task.c</FilePath>
-            </File>
-            <File>
               <FileName>BasicWEB_Task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Task\BasicWEB_Task.c</FilePath>
@@ -701,6 +696,11 @@
               <FileName>ReadInputData_Task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Task\ReadInputData_Task.c</FilePath>
+            </File>
+            <File>
+              <FileName>Test_Task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Task\Test_Task.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -827,6 +827,11 @@
               <FileType>1</FileType>
               <FilePath>..\UI\SleepPage.c</FilePath>
             </File>
+            <File>
+              <FileName>AdjustPage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\UI\AdjustPage.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -876,6 +881,11 @@
               <FileName>UI_Data.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Datas\UI_Data.c</FilePath>
+            </File>
+            <File>
+              <FileName>Debug.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Datas\Debug.c</FilePath>
             </File>
           </Files>
         </Group>

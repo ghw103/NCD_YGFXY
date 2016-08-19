@@ -33,6 +33,7 @@
 #include	"TM1623_Driver.h"
 #include	"MAX4051_Driver.h"
 #include	"TLV5617_Driver.h"
+#include	"LEDCheck_Driver.h"
 
 #include	"WifiFunction.h"
 #include	"OutModel_Fun.h"
@@ -128,6 +129,9 @@ void MySystemBSPInit(void)
 
 	TM1623_Init();						//排队模块初始化
 	delay_ms(50);
+	
+	LEDCheck_Init();					//检测发光模块的发光二极管状态初始化
+	delay_ms(10);
 	
 	FatfsInit();						//文件系统初始化
 	

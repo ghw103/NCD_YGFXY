@@ -6,9 +6,15 @@
 
 #define		NormalCode	0											//正常程序
 #define		DebugCode	1											//测试程序
-#define		TestCode	2											//测试程序
 	
 #define		CodeType	DebugCode									//程序分类
+
+#define		AdminPassWord	"123456"
+#define		AdjustPassWord	"111111"								//校准密码
+#define		TestPassWord	"222222"								//老化测试密码
+
+#define		MY_SUCCESS	1
+#define		MY_FALSE	0
 /***************************************************************************************************/
 /***************************************************************************************************/
 /*****************************************软件版本**************************************************/
@@ -26,6 +32,12 @@ typedef enum
 	My_Pass = 1,		//操作成功
 	My_Fail = 0			//操作失败
 }MyState_TypeDef;
+
+typedef enum
+{ 
+	LED_Error = 1,		//led错误
+	LED_OK = 0			//led正常
+}MyLEDCheck_TypeDef;
 /**********************************************************************************************************/
 /**********************************************************************************************************/
 
@@ -131,10 +143,13 @@ typedef struct
 /*???????*/
 typedef enum
 {
-	CardCodeScanning = 0,												//正在扫描
+	CardCodeScanning = 0,											//正在扫描
 	CardCodeScanOK = 1,												//扫描二维码成功
 	CardCodeScanFail = 2,											//扫描失败
 	CardCodeTimeOut = 3,											//过期
+	CardCodeCardOut = 4,											//卡被拔出
+	CardCodeScanTimeOut = 5,										//扫描超时
+	CardCodeCRCError = 6											//crc错误
 }ScanCodeResult;
 
 #pragma pack(1)
@@ -160,6 +175,14 @@ typedef struct CardInfo_Tag
 }CardCodeInfo;
 #pragma pack()
 
+
+#pragma pack(1)
+typedef struct ScanQRTaskData_Tag
+{
+	CardCodeInfo * cardQR;
+	ScanCodeResult scanresult;
+}ScanQRTaskData;
+#pragma pack()
 
 #define	MaxLocation			7000						//最大行程
 #define	StartTestLocation	700							//测试起始位置
@@ -433,6 +456,105 @@ typedef struct AdjustData_tag
 	float parm;
 	unsigned short crc;
 }AdjustData;
+#pragma pack()
+
+typedef enum
+{
+	NoResult = 0,
+	ValueIsTooLarge = 1,
+	ValueIsTooSmall = 2,
+	BValueIsTooLarge = 3,
+	BValueIsTooSmall = 6,
+	PeakNumError = 4,
+	ErrorCountOut = 5,
+	MemError = 6,
+	PeakNumZero = 7,									//无峰
+	TestInterrupt = 8,
+	ResultIsOK = 99,
+}ResultState;
+
+#pragma pack(1)
+typedef struct TestLine_tag {
+	unsigned short TestPoint[MaxPointLen];
+	unsigned short C_Point[2];
+	unsigned short T_Point[2];
+	unsigned short B_Point[2];
+	float BasicBili;
+	float BasicResult;
+	float AdjustResult;
+} TestLine;
+#pragma pack()
+
+#pragma pack(1)
+typedef struct TestData_tag {
+	User_Type user;
+	char sampleid[MaxSampleIDLen];
+	CardCodeInfo temperweima;
+	AdjustData tempadjust;
+	TestLine testline;
+	MyTime_Def TestTime;					//测试时间
+	MyTemp_Def TestTemp;					//测试温度
+	unsigned short time;					//超时时间
+	unsigned short crc;
+}TestData;
+#pragma pack()
+
+
+#pragma pack(1)
+typedef struct TestTaskData_tag {
+	TestData * testdata;
+	ResultState testresult;
+}TestTaskData;
+#pragma pack()
+
+
+
+/*********************************************************************************************/
+/*********************************************************************************************/
+/*********************************************************************************************/
+/*******************************定时器********************************************************/
+/*********************************************************************************************/
+#pragma pack(1)
+typedef struct
+{
+	unsigned int start;
+	unsigned int interval;
+}Timer;
+#pragma pack()
+
+typedef enum
+{ 
+	TimeNotTo = 0,		//计时时间未到
+	TimeOut = 1,		//计时时间到
+	TimeError = 2,		//错误
+}TimerState_Def;
+
+
+/*********************************************************************************************/
+/*********************************************************************************************/
+/*********************************************************************************************/
+/*******************************老化测试数据**************************************************/
+/*********************************************************************************************/
+#pragma pack(1)
+typedef struct ReTestData_tag{
+	unsigned int retestcount;								//总次数
+	unsigned short retestsurpluscount;						//剩余测试次数
+	unsigned short retestedcount;							//已经测试次数
+	unsigned char reteststatus;								//老化测试状态，0停止，1等待插卡，2读二维码，3测试
+	Timer retesttimer;										//老化测试计时器
+	Timer oneretesttimer;									//一次老化测试计时器
+	TestData testdata;										//老化测试数据空间
+	char result[30];										//当前测试的结论
+	unsigned short playcount;								//老化播放计数器，记录播放次数
+	Timer playtimer;										//老化音频总时间	
+	Timer oneplaytimer;										//老化播放计时器，记录每次播放的时长
+	MyTime_Def startplayTime;								//当前音频起始时间
+	MyTime_Def endplayTime;									//当前音频结束时间
+	double advalue1;										//DA值100时的AD值
+	double advalue2;										//DA值200时的AD值
+	double advalue3;										//DA值300时的AD值
+	MyLEDCheck_TypeDef ledstatus;							//发光模块状态
+}ReTestData;
 #pragma pack()
 
 #endif

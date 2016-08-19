@@ -21,7 +21,6 @@
 
 /******************************************************************************************/
 /*****************************************局部变量声明*************************************/
-const char *GB_Password	= "123456";		//密码,进入校准界面密码
 static ShowDeviceInfoPageBuffer * S_ShowDeviceInfoPageBuffer = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
@@ -77,7 +76,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		/*获取密码*/
 		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x2230)
 		{
-			if(pdPASS == CheckStrIsSame(&pbuf[7] , (void *)GB_Password ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
+			if(pdPASS == CheckStrIsSame(&pbuf[7] , AdminPassWord ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
 			{
 				SetGBChildPage(DspSetDeviceIDPage);
 				GotoGBChildPage(&(S_ShowDeviceInfoPageBuffer->s_deviceinfo));
