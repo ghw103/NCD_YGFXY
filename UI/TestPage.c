@@ -167,6 +167,7 @@ static void RefreshCurve(void)
 	 
 	if(My_Pass == TakeTestResult(&(S_TestPageBuffer->cardpretestresult)))
 	{
+		
 		if(S_TestPageBuffer->cardpretestresult == ResultIsOK)
 		{
 			RefreshPageText();

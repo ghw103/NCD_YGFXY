@@ -145,7 +145,7 @@ ResultState TestFunction(void * parm)
 			
 			END:
 				S_TestTaskData->testresult = S_TempCalData->resultstatues;
-				MotorMoveTo(MaxLocation, 0);
+				MotorMoveTo(GetGB_MotorMaxLocation(), 0);
 				
 				MyFree(S_TempCalData);
 				S_TempCalData = NULL;

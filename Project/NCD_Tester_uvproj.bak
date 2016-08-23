@@ -547,6 +547,11 @@
               <FileType>1</FileType>
               <FilePath>..\HardwareDriver\Timer4_Driver.c</FilePath>
             </File>
+            <File>
+              <FileName>LEDCheck_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\LEDCheck_Driver.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -831,6 +836,11 @@
               <FileName>AdjustPage.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\UI\AdjustPage.c</FilePath>
+            </File>
+            <File>
+              <FileName>ReTestPage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\UI\ReTestPage.c</FilePath>
             </File>
           </Files>
         </Group>

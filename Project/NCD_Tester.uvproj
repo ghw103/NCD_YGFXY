@@ -547,6 +547,11 @@
               <FileType>1</FileType>
               <FilePath>..\HardwareDriver\Timer4_Driver.c</FilePath>
             </File>
+            <File>
+              <FileName>LEDCheck_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\LEDCheck_Driver.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1156,11 +1161,6 @@
               <FileName>user_fatfs.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\ThirdParty\Fatfs\src\user_fatfs.c</FilePath>
-            </File>
-            <File>
-              <FileName>cc936.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\Fatfs\src\option\cc936.c</FilePath>
             </File>
             <File>
               <FileName>syscall.c</FileName>

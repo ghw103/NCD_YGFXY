@@ -14,7 +14,6 @@
 #include	"CardLimit_Driver.h"
 #include	"DRV8825_Driver.h"
 
-
 #include 	"task.h"
 #include 	"queue.h"
 #include	"semphr.h"
@@ -82,8 +81,8 @@ static BaseType_t TakeMotorMutex(portTickType xBlockTime)
 
 void MotorMoveTo(unsigned int location, unsigned char mode)
 {
-	if(location > MaxLocation)
-			location = MaxLocation;
+//	if(location > MaxLocation)
+//			location = MaxLocation;
 
 //	ClearMotorMutex();
 	

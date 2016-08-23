@@ -404,7 +404,7 @@ void CheckTime(void)
 						timer_restart(&(temp->timer3));
 						AddNumOfSongToList(index+34, 0);
 						
-						MotorMoveTo(MaxLocation, 1);
+						MotorMoveTo(GetGB_MotorMaxLocation(), 1);
 					}
 				}
 				/*提醒时间快到了*/
@@ -447,7 +447,7 @@ void CheckTime(void)
 						timer_restart(&(temp->timer3));
 						AddNumOfSongToList(index+34, 0);
 						
-						MotorMoveTo(MaxLocation, 1);
+						MotorMoveTo(GetGB_MotorMaxLocation(), 1);
 					}
 				}
 				if(TimeOut == timer_expired(&(temp->timer3)))

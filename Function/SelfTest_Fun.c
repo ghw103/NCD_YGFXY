@@ -63,7 +63,7 @@ static void GB_DataInit(void);
 ***************************************************************************************************/
 void SelfTest_Function(void)
 {	
-	GB_DataInit();
+//	GB_DataInit();
 	vTaskDelay(500 *portTICK_RATE_MS);
 	
 //	ErWeiMaTest();
@@ -275,13 +275,14 @@ static MyState_TypeDef MotorSelfTest(void)
 	
 	SetDRVPowerStatues(LowPower);
 
+	SetGB_MotorLocation(10000);
 	MotorMoveTo(0, 1);
 	vTaskDelay(100 / portTICK_RATE_MS);
 	
 	while(!BackLimited)
 	{
 		vTaskDelay(500 / portTICK_RATE_MS);
-		SetGB_MotorLocation(GetGB_MotorLocation()+1000);
+		
 		count++;
 		if(count > 6)
 			break;
@@ -293,19 +294,28 @@ static MyState_TypeDef MotorSelfTest(void)
 		return My_Fail;
 	}
 	
-	MotorMoveTo(MaxLocation, 0);
+	MotorMoveTo(10000, 1);
 	vTaskDelay(100 / portTICK_RATE_MS);
 
 	SetDRVPowerStatues(NonamalPower);
 	vTaskDelay(100 / portTICK_RATE_MS);
 	
-	if(!PreLimited)
+	count = 0;
+	while(!PreLimited)
+	{
+		vTaskDelay(500 / portTICK_RATE_MS);
+		count++;
+		if(count > 8)
+			break;
+	}
+	
+	if(count > 6)
 	{
 		StopMotor();
 		return My_Fail;
 	}
-	else
-		return My_Pass;
+	
+	return My_Pass;
 }
 /***************************************************************************************************
 *FunctionName£ºMotorCheck

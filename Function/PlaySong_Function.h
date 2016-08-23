@@ -6,7 +6,7 @@
 #include 	"FreeRTOS.h"
 #include	"semphr.h"
 
-#define	DataBlockSize	10240
+#define	DataBlockSize	4096
 
 /* Audio Parsing Constants */
 #define  RIFFChunkID         0x46464952  /* correspond to the letters 'RIFF' */

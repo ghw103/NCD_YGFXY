@@ -72,7 +72,7 @@
 / Locale and Namespace Configurations
 /---------------------------------------------------------------------------*/
 
-#define _CODE_PAGE	936
+#define _CODE_PAGE	1
 /* This option specifies the OEM code page to be used on the target system.
 /  Incorrect setting of the code page can cause a file open failure.
 /
@@ -101,7 +101,7 @@
 */
 
 
-#define	_USE_LFN	3
+#define	_USE_LFN	0
 #define	_MAX_LFN	255
 /* The _USE_LFN switches the support of long file name (LFN).
 /
@@ -232,7 +232,7 @@
 /  These options have no effect at read-only configuration (_FS_READONLY = 1). */
 
 
-#define	_FS_LOCK	2
+#define	_FS_LOCK	3
 /* The option _FS_LOCK switches file lock function to control duplicated file open
 /  and illegal operation to open objects. This option must be 0 when _FS_READONLY
 /  is 1.
@@ -245,7 +245,7 @@
 
 
 #define _FS_REENTRANT	1
-#define _FS_TIMEOUT		portMAX_DELAY					//ms
+#define _FS_TIMEOUT		500					//ms
 #define	_SYNC_t			xSemaphoreHandle
 /* The option _FS_REENTRANT switches the re-entrancy (thread safe) of the FatFs
 /  module itself. Note that regardless of this option, file access to different

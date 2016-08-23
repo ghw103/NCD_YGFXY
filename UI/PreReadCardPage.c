@@ -193,13 +193,13 @@ static void CheckQRCode(void)
 			(S_PreReadPageBuffer->scancode == CardCodeScanTimeOut) || (S_PreReadPageBuffer->scancode == CardCodeCRCError))
 		{
 			SendKeyCode(1);
-			MotorMoveTo(MaxLocation, 1);
+			MotorMoveTo(GetGB_MotorMaxLocation(), 1);
 			AddNumOfSongToList(23, 0);
 		}
 		else if(S_PreReadPageBuffer->scancode == CardCodeTimeOut)
 		{
 			SendKeyCode(2);
-			MotorMoveTo(MaxLocation, 1);
+			MotorMoveTo(GetGB_MotorMaxLocation(), 1);
 			AddNumOfSongToList(21, 0);
 		}
 		else if(S_PreReadPageBuffer->scancode == CardCodeScanOK)
@@ -226,14 +226,14 @@ static void CheckPreTestCard(void)
 		if(S_PreReadPageBuffer->cardpretestresult == TestInterrupt)
 		{
 			SendKeyCode(5);
-			MotorMoveTo(MaxLocation, 1);
+			MotorMoveTo(GetGB_MotorMaxLocation(), 1);
 			AddNumOfSongToList(22, 0);
 		}
 
 		else if((S_PreReadPageBuffer->cardpretestresult == PeakNumError)||(S_PreReadPageBuffer->cardpretestresult == ResultIsOK))
 		{
 			SendKeyCode(3);
-			MotorMoveTo(MaxLocation, 1);
+			MotorMoveTo(GetGB_MotorMaxLocation(), 1);
 			AddNumOfSongToList(22, 0);
 		}
 		else if(S_PreReadPageBuffer->cardpretestresult == PeakNumZero)
@@ -241,7 +241,7 @@ static void CheckPreTestCard(void)
 			//如果是排队模式，则进入排队界面
 			if((S_PreReadPageBuffer->currenttestdata->testlocation > 0)&&(S_PreReadPageBuffer->currenttestdata->testlocation < PaiDuiWeiNum))
 			{
-				MotorMoveTo(MaxLocation, 1);
+				MotorMoveTo(GetGB_MotorMaxLocation(), 1);
 				S_PreReadPageBuffer->currenttestdata->statues = statuesNull;
 				timer_restart(&(S_PreReadPageBuffer->currenttestdata->timer));
 				

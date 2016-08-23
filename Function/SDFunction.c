@@ -868,7 +868,7 @@ MyState_TypeDef SaveReTestData(ReTestData *retestdata, unsigned char type)
 	{
 		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
 		
-		myfile->res = f_open(&(myfile->file), "0:/老化测试数据.csv", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
+		myfile->res = f_open(&(myfile->file), "0:/laohua.csv", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
 			
 		if(FR_OK == myfile->res)
 		{
@@ -898,7 +898,7 @@ MyState_TypeDef SaveReTestData(ReTestData *retestdata, unsigned char type)
 			else
 			{
 				memset(buf, 0, 1024);
-				sprintf(buf, ",,,,,,,,,,,,,%d-%d-%d %d:%d:%d,%d-%d-%d %d:%d:%d,%d,%d,%d\r", retestdata->startplayTime.year, retestdata->startplayTime.month, retestdata->startplayTime.day
+				sprintf(buf, ",,,,,,,,,,,,,,,,,%d-%d-%d %d:%d:%d,%d-%d-%d %d:%d:%d,%d,%d,%d\r", retestdata->startplayTime.year, retestdata->startplayTime.month, retestdata->startplayTime.day
 					,retestdata->startplayTime.hour, retestdata->startplayTime.min, retestdata->startplayTime.sec, retestdata->endplayTime.year, retestdata->endplayTime.month
 					, retestdata->endplayTime.day, retestdata->endplayTime.hour, retestdata->endplayTime.min, retestdata->endplayTime.sec, timer_Count(&(retestdata->oneplaytimer))
 					, timer_Count(&(retestdata->playtimer)), retestdata->playcount);

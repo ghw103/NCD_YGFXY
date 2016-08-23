@@ -194,7 +194,7 @@ static void AudioDataSend(void)
 		myAudioPlayInfo->source1 = MyMalloc(DataBlockSize);
 		myAudioPlayInfo->source2 = MyMalloc(DataBlockSize);
 		
-		if(myAudioPlayInfo->source1 && myAudioPlayInfo->source1)
+		if(myAudioPlayInfo->source1 && myAudioPlayInfo->source2)
 		{
 			myAudioPlayInfo->sourceindex = 1;
 			
@@ -236,10 +236,9 @@ static void AudioDataSend(void)
 				vTaskDelay(10*portTICK_RATE_MS);
 			}
 			StopPlay();
-			
-			MyFree(myAudioPlayInfo->source2);
-			MyFree(myAudioPlayInfo->source1);
 		}
+		MyFree(myAudioPlayInfo->source2);
+		MyFree(myAudioPlayInfo->source1);
 	}
 
 }

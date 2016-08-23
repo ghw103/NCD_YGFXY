@@ -66,5 +66,8 @@ void SetGB_MotorTargetLocation(unsigned short value);
 unsigned short GetGB_MotorDir(void);
 void SetGB_MotorDir(DRVDir_Type dir);
 
+void SetGB_MotorMaxLocation(unsigned short loc);
+unsigned short GetGB_MotorMaxLocation(void);
+
 #endif
 

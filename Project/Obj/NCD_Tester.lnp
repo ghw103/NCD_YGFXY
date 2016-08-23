@@ -137,7 +137,6 @@
 ".\obj\diskio.o"
 ".\obj\ff.o"
 ".\obj\user_fatfs.o"
-".\obj\cc936.o"
 ".\obj\syscall.o"
 ".\obj\api_lib.o"
 ".\obj\api_msg.o"

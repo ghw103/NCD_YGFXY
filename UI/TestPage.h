@@ -10,6 +10,7 @@ typedef struct TestPageBuffer_tag {
 	Basic_ICO myico[3];
 	LineInfo line;
 	unsigned short lcdinput[100];
+	unsigned char testisover;
 }TestPageBuffer;
 
 

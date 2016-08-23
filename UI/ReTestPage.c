@@ -128,12 +128,15 @@ static void PageUpDate(void)
 				
 				//老化AD,DA
 				SetGB_LedValue(100);
+				vTaskDelay(100 / portTICK_RATE_MS);
 				S_ReTestPageBuffer->retestdata.advalue1 = ADS8325();
 				
 				SetGB_LedValue(200);
+				vTaskDelay(100 / portTICK_RATE_MS);
 				S_ReTestPageBuffer->retestdata.advalue2 = ADS8325();
 				
 				SetGB_LedValue(300);
+				vTaskDelay(100 / portTICK_RATE_MS);
 				S_ReTestPageBuffer->retestdata.advalue3 = ADS8325();
 				
 				S_ReTestPageBuffer->retestdata.ledstatus = ReadLEDStatus();
@@ -191,7 +194,7 @@ static MyState_TypeDef PageInit(void *  parm)
 	
 	memset(S_ReTestPageBuffer->buf, 0, 100);
 	sprintf(S_ReTestPageBuffer->buf, "Stopped");
-	DisText(0x300a, S_ReTestPageBuffer->buf, strlen(S_ReTestPageBuffer->buf));
+	DisText(0x300c, S_ReTestPageBuffer->buf, strlen(S_ReTestPageBuffer->buf));
 	
 	return My_Pass;
 }
@@ -253,20 +256,20 @@ static void StartReTest(void)
 		//更新老化工作状态
 		memset(S_ReTestPageBuffer->buf, 0, 100);
 		sprintf(S_ReTestPageBuffer->buf, "Testing");
-		DisText(0x300a, S_ReTestPageBuffer->buf, strlen(S_ReTestPageBuffer->buf));
+		DisText(0x300c, S_ReTestPageBuffer->buf, strlen(S_ReTestPageBuffer->buf));
 		
 		//更新已老化次数
 		S_ReTestPageBuffer->retestdata.retestedcount = 0;
-		DspNum(0x3006 , S_ReTestPageBuffer->retestdata.retestedcount, 2);
+		DspNum(0x3006 , S_ReTestPageBuffer->retestdata.retestedcount, 4);
 		
 		//更新剩余老化次数
 		S_ReTestPageBuffer->retestdata.retestsurpluscount = S_ReTestPageBuffer->retestdata.retestcount - S_ReTestPageBuffer->retestdata.retestedcount;
-		DspNum(0x3007 , S_ReTestPageBuffer->retestdata.retestsurpluscount, 2);
+		DspNum(0x3008 , S_ReTestPageBuffer->retestdata.retestsurpluscount, 4);
 		
 		//初始化测试总时长计时器
 		timer_set(&(S_ReTestPageBuffer->retestdata.retesttimer), 999999);
 		//更新老化时间
-		DspNum(0x3008 , timer_Count(&(S_ReTestPageBuffer->retestdata.retesttimer)), 4);
+		DspNum(0x300a , timer_Count(&(S_ReTestPageBuffer->retestdata.retesttimer)), 4);
 		
 		//初始化当前测试的时长计时器
 		timer_set(&(S_ReTestPageBuffer->retestdata.oneretesttimer), 999999);
@@ -328,18 +331,18 @@ static void EndOneReTest(char *result, unsigned char len)
 		S_ReTestPageBuffer->retestdata.reteststatus = 1;
 		
 		//已测
-		DspNum(0x3006 , S_ReTestPageBuffer->retestdata.retestedcount, 2);
+		DspNum(0x3006 , S_ReTestPageBuffer->retestdata.retestedcount, 4);
 		//剩余
-		DspNum(0x3007 , S_ReTestPageBuffer->retestdata.retestsurpluscount, 2);
+		DspNum(0x3008 , S_ReTestPageBuffer->retestdata.retestsurpluscount, 4);
 		//已测时间
-		DspNum(0x3008 , timer_Count(&(S_ReTestPageBuffer->retestdata.retesttimer)), 4);
+		DspNum(0x300a , timer_Count(&(S_ReTestPageBuffer->retestdata.retesttimer)), 4);
 		//状态
 		memset(S_ReTestPageBuffer->buf, 0, 100);
 		if(S_ReTestPageBuffer->retestdata.retestsurpluscount == 0)
 			sprintf(S_ReTestPageBuffer->buf, "Stopped");
 		else
 			sprintf(S_ReTestPageBuffer->buf, "Testing");
-		DisText(0x300a, S_ReTestPageBuffer->buf, strlen(S_ReTestPageBuffer->buf));
+		DisText(0x300c, S_ReTestPageBuffer->buf, strlen(S_ReTestPageBuffer->buf));
 		
 		if(S_ReTestPageBuffer->retestdata.retestedcount >= S_ReTestPageBuffer->retestdata.retestcount)
 			StopReTest();
