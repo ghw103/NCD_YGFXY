@@ -85,8 +85,8 @@ typedef struct
 {
 	FatfsFileInfo_Def myfile;					//音频文件
 	AudioInfo audioinfo;						//音频信息
-	unsigned char *source1;						//缓冲区1
-	unsigned char *source2;						//缓冲区2
+	unsigned char source1[DataBlockSize];						//缓冲区1
+	unsigned char source2[DataBlockSize];						//缓冲区2
 	unsigned char sourceindex;					//当前空闲的缓冲区
 	unsigned char sourcestatues;				//当前缓冲区的播放情况， 0正在播放，1一个缓冲区播放完毕，切换缓冲区
 	unsigned char playstatues;					//播放控制，0 -- 正常播放， 1 -- 暂停， 2 -- 停止

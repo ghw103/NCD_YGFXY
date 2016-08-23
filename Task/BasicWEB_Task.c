@@ -30,7 +30,7 @@
 "<html>\
 <head>\
 </head>\
-<BODY>\
+<BODY onLoad=\"window.setTimeout(&quot;location.href='index.html'&quot;,1000)\" bgcolor=\"#FFFFFF\" text=\"#2477E6\">\
 "
 
 #define webHTML_END \
@@ -118,8 +118,13 @@ static void prvweb_ParseHTMLRequest( struct netconn *pxNetCon )
 				/* Generate the dynamic page... First the page header. */
 				strcpy( cDynamicPage, webHTML_START );
 				
-				sprintf(buf, "ok</br>");
+				sprintf(buf, "ƒ⁄¥Ê”‡¡ø:%d<br>", MyGetFreeHeapSize());
 				strcat(cDynamicPage, buf);
+				
+				strcat( cDynamicPage, "<p><pre>Task            State   Priority    Stack	#<br>************************************************<br>" );
+
+				/* ... Then the list of tasks and their status... */
+				vTaskList(cDynamicPage + strlen( cDynamicPage ) );
 
 				/* ... Finally the page footer. */
 				strcat( cDynamicPage, webHTML_END );

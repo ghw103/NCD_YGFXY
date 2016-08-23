@@ -14,6 +14,7 @@
 /******************************************************************************************/
 /*****************************************局部变量*************************************/
 AudioPlayInfo * myAudioPlayInfo = NULL;
+#define RESERVED_MASK (uint32_t)0x0F7D0F7D //Ô­¶¨ÒåÎ»ÓÚstm32f4xx_dma.c
 /******************************************************************************************/
 /*****************************************局部函数*************************************/
 static void ChangeOutputDataSource(void);
@@ -191,56 +192,61 @@ static void AudioDataSend(void)
 	
 	if(myAudioPlayInfo)
 	{
-		myAudioPlayInfo->source1 = MyMalloc(DataBlockSize);
-		myAudioPlayInfo->source2 = MyMalloc(DataBlockSize);
+		myAudioPlayInfo->sourceindex = 1;
+			
+		f_lseek (&(myAudioPlayInfo->myfile.file), myAudioPlayInfo->audioinfo.datastart);				//跳过头文件信息，定位到wav数据区
 		
-		if(myAudioPlayInfo->source1 && myAudioPlayInfo->source2)
+		myAudioPlayInfo->playstatues = 1;
+		myAudioPlayInfo->sourcestatues = 0;
+			
+		if(My_Pass == wav_filldata(myAudioPlayInfo->source1, DataBlockSize))
 		{
-			myAudioPlayInfo->sourceindex = 1;
-			
-			f_lseek (&(myAudioPlayInfo->myfile.file), myAudioPlayInfo->audioinfo.datastart);				//跳过头文件信息，定位到wav数据区
-		
-			myAudioPlayInfo->playstatues = 1;
-			myAudioPlayInfo->sourcestatues = 0;
-			
-			if(My_Pass == wav_filldata(myAudioPlayInfo->source1, DataBlockSize))
+			if(My_Pass == wav_filldata(myAudioPlayInfo->source2, DataBlockSize))
 			{
-				if(My_Pass == wav_filldata(myAudioPlayInfo->source2, DataBlockSize))
-				{
-					myAudioPlayInfo->playstatues = 0;
-				}
+				myAudioPlayInfo->playstatues = 0;
 			}
-
-			I2S_DMA_Init(myAudioPlayInfo->source1, myAudioPlayInfo->source2, DataBlockSize/2);
-			
-			StartPlay();
-			while(1)
-			{
-				/*等待当前缓冲区播放完毕*/
-				if(myAudioPlayInfo->sourcestatues != 0)
-				{
-					if((My_Fail == readstatues) || (myAudioPlayInfo->playstatues == 1))
-						break;
-					
-					if(0 == myAudioPlayInfo->playstatues)
-					{
-						if(myAudioPlayInfo->sourceindex == 0)
-							readstatues = wav_filldata(myAudioPlayInfo->source2, DataBlockSize);
-						else if(myAudioPlayInfo->sourceindex == 1)
-							readstatues = wav_filldata(myAudioPlayInfo->source1, DataBlockSize);
-					}
-					
-					myAudioPlayInfo->sourcestatues = 0;
-				}
-				
-				vTaskDelay(10*portTICK_RATE_MS);
-			}
-			StopPlay();
 		}
-		MyFree(myAudioPlayInfo->source2);
-		MyFree(myAudioPlayInfo->source1);
-	}
 
+		I2S_DMA_Init(myAudioPlayInfo->source1, myAudioPlayInfo->source2, DataBlockSize/2);
+			
+		StartPlay();
+		while(1)
+		{
+			//dma传输完成
+			if(((DMA1->HISR & RESERVED_MASK) & DMA_FLAG_TCIF5))
+			{
+				if(DMA1_Stream5->CR&(1<<19)) 								//当前使用Memory1数据
+					myAudioPlayInfo->sourceindex = 1;                       //可以将数据读取到缓冲区0
+
+				else                               							//当前使用Memory0数据
+					myAudioPlayInfo->sourceindex = 0;                       //可以将数据读取到缓冲区1
+				
+				myAudioPlayInfo->sourcestatues = 1;
+				
+				DMA1->HIFCR = DMA_FLAG_TCIF5 & RESERVED_MASK;				//清除发送完成标志位
+			}
+			
+			/*等待当前缓冲区播放完毕*/
+			if(myAudioPlayInfo->sourcestatues != 0)
+			{
+				if((My_Fail == readstatues) || (myAudioPlayInfo->playstatues == 1))
+					break;
+					
+				if(0 == myAudioPlayInfo->playstatues)
+				{
+					if(myAudioPlayInfo->sourceindex == 0)
+						readstatues = wav_filldata(myAudioPlayInfo->source2, DataBlockSize);
+					else if(myAudioPlayInfo->sourceindex == 1)
+						readstatues = wav_filldata(myAudioPlayInfo->source1, DataBlockSize);
+				}
+					
+				myAudioPlayInfo->sourcestatues = 0;
+			}
+				
+			vTaskDelay(10*portTICK_RATE_MS);
+		}
+		StopPlay();
+	}
 }
 /***************************************************************************************************
 *FunctionName：AudioPlay
@@ -272,7 +278,6 @@ void AudioPlay(const char *fname)
 		}
 		
 		MyFree(myAudioPlayInfo);
-		myAudioPlayInfo = NULL;
 	}
 }
 

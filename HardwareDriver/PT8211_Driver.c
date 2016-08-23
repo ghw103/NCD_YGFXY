@@ -140,16 +140,16 @@ void I2S_DMA_Init(unsigned char *buf0, unsigned char *buf1, unsigned short num)
 	 
 	DMA_DoubleBufferModeCmd(DMA1_Stream5,ENABLE);//双缓冲模式开启
 	 
-	DMA_ITConfig(DMA1_Stream5,DMA_IT_TC,ENABLE);//开启传输完成中断
+//	DMA_ITConfig(DMA1_Stream5,DMA_IT_TC,ENABLE);//开启传输完成中断
 	SPI_I2S_DMACmd(SPI3,SPI_I2S_DMAReq_Tx,ENABLE);//SPI2 TX DMA????.
 	
-	NVIC_InitStructure.NVIC_IRQChannel = DMA1_Stream5_IRQn; 
+/*	NVIC_InitStructure.NVIC_IRQChannel = DMA1_Stream5_IRQn; 
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x4;//抢占优先级0
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;//子优先级0
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;//使能外部中断通道
-	NVIC_Init(&NVIC_InitStructure);//配置
+	NVIC_Init(&NVIC_InitStructure);//配置*/
 }
-
+/*
 void DMA1_Stream5_IRQHandler(void)
 {      
 	if(DMA_GetITStatus(DMA1_Stream5,DMA_IT_TCIF5)==SET)////DMA1_Stream4,传输完成标志
@@ -157,7 +157,7 @@ void DMA1_Stream5_IRQHandler(void)
 		DMA_ClearITPendingBit(DMA1_Stream5,DMA_IT_TCIF5);
       	i2s_tx_callback();	//执行回调函数,读取数据等操作在这里面处理  
 	}   											 
-}  
+}  */
 
 void StartPlay(void)
 {

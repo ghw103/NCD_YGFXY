@@ -384,6 +384,8 @@ static void CheckQRCode(void)
 			
 			S_ReTestPageBuffer->retestdata.reteststatus = 3;
 			StartTest(&(S_ReTestPageBuffer->retestdata.testdata));
+			
+		//	EndOneReTest("²âÊÔÕı³£", 8);
 		}
 	}
 }
