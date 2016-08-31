@@ -8,6 +8,7 @@
 /*-----------------------------------------------------------------------*/
 
 #include "diskio.h"		/* FatFs lower layer API */
+
 #include "SD_SPI_Driver.h"
 
 
@@ -36,9 +37,7 @@ DSTATUS disk_initialize (
 	if (pdrv) return STA_NOINIT;		/* Supports only single drive */
 	
 	if (SD_Init())
-	{
 		return STA_NOINIT;
-	}
 	else
 	{
 		return RES_OK;
@@ -58,19 +57,19 @@ DRESULT disk_read (
 	UINT count		/* Number of sectors to read */
 )
 {
-	if (SD_CardInfo.Type != SD_TYPE_SDHC) // SDHC 以 BLOCK 为单位，其他的以 BYTE 为单位
-	{
-		sector *= SD_BLOCK_SIZE;
-	}
-	if (count == 1)
-	{
-		if (SD_ReadBlock(buff, sector, SD_BLOCK_SIZE)) return RES_ERROR;
-	}
-	else
-	{
-		if (SD_ReadMultiBlocks(buff, sector, SD_BLOCK_SIZE, count)) return RES_ERROR;
-	}
-	return RES_OK;
+		if (SD_CardInfo.Type != SD_TYPE_SDHC) // SDHC 以 BLOCK 为单位，其他的以 BYTE 为单位
+		{
+			sector *= SD_BLOCK_SIZE;
+		}
+		if (count == 1)
+		{
+			if (SD_ReadBlock(buff, sector, SD_BLOCK_SIZE)) return RES_ERROR;
+		}
+		else
+		{
+			if (SD_ReadMultiBlocks(buff, sector, SD_BLOCK_SIZE, count)) return RES_ERROR;
+		}
+		return RES_OK;
 }
 
 
@@ -86,19 +85,19 @@ DRESULT disk_write (
 	UINT count			/* Number of sectors to write */
 )
 {
-	if (SD_CardInfo.Type != SD_TYPE_SDHC) // SDHC 以 BLOCK 为单位，其他的以 BYTE 为单位
-	{
-		sector *= SD_BLOCK_SIZE;
-	}
-	if (count == 1)
-	{
-		if (SD_WriteBlock((uint8_t *)buff, sector, SD_BLOCK_SIZE)) return RES_ERROR;
-	}
-	else
-	{
-		if (SD_WriteMultiBlocks((uint8_t *)buff, sector, SD_BLOCK_SIZE, count)) return RES_ERROR;
-	}
-	return RES_OK;
+		if (SD_CardInfo.Type != SD_TYPE_SDHC) // SDHC 以 BLOCK 为单位，其他的以 BYTE 为单位
+		{
+			sector *= SD_BLOCK_SIZE;
+		}
+		if (count == 1)
+		{
+			if (SD_WriteBlock((uint8_t *)buff, sector, SD_BLOCK_SIZE)) return RES_ERROR;
+		}
+		else
+		{
+			if (SD_WriteMultiBlocks((uint8_t *)buff, sector, SD_BLOCK_SIZE, count)) return RES_ERROR;
+		}
+		return RES_OK;
 }
 
 
@@ -113,42 +112,42 @@ DRESULT disk_ioctl (
 	void *buff		/* Buffer to send/receive control data */
 )
 {
-	DRESULT res = RES_OK;
-	switch (cmd)
-	{
-		#if !_FS_READONLY
-		case CTRL_SYNC:
-			if (SD_Assert())
-			{
-				res = RES_ERROR;
-			}
-			else
-			{
+		DRESULT res = RES_OK;
+		switch (cmd)
+		{
+			#if !_FS_READONLY
+			case CTRL_SYNC:
+				if (SD_Assert())
+				{
+					res = RES_ERROR;
+				}
+				else
+				{
+					res = RES_OK;
+					SD_DeAssert();
+				}
+				break;
+			#endif
+			#if _USE_MKFS && !_FS_READONLY
+			case GET_SECTOR_COUNT:
+				*(DWORD*)buff = (DWORD)((SD_CardInfo.Capacity) >> 9);
+				//SD_TYPE_MMC3 / SD_TYPE_SDV1 算法不一样
 				res = RES_OK;
-				SD_DeAssert();
-			}
-			break;
-		#endif
-		#if _USE_MKFS && !_FS_READONLY
-		case GET_SECTOR_COUNT:
-			*(DWORD*)buff = (DWORD)((SD_CardInfo.Capacity) >> 9);
-			//SD_TYPE_MMC3 / SD_TYPE_SDV1 算法不一样
-			res = RES_OK;
-			break;
-		case GET_BLOCK_SIZE:
-			*(DWORD*)buff = SD_CardInfo.BlockSize;
-			res = RES_OK;
-			break;
-		#endif
-		#if _MAX_SS != _MIN_SS
-		case GET_SECTOR_SIZE:
-			res = RES_OK;
-			break;
-		#endif
-		default:
-			res = RES_PARERR;
-	}
-	return res;
+				break;
+			case GET_BLOCK_SIZE:
+				*(DWORD*)buff = SD_CardInfo.BlockSize;
+				res = RES_OK;
+				break;
+			#endif
+			#if _MAX_SS != _MIN_SS
+			case GET_SECTOR_SIZE:
+				res = RES_OK;
+				break;
+			#endif
+			default:
+				res = RES_PARERR;
+		}
+		return res;
 }
 
 DWORD get_fattime (void)

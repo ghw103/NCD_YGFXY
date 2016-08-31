@@ -38,7 +38,9 @@
 #include	"WifiFunction.h"
 #include	"OutModel_Fun.h"
 #include	"Net_Data.h"
+#include	"System_Data.h"
 #include	"Motor_Fun.h"
+#include	"SDFunction.h"
 
 #include	"Delay.h"
 /***************************************************************************************************/
@@ -135,7 +137,7 @@ void MySystemBSPInit(void)
 	
 	FatfsInit();						//文件系统初始化
 	
-//	IWDG_Init(3, 2000);					//看门狗初始化,超时时间2S
+	IWDG_Init(3, 2000);					//看门狗初始化,超时时间2S
 	delay_ms(50);
 }
 
@@ -156,4 +158,8 @@ void MySystemDataInit(void)
 	InitMutex();						//wifi数据初始化
 	
 	InitMotorData();
+	
+	ReadNetData(GetGB_NetData());		//读取网络设置
+	
+	ReadDeviceInfo(GetGB_DeviceInfo());	//读取设备信息
 }

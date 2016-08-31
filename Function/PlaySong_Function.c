@@ -176,7 +176,6 @@ static MyState_TypeDef wav_filldata(void *buf , unsigned int len)
 }
 static void ChangeOutputDataSource(void)
 {
-	
 	if(DMA1_Stream5->CR&(1<<19)) 								//当前使用Memory1数据
 		myAudioPlayInfo->sourceindex = 1;                       //可以将数据读取到缓冲区0
 
@@ -212,7 +211,7 @@ static void AudioDataSend(void)
 		StartPlay();
 		while(1)
 		{
-			//dma传输完成
+/*			//dma传输完成
 			if(((DMA1->HISR & RESERVED_MASK) & DMA_FLAG_TCIF5))
 			{
 				if(DMA1_Stream5->CR&(1<<19)) 								//当前使用Memory1数据
@@ -224,7 +223,7 @@ static void AudioDataSend(void)
 				myAudioPlayInfo->sourcestatues = 1;
 				
 				DMA1->HIFCR = DMA_FLAG_TCIF5 & RESERVED_MASK;				//清除发送完成标志位
-			}
+			}*/
 			
 			/*等待当前缓冲区播放完毕*/
 			if(myAudioPlayInfo->sourcestatues != 0)

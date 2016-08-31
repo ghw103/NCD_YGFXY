@@ -126,15 +126,11 @@ static MyState_TypeDef PageBufferMalloc(void)
 	{
 		S_SetDeviceIDPage = (SetDeviceIDPage *)MyMalloc(sizeof(SetDeviceIDPage));
 			
-		if(S_SetDeviceIDPage)
-		{
-			memset(S_SetDeviceIDPage, 0, sizeof(SetDeviceIDPage));
-			
-			return My_Pass;
-		}
-		else
+		if(NULL == S_SetDeviceIDPage)
 			return My_Fail;
 	}
+	
+	memset(S_SetDeviceIDPage, 0, sizeof(SetDeviceIDPage));
 	
 	return My_Pass;
 }

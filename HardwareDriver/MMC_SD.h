@@ -1,3 +1,5 @@
+#if SDDMA_USED == 0
+
 #ifndef __MMC_SD_H
 #define __MMC_SD_H
 
@@ -57,5 +59,7 @@ u32 SD_GetSectorCount(void);   					//¶ÁÉÈÇøÊý
 u8 SD_GetCID(u8 *cid_data);                     //¶ÁSD¿¨CID
 u8 SD_GetCSD(u8 *csd_data);                     //¶ÁSD¿¨CSD
 
+
+#endif
 
 #endif

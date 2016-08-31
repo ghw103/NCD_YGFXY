@@ -128,7 +128,7 @@ void I2S_DMA_Init(unsigned char *buf0, unsigned char *buf1, unsigned short num)
 	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;//外设数据长度:16位
 	DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;//存储器数据长度：16位 
 	DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;// 使用循环模式 
-	DMA_InitStructure.DMA_Priority = DMA_Priority_High;//高优先级
+	DMA_InitStructure.DMA_Priority = DMA_Priority_Medium;//高优先级
 	DMA_InitStructure.DMA_FIFOMode = DMA_FIFOMode_Disable; //不使用FIFO模式        
 	DMA_InitStructure.DMA_FIFOThreshold = DMA_FIFOThreshold_1QuarterFull;
 	DMA_InitStructure.DMA_MemoryBurst = DMA_MemoryBurst_Single;//外设突发单次传输
@@ -140,33 +140,37 @@ void I2S_DMA_Init(unsigned char *buf0, unsigned char *buf1, unsigned short num)
 	 
 	DMA_DoubleBufferModeCmd(DMA1_Stream5,ENABLE);//双缓冲模式开启
 	 
-//	DMA_ITConfig(DMA1_Stream5,DMA_IT_TC,ENABLE);//开启传输完成中断
+	DMA_ITConfig(DMA1_Stream5,DMA_IT_TC,ENABLE);//开启传输完成中断
 	SPI_I2S_DMACmd(SPI3,SPI_I2S_DMAReq_Tx,ENABLE);//SPI2 TX DMA????.
 	
-/*	NVIC_InitStructure.NVIC_IRQChannel = DMA1_Stream5_IRQn; 
+	NVIC_InitStructure.NVIC_IRQChannel = DMA1_Stream5_IRQn; 
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x4;//抢占优先级0
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;//子优先级0
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;//子优先级0
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;//使能外部中断通道
-	NVIC_Init(&NVIC_InitStructure);//配置*/
+	NVIC_Init(&NVIC_InitStructure);//配置
+	
 }
-/*
+
 void DMA1_Stream5_IRQHandler(void)
-{      
+{
 	if(DMA_GetITStatus(DMA1_Stream5,DMA_IT_TCIF5)==SET)////DMA1_Stream4,传输完成标志
-	{ 
+	{
 		DMA_ClearITPendingBit(DMA1_Stream5,DMA_IT_TCIF5);
       	i2s_tx_callback();	//执行回调函数,读取数据等操作在这里面处理  
-	}   											 
-}  */
+	}
+}
 
 void StartPlay(void)
 {
 	SetAudioMode(Audio_Mode);
-	DMA_Cmd(DMA1_Stream5,ENABLE);//开启DMA TX传输,开始播放 	
+	DMA_Cmd(DMA1_Stream5,ENABLE);//开启DMA TX传输,开始播放 
+	
 }
 void StopPlay(void)
 {
 	SetAudioMode(Mute_Mode);
 	DMA_Cmd(DMA1_Stream5,DISABLE);//关闭DMA,结束播放	
+	DMA_ITConfig(DMA1_Stream5,DMA_IT_TC,DISABLE);//开启传输完成中断
+	SPI_I2S_DMACmd(SPI3,SPI_I2S_DMAReq_Tx,DISABLE);//SPI2 TX DMA????.
 }
 

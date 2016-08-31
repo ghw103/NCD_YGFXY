@@ -109,12 +109,14 @@ static void low_level_init(struct netif *netif)
   netif->hwaddr_len = ETHARP_HWADDR_LEN;
 
   /* set netif MAC hardware address */
-  netif->hwaddr[0] =  MAC_ADDR0;
-  netif->hwaddr[1] =  MAC_ADDR1;
-  netif->hwaddr[2] =  MAC_ADDR2;
-  netif->hwaddr[3] =  MAC_ADDR3;
-  netif->hwaddr[4] =  MAC_ADDR4;
-  netif->hwaddr[5] =  MAC_ADDR5;
+
+	i=*(vu32*)(0x1FFF7A10);			//获取STM32的唯一ID的前24位作为MAC地址后三字节
+  netif->hwaddr[0] =  0x58;
+  netif->hwaddr[1] =  0x53;
+  netif->hwaddr[2] =  0x58;
+  netif->hwaddr[3] =  (i>>16)&0xff;
+  netif->hwaddr[4] =  (i>>8)&0xff;
+  netif->hwaddr[5] =  i&0xff;
 
   /* set netif maximum transfer unit */
   netif->mtu = 1500;

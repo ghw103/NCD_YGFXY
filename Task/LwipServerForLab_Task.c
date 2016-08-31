@@ -4,21 +4,27 @@
 *Author: xsx_kair
 *Data:
 ***************************************************************************************************/
-#if (DebugCode == CodeType)
+
 /***************************************************************************************************/
 /******************************************Header List********************************************/
 /***************************************************************************************************/
-#include	"Debug.h"
-/***************************************************************************************************/
-/***************************************************************************************************/
-/***************************************************************************************************/
-static unsigned short GB_DebugCount = 0;
-static unsigned short GB_DebugQRErrorCount = 0;
-static float GB_DebugResult[100];
-/***************************************************************************************************/
-/***************************************************************************************************/
-/***************************************************************************************************/
+#include	"LwipServerForLab_Task.h"
+#include	"LabServer_Fun.h"
+#include 	"tcpip.h"
 
+#include 	"FreeRTOS.h"
+#include 	"task.h"
+/***************************************************************************************************/
+/***************************************************************************************************/
+/***************************************************************************************************/
+#define LwipLabServerTask_PRIORITY			2							//客户端任务优先级
+const char * LwipLabServerTaskName = "vLwipLabServerTask";				//客户端任务名
+
+struct netconn *pxServerListener, *pxNewConnection;
+/***************************************************************************************************/
+/***************************************************************************************************/
+/***************************************************************************************************/
+static void LwipLabServerTask(void *pvParameters);
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -26,43 +32,32 @@ static float GB_DebugResult[100];
 /***************************************************************************************************/
 /***************************************************************************************************/
 
-void SetGB_DebugCount(unsigned short count)
+void StartLwipLabServerTask(void)
 {
-	GB_DebugCount = count;
-}
-unsigned short GetGB_DebugCount(void)
-{
-	return GB_DebugCount;
+	xTaskCreate( LwipLabServerTask, LwipLabServerTaskName, configMINIMAL_STACK_SIZE, NULL, LwipLabServerTask_PRIORITY, NULL );
 }
 
-void SetGB_DebugQRErrorCount(unsigned short count)
-{
-	GB_DebugQRErrorCount = count;
-}
-unsigned short GetGB_DebugQRErrorCount(void)
-{
-	return GB_DebugQRErrorCount;
-}
 
-void SetGB_DebugResult(float result)
+static void LwipLabServerTask(void *pvParameters)
 {
-	GB_DebugResult[GB_DebugCount-1] = result;
-}
-float GetGB_DebugResult(unsigned char index)
-{
-	return GB_DebugResult[index];
-}
-
-void ClearDebugData(void)
-{
-	unsigned char i=0;
+	err_t err;
+	/* Create a new tcp connection handle */
+	pxServerListener = netconn_new( NETCONN_TCP );
 	
-	SetGB_DebugCount(0);
-	SetGB_DebugQRErrorCount(0);
+	netconn_bind(pxServerListener, IP_ADDR_ANY, 9001 );
+	netconn_listen( pxServerListener );
 	
-	for(i=0; i<100; i++)
-		GB_DebugResult[i] = 0;
+	while(1)
+	{
+		err = netconn_accept(pxServerListener, &pxNewConnection);
+
+		if(err == ERR_OK)
+		{
+			/* connection timeout 5000 ms */
+			pxNewConnection->recv_timeout = (3000 / portTICK_RATE_MS);
+			ProcessQuest(pxNewConnection);
+		}
+	}
 }
 
-#endif
 /****************************************end of file************************************************/

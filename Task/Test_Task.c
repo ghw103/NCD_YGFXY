@@ -11,6 +11,10 @@
 #include	"Test_Task.h"
 #include	"Test_Fun.h"
 
+#if (NormalCode != CodeType)
+	#include	"System_Data.h"
+#endif
+
 #include 	"FreeRTOS.h"
 #include 	"task.h"
 #include 	"queue.h"
@@ -72,11 +76,20 @@ static void vTestTask( void *pvParameters )
 			while(pdPASS == TakeTestResult(&(S_TestTaskData.testresult)))
 				;
 			
+			#if (NormalCode != CodeType)
+			
+				SetTestStatusFlorLab(1);
+			#endif
 			TestFunction(&S_TestTaskData);
 			
-			xQueueSend( xTestResultQueue, &(S_TestTaskData.testresult), 10000/portTICK_RATE_MS );
+			xQueueSend( xTestResultQueue, &(S_TestTaskData.testresult), 1000/portTICK_RATE_MS );
 				
 			memset(&S_TestTaskData, 0, sizeof(TestTaskData));
+			
+			#if (NormalCode != CodeType)
+			
+				SetTestStatusFlorLab(0);
+			#endif
 		}
 		
 		vTaskDelay(500 * portTICK_RATE_MS);

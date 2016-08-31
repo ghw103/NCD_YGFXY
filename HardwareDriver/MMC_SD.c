@@ -1,3 +1,5 @@
+#if SDDMA_USED == 0
+
 #include "MMC_SD.h"
 #include	"SPI2_Driver.h"
 #include	"DELAY.h"
@@ -322,3 +324,5 @@ u8 SD_WriteDisk(u8*buf,u32 sector,u8 cnt)
 	SD_DisSelect();//È¡ÏûÆ¬Ñ¡
 	return r1;//
 }
+
+#endif

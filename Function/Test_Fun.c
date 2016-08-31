@@ -285,7 +285,7 @@ static void AnalysisTestData(void)
 				}
 			}
 			/*测试值偏小，需要放大*/
-			else if(S_TempCalData->MaxPoint < 1000)
+/*			else if(S_TempCalData->MaxPoint < 1000)
 			{
 				if(GetChannel() < 7)
 				{
@@ -294,6 +294,7 @@ static void AnalysisTestData(void)
 					return;
 				}
 			}
+*/
 #if (NormalCode == CodeType)			
 			for(i=0; i<S_TempCalData->peaknum; i++)
 			{

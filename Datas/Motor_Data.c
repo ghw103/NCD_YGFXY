@@ -30,44 +30,24 @@ static unsigned short GB_MotorMaxLocation = 0;									//电机最大位置
 /***************************************************************************************************/
 /***************************************************************************************************/
 
-
-
-
-
 LimitState_Def GetMotorPreLimitState(void)
 {
-	LimitState_Def temp ;
-	
-
-		temp = GB_PreLimitState;
-	
-	
-	return temp;
+	return GB_PreLimitState;
 }
 
 void SetMotorPreLimitState(LimitState_Def value)
 {
-
-		GB_PreLimitState = value;
-
+	GB_PreLimitState = value;
 }
 
 LimitState_Def GetMotorBackLimitState(void)
 {
-	LimitState_Def temp ;
-	
-
-	
-		temp = GB_BackLimitState;
-
-	return temp;
+	return GB_BackLimitState;
 }
 
 void SetMotorBackLimitState(LimitState_Def value)
 {
-
-		GB_BackLimitState = value;
-
+	GB_BackLimitState = value;
 }
 
 unsigned short GetGB_MotorLocation(void)
@@ -77,9 +57,7 @@ unsigned short GetGB_MotorLocation(void)
 
 void SetGB_MotorLocation(unsigned short value)
 {
-
-		GB_MotorLocation = value;
-
+	GB_MotorLocation = value;
 }
 
 unsigned short GetGB_MotorTargetLocation(void)
@@ -89,28 +67,18 @@ unsigned short GetGB_MotorTargetLocation(void)
 
 void SetGB_MotorTargetLocation(unsigned short value)
 {
-
-		GB_MotorTargetLocation = value;
-
+	GB_MotorTargetLocation = value;
 }
 
 
 unsigned short GetGB_MotorDir(void)
 {
-	unsigned short temp ;
-
-		temp = GB_MotorDir;
-
-	
-	return temp;
+	return GB_MotorDir;
 }
 
 void SetGB_MotorDir(DRVDir_Type dir)
 {
-
-	
-		GB_MotorDir = dir;
-
+	GB_MotorDir = dir;
 }
 
 

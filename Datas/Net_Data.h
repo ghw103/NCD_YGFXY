@@ -18,6 +18,9 @@ LinkState_TypeDef GetGB_WifiState(void);
 
 void SetGB_NetData(NetData netdata);
 NetData * GetGB_NetData(void);
+NetIP_Type GetNteIPMode(void);
+void GetMyIP(IP_Def * myip);
+void GetServerIP(IP_Def * serverip);
 
 void SetGB_NCDServerLinkState(LinkState_TypeDef linkstate);
 LinkState_TypeDef GetGB_NCDServerLinkState(void);

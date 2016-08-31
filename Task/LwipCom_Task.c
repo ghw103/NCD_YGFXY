@@ -68,19 +68,19 @@ static void vLwipComTask( void *pvParameters )
 	{
 		SetGB_LinkState(ReadPHYLinkState());
 
-		if((Link_Down == GetGB_LinkState())&&(netif_is_link_up(tempnetif)))
+		if(Link_Down == GetGB_LinkState())
 		{
 			netif_set_link_down(tempnetif);
 			SetGB_NetCard(Line_Mode);//NetNone);
 		}
-		else if((Link_Up == GetGB_LinkState())&&(!netif_is_link_up(tempnetif)))
+		else if(Link_Up == GetGB_LinkState())
 		{
 			netif_set_link_up(tempnetif);
 			SetGB_NetCard(Line_Mode);
 		}
 		/* wait 250 ms */
 		vTaskDelay(1000 / portTICK_RATE_MS);
-	}   
+	}  
 }
 
 

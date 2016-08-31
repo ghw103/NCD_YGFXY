@@ -3,18 +3,17 @@
 
 #include	"ShowDeviceInfoPage.h"
 
-#include	"LCD_Driver.h"
-#include	"UI_Data.h"
 #include	"SetDeviceInfoPage.h"
 #include	"SetDeviceIDPage.h"
 #include	"SystemSetPage.h"
+
+#include	"LCD_Driver.h"
+
+#include	"UI_Data.h"
+
 #include	"MyMem.h"
 #include	"SDFunction.h"
 #include	"MyTools.h"
-
-#include 	"FreeRTOS.h"
-#include 	"task.h"
-#include 	"queue.h"
 
 #include	<string.h>
 #include	"stdio.h"
@@ -59,19 +58,15 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		
 		/*基本信息*/
 		if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x220a)
-		{
 			S_ShowDeviceInfoPageBuffer->presscount = 0;
-		}
+		
 		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x220b)
-		{
 			S_ShowDeviceInfoPageBuffer->presscount++;
-		}
+		
 		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x220c)
 		{
 			if(S_ShowDeviceInfoPageBuffer->presscount > 20)
-			{
 				SendKeyCode(1);
-			}
 		}
 		/*获取密码*/
 		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x2230)
