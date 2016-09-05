@@ -237,7 +237,6 @@ static void ProgressWifiListData(WIFI_Def *wifis, char *buf)
 	if(NULL == tempbuf)
 		return;
 	
-	SendDataToNCDServer(buf, strlen(buf));
 	for(i=0; i<MaxWifiListNum; i++)
 	{
 		if(i == 0)

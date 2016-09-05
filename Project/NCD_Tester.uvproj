@@ -678,19 +678,9 @@
               <FilePath>..\Task\BasicWEB_Task.c</FilePath>
             </File>
             <File>
-              <FileName>LwipNCDClient_Task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Task\LwipNCDClient_Task.c</FilePath>
-            </File>
-            <File>
               <FileName>PlaySong_Task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Task\PlaySong_Task.c</FilePath>
-            </File>
-            <File>
-              <FileName>WIFI_Task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Task\WIFI_Task.c</FilePath>
             </File>
             <File>
               <FileName>NormalUpLoad_Task.c</FileName>

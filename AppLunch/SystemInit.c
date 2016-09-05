@@ -137,7 +137,7 @@ void MySystemBSPInit(void)
 	
 	FatfsInit();						//文件系统初始化
 	
-	IWDG_Init(3, 2000);					//看门狗初始化,超时时间2S
+//	IWDG_Init(3, 2000);					//看门狗初始化,超时时间2S
 	delay_ms(50);
 }
 

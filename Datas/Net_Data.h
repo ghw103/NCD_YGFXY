@@ -25,22 +25,11 @@ void GetServerIP(IP_Def * serverip);
 void SetGB_NCDServerLinkState(LinkState_TypeDef linkstate);
 LinkState_TypeDef GetGB_NCDServerLinkState(void);
 
-void SetGB_UserServerLinkState(LinkState_TypeDef linkstate);
-LinkState_TypeDef GetGB_UserServerLinkState(void);
-
 void CreateNetQueue(void);
 
 /*获取纽康度服务器数据接口*/
 xQueueHandle GetGBNCDClientTXQueue(void);
-xSemaphoreHandle GetGBNCDClientTXMutex(void);
 xQueueHandle GetGBNCDClientRXQueue(void);
-xSemaphoreHandle GetGBNCDClientRXMutex(void);
 
-/*获取用户服务器数据接口*/
-xQueueHandle GetGBUserClientTXQueue(void);
-
-xSemaphoreHandle GetGBUserClientTXMutex(void);
-xQueueHandle GetGBUserClientRXQueue(void);
-xSemaphoreHandle GetGBUserClientRXMutex(void);
 #endif
 

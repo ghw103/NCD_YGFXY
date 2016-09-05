@@ -3,10 +3,9 @@
 
 #include	"Define.h"
 
-void SendDataToNCDServer(char *buf, unsigned short len);
-MyState_TypeDef RecvDataFromNCDServer(char *buf);
+MyState_TypeDef CommunicateWithServerByLineNet(void *sendnetbuf, void *recvnetbuf);
 
-void SendDataToUserServer(char *buf, unsigned short len);
+
 MyState_TypeDef UpLoadData(char *URL, void * buf, unsigned short buflen);
 
 #endif

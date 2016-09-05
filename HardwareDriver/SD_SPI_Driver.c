@@ -188,17 +188,25 @@ void SD_DMA_Config(void)
 	//SPI_I2S_DMACmd(SD_SPI, SPI_I2S_DMAReq_Rx, ENABLE);
 	//SPI_I2S_DMACmd(SD_SPI, SPI_I2S_DMAReq_Tx, ENABLE);
 }
+/*
 // DMA 启动、等待、清除标志、停止
 void SD_DMAProcess(void)
 {
 	// 启动
+	unsigned short waittime = 0;
+	
 	SD_DMA_RX_STREAM->CR |= DMA_SxCR_EN; //先启动接收
 	//DMA_Cmd(SD_DMA_RX_STREAM, ENABLE);
 	while(!(SD_DMA_RX_STREAM->CR & DMA_SxCR_EN));
 	//while(DMA_GetCmdStatus(SD_DMA_RX_STREAM) == DISABLE);
 	SD_DMA_TX_STREAM->CR |= DMA_SxCR_EN; //再启动发送
 	//DMA_Cmd(SD_DMA_TX_STREAM, ENABLE);
-	while(!(SD_DMA_TX_STREAM->CR & DMA_SxCR_EN));
+	while(!(SD_DMA_TX_STREAM->CR & DMA_SxCR_EN))
+	{
+		waittime++;
+		if(waittime > 1000)
+			;
+	}
 	//while(DMA_GetCmdStatus(SD_DMA_TX_STREAM) == DISABLE);
 	
 	// 等待完成
@@ -222,7 +230,96 @@ void SD_DMAProcess(void)
 	//DMA_Cmd(SD_DMA_RX_STREAM, DISABLE);
 	while(SD_DMA_RX_STREAM->CR & DMA_SxCR_EN);
 	//while(DMA_GetCmdStatus(SD_DMA_TX_STREAM) == ENABLE);
+}*/
+
+static
+void stm32_dma_transfer(
+   unsigned char receive,      /* FALSE for buff->SPI, TRUE for SPI->buff               */
+   const BYTE *buff,   /* receive TRUE  : 512 byte data block to be transmitted
+                     receive FALSE : Data buffer to store received data    */
+   UINT btr          /* receive TRUE  : Byte count (must be multiple of 2)
+                     receive FALSE : Byte count (must be 512)              */
+)
+{
+   DMA_InitTypeDef DMA_InitStructure;
+   uint32_t rw_workbyte[] = { 0xffff };
+
+   /* shared DMA configuration values */
+   DMA_InitStructure.DMA_Channel = DMA_Channel_0;
+   DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)(&(SD_SPI->DR));
+   DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
+   DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
+   DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+   DMA_InitStructure.DMA_BufferSize = btr;
+   DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;
+   DMA_InitStructure.DMA_Priority = DMA_Priority_High;
+   DMA_InitStructure.DMA_FIFOMode = DMA_FIFOMode_Disable;
+   DMA_InitStructure.DMA_FIFOThreshold       = DMA_FIFOThreshold_Full;
+   DMA_InitStructure.DMA_MemoryBurst          = DMA_MemoryBurst_Single;
+   DMA_InitStructure.DMA_PeripheralBurst       = DMA_PeripheralBurst_Single;
+
+   DMA_DeInit(SD_DMA_RX_STREAM);
+   DMA_DeInit(SD_DMA_TX_STREAM);
+
+   if ( receive ) {
+
+      /* DMA1 channel4 configuration SPI2 RX ---------------------------------------------*/
+	  DMA_InitStructure.DMA_Channel = SD_DMA_RX_CHANNEL;
+      DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)buff;
+      DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;
+      DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
+      DMA_Init(SD_DMA_RX_STREAM, &DMA_InitStructure);
+
+      /* DMA1 channel5 configuration SPI2 TX ---------------------------------------------*/
+	   DMA_InitStructure.DMA_Channel = SD_DMA_TX_CHANNEL;
+      DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)rw_workbyte;
+      DMA_InitStructure.DMA_DIR = DMA_DIR_MemoryToPeripheral;
+      DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Disable;
+      DMA_Init(SD_DMA_TX_STREAM, &DMA_InitStructure);
+
+   } else {
+
+      /* DMA1 channel2 configuration SPI2 RX ---------------------------------------------*/
+	   DMA_InitStructure.DMA_Channel = SD_DMA_RX_CHANNEL;
+      DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)rw_workbyte;
+      DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;
+      DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Disable;
+      DMA_Init(SD_DMA_RX_STREAM, &DMA_InitStructure);
+
+      /* DMA1 channel3 configuration SPI2 TX ---------------------------------------------*/
+	   DMA_InitStructure.DMA_Channel = SD_DMA_TX_CHANNEL;
+      DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)buff;
+      DMA_InitStructure.DMA_DIR = DMA_DIR_MemoryToPeripheral;
+      DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
+      DMA_Init(SD_DMA_TX_STREAM, &DMA_InitStructure);
+
+   }
+
+   /* Enable DMA1 Channel4 */
+   DMA_Cmd(SD_DMA_RX_STREAM, ENABLE);
+   /* Enable DMA1 Channel5 */
+   DMA_Cmd(SD_DMA_TX_STREAM, ENABLE);
+
+   /* Enable SPI2 TX/RX request */
+   SPI_I2S_DMACmd(SD_SPI, SPI_I2S_DMAReq_Rx | SPI_I2S_DMAReq_Tx, ENABLE);
+
+   /* Wait until DMA1_Channel 5 Transfer Complete */
+   // not needed: while (DMA_GetFlagStatus(DMA1_FLAG_TC3) == RESET) { ; }
+   /* Wait until DMA1_Channel 4 Receive Complete */
+   while (DMA_GetFlagStatus(SD_DMA_RX_STREAM,DMA_FLAG_TCIF3) == RESET) { ; }
+
+   /* Disable DMA1 Channel4 */
+   DMA_Cmd(SD_DMA_TX_STREAM, DISABLE);
+   /* Disable DMA1 Channel5 */
+   DMA_Cmd(SD_DMA_RX_STREAM, DISABLE);
+
+   /* Disable SPI1 RX/TX request */
+   SPI_I2S_DMACmd(SD_SPI, SPI_I2S_DMAReq_Rx | SPI_I2S_DMAReq_Tx, DISABLE);
+
+   DMA_ClearFlag(SD_DMA_RX_STREAM,DMA_FLAG_TCIF3);
+   DMA_ClearFlag(SD_DMA_TX_STREAM,DMA_FLAG_TCIF4);
 }
+
 //设置SPI速度 SPI_BaudRatePrescaler_2 ~ SPI_BaudRatePrescaler_256 => (0~7)*8
 void SD_SpeedSet(uint16_t speed)
 {
@@ -655,7 +752,7 @@ SD_Error SD_ReadBlock(uint8_t* pBuffer, uint32_t ReadAddr, uint16_t BlockSize)
 		while ((SD_ReadByte() != SD_START_DATA_SINGLE_BLOCK_READ) && --i);
 		if (i)
 		{
-			// 设置接收通道
+/*			// 设置接收通道
 			SD_DMA_RX_STREAM->CR |= DMA_MemoryInc_Enable; //自增
 			SD_DMA_RX_STREAM->M0AR = (uint32_t)pBuffer;
 			SD_DMA_RX_STREAM->NDTR = BlockSize;
@@ -668,6 +765,8 @@ SD_Error SD_ReadBlock(uint8_t* pBuffer, uint32_t ReadAddr, uint16_t BlockSize)
 			//DMA_SetCurrDataCounter(SD_DMA_TX_STREAM, BlockSize);
 			
 			SD_DMAProcess();
+*/			
+			stm32_dma_transfer(1, pBuffer, BlockSize);
 
 			// Get CRC bytes (not really needed by us, but required by SD)
 			SD_ReadByte();
@@ -718,14 +817,15 @@ SD_Error SD_ReadMultiBlocks(uint8_t* pBuffer, uint32_t ReadAddr, uint16_t BlockS
 			while ((SD_ReadByte() != SD_START_DATA_MULTIPLE_BLOCK_READ) && --j);
 			if (j > 0)
 			{
-				// 设置接收通道
+/*				// 设置接收通道
 				SD_DMA_RX_STREAM->M0AR = (uint32_t)(pBuffer) + i*BlockSize;
 				SD_DMA_RX_STREAM->NDTR = BlockSize;
 				// 设置发送通道
 				SD_DMA_TX_STREAM->NDTR = BlockSize;
 
 				SD_DMAProcess();
-				
+*/
+				stm32_dma_transfer(1, pBuffer + i*BlockSize, BlockSize);
 				// Get CRC bytes (not really needed by us, but required by SD)
 				SD_ReadByte();
 				SD_ReadByte();
@@ -772,7 +872,7 @@ SD_Error SD_WriteBlock(uint8_t* pBuffer, uint32_t WriteAddr, uint16_t BlockSize)
 			// Send the data token(0xFE) to signify the start of the data
 			SD_WriteByte(SD_START_DATA_SINGLE_BLOCK_WRITE);
 			
-			// Write the block data to SD
+/*			// Write the block data to SD
 			// 设置接收通道
 			SD_DMA_RX_STREAM->CR &= ~DMA_MemoryInc_Enable; //不自增
 			SD_DMA_RX_STREAM->M0AR = (uint32_t)&Dummy_Recv;
@@ -783,7 +883,8 @@ SD_Error SD_WriteBlock(uint8_t* pBuffer, uint32_t WriteAddr, uint16_t BlockSize)
 			SD_DMA_TX_STREAM->NDTR = BlockSize;
 			
 			SD_DMAProcess();
-
+*/			
+			stm32_dma_transfer(0, pBuffer, BlockSize);
 			// Put CRC bytes (not really needed by us, but required by SD)
 			SD_ReadByte();
 			SD_ReadByte();
@@ -840,26 +941,27 @@ SD_Error SD_WriteMultiBlocks(uint8_t* pBuffer, uint32_t WriteAddr, uint16_t Bloc
 	res = SD_CmdRsp(SD_CMD_WRITE_MULTIPLE_BLOCK, WriteAddr, 0xFF);
 	if (!res)
 	{
-		// 设置接收通道
+/*		// 设置接收通道
 		SD_DMA_RX_STREAM->M0AR = (uint32_t)&Dummy_Recv;
 		SD_DMA_RX_STREAM->CR &= ~DMA_MemoryInc_Enable; //不自增
 		// 设置发送通道
 		SD_DMA_TX_STREAM->CR |= DMA_MemoryInc_Enable; //自增
-		
+	*/	
 		for (i = 0; i < NumberOfBlocks; i++)
 		{
 			if (SD_WaitReady()) break;
 			// Send the data token(0xFC) to signify the start of the data
 			SD_WriteByte(SD_START_DATA_MULTIPLE_BLOCK_WRITE);
 			
-			// 设置接收通道
+/*			// 设置接收通道
 			SD_DMA_RX_STREAM->NDTR = BlockSize;
 			// 设置发送通道
 			SD_DMA_TX_STREAM->M0AR = (uint32_t)(pBuffer) + i*BlockSize;
 			SD_DMA_TX_STREAM->NDTR = BlockSize;
 			
 			SD_DMAProcess();
-			
+	*/
+			stm32_dma_transfer(0, pBuffer + i*BlockSize, BlockSize);			
 			// Put CRC bytes (not really needed by us, but required by SD)
 			SD_ReadByte();
 			SD_ReadByte();

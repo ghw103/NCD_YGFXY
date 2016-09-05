@@ -12,6 +12,7 @@ typedef struct PointData_tag {
 	unsigned short index;
 }PointData;
 
+#pragma pack(1)
 typedef struct PeakData_tag {
 	unsigned short StartLocation;											//起峰位置
 	unsigned short StartValue;												//起峰值
@@ -25,25 +26,22 @@ typedef struct PeakData_tag {
 	float PeakScale;														//起峰与落峰比值
 	unsigned char step;														//找峰步骤
 }PeakData;
+#pragma pack()
 
-
-
+#pragma pack(1)
 typedef struct TempCalData_tag{
 	unsigned short tempvalue;
 	double tempvalue2;
 	short testline2[MaxPointLen];
+	double lastdata;														//记录上次滤波数据
 	
 	PeakData peakdata[10];													//定于10个峰
 	unsigned char peaknum;
 	
-	unsigned short MaxPoint;												//曲线中最大的点
-	unsigned short MaxPointNum;												//曲线中最大的点的数目
-	unsigned short MinPoint;												//曲线中最小的点
-	unsigned short MinPointNum;												//曲线中最小的点的数目
-	
-	unsigned char errorcount;												//错误次数
+	unsigned short maxdata;
 	ResultState resultstatues;											//测试结果状态
 }TempCalData;
+#pragma pack()
 
 MyState_TypeDef InitTestFunData(void);
 ResultState TestFunction(void * parm);

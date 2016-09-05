@@ -246,7 +246,7 @@ void SD_LowLevel_Init(void);
 void SD_LowLevel_DeInit(void);
 void SD_SPI_Config(void);
 void SD_DMA_Config(void);
-void SD_DMAProcess(void);
+//void SD_DMAProcess(void);
 void SD_SpeedSet(uint16_t speed);
 
 uint8_t SD_Detect(void);

@@ -53,8 +53,6 @@ static void StopReTest(void);
 static void EndOneReTest(char *result, unsigned char len);
 static void CheckQRCode(void);
 static void CheckTestCard(void);
-static void StartOnePlay(void);
-static void StopOnePlay(void);
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -116,7 +114,7 @@ static void PageUpDate(void)
 {
 	if(S_ReTestPageBuffer)
 	{
-/*		if(S_ReTestPageBuffer->retestdata.reteststatus == 1)
+		if(S_ReTestPageBuffer->retestdata.reteststatus == 1)
 		{
 			if(GetCardState() == CardIN)
 			{
@@ -141,7 +139,6 @@ static void PageUpDate(void)
 				
 				S_ReTestPageBuffer->retestdata.ledstatus = ReadLEDStatus();
 				
-//				EndOneReTest("检测到插卡", 10);
 				S_ReTestPageBuffer->retestdata.reteststatus = 2;
 				StartScanQRCode(&(S_ReTestPageBuffer->retestdata.testdata.temperweima));
 			}
@@ -151,7 +148,7 @@ static void PageUpDate(void)
 		else if(S_ReTestPageBuffer->retestdata.reteststatus == 2)
 			CheckQRCode();
 		else if(S_ReTestPageBuffer->retestdata.reteststatus == 3)
-			*/CheckTestCard();
+			CheckTestCard();
 
 		
 		if(My_Pass == TakeAudioPlayStatus(&(S_ReTestPageBuffer->playstatus)))
@@ -174,7 +171,7 @@ static void PageUpDate(void)
 				if(My_Pass == SaveReTestData(&(S_ReTestPageBuffer->retestdata), 1))
 				{
 					if(S_ReTestPageBuffer->retestdata.reteststatus > 0)
-						AddNumOfSongToList(52, 3);
+						AddNumOfSongToList(62, 3);
 				}
 				else
 				{
@@ -285,14 +282,13 @@ static void StartReTest(void)
 		//初始化当前测试的时长计时器
 		timer_set(&(S_ReTestPageBuffer->retestdata.oneretesttimer), 999999);
 		
-		S_ReTestPageBuffer->retestdata.reteststatus = 3;
-		StartTest(&(S_ReTestPageBuffer->retestdata.testdata));
+		S_ReTestPageBuffer->retestdata.reteststatus = 1;
 		
 		for(S_ReTestPageBuffer->buf[0]=0; S_ReTestPageBuffer->buf[0]<PaiDuiWeiNum; S_ReTestPageBuffer->buf[0]++)
 			UpOneModelData(S_ReTestPageBuffer->buf[0], R_ON_G_OFF, 5);
 			
 		//开始测试音频
-		AddNumOfSongToList(52, 3);
+		AddNumOfSongToList(62, 3);
 		//初始化播放总时长
 		timer_set(&(S_ReTestPageBuffer->retestdata.playtimer), 999999);
 	}
@@ -312,16 +308,6 @@ static void StopReTest(void)
 	}
 }
 
-static void StartOnePlay(void)
-{
-	while(GetCardState() != CardIN)
-		vTaskDelay(100);
-}
-
-static void StopOnePlay(void)
-{
-
-}
 
 static void EndOneReTest(char *result, unsigned char len)
 {
@@ -340,8 +326,7 @@ static void EndOneReTest(char *result, unsigned char len)
 				S_ReTestPageBuffer->retestdata.retestedcount++;
 			
 			S_ReTestPageBuffer->retestdata.retestsurpluscount = S_ReTestPageBuffer->retestdata.retestcount - S_ReTestPageBuffer->retestdata.retestedcount;
-			S_ReTestPageBuffer->retestdata.reteststatus = 3;
-			StartTest(&(S_ReTestPageBuffer->retestdata.testdata));
+			S_ReTestPageBuffer->retestdata.reteststatus = 1;
 			
 			//已测
 			DspNum(0x3006 , S_ReTestPageBuffer->retestdata.retestedcount, 4);
@@ -405,11 +390,9 @@ static void CheckQRCode(void)
 			memcpy(S_ReTestPageBuffer->retestdata.testdata.tempadjust.ItemName, S_ReTestPageBuffer->retestdata.testdata.temperweima.ItemName, ItemNameLen);
 			if(My_Fail == ReadAdjustData(&(S_ReTestPageBuffer->retestdata.testdata.tempadjust)))
 				memset(&(S_ReTestPageBuffer->retestdata.testdata.tempadjust), 0, sizeof(AdjustData));
-			/*
+
 			S_ReTestPageBuffer->retestdata.reteststatus = 3;
-			StartTest(&(S_ReTestPageBuffer->retestdata.testdata));*/
-			
-			EndOneReTest("测试正常", 8);
+			StartTest(&(S_ReTestPageBuffer->retestdata.testdata));
 		}
 	}
 }

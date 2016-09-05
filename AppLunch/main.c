@@ -20,7 +20,6 @@
 #include	"Universal_Task.h"
 #include	"Test_Task.h"
 #include	"OutModel_Task.h"
-#include	"WIFI_Task.h"
 #include	"PlaySong_Task.h"
 #include	"NormalUpLoad_Task.h"
 #include	"user_fatfs.h"
@@ -94,9 +93,6 @@ static void vStartTask(void * param)
 	
 	/*开启网络任务*/
 	StartEthernet();
-	
-	/*开启wifi任务*/
-	StartvWIFITask();
 
 	/*上传任务*/
 	StartvNormalUpLoadTask();

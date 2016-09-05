@@ -123,6 +123,10 @@ double ADS8325(void)
 		
 		ADS_SCK_H();
 		delay_us(1);
+		
+		AData++;
+		if(AData > 200)
+			return 0;
 	}
 	
 	for(i=0; i<16; i++)

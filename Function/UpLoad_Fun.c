@@ -42,10 +42,11 @@ static MyState_TypeDef UpLoadTestData(void);
 
 void UpLoadFunction(void)
 {
-	static unsigned int count = 0;
+	static unsigned short count = 0;
+	unsigned char buf[10];
 	while(1)
 	{
-		if(Link_Up == GetGB_NCDServerLinkState())
+/*		if(Link_Up == GetGB_NCDServerLinkState())
 		{
 			if((count % 10) == 0)
 				UpLoadDeviceInfo();
@@ -53,7 +54,8 @@ void UpLoadFunction(void)
 			if(My_Pass != UpLoadTestData())
 				vTaskDelay(10000);
 		}
-		count++;
+		count++;*/
+
 		vTaskDelay(1000 / portTICK_RATE_MS);
 	}
 }

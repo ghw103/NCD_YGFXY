@@ -84,14 +84,14 @@ ResultState TestFunction(void * parm)
 	{
 		memset(S_TempCalData, 0, sizeof(TempCalData));
 		
-		/*初始配置*/
-		SetGB_LedValue(300);
+		//初始配置
+		SetGB_LedValue(1000);
 		vTaskDelay(10/portTICK_RATE_MS);
 		
 		SetGB_CLineValue(0);
 		vTaskDelay(10/portTICK_RATE_MS);
 		
-		SelectChannel(1);
+		SelectChannel(7);
 		vTaskDelay(10/portTICK_RATE_MS);
 		
 		S_TestTaskData = parm;
@@ -102,7 +102,7 @@ ResultState TestFunction(void * parm)
 				
 			MotorMoveTo(StartTestLocation, 0);
 		
-			memset(S_TempCalData, 0, sizeof(TempCalData));
+//			memset(S_TempCalData, 0, sizeof(TempCalData));
 
 			for(i=1; i<= steps; i++)
 			{
@@ -113,7 +113,9 @@ ResultState TestFunction(void * parm)
 				if(i%AvregeNum == 0)
 				{
 					S_TempCalData->tempvalue2 /= AvregeNum;
-					S_TempCalData->tempvalue = (unsigned short)S_TempCalData->tempvalue2;
+//					S_TempCalData->lastdata = 0.2*S_TempCalData->tempvalue2+0.8*S_TempCalData->lastdata;
+					
+					S_TempCalData->tempvalue = (unsigned short)(S_TempCalData->tempvalue2);
 					
 					S_TestTaskData->testdata->testline.TestPoint[i/AvregeNum-1] = S_TempCalData->tempvalue;
 							
@@ -130,26 +132,25 @@ ResultState TestFunction(void * parm)
 				}*/
 			}
 			
-			vTaskDelay(1000/portTICK_RATE_MS);
+			vTaskDelay(10/portTICK_RATE_MS);
 			
-			/*分析曲线*/
+			//分析曲线
 			AnalysisTestData();
 			
 			if(S_TempCalData->resultstatues == NoResult)
 			{
-				/*发送一个特定数据，清除曲线*/
+				//发送一个特定数据，清除曲线
 				S_TestTaskData->testdata->testline.TestPoint[0] = 0xffff;
 				SendTestPointData(&(S_TestTaskData->testdata->testline.TestPoint[0]));
 				goto repeat;
 			}
-			
-			END:
+
+//			END:
 				S_TestTaskData->testresult = S_TempCalData->resultstatues;
 				MotorMoveTo(GetGB_MotorMaxLocation(), 0);
-				
+			
 				MyFree(S_TempCalData);
-				S_TempCalData = NULL;
-				
+
 				return S_TestTaskData->testresult;
 	}
 	else
@@ -184,41 +185,19 @@ static void AnalysisTestData(void)
 {
 	unsigned short i=0;
 	
-
 	{
-		/*找出最大值和最小值*/
-		S_TempCalData->MaxPoint = 0;
-		S_TempCalData->MaxPointNum = 0;
-		S_TempCalData->MinPoint = 0xffff;
-		S_TempCalData->MinPointNum = 0;
-		for(i=0; i<MaxPointLen; i++)
-		{
-			if(S_TempCalData->MaxPoint < S_TestTaskData->testdata->testline.TestPoint[i])
-			{
-				S_TempCalData->MaxPoint = S_TestTaskData->testdata->testline.TestPoint[i];
-				S_TempCalData->MaxPointNum = 0;
-			}
-			else if(S_TempCalData->MaxPoint == S_TestTaskData->testdata->testline.TestPoint[i])
-				S_TempCalData->MaxPointNum++;
-			
-			if(S_TempCalData->MinPoint > S_TestTaskData->testdata->testline.TestPoint[i])
-			{
-				S_TempCalData->MinPoint = S_TestTaskData->testdata->testline.TestPoint[i];
-				S_TempCalData->MinPointNum = 0;
-			}
-			else if(S_TempCalData->MinPoint == S_TestTaskData->testdata->testline.TestPoint[i])
-				S_TempCalData->MinPointNum++;
-		}
-		
-		
+		S_TempCalData->maxdata = S_TestTaskData->testdata->testline.TestPoint[0];
 		/*计算峰递增值*/
-		for(i=0; i<MaxPointLen; i++)
+		for(i=1; i<MaxPointLen; i++)
 		{
-			if(i >= 1)
-				S_TempCalData->testline2[i-1] = S_TestTaskData->testdata->testline.TestPoint[i] - S_TestTaskData->testdata->testline.TestPoint[i-1];
+			S_TempCalData->testline2[i-1] = S_TestTaskData->testdata->testline.TestPoint[i] - S_TestTaskData->testdata->testline.TestPoint[i-1];
+			if(S_TempCalData->maxdata < S_TestTaskData->testdata->testline.TestPoint[i])
+				S_TempCalData->maxdata = S_TestTaskData->testdata->testline.TestPoint[i];
 		}
 
 		/*寻找所有峰*/
+		memset(&(S_TempCalData->peakdata[0]), 0, 10*sizeof(PeakData)+1);
+		
 		for(i=0; i<MaxPointLen-1; i++)
 		{
 			if((S_TempCalData->peakdata[S_TempCalData->peaknum].step == 0) && (S_TempCalData->testline2[i] > 0))
@@ -240,18 +219,19 @@ static void AnalysisTestData(void)
 				S_TempCalData->peakdata[S_TempCalData->peaknum].EndValue = S_TestTaskData->testdata->testline.TestPoint[i];
 				S_TempCalData->peakdata[S_TempCalData->peaknum].DownWidth = i - S_TempCalData->peakdata[S_TempCalData->peaknum].PeakLocation;
 				S_TempCalData->peakdata[S_TempCalData->peaknum].PeakWidth = i - S_TempCalData->peakdata[S_TempCalData->peaknum].StartLocation;
-				S_TempCalData->peakdata[S_TempCalData->peaknum].step = 3;
-				
+				S_TempCalData->peakdata[S_TempCalData->peaknum].PeakScale = S_TempCalData->peakdata[S_TempCalData->peaknum].UpWidth;
+				S_TempCalData->peakdata[S_TempCalData->peaknum].PeakScale /= S_TempCalData->peakdata[S_TempCalData->peaknum].DownWidth;
 				/*一个峰找完，对这个峰进行判断*/
 				/*如果峰的宽度小于30或者大于100，则此峰为假*/
-				if((S_TempCalData->peakdata[S_TempCalData->peaknum].PeakWidth < 30) || (S_TempCalData->peakdata[S_TempCalData->peaknum].PeakWidth > 100))
+				if((S_TempCalData->peakdata[S_TempCalData->peaknum].PeakWidth > 50)&&(S_TempCalData->peakdata[S_TempCalData->peaknum].PeakWidth<150))
 				{
-					S_TempCalData->peakdata[S_TempCalData->peaknum].step = 0;
+					S_TempCalData->peaknum++;
+					
 				}
 				/*如果判断条件都通过，则峰为真*/
 				else
-				{				
-					S_TempCalData->peaknum++;
+				{
+					S_TempCalData->peakdata[S_TempCalData->peaknum].step = 0;
 				}
 			}
 		}
@@ -271,11 +251,8 @@ static void AnalysisTestData(void)
 		/*如果都正确，根据二维码找峰*/
 		else
 		{
-			S_TempCalData->tempvalue2 = S_TempCalData->MinPoint;
-			S_TempCalData->tempvalue2 /= S_TempCalData->MaxPoint;
-			
 			/*判断测试值是否饱和*/
-			if(S_TempCalData->MaxPoint >= 4000)
+			if(S_TempCalData->maxdata >= 4000)
 			{
 				if(GetChannel() > 0)
 				{
@@ -284,17 +261,7 @@ static void AnalysisTestData(void)
 					return;
 				}
 			}
-			/*测试值偏小，需要放大*/
-/*			else if(S_TempCalData->MaxPoint < 1000)
-			{
-				if(GetChannel() < 7)
-				{
-					SelectChannel(GetChannel() + 3);
-					vTaskDelay(10/portTICK_RATE_MS);
-					return;
-				}
-			}
-*/
+
 #if (NormalCode == CodeType)			
 			for(i=0; i<S_TempCalData->peaknum; i++)
 			{
@@ -385,6 +352,12 @@ static void AnalysisTestData(void)
 			}
 			
 			/*计算结果*/
+			if(((S_TestTaskData->testdata->testline.T_Point[0] < S_TestTaskData->testdata->testline.B_Point[0])) || (S_TestTaskData->testdata->testline.C_Point[0] <= S_TestTaskData->testdata->testline.B_Point[0]))
+			{
+				S_TempCalData->resultstatues = PeakNumError;
+				return;
+			}
+			
 			S_TempCalData->tempvalue2 = (S_TestTaskData->testdata->testline.T_Point[0] - S_TestTaskData->testdata->testline.B_Point[0]);
 			S_TempCalData->tempvalue2 /= (S_TestTaskData->testdata->testline.C_Point[0] - S_TestTaskData->testdata->testline.B_Point[0]);
 				
@@ -392,22 +365,23 @@ static void AnalysisTestData(void)
 			S_TestTaskData->testdata->testline.BasicBili = S_TempCalData->tempvalue2;
 			
 			/*根据分段，计算原始结果*/
+			
 			if((S_TestTaskData->testdata->testline.BasicBili < S_TestTaskData->testdata->temperweima.ItemFenDuan) || (S_TestTaskData->testdata->temperweima.ItemBiaoQuNum == 1))
 			{
 				S_TestTaskData->testdata->testline.BasicResult = S_TestTaskData->testdata->testline.BasicBili * S_TestTaskData->testdata->testline.BasicBili;
 				S_TestTaskData->testdata->testline.BasicResult *= S_TestTaskData->testdata->temperweima.ItemBiaoQu[0][0];
-					
+						
 				S_TestTaskData->testdata->testline.BasicResult += (S_TestTaskData->testdata->testline.BasicBili * S_TestTaskData->testdata->temperweima.ItemBiaoQu[0][1]);
-					
+						
 				S_TestTaskData->testdata->testline.BasicResult += S_TestTaskData->testdata->temperweima.ItemBiaoQu[0][2];
 			}
 			else
 			{
 				S_TestTaskData->testdata->testline.BasicResult = S_TestTaskData->testdata->testline.BasicBili * S_TestTaskData->testdata->testline.BasicBili;
 				S_TestTaskData->testdata->testline.BasicResult *= S_TestTaskData->testdata->temperweima.ItemBiaoQu[1][0];
-					
+						
 				S_TestTaskData->testdata->testline.BasicResult += (S_TestTaskData->testdata->testline.BasicBili * S_TestTaskData->testdata->temperweima.ItemBiaoQu[1][1]);
-					
+						
 				S_TestTaskData->testdata->testline.BasicResult += S_TestTaskData->testdata->temperweima.ItemBiaoQu[1][2];
 			}
 			
