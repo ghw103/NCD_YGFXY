@@ -25,6 +25,7 @@
 #include	"user_fatfs.h"
 #include	"WelcomePage.h"
 #include	"UI_Data.h"
+#include	"ReadBarCode_Task.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -87,6 +88,9 @@ static void vStartTask(void * param)
 	
 	/*读取输入数据任务*/
 	StartvReadInDataTask();
+	
+	/*创建读取条码枪任务*/
+	StartBarCodeTask();
 	
 	/*开启测试任务*/
 	StartvTestTask();

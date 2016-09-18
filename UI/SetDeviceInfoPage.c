@@ -7,7 +7,6 @@
 #include	"UI_Data.h"
 #include	"MyMem.h"
 #include	"ShowDeviceInfoPage.h"
-#include	"GetSampleIDFun.h"
 #include	"SDFunction.h"
 
 #include 	"FreeRTOS.h"

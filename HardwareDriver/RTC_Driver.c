@@ -1,127 +1,396 @@
- /***************************************************************************************************
-*FileName£ºRTC_Driver
-*Description£ºÄÚ²¿RTC
-*Author£ºxsx
-*Data£º2016Äê3ÔÂ15ÈÕ15:39:48
+/***************************************************************************************************
+*FileName:
+*Description:
+*Author: xsx_kair
+*Data:
 ***************************************************************************************************/
 
 /***************************************************************************************************/
-/******************************************Í·ÎÄ¼þ***************************************************/
+/******************************************Header List********************************************/
 /***************************************************************************************************/
-
 #include	"RTC_Driver.h"
-#include	"Delay.h"
-#include	"MyMem.h"
+#include 	"usbd_cdc_vcp.h"
 
-/***************************************************************************************************/
-/**************************************¾Ö²¿±äÁ¿ÉùÃ÷*************************************************/
-/***************************************************************************************************/
+#include	"stm32f4xx_gpio.h"
 
-/***************************************************************************************************/
-/**************************************¾Ö²¿º¯ÊýÉùÃ÷*************************************************/
-/***************************************************************************************************/
+#include	"Define.h"
 
-/***************************************************************************************************/
-/***************************************************************************************************/
-/***************************************ÕýÎÄ********************************************************/
+#include	<string.h>
+#include	"stdio.h"
+#include 	"stdlib.h"
+
+#include 	"delay.h"
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
 
-/***************************************************************************************************
-*FunctionName£ºRTC_Init
-*Description£ºRTC³õÊ¼»¯
-*Input£ºNone
-*Output£º0 -- Ê§°Ü
-*		1 -- ³É¹¦
-*Author£ºxsx
-*Data£º2016Äê3ÔÂ15ÈÕ15:46:16
-***************************************************************************************************/
-MyState_TypeDef My_RTC_Init(void)
+/***************************************************************************************************/
+/***************************************************************************************************/
+/***************************************************************************************************/
+static void RX_SDA_IN(void);
+static void RX_SDA_OUT(void);
+static void RX_IIC_Start(void);
+static void RX_IIC_Stop(void);
+static unsigned char RX8025_Write(unsigned char addr, unsigned char *pdata, unsigned char len);
+static unsigned char RX8025_Read(unsigned char addr, unsigned char *pdata, unsigned char len);
+static unsigned char BCD2HEX(unsigned char bcd_data);
+static unsigned char HEX2BCD(unsigned char hex_data);
+/***************************************************************************************************/
+/***************************************************************************************************/
+/***************************************************************************************************/
+/****************************************File Start*************************************************/
+/***************************************************************************************************/
+/***************************************************************************************************/
+
+void RTC_BSPInit(void)
 {
-	unsigned char i=0;
-	
-	RTC_InitTypeDef RTC_InitStructure;
-	/* Enable the PWR clock */
-	
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
-		
-	/* Allow access to RTC */
-	PWR_BackupAccessCmd(ENABLE);
-	
-	/* Reset RTC Domain */
-//	RCC_BackupResetCmd(ENABLE);
-//	RCC_BackupResetCmd(DISABLE);
+	GPIO_InitTypeDef    GPIO_InitStructure;
 
-	if(RTC_ReadBackupRegister(RTC_BKP_DR0)!=0x5050)
-	{
-		
-		
-		/* Enable the LSE OSC */
-		RCC_LSEConfig(RCC_LSE_ON);
+	RCC_AHB1PeriphClockCmd(RX_SCK_Rcc | RX_SDA_Rcc, ENABLE);
 
-		/* Wait till LSE is ready */  
-		while(RCC_GetFlagStatus(RCC_FLAG_LSERDY) == RESET)
-		{
-			i++;
-			delay_ms(200);
-			
-			/*·µ»ØÊ§°Ü*/
-			if(i > 20)
-				return My_Fail;
-		}
-
-		/* Select the RTC Clock Source */
-		RCC_RTCCLKConfig(RCC_RTCCLKSource_LSE);
-		RCC_RTCCLKCmd(ENABLE);	//Ê¹ÄÜRTCÊ±ÖÓ
-		
-		/* Wait for RTC APB registers synchronisation */
-		RTC_WaitForSynchro();
-		
-		/* Configure the RTC data register and RTC prescaler */
-		/* ck_spre(1Hz) = RTCCLK(LSI) /(AsynchPrediv + 1)*(SynchPrediv + 1)*/
-		RTC_InitStructure.RTC_AsynchPrediv = 0x7F;
-		RTC_InitStructure.RTC_SynchPrediv  = 0xFF;
-		RTC_InitStructure.RTC_HourFormat   = RTC_HourFormat_24;
-		RTC_Init(&RTC_InitStructure);
-		
-		SetTime(0, 1, 1, 12, 12, 12);
-		
-		RTC_WriteBackupRegister(RTC_BKP_DR0,0x5050);	//±ê¼ÇÒÑ¾­³õÊ¼»¯¹ýÁË
-	}
-	else
-	{
-		/* Wait for RTC APB registers synchronisation */
-		RTC_WaitForSynchro();
-	}
+	GPIO_InitStructure.GPIO_Pin = RX_SCK_Pin;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+    GPIO_Init(RX_SCK_Group, &GPIO_InitStructure);
 	
-	return My_Pass;
+	GPIO_InitStructure.GPIO_Pin = RX_SDA_Pin;
+    GPIO_Init(RX_SDA_Group, &GPIO_InitStructure);
 }
+
 /***************************************************************************************************
-*FunctionName£ºSetTime
-*Description£ºÉèÖÃÊ±¼ä
+*FunctionName£ºRX_SDA_IN
+*Description£ºÊ±ÖÓÐ¾Æ¬Êý¾ÝÏß¸ü¸ÄÅäÖÃÎªÊä³ö
 *Input£ºNone
 *Output£ºNone
 *Author£ºxsx
-*Data£º2016Äê3ÔÂ15ÈÕ16:45:11
+*Data£2016Äê9ÔÂ18ÈÕ10:10:12
 ***************************************************************************************************/
-MyState_TypeDef SetTime(unsigned char year, unsigned char month, unsigned char day, unsigned char hour,
-	unsigned char minute, unsigned char second)
+static void RX_SDA_IN(void)
 {
-	RTC_TimeTypeDef temptime;
-	RTC_DateTypeDef tempdata;
-	
-	tempdata.RTC_Year = year;
-	tempdata.RTC_Month = month;
-	tempdata.RTC_Date = day;
-	temptime.RTC_Hours = hour;
-	temptime.RTC_Minutes = minute;
-	temptime.RTC_Seconds = second;
-	
-	if((SUCCESS == RTC_SetDate(RTC_Format_BIN,&tempdata))&&(SUCCESS == RTC_SetTime(RTC_Format_BIN,&temptime)))
-		return My_Pass;
-	else
-		return My_Fail;
+	GPIO_InitTypeDef  GPIO_InitStructure;
+
+	GPIO_InitStructure.GPIO_Pin = RX_SDA_Pin;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(RX_SDA_Group, &GPIO_InitStructure);
+}
+/***************************************************************************************************
+*FunctionName£ºRX_SDA_OUT
+*Description£ºÊ±ÖÓÐ¾Æ¬Êý¾ÝÏß¸ü¸ÄÅäÖÃÎªÊä³ö
+*Input£ºNone
+*Output£ºNone
+*Author£ºxsx
+*Data£º2016Äê9ÔÂ18ÈÕ10:10:16
+***************************************************************************************************/
+static void RX_SDA_OUT(void)
+{
+	GPIO_InitTypeDef  GPIO_InitStructure;
+
+	GPIO_InitStructure.GPIO_Pin = RX_SDA_Pin;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(RX_SDA_Group, &GPIO_InitStructure);
 }
 
+/***************************************************************************************************
+*FunctionName:RX_IIC_Start 
+*Description: IIC×ÜÏßÆðÊ¼ÐÅºÅ
+*Input: 
+*Output: 
+*Author: xsx
+*Date: 2016Äê9ÔÂ18ÈÕ10:18:20
+***************************************************************************************************/
+static void RX_IIC_Start(void)
+{
+	RX_SDA_OUT();
+	
+	RX_SCK_H();
+	RX_SDA_H();
+	delay_us(RX_DelayTime);
+	
+	RX_SDA_L();
+	delay_us(RX_DelayTime);
+	
+	RX_SCK_L();
+	delay_us(RX_DelayTime);
+}
 
+/***************************************************************************************************
+*FunctionName:RX_IIC_Stop 
+*Description: IIC×ÜÏß½áÊøÐÅºÅ
+*Input: 
+*Output: 
+*Author: xsx
+*Date: 2016Äê9ÔÂ18ÈÕ10:18:35
+***************************************************************************************************/
+static void RX_IIC_Stop(void)
+{
+	RX_SDA_OUT();
+	
+	RX_SCK_L();
+	RX_SDA_L();
+	delay_us(RX_DelayTime);
+	
+	RX_SCK_H();
+	delay_us(RX_DelayTime);
+	
+	RX_SDA_H();
+	delay_us(RX_DelayTime);
+}
+
+static unsigned char RX_IIC_Wait_Ack(void)
+{
+	unsigned char errortime = 0;
+	
+	RX_SDA_IN();
+	
+	RX_SDA_H();
+	delay_us(RX_DelayTime);
+	
+	RX_SCK_H();
+	delay_us(RX_DelayTime);
+	
+	while(RX_SDA_PIN())
+	{
+		errortime++;
+		
+		if(errortime > 250)
+		{
+			RX_IIC_Stop();
+			return 0;
+		}
+	}
+	
+	RX_SCK_L();
+	return 1;
+}
+
+//²úÉúACKÓ¦´ð
+void RX_IIC_Ack(void)
+{
+	RX_SCK_L();
+	
+	RX_SDA_OUT();
+	RX_SDA_L();
+	delay_us(RX_DelayTime);
+	
+	RX_SCK_H();
+	delay_us(RX_DelayTime);
+	RX_SCK_L();
+}
+//²»²úÉúACKÓ¦´ð		    
+void RX_IIC_NAck(void)
+{
+	RX_SCK_L();
+	RX_SDA_OUT();
+	RX_SDA_H();
+	delay_us(RX_DelayTime);
+	
+	RX_SCK_H();
+	delay_us(RX_DelayTime);
+	RX_SCK_L();
+}
+
+static unsigned char RX_IIC_WriteByte(unsigned char data)
+{
+	unsigned char i=0;
+	
+	RX_SDA_OUT();
+	
+	RX_SCK_L();
+	
+	for(i=0; i<8; i++)
+	{		
+		if(data&0x80)
+			RX_SDA_H();
+		else
+			RX_SDA_L();
+		delay_us(RX_DelayTime);
+		
+		RX_SCK_H();
+		delay_us(RX_DelayTime);
+		
+		RX_SCK_L();
+		delay_us(RX_DelayTime);
+		
+		data <<= 1;
+	}
+	
+	return RX_IIC_Wait_Ack();
+}
+
+static unsigned char RX_IIC_ReadByte(unsigned char ack)
+{
+	unsigned char i, data = 0;
+	
+	RX_SDA_IN();
+	
+	for(i=0; i<8; i++)
+	{
+		RX_SCK_L();
+		delay_us(RX_DelayTime);
+		
+		RX_SCK_H();
+		
+		data <<= 1;
+		
+		if(RX_SDA_PIN())
+			data++;
+		delay_us(RX_DelayTime);
+	}
+	
+	if(!ack)
+		RX_IIC_NAck();
+	else
+		RX_IIC_Ack();
+	
+	return data;
+}
+
+static unsigned char RX8025_Write(unsigned char addr, unsigned char *pdata, unsigned char len)
+{
+	unsigned char i=0;
+	
+	RX_IIC_Start();
+	
+	if(RX_IIC_WriteByte(0x64) == 0)
+	{
+		RX_IIC_Stop();
+		return 0;
+	}
+	
+	if(RX_IIC_WriteByte(addr) == 0)
+	{
+		RX_IIC_Stop();
+		return 0;
+	}
+	
+	for(i=0; i<len; i++)
+	{
+		if(RX_IIC_WriteByte(*pdata) == 0)
+		{
+			RX_IIC_Stop();
+			return 0;
+		}
+		pdata++;
+	}
+	
+	RX_IIC_Stop();
+	
+	return 1;
+}
+
+static unsigned char RX8025_Read(unsigned char addr, unsigned char *pdata, unsigned char len)
+{
+	unsigned char i=0;
+	
+	RX_IIC_Start();
+	
+	if(RX_IIC_WriteByte(0x64) == 0)
+	{
+		RX_IIC_Stop();
+		return 0;
+	}
+	
+	if(RX_IIC_WriteByte(addr) == 0)
+	{
+		RX_IIC_Stop();
+		return 0;
+	}
+	
+	RX_IIC_Start();
+	
+	if(RX_IIC_WriteByte(0x65) == 0)
+	{
+		RX_IIC_Stop();
+		return 0;
+	}
+	
+	for(i=0; i<len-1; i++)
+	{
+		*pdata++ = RX_IIC_ReadByte(1);
+	}
+	
+	*pdata++ = RX_IIC_ReadByte(0);
+	
+	RX_IIC_Stop();
+	
+	return 1;
+}
+
+static unsigned char BCD2HEX(unsigned char bcd_data)  
+{   
+    unsigned char temp;   
+    temp=(bcd_data>>4)*10 + (bcd_data&0x0f);
+    return temp;
+}
+
+/*******************************************************************************
+* º¯ÊýÃû	: HEX2BCD
+* ÃèÊö  	: HEX×ªÎªBCD  
+* ²ÎÊý  	: -hex_data:´«ÈëÊ®Áù½øÖÆ¸ñÊ½µÄÊý¾Ý
+* ·µ»ØÖµ	: BCDÂë
+*******************************************************************************/
+static unsigned char HEX2BCD(unsigned char hex_data)  
+{   
+    unsigned char temp; 
+    temp=((hex_data/10)<<4) + (hex_data%10);
+    return temp; 	
+}  
+
+
+/***************************************************************************************************
+*FunctionName: RTC_SetTimeData
+*Description: ÉèÖÃrtcÊ±¼ä
+*Input: data -- ±ØÐëÎªMyTime_Def½á¹¹µÄÖ¸Õë
+*Output: 
+*Author: xsx
+*Date: 2016Äê9ÔÂ18ÈÕ16:11:52
+***************************************************************************************************/
+MyState_TypeDef RTC_SetTimeData(MyTime_Def * data)
+{
+	unsigned char buf[7];
+	
+	buf[0] = 0x20;
+	RX8025_Write(0x0e, buf, 1);
+	
+	/*ÉèÖÃÊ±¼ä*/
+	buf[0] = HEX2BCD(data->sec);
+	buf[1] = HEX2BCD(data->min);
+	buf[2] = HEX2BCD(data->hour);
+	buf[3] = HEX2BCD(0);
+//	if(RX8025_Write(0, buf, 3) == 0)
+//		return My_Fail;
+	
+	/*ÉèÖÃÈÕÆÚ*/
+	buf[4] = HEX2BCD(data->day);
+	buf[5] = HEX2BCD(data->month);
+	buf[6] = HEX2BCD(data->year);
+	
+	if(RX8025_Write(0, buf, 7) == 0)
+		return My_Fail;
+	else
+		return My_Pass;
+}
+
+void RTC_GetTimeData(MyTime_Def * time)
+{
+	unsigned char buf[7];
+	
+	RX8025_Read(0, buf, 7);
+	
+	time->year = BCD2HEX(buf[6]);
+    time->month = BCD2HEX(buf[5]);
+    time->day = BCD2HEX(buf[4]);
+    time->hour = BCD2HEX(buf[2]);
+    time->min = BCD2HEX(buf[1]);
+    time->sec = BCD2HEX(buf[0]);	
+}
+
+/****************************************end of file************************************************/

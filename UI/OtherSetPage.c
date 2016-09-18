@@ -187,9 +187,7 @@ static void SetGB_Time(char *buf, unsigned char len)
 		}
 		S_OtherSetPageBuffer->temptime.sec = temp;
 		
-		if(My_Pass == SetTime(S_OtherSetPageBuffer->temptime.year, S_OtherSetPageBuffer->temptime.month, S_OtherSetPageBuffer->temptime.day, 
-			S_OtherSetPageBuffer->temptime.hour, S_OtherSetPageBuffer->temptime.min, S_OtherSetPageBuffer->temptime.sec)
-		)
+		if(My_Pass == RTC_SetTimeData(&(S_OtherSetPageBuffer->temptime)))
 			/*ÐÞ¸Ä³É¹¦*/
 			SendKeyCode(1);
 		else

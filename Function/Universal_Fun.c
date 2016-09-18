@@ -11,8 +11,12 @@
 /***************************************************************************************************/
 #include	"Universal_Fun.h"
 
+#include	"RTC_Driver.h"
 #include	"CardStatues_Data.h"
 #include	"CardLimit_Driver.h"
+#include	"System_Data.h"
+
+#include	"Define.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -59,4 +63,10 @@ void CheckCardStatues(void)
 	}
 }
 
-
+void UpDateGB_Time(void)
+{
+	MyTime_Def time ;
+	
+	RTC_GetTimeData(&time);
+	SetGB_Time(&time);	
+}

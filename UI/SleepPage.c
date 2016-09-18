@@ -5,7 +5,7 @@
 
 #include	"LCD_Driver.h"
 #include	"UI_Data.h"
-#include	"Time_Data.h"
+#include	"System_Data.h"
 
 #include	"MyMem.h"
 
@@ -122,7 +122,7 @@ static void DspPageText(void)
 {
 	if(S_SleepPageBuffer)
 	{
-		GetGBTimeData(&(S_SleepPageBuffer->time));
+		GetGB_Time(&(S_SleepPageBuffer->time));
 		
 		memset(S_SleepPageBuffer->buf, 0, 50);
 		sprintf(S_SleepPageBuffer->buf, "20%02d-%02d-%02d %02d:%02d:%02d", S_SleepPageBuffer->time.year, S_SleepPageBuffer->time.month, S_SleepPageBuffer->time.day,

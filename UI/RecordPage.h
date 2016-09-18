@@ -10,10 +10,10 @@ typedef struct Record_tag {
 	TestData testdata[DataNumInPage];					//测试数据
 	unsigned char selectindex;							//选中的索引
 	unsigned char pageindex;							//页面索引
-	TestDateInfo_Def testdatainfo[TestDataDateRepeatNum];					//数据保存的日期管理信息
-	unsigned short maxdatanum;
-	unsigned short maxpagenum;
-	MyTime_Def datatime;									//当前选择查看的日期
+	
+	unsigned int maxdatanum;
+	unsigned int maxpagenum;
+
 	char buf[300];										//临时缓冲区
 	unsigned int tempvalue1;
 	unsigned int tempvalue2;

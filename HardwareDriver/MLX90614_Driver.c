@@ -377,20 +377,20 @@ static unsigned char PEC_Calculation(unsigned char pec[])
 *Data：2016年3月17日15:46:52
 ***************************************************************************************************/
 void CollecteTemperature(void)
-{   
+{
 	static double temp = 0.0;
 	
 	/*读取环境温度*/
 	temp = SMBus_ReadMemory(SA, RAM_ACCESS|0x06);
 	temp *= 0.02;
 	temp -= 273.15;
-	SetCardTemperature(temp);
+	SetInnerTemperature(temp);
 	
 	/*读取被测物体温度*/
 	temp = SMBus_ReadMemory(SA, RAM_ACCESS|0x07);
 	temp *= 0.02;
 	temp -= 273.15;
-	SetInnerTemperature(temp);
+	SetCardTemperature(temp);
 }
 
 /*********************************END OF FILE*********************************/

@@ -558,11 +558,6 @@
           <GroupName>Functions</GroupName>
           <Files>
             <File>
-              <FileName>GetSampleIDFun.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Function\GetSampleIDFun.c</FilePath>
-            </File>
-            <File>
               <FileName>CodeScanFunction.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Function\CodeScanFunction.c</FilePath>
@@ -626,6 +621,16 @@
               <FileName>LabServer_Fun.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Function\LabServer_Fun.c</FilePath>
+            </File>
+            <File>
+              <FileName>ReadBarCode_Fun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Function\ReadBarCode_Fun.c</FilePath>
+            </File>
+            <File>
+              <FileName>Printf_Fun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Function\Printf_Fun.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -701,6 +706,11 @@
               <FileName>LwipServerForLab_Task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Task\LwipServerForLab_Task.c</FilePath>
+            </File>
+            <File>
+              <FileName>ReadBarCode_Task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Task\ReadBarCode_Task.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -846,11 +856,6 @@
               <FileName>Temperature_Data.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Datas\Temperature_Data.c</FilePath>
-            </File>
-            <File>
-              <FileName>Time_Data.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Datas\Time_Data.c</FilePath>
             </File>
             <File>
               <FileName>CardStatues_Data.c</FileName>

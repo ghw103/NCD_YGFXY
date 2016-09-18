@@ -6,9 +6,9 @@
 #include	"MyTest_Data.h"
 
 typedef struct SampleIDPage_tag {
-	char tempid[MaxSampleIDLen];				//临时的条码数据
-	char *tempbuf;								//临时指针
-	Timer timer;				//一个计时器
+	Timer timer;															//一个计时器
+	unsigned char tempbuf[150];
+	unsigned int tempv1;
 	ItemData * currenttestdata;												//当前测试数据
 	unsigned short lcdinput[100];
 }SampleIDPage;

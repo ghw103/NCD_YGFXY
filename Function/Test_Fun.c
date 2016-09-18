@@ -55,7 +55,7 @@ MyState_TypeDef InitTestFunData(void)
 {
 	/*曲线队列*/
 	if(xTestCurveQueue == NULL)
-		xTestCurveQueue = xQueueCreate( 100, ( unsigned portBASE_TYPE ) sizeof( unsigned short ) );
+		xTestCurveQueue = xQueueCreate( 1000, ( unsigned portBASE_TYPE ) sizeof( unsigned short ) );
 	
 	if(xTestCurveQueue == NULL)
 		return My_Fail;
@@ -102,7 +102,7 @@ ResultState TestFunction(void * parm)
 				
 			MotorMoveTo(StartTestLocation, 0);
 		
-//			memset(S_TempCalData, 0, sizeof(TempCalData));
+			memset(S_TempCalData, 0, sizeof(TempCalData));
 
 			for(i=1; i<= steps; i++)
 			{
@@ -113,7 +113,6 @@ ResultState TestFunction(void * parm)
 				if(i%AvregeNum == 0)
 				{
 					S_TempCalData->tempvalue2 /= AvregeNum;
-//					S_TempCalData->lastdata = 0.2*S_TempCalData->tempvalue2+0.8*S_TempCalData->lastdata;
 					
 					S_TempCalData->tempvalue = (unsigned short)(S_TempCalData->tempvalue2);
 					
@@ -174,7 +173,7 @@ MyState_TypeDef TakeTestPointData(void * data)
 	if(xTestCurveQueue == NULL)
 		return My_Fail;
 	
-	if(pdPASS == xQueueReceive( xTestCurveQueue, data, 10*portTICK_RATE_MS))
+	if(pdPASS == xQueueReceive( xTestCurveQueue, data, 0*portTICK_RATE_MS))
 		return My_Pass;
 	else
 		return My_Fail;	
@@ -193,6 +192,18 @@ static void AnalysisTestData(void)
 			S_TempCalData->testline2[i-1] = S_TestTaskData->testdata->testline.TestPoint[i] - S_TestTaskData->testdata->testline.TestPoint[i-1];
 			if(S_TempCalData->maxdata < S_TestTaskData->testdata->testline.TestPoint[i])
 				S_TempCalData->maxdata = S_TestTaskData->testdata->testline.TestPoint[i];
+		}
+		
+		/*判断测试值是否饱和*/
+		if(S_TempCalData->maxdata >= 4000)
+		{
+			if(GetChannel() > 0)
+			{
+				SelectChannel(GetChannel() - 1);
+				//SelectChannel(5);
+				vTaskDelay(10/portTICK_RATE_MS);
+				return;
+			}
 		}
 
 		/*寻找所有峰*/
@@ -223,7 +234,7 @@ static void AnalysisTestData(void)
 				S_TempCalData->peakdata[S_TempCalData->peaknum].PeakScale /= S_TempCalData->peakdata[S_TempCalData->peaknum].DownWidth;
 				/*一个峰找完，对这个峰进行判断*/
 				/*如果峰的宽度小于30或者大于100，则此峰为假*/
-				if((S_TempCalData->peakdata[S_TempCalData->peaknum].PeakWidth > 50)&&(S_TempCalData->peakdata[S_TempCalData->peaknum].PeakWidth<150))
+				if((S_TempCalData->peakdata[S_TempCalData->peaknum].PeakWidth > 30)&&(S_TempCalData->peakdata[S_TempCalData->peaknum].PeakWidth<150))
 				{
 					S_TempCalData->peaknum++;
 					
@@ -251,16 +262,6 @@ static void AnalysisTestData(void)
 		/*如果都正确，根据二维码找峰*/
 		else
 		{
-			/*判断测试值是否饱和*/
-			if(S_TempCalData->maxdata >= 4000)
-			{
-				if(GetChannel() > 0)
-				{
-					SelectChannel(GetChannel() - 1);
-					vTaskDelay(10/portTICK_RATE_MS);
-					return;
-				}
-			}
 
 #if (NormalCode == CodeType)			
 			for(i=0; i<S_TempCalData->peaknum; i++)

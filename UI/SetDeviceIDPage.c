@@ -4,10 +4,11 @@
 #include	"SetDeviceIDPage.h"
 
 #include	"LCD_Driver.h"
+#include	"System_Data.h"
 #include	"UI_Data.h"
 #include	"MyMem.h"
 #include	"ShowDeviceInfoPage.h"
-#include	"GetSampleIDFun.h"
+#include	"ReadBarCode_Fun.h"
 #include	"SDFunction.h"
 
 #include 	"FreeRTOS.h"
@@ -92,14 +93,17 @@ static void Input(unsigned char *pbuf , unsigned short len)
 
 static void PageUpDate(void)
 {
-	if((S_SetDeviceIDPage) && (My_Pass == TakeSampleIDData(&(S_SetDeviceIDPage->tempbuf))))
+	if(S_SetDeviceIDPage)
 	{
-		memcpy(S_SetDeviceIDPage->temp_deviceinfo.deviceid, S_SetDeviceIDPage->tempbuf, MaxDeviceIDLen);
-		MyFree(S_SetDeviceIDPage->tempbuf);
+		if(My_Pass == CheckBarCodeHasRead())
+		{
+			GetGB_BarCode(S_SetDeviceIDPage->tempbuf);
+			
+			memcpy(S_SetDeviceIDPage->temp_deviceinfo.deviceid, S_SetDeviceIDPage->tempbuf, MaxDeviceIDLen);
+			DisText(0x23a0, S_SetDeviceIDPage->temp_deviceinfo.deviceid, MaxDeviceIDLen);
 		
-		DisText(0x23a0, S_SetDeviceIDPage->temp_deviceinfo.deviceid, strlen(S_SetDeviceIDPage->temp_deviceinfo.deviceid));
-		
-		S_SetDeviceIDPage->ismodify = 1;
+			S_SetDeviceIDPage->ismodify = 1;
+		}	
 	}
 }
 

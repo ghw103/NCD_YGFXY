@@ -12,7 +12,7 @@
 #include	"LCD_Driver.h"
 #include	"QueueUnits.h"
 
-#include	"Time_Data.h"
+#include	"System_Data.h"
 #include	"Temperature_Data.h"
 
 #include	"CRC16.h"
@@ -106,7 +106,7 @@ static void WriteLCDData(unsigned short addr, void *data, unsigned char len)
 	
 	CalModbusCRC16Fun2(txdat+3, len + 3, q);
 	
-	SendDataToQueue(GetUsart6TXQueue(), GetUsart6TXMutex(), txdat, txdat[2]+3, 1, 50 * portTICK_RATE_MS, EnableUsart6TXInterrupt);
+	SendDataToQueue(GetUsart6TXQueue(), GetUsart6TXMutex(), txdat, txdat[2]+3, 1, 50 / portTICK_RATE_MS, EnableUsart6TXInterrupt);
 
 	MyFree(txdat);
 }
@@ -276,7 +276,7 @@ void DspTimeAndTempData(void)
 		memset(time, 0, sizeof(MyTime_Def));
 		
 		/*获取当前时间*/
-		GetGBTimeData(time);
+		GetGB_Time(time);
 		
 		/*显示时间*/
 		sprintf(buftime, " 20%02d-%02d-%02d %02d:%02d:%02d", time->year, time->month, time->day,

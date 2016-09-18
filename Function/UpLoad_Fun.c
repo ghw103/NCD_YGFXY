@@ -98,7 +98,7 @@ static MyState_TypeDef UpLoadTestData(void)
 	DeviceInfo * deviceinfo = NULL;
 	
 	char *tempbuf = NULL;
-	unsigned int sendindex = 0;
+	UpLoadIndex uploadindex;
 	char *linebuf = NULL;
 	unsigned short i = 0;
 	
@@ -112,9 +112,9 @@ static MyState_TypeDef UpLoadTestData(void)
 	
 	if(testdata && sendbuf && deviceinfo && linebuf)
 	{
-		if(My_Pass == ReadUpLoadIndex(&sendindex))
+		if(My_Pass == ReadUpLoadIndex(&uploadindex))
 		{
-			if((My_Pass == ReadTestData(testdata, sendindex, 1, NULL)) && (testdata->crc == CalModbusCRC16Fun1(testdata, sizeof(TestData)-2)) &&
+			if((My_Pass == ReadTestData(testdata, uploadindex.index, 1)) && (testdata->crc == CalModbusCRC16Fun1(testdata, sizeof(TestData)-2)) &&
 				(My_Pass == ReadDeviceInfo(deviceinfo)) && (deviceinfo->crc == CalModbusCRC16Fun1(deviceinfo, sizeof(DeviceInfo)-2)) )
 			{
 				memset(sendbuf, 0, 4096);
@@ -135,8 +135,8 @@ static MyState_TypeDef UpLoadTestData(void)
 
 					if(My_Pass == UpLoadData("http://123.57.94.39/api/myFluorescenceData/", sendbuf, strlen(sendbuf)))
 					{
-						sendindex++;
-						WriteUpLoadIndex(sendindex);
+						uploadindex.index++;
+						WriteUpLoadIndex(uploadindex.index);
 						statues = My_Pass;
 					}
 				}

@@ -3,7 +3,7 @@
 
 
 void CheckCardStatues(void);
-
+void UpDateGB_Time(void);
 
 #endif
 

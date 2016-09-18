@@ -10,7 +10,7 @@
 #include	"Motor_Fun.h"
 #include	"Motor_Data.h"
 #include	"CardStatues_Data.h"
-#include	"Time_Data.h"
+#include	"System_Data.h"
 
 #include	"Define.h"
 #include	"CRC16.h"
@@ -63,6 +63,7 @@ ScanCodeResult ScanCodeFun(void * parm)
 	MotorMoveTo(500, 0);
 		
 	OpenCodeScanner();
+	
 		
 	while(pdPASS == ReceiveDataFromQueue(GetUsart2RXQueue(), GetUsart2RXMutex(), &dir , 1, 1, 50 * portTICK_RATE_MS))
 		;
@@ -86,7 +87,7 @@ ScanCodeResult ScanCodeFun(void * parm)
 
 			count++;
 					
-			if((GetGB_MotorLocation() >= 1500)||(GetGB_MotorLocation() <= 500))
+			if((GetGB_MotorLocation() >= 3500)||(GetGB_MotorLocation() <= 200))
 			{
 				dir++;
 				ReadBasicCodeData();
@@ -327,7 +328,7 @@ static MyState_TypeDef CheckCardIsTimeOut(CardCodeInfo * s_CardCodeInfo)
 {
 	if(S_ReadCodeBuffer)
 	{
-		GetGBTimeData(&(S_ReadCodeBuffer->temptime));
+		GetGB_Time(&(S_ReadCodeBuffer->temptime));
 		
 		if(s_CardCodeInfo->CardBaoZhiQi.RTC_Year == S_ReadCodeBuffer->temptime.year)
 		{

@@ -81,11 +81,11 @@ static void ProcessCMD(unsigned char *buf, unsigned short len, struct netconn *p
 	unsigned short i=0;
 	ResultState cardpretestresult;
 	
-	pxbuf1 = MyMalloc(2048);
+	pxbuf1 = MyMalloc(4096);
 	pxbuf2 = MyMalloc(10);
 	if(pxbuf1 && pxbuf2)
 	{
-		memset(pxbuf1, 0, 2048);
+		memset(pxbuf1, 0, 4096);
 		
 		if(!strncmp( (char *)buf, "Read Device Info", 16 ))
 		{

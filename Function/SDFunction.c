@@ -266,6 +266,7 @@ void ReadUserData(User_Type * user)
 MyState_TypeDef SaveTestData(TestData *tempdata)
 {
 	FatfsFileInfo_Def * myfile = NULL;
+	UpLoadIndex myUpLoadIndex;
 	MyState_TypeDef statues = My_Fail;
 	
 	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
@@ -274,28 +275,35 @@ MyState_TypeDef SaveTestData(TestData *tempdata)
 	{
 		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
 
-		myfile->res = f_open(&(myfile->file), "0:/TestData.ncd", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
+		myfile->res = f_open(&(myfile->file), "0:/TD.NCD", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
 			
 		if(FR_OK == myfile->res)
 		{
 			myfile->size = f_size(&(myfile->file));
 			if(myfile->size == 0)
-				myfile->res = f_write(&(myfile->file), &(myfile->size), sizeof(unsigned int), &(myfile->bw));
-			
-			myfile->size = f_size(&(myfile->file));
+			{
+				myUpLoadIndex.index = 0;
+				myUpLoadIndex.crc = CalModbusCRC16Fun1(&(myUpLoadIndex), sizeof(UpLoadIndex)-2);
+				
+				myfile->res = f_write(&(myfile->file), &(myUpLoadIndex), sizeof(UpLoadIndex), &(myfile->bw));
+
+				if(FR_OK != myfile->res)
+					goto END;
+				
+				myfile->size = f_size(&(myfile->file));
+			}
 			
 			f_lseek(&(myfile->file), myfile->size);
 				
 			tempdata->crc = CalModbusCRC16Fun1(tempdata, sizeof(TestData)-2);
+			
 			myfile->res = f_write(&(myfile->file), tempdata, sizeof(TestData), &(myfile->bw));
+			
 			if(FR_OK == myfile->res)
-			{
-				myfile->size = f_size(&(myfile->file));
-				SaveDateInfo(tempdata, myfile->size/sizeof(TestData));
 				statues = My_Pass;
-			}
-				
-			f_close(&(myfile->file));
+			
+			END:
+				f_close(&(myfile->file));
 		}
 	}
 	
@@ -315,7 +323,7 @@ MyState_TypeDef SaveTestData(TestData *tempdata)
 *Author：xsx
 *Data：
 ***************************************************************************************************/
-MyState_TypeDef ReadTestData(TestData *tempdata, unsigned int index, unsigned char readnum, unsigned short *br)
+MyState_TypeDef ReadTestData(TestData *tempdata, unsigned int index, unsigned char readnum)
 {
 	FatfsFileInfo_Def * myfile = NULL;
 	MyState_TypeDef statues = My_Fail;
@@ -325,25 +333,27 @@ MyState_TypeDef ReadTestData(TestData *tempdata, unsigned int index, unsigned ch
 	
 	if(myfile)
 	{
-		myfile->res = f_open(&(myfile->file), "0:/TestData.ncd", FA_READ);
+		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
+		
+		myfile->res = f_open(&(myfile->file), "0:/TD.NCD", FA_READ);
+		
 		if(FR_OK == myfile->res)
 		{
 			myfile->size = f_size(&(myfile->file));
 			
-			myfile->res = f_lseek(&(myfile->file), index*sizeof(TestData)+4);
+			myfile->res = f_lseek(&(myfile->file), index*sizeof(TestData)+sizeof(UpLoadIndex));
 			if(FR_OK == myfile->res)
 			{
 				for(i=0; i<readnum; i++)
 				{
 					myfile->res = f_read(&(myfile->file), tempdata, sizeof(TestData), &(myfile->br));
+					
 					if((FR_OK == myfile->res) && (sizeof(TestData) == myfile->br))
 						tempdata++;
 					else
 						break;
 				}
 				statues = My_Pass;
-				if(br)
-					*br = i;
 			}
 			
 			f_close(&(myfile->file));
@@ -355,103 +365,26 @@ MyState_TypeDef ReadTestData(TestData *tempdata, unsigned int index, unsigned ch
 	return statues;
 }
 
-/***************************************************************************************************
-*FunctionName：写入一个未上传数据的id
-*Description：
-*Input：None
-*Output：None
-*Author：xsx
-*Data：
-***************************************************************************************************/
-MyState_TypeDef SaveDateInfo(TestData *tempdata, unsigned int index)
+MyState_TypeDef GetTestDataNum(unsigned int *num)
 {
 	FatfsFileInfo_Def * myfile = NULL;
-	MyState_TypeDef statues = My_Fail;
-	TestDateInfo_Def *my_TestDateInfo = NULL;
+	
+	*num = 0;
+	
 	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
 	
 	if(myfile)
 	{
 		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
-
-		myfile->res = f_open(&(myfile->file), "0:/TestDateInfo.ncd", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
-			
+		
+		myfile->res = f_open(&(myfile->file), "0:/TD.NCD", FA_READ);
+		
 		if(FR_OK == myfile->res)
 		{
 			myfile->size = f_size(&(myfile->file));
 			
-			my_TestDateInfo = MyMalloc(sizeof(TestDateInfo_Def));
-			if(my_TestDateInfo)
-			{
-				if(myfile->size < sizeof(TestDateInfo_Def))
-					f_lseek(&(myfile->file), 0);
-				else
-					f_lseek(&(myfile->file), myfile->size - sizeof(TestDateInfo_Def));
-				
-				myfile->res = f_read(&(myfile->file), my_TestDateInfo, sizeof(TestDateInfo_Def), &(myfile->br));
-				if(FR_OK == myfile->res)
-				{
-					if(0 == memcmp(&(my_TestDateInfo->year), &(tempdata->TestTime.year), 3))
-					{
-						my_TestDateInfo->num += 1;
-						f_lseek(&(myfile->file), myfile->size - sizeof(TestDateInfo_Def));
-					}
-					else
-					{
-						my_TestDateInfo->year = tempdata->TestTime.year;
-						my_TestDateInfo->month = tempdata->TestTime.month;
-						my_TestDateInfo->day = tempdata->TestTime.day;
-						my_TestDateInfo->index = index;
-						my_TestDateInfo->num = 1;
-					}
-					
-					myfile->res = f_write(&(myfile->file), my_TestDateInfo, sizeof(TestDateInfo_Def), &(myfile->bw));
-					if(FR_OK == myfile->res)
-						statues = My_Pass;
-				}
-			}
-			MyFree(my_TestDateInfo);
-			f_close(&(myfile->file));
-		}
-	}
-	
-	MyFree(myfile);
-	
-	return statues;
-}
-MyState_TypeDef ReadDateInfo(TestDateInfo_Def *tempdata, MyTime_Def *testtime)
-{
-	FatfsFileInfo_Def * myfile = NULL;
-	MyState_TypeDef statues = My_Fail;
-	unsigned char i=0, j=0;
-
-	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
-	
-	if(myfile)
-	{
-		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
-
-		myfile->res = f_open(&(myfile->file), "0:/TestDateInfo.ncd", FA_READ);
-			
-		if(FR_OK == myfile->res)
-		{
-			f_lseek(&(myfile->file), 0);
-			for(i=0; i<0xff; i++)
-			{
-				myfile->res = f_read(&(myfile->file), tempdata, sizeof(TestDateInfo_Def), &(myfile->br));
-				if((FR_OK != myfile->res) || (sizeof(TestDateInfo_Def) != myfile->br))
-					break;
-				
-				if(0 == memcmp(&(tempdata->year), &(testtime->year), 3))
-				{
-					tempdata++;			
-					j++;
-					if(j >= TestDataDateRepeatNum)
-						break;
-				}
-				else
-					memset(tempdata, 0, sizeof(TestDateInfo_Def));
-			}
+			if(myfile->size > sizeof(UpLoadIndex))
+				*num = (myfile->size - sizeof(UpLoadIndex)) / sizeof(TestData);
 			
 			f_close(&(myfile->file));
 		}
@@ -459,30 +392,33 @@ MyState_TypeDef ReadDateInfo(TestDateInfo_Def *tempdata, MyTime_Def *testtime)
 	
 	MyFree(myfile);
 	
-	return statues;
+	return My_Pass;
 }
 
 MyState_TypeDef WriteUpLoadIndex(unsigned int index)
 {
 	FatfsFileInfo_Def * myfile = NULL;
+	UpLoadIndex myUpLoadIndex;
 	MyState_TypeDef statues = My_Fail;
-
+	
 	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
 	
 	if(myfile)
 	{
 		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
 
-		myfile->res = f_open(&(myfile->file), "0:/TestData.ncd", FA_WRITE | FA_READ);
+		myfile->res = f_open(&(myfile->file), "0:/TD.NCD", FA_WRITE | FA_READ);
 			
 		if(FR_OK == myfile->res)
 		{
-			f_lseek(&(myfile->file), 0);
+			myUpLoadIndex.index = index;
+			myUpLoadIndex.crc = CalModbusCRC16Fun1(&(myUpLoadIndex), sizeof(UpLoadIndex)-2);
 			
-			myfile->res = f_write(&(myfile->file), &index, sizeof(unsigned int), &(myfile->bw));
-			if((FR_OK == myfile->res) && (myfile->bw == sizeof(unsigned int)))
+			myfile->res = f_lseek(&(myfile->file), 0);
+			myfile->res = f_write(&(myfile->file), &(myUpLoadIndex), sizeof(UpLoadIndex), &(myfile->bw));
+			if(FR_OK == myfile->res)
 				statues = My_Pass;
-
+			
 			f_close(&(myfile->file));
 		}
 	}
@@ -491,28 +427,27 @@ MyState_TypeDef WriteUpLoadIndex(unsigned int index)
 	
 	return statues;
 }
-
-MyState_TypeDef ReadUpLoadIndex(unsigned int *index)
+MyState_TypeDef ReadUpLoadIndex(UpLoadIndex *uploadindex)
 {
 	FatfsFileInfo_Def * myfile = NULL;
 	MyState_TypeDef statues = My_Fail;
-
+	
 	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
 	
 	if(myfile)
 	{
 		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
 
-		myfile->res = f_open(&(myfile->file), "0:/TestData.ncd", FA_READ);
+		myfile->res = f_open(&(myfile->file), "0:/TD.NCD", FA_WRITE | FA_READ);
 			
 		if(FR_OK == myfile->res)
-		{
-			f_lseek(&(myfile->file), 0);
+		{	
+			myfile->res = f_lseek(&(myfile->file), 0);
+			myfile->res = f_read(&(myfile->file), uploadindex, sizeof(UpLoadIndex), &(myfile->bw));
 			
-			myfile->res = f_read(&(myfile->file), index, sizeof(unsigned int), &(myfile->br));
-			if((FR_OK == myfile->res) && (myfile->br == sizeof(unsigned int)))
+			if((FR_OK == myfile->res) && (myfile->bw == sizeof(UpLoadIndex)) && (uploadindex->crc == CalModbusCRC16Fun1(uploadindex, sizeof(UpLoadIndex)-2)))
 				statues = My_Pass;
-
+			
 			f_close(&(myfile->file));
 		}
 	}
@@ -521,6 +456,7 @@ MyState_TypeDef ReadUpLoadIndex(unsigned int *index)
 	
 	return statues;
 }
+
 /***************************************************************************************************/
 /***************************************************************************************************/
 /*************************************IP设置********************************************************/
@@ -763,7 +699,7 @@ MyState_TypeDef SaveAdjustData(AdjustData *adjustdata)
 		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
 		memset(tempadjust, 0, sizeof(AdjustData));
 
-		myfile->res = f_open(&(myfile->file), "0:/AdjustData.ncd", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
+		myfile->res = f_open(&(myfile->file), "0:/AdjustD.ncd", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
 			
 		if(FR_OK == myfile->res)
 		{
@@ -816,7 +752,7 @@ MyState_TypeDef ReadAdjustData(AdjustData *adjustdata)
 		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
 		memset(tempadjust, 0, sizeof(AdjustData));
 
-		myfile->res = f_open(&(myfile->file), "0:/AdjustData.ncd", FA_READ);
+		myfile->res = f_open(&(myfile->file), "0:/AdjustD.ncd", FA_READ);
 			
 		if(FR_OK == myfile->res)
 		{

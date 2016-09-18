@@ -67,16 +67,14 @@ unsigned char ReceiveDataFromQueue(xQueueHandle queue, xSemaphoreHandle mutex, v
 	for(i=0; i<len; i++)
 	{
 		if(pdPASS == xQueueReceive(queue, pdata , xBlockTime))
-		{
 			pdata += itemsize;
-			statues = pdPASS;
-		}
+			
 		else
-		{
-			statues = pdFAIL;
 			break;
-		}
 	}
+	
+	if(i > 0)
+		statues = pdPASS;
 	
 	if(mutex != NULL)
 		GivexMutex(mutex);

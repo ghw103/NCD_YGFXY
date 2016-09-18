@@ -62,17 +62,7 @@ typedef struct
 	FSIZE_t size;
 }FatfsDirInfo_Def; 
 
-#pragma pack(1)
-typedef struct
-{
-	unsigned char year;
-	unsigned char month;
-	unsigned char day;
-	unsigned int num;
-	unsigned int index;
-}TestDateInfo_Def;
-#pragma pack()
-#define	TestDataDateRepeatNum	10					//同一个日期在日期管理文件中出现的次数
+
 /**********************************************************************************************************/
 /**********************************************************************************************************/
 
@@ -156,23 +146,23 @@ typedef enum
 #pragma pack(1)
 typedef struct CardInfo_Tag
 {
-	char	ItemName[ItemNameLen];						//????,??10???
-	unsigned char	TestType;							//??????
-	float	NormalResult;								//????
-	float	LowstResult;								//????????
-	float	HighestResult;								//????????
-	char	ItemMeasure[ItemMeasureLen];				//????	
-	unsigned short ItemLocation;						//T???
-	unsigned char ItemBiaoQuNum;						//????????????,???2?
-	float	ItemFenDuan;			//?????????2????????,3??2?
-	float	ItemBiaoQu[2][3];			//?????????
+	char	ItemName[ItemNameLen];						//测试项目
+	unsigned char	TestType;							//峰高计算方式
+	float	NormalResult;								//正常值
+	float	LowstResult;								//最低检测线
+	float	HighestResult;								//最高检测线
+	char	ItemMeasure[ItemMeasureLen];				//测试单位
+	unsigned short ItemLocation;						//T线位置
+	unsigned char ItemBiaoQuNum;						//标准曲线数目
+	float	ItemFenDuan;								//分段峰高比
+	float	ItemBiaoQu[2][3];							//标准曲线
 			//2 --- ?2???
 			//3 --- a , b, c  (????)
-	unsigned char CardWaitTime;										//???????
-	unsigned short CLineLocation;									//c???
-	char	CardPiCi[CardPiCiHaoLen];								//?????
-	RTC_DateTypeDef	CardBaoZhiQi;										//???
-	unsigned short CRC16;												//????CRC
+	unsigned char CardWaitTime;							//检测卡反应时间
+	unsigned short CLineLocation;						//c线位置
+	char	CardPiCi[CardPiCiHaoLen];					//批次号
+	RTC_DateTypeDef	CardBaoZhiQi;						//保质期
+	unsigned short CRC16;								//crc
 }CardCodeInfo;
 #pragma pack()
 
@@ -188,7 +178,7 @@ typedef struct ScanQRTaskData_Tag
 #define	MaxLocation			7000						//最大行程
 #define	StartTestLocation	700							//测试起始位置
 #define	EndTestLocation		5000						//测试结束为止
-#define	WaittingCardLocation	6500					//等待插卡的位置
+#define	WaittingCardLocation	7000					//等待插卡的位置
 #define	AvregeNum		10															//??????????,??????????
 #define	MaxPointLen		(EndTestLocation - StartTestLocation)/AvregeNum				//?????
 
@@ -227,7 +217,7 @@ typedef struct SysPage_Tag
 	unsigned char (*ChildPage)(void *  parm);
 }SysPage;
 
-#define	DataNumInPage		8							//一页8个数据
+#define	DataNumInPage		9							//一页8个数据
 /**********************************************************************************************************/
 /**********************************************************************************************************/
 
@@ -508,7 +498,12 @@ typedef struct TestTaskData_tag {
 }TestTaskData;
 #pragma pack()
 
-
+#pragma pack(1)
+typedef struct UpLoadIndex_tag {
+	unsigned int index;
+	unsigned short crc;
+}UpLoadIndex;
+#pragma pack()
 
 /*********************************************************************************************/
 /*********************************************************************************************/

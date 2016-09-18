@@ -10,9 +10,10 @@
 
 #include	"MyTest_Data.h"
 #include	"Temperature_Data.h"
-#include	"Time_Data.h"
+#include	"System_Data.h"
 #include	"Define.h"
 #include	"SDFunction.h"
+#include	"Printf_Fun.h"
 #include	"RecordPage.h"
 
 #include 	"FreeRTOS.h"
@@ -75,7 +76,14 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		/*´òÓ¡*/
 		else if(0x2b00 == S_ShowPageBuffer->lcdinput[0])
 		{
-			;
+			if(My_Pass == ConnectPrintter())
+			{
+				SendKeyCode(1);
+				PrintfData(S_ShowPageBuffer->testdata);
+				SendKeyCode(9);
+			}
+			else
+				SendKeyCode(2);
 		}
 	}
 }

@@ -12,8 +12,7 @@
 #include	"Universal_Task.h"
 #include 	"MLX90614_Driver.h"
 #include	"Temperature_Data.h"
-#include	"RTC_Driver.h"
-#include	"Time_Data.h"
+#include	"System_Data.h"
 #include	"DRV8825_Driver.h"
 #include	"Led_Driver.h"
 
@@ -81,7 +80,7 @@ static void vUniversalTask( void *pvParameters )
 		
 		/*读取时间，500ms采集一次*/
 		if(count % 50 == 0)
-			UpGBTimeData();
+			UpDateGB_Time();
 		
 		/*检测卡状态，500ms间隔*/
 		if(count % 50 == 0)

@@ -10,10 +10,11 @@
 #include	"MyTest_Data.h"
 
 #include	"Temperature_Data.h"
-#include	"Time_Data.h"
+#include	"System_Data.h"
 #include	"SDFunction.h"
 #include	"Test_Task.h"
 #include	"LunchPage.h"
+#include	"Printf_Fun.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -75,9 +76,20 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			else
 				SendKeyCode(7);
 		}
-		else if(0x2190 == S_TestPageBuffer->lcdinput[1])
+		/*´òÓ¡Êı¾İ*/
+		else if(0x2190 == S_TestPageBuffer->lcdinput[0])
 		{
-			
+			if(S_TestPageBuffer->cardpretestresult == ResultIsOK)
+			{
+				if(My_Pass == ConnectPrintter())
+				{
+					SendKeyCode(6);
+					PrintfData(&(S_TestPageBuffer->currenttestdata->testdata));
+					SendKeyCode(9);
+				}
+				else
+					SendKeyCode(8);
+			}
 		}
 	}
 }
@@ -172,7 +184,7 @@ static void RefreshCurve(void)
 		{
 			RefreshPageText();
 				
-			GetGBTimeData(&(GetCurrentTestItem()->testdata.TestTime));
+			GetGB_Time(&(GetCurrentTestItem()->testdata.TestTime));
 			SaveTestData(&(GetCurrentTestItem()->testdata));
 		}
 		else if(S_TestPageBuffer->cardpretestresult == PeakNumZero)

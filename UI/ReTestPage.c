@@ -20,7 +20,7 @@
 #include	"CodeScan_Task.h"
 #include	"Test_Task.h"
 #include	"SDFunction.h"
-#include	"Time_Data.h"
+#include	"System_Data.h"
 #include	"OutModel_Fun.h"
 #include	"PlaySong_Task.h"
 #include	"Ads8325_Driver.h"
@@ -122,7 +122,7 @@ static void PageUpDate(void)
 				S_ReTestPageBuffer->retestdata.testdata.TestTemp.I_Temperature = GetInnerTemperature();
 				S_ReTestPageBuffer->retestdata.testdata.TestTemp.O_Temperature = GetCardTemperature();
 					
-				GetGBTimeData(&(S_ReTestPageBuffer->retestdata.testdata.TestTime));
+				GetGB_Time(&(S_ReTestPageBuffer->retestdata.testdata.TestTime));
 				
 				//老化AD,DA
 				SetGB_LedValue(100);
@@ -161,11 +161,11 @@ static void PageUpDate(void)
 				//初始化当前播放时长
 				timer_set(&(S_ReTestPageBuffer->retestdata.oneplaytimer), 999999);
 					
-				GetGBTimeData(&(S_ReTestPageBuffer->retestdata.startplayTime));
+				GetGB_Time(&(S_ReTestPageBuffer->retestdata.startplayTime));
 			}
 			else if(S_ReTestPageBuffer->playstatus == 0)
 			{
-				GetGBTimeData(&(S_ReTestPageBuffer->retestdata.endplayTime));
+				GetGB_Time(&(S_ReTestPageBuffer->retestdata.endplayTime));
 					
 				//保存当前播放信息
 				if(My_Pass == SaveReTestData(&(S_ReTestPageBuffer->retestdata), 1))

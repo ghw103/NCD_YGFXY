@@ -13,10 +13,6 @@
 #define	DRV_Sleep_Group			GPIOG
 #define	DRV_Sleep_RCC			RCC_AHB1Periph_GPIOG
 
-#define	DRV_Step_Pin			GPIO_Pin_2
-#define	DRV_Step_Group			GPIOG
-#define	DRV_Step_RCC			RCC_AHB1Periph_GPIOG
-
 #define	DRV_Dir_Pin				GPIO_Pin_3
 #define	DRV_Dir_Group			GPIOG
 #define	DRV_Dir_RCC				RCC_AHB1Periph_GPIOG

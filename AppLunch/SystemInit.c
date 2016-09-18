@@ -116,7 +116,7 @@ void MySystemBSPInit(void)
 	SMBus_Init();						//温度检测初始化
 	delay_ms(50);
 	
-	My_RTC_Init();						//RTC初始化
+	RTC_BSPInit();						//RTC初始化
 	delay_ms(50);
 	
 	Wifi_GPIOInit();					//WIFI端口初始化
@@ -137,7 +137,7 @@ void MySystemBSPInit(void)
 	
 	FatfsInit();						//文件系统初始化
 	
-//	IWDG_Init(3, 2000);					//看门狗初始化,超时时间2S
+	IWDG_Init(3, 2000);					//看门狗初始化,超时时间2S
 	delay_ms(50);
 }
 
