@@ -220,8 +220,7 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	/*¶ÁÈ¡¼ì²â¿¨TÏßÎ»ÖÃ*/
 	S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
 	if(S_ReadCodeBuffer->pbuf1)
-		S_ScanQRTaskData->cardQR
-	->ItemLocation = strtol(S_ReadCodeBuffer->pbuf1 , NULL, 10);
+		S_ScanQRTaskData->cardQR->ItemLocation = 210;//strtol(S_ReadCodeBuffer->pbuf1 , NULL, 10);
 	else
 		goto END;
 		
@@ -272,7 +271,7 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	/*¶ÁÈ¡¼ì²â¿¨CÏßÎ»ÖÃ*/
 	S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
 	if(S_ReadCodeBuffer->pbuf1)
-		S_ScanQRTaskData->cardQR->CLineLocation = strtol(S_ReadCodeBuffer->pbuf1 , NULL , 10);
+		S_ScanQRTaskData->cardQR->CLineLocation = 280;//strtol(S_ReadCodeBuffer->pbuf1 , NULL , 10);
 	else
 		goto END;
 

@@ -461,6 +461,7 @@ typedef enum
 	MemError = 6,
 	PeakNumZero = 7,									//无峰
 	TestInterrupt = 8,
+	LineLocationError = 9,								//二维码中峰的位置错误
 	ResultIsOK = 99,
 }ResultState;
 

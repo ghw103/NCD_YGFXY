@@ -24,7 +24,7 @@ typedef struct PeakData_tag {
 	unsigned short UpWidth;													//峰上升宽度
 	unsigned short DownWidth;												//峰下降宽度
 	float PeakScale;														//起峰与落峰比值
-	unsigned char step;														//找峰步骤
+	unsigned char status;													//
 }PeakData;
 #pragma pack()
 
@@ -35,8 +35,7 @@ typedef struct TempCalData_tag{
 	short testline2[MaxPointLen];
 	double lastdata;														//记录上次滤波数据
 	
-	PeakData peakdata[10];													//定于10个峰
-	unsigned char peaknum;
+	PeakData peakdata[2];													//定于10个峰
 	
 	unsigned short maxdata;
 	ResultState resultstatues;											//测试结果状态
