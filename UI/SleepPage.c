@@ -125,7 +125,7 @@ static void DspPageText(void)
 		GetGB_Time(&(S_SleepPageBuffer->time));
 		
 		memset(S_SleepPageBuffer->buf, 0, 50);
-		sprintf(S_SleepPageBuffer->buf, "20%02d-%02d-%02d %02d:%02d:%02d", S_SleepPageBuffer->time.year, S_SleepPageBuffer->time.month, S_SleepPageBuffer->time.day,
+		sprintf(S_SleepPageBuffer->buf, "20%02d-%02d-%02d %02d:%02d:%02d ", S_SleepPageBuffer->time.year, S_SleepPageBuffer->time.month, S_SleepPageBuffer->time.day,
 			S_SleepPageBuffer->time.hour, S_SleepPageBuffer->time.min, S_SleepPageBuffer->time.sec);
 	
 		DisText(0x2f20, S_SleepPageBuffer->buf, strlen(S_SleepPageBuffer->buf));

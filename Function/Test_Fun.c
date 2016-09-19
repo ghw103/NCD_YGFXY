@@ -186,6 +186,7 @@ static void AnalysisTestData(void)
 	
 	{
 		S_TempCalData->maxdata = S_TestTaskData->testdata->testline.TestPoint[0];
+		
 		/*计算峰递增值*/
 		for(i=1; i<MaxPointLen; i++)
 		{
@@ -254,11 +255,11 @@ static void AnalysisTestData(void)
 			return;
 		}
 		/*如果只有一个峰*/
-		else if(S_TempCalData->peaknum == 1)
+/*		else if(S_TempCalData->peaknum == 1)
 		{
 			S_TempCalData->resultstatues = PeakNumError;
 			return;
-		}
+		}*/
 		/*如果都正确，根据二维码找峰*/
 		else
 		{
@@ -336,8 +337,16 @@ static void AnalysisTestData(void)
 				return;
 			}
 #else
-			S_TestTaskData->testdata->testline.T_Point[0] = S_TempCalData->peakdata[S_TempCalData->peaknum-2].PeakValue;
-			S_TestTaskData->testdata->testline.T_Point[1] = S_TempCalData->peakdata[S_TempCalData->peaknum-2].PeakLocation;
+			if(S_TempCalData->peaknum == 1)
+			{
+				S_TestTaskData->testdata->testline.T_Point[0] = 0;
+				S_TestTaskData->testdata->testline.T_Point[1] = S_TestTaskData->testdata->temperweima.ItemLocation;
+			}
+			else
+			{
+				S_TestTaskData->testdata->testline.T_Point[0] = S_TempCalData->peakdata[S_TempCalData->peaknum-2].PeakValue;
+				S_TestTaskData->testdata->testline.T_Point[1] = S_TempCalData->peakdata[S_TempCalData->peaknum-2].PeakLocation;
+			}
 			
 			S_TestTaskData->testdata->testline.C_Point[0] = S_TempCalData->peakdata[S_TempCalData->peaknum-1].PeakValue;
 			S_TestTaskData->testdata->testline.C_Point[1] = S_TempCalData->peakdata[S_TempCalData->peaknum-1].PeakLocation;
@@ -352,6 +361,11 @@ static void AnalysisTestData(void)
 				}
 			}
 			
+			if(S_TempCalData->peaknum == 1)
+			{
+				S_TestTaskData->testdata->testline.T_Point[0] = S_TestTaskData->testdata->testline.B_Point[0];
+				S_TestTaskData->testdata->testline.T_Point[1] = S_TestTaskData->testdata->testline.B_Point[1];
+			}
 			/*计算结果*/
 			if(((S_TestTaskData->testdata->testline.T_Point[0] < S_TestTaskData->testdata->testline.B_Point[0])) || (S_TestTaskData->testdata->testline.C_Point[0] <= S_TestTaskData->testdata->testline.B_Point[0]))
 			{
@@ -385,6 +399,9 @@ static void AnalysisTestData(void)
 						
 				S_TestTaskData->testdata->testline.BasicResult += S_TestTaskData->testdata->temperweima.ItemBiaoQu[1][2];
 			}
+			
+			if(S_TestTaskData->testdata->testline.BasicResult < 0)
+				S_TestTaskData->testdata->testline.BasicResult = 0;
 			
 			if(S_TestTaskData->testdata->tempadjust.crc == CalModbusCRC16Fun1(&(S_TestTaskData->testdata->tempadjust), sizeof(AdjustData)-2) )
 				S_TestTaskData->testdata->testline.AdjustResult =  S_TestTaskData->testdata->testline.BasicResult * S_TestTaskData->testdata->tempadjust.parm;

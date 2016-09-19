@@ -79,30 +79,33 @@ static void Input(unsigned char *pbuf , unsigned short len)
 
 static void PageUpDate(void)
 {
-	/*是否插卡*/
-	if(GetCardState() == CardIN)
+	if(S_WaitPageData)
 	{
-		GBPageBufferFree();
-		SetGBChildPage(DspPreReadCardPage);
-		GotoGBChildPage(NULL);
+		/*是否插卡*/
+		if(GetCardState() == CardIN)
+		{
+			GBPageBufferFree();
+			SetGBChildPage(DspPreReadCardPage);
+			GotoGBChildPage(NULL);
+			
+		}
+		/*时间到，未插卡，返回*/
+		else if(TimeOut == timer_expired(&(S_WaitPageData->timer)))
+		{
+			AddNumOfSongToList(8, 0);
+			
+			GBPageBufferFree();
+			SetGBParentPage(DspLunchPage);
+			GotoGBParentPage(NULL);
+			return;
+		}
 		
-	}
-	/*时间到，未插卡，返回*/
-	else if(TimeOut == timer_expired(&(S_WaitPageData->timer)))
-	{
-		AddNumOfSongToList(8, 0);
-		
-		GBPageBufferFree();
-		SetGBParentPage(DspLunchPage);
-		GotoGBParentPage(NULL);
-		return;
-	}
-	
-	/*提示插卡*/
-	if(TimeOut == timer_expired(&(S_WaitPageData->timer2)))
-	{
-		AddNumOfSongToList(43, 0);
-		timer_restart(&(S_WaitPageData->timer2));
+		/*提示插卡*/
+		if(TimeOut == timer_expired(&(S_WaitPageData->timer2)))
+		{
+			AddNumOfSongToList(43, 0);
+			timer_restart(&(S_WaitPageData->timer2));
+		}
 	}
 }
 
@@ -121,7 +124,7 @@ static MyState_TypeDef PageInit(void *  parm)
 	timer_set(&(S_WaitPageData->timer), 55);
 	
 	/*间隔一段时间提示插卡*/
-	timer_set(&(S_WaitPageData->timer2), 10);
+	timer_set(&(S_WaitPageData->timer2), 20);
 	
 	AddNumOfSongToList(43, 0);
 	

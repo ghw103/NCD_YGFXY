@@ -78,7 +78,7 @@ void SelfTest_Function(void)
 	ADDACheck();
 	vTaskDelay(500 *portTICK_RATE_MS);
 	
-//	MotorCheck();
+	MotorCheck();
 	vTaskDelay(500 *portTICK_RATE_MS);
 	
 	

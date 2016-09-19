@@ -858,11 +858,6 @@
               <FilePath>..\Datas\Temperature_Data.c</FilePath>
             </File>
             <File>
-              <FileName>Time_Data.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Datas\Time_Data.c</FilePath>
-            </File>
-            <File>
               <FileName>CardStatues_Data.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Datas\CardStatues_Data.c</FilePath>

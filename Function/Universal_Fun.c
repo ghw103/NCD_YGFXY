@@ -68,5 +68,6 @@ void UpDateGB_Time(void)
 	MyTime_Def time ;
 	
 	RTC_GetTimeData(&time);
+
 	SetGB_Time(&time);	
 }
