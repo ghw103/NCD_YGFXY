@@ -20,6 +20,7 @@
 #include	"PlaySong_Task.h"
 #include	"Test_Task.h"
 #include	"SDFunction.h"
+#include	"BackDoorData.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -204,6 +205,8 @@ static void CheckQRCode(void)
 		}
 		else if(S_PreReadPageBuffer->scancode == CardCodeScanOK)
 		{
+			SetS_TestItemName(S_PreReadPageBuffer->currenttestdata->testdata.temperweima.ItemName);
+			
 			//设置倒计时时间
 			timer_set(&(S_PreReadPageBuffer->currenttestdata->timer), S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardWaitTime*1);
 			

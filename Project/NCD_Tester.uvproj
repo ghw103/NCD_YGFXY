@@ -358,7 +358,7 @@
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
-            <uC99>0</uC99>
+            <uC99>1</uC99>
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls></MiscControls>
@@ -896,6 +896,11 @@
               <FileName>System_Data.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Datas\System_Data.c</FilePath>
+            </File>
+            <File>
+              <FileName>BackDoorData.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Datas\BackDoorData.c</FilePath>
             </File>
           </Files>
         </Group>

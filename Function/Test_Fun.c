@@ -20,6 +20,7 @@
 #include	"CardStatues_Data.h"
 #include	"MyTest_Data.h"
 #include	"CRC16.h"
+#include	"BackDoorData.h"
 
 #include	"MyMem.h"
 
@@ -131,7 +132,7 @@ ResultState TestFunction(void * parm)
 					}
 					S_TestTaskData->testdata->testline.TestPoint[i/AvregeNum-1] = S_TempCalData->tempvalue;
 							
-					SendTestPointData(&(S_TestTaskData->testdata->testline.TestPoint[i/AvregeNum-1]));
+					//SendTestPointData(&(S_TestTaskData->testdata->testline.TestPoint[i/AvregeNum-1]));
 						
 					S_TempCalData->tempvalue2 = 0;
 				}
@@ -155,7 +156,7 @@ ResultState TestFunction(void * parm)
 				vTaskDelay(100/portTICK_RATE_MS);
 				//发送一个特定数据，清除曲线
 				S_TestTaskData->testdata->testline.TestPoint[0] = 0xffff;
-				SendTestPointData(&(S_TestTaskData->testdata->testline.TestPoint[0]));
+				//SendTestPointData(&(S_TestTaskData->testdata->testline.TestPoint[0]));
 				goto repeat;
 			
 			END:
@@ -401,7 +402,9 @@ static void AnalysisTestData(void)
 				S_TestTaskData->testdata->testline.AdjustResult =  S_TestTaskData->testdata->testline.BasicResult * S_TestTaskData->testdata->tempadjust.parm;
 			else
 				S_TestTaskData->testdata->testline.AdjustResult =  S_TestTaskData->testdata->testline.BasicResult;
-				
+			
+			S_TestTaskData->testdata->testline.AdjustResult = GetCurrentData();
+			
 			S_TempCalData->resultstatues = ResultIsOK;
 
 		}

@@ -14,12 +14,15 @@
 #include	"PlaySong_Task.h"
 #include	"ReadBarCode_Fun.h"
 
+#include	"BackDoorData.h"
+
 #include 	"FreeRTOS.h"
 #include 	"task.h"
 #include 	"queue.h"
 
 #include	<string.h>
 #include	"stdio.h"
+#include 	"stdlib.h"
 
 /******************************************************************************************/
 /*****************************************局部变量声明*************************************/
@@ -86,6 +89,13 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		{
 			memset(S_SampleIDPage->currenttestdata->testdata.sampleid, 0, MaxSampleIDLen);
 			memcpy(S_SampleIDPage->currenttestdata->testdata.sampleid, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
+			
+			SetS_TestIndex(strtol(S_SampleIDPage->currenttestdata->testdata.sampleid , NULL , 10));
+		}
+		//选择第一个测试项目
+		else if((S_SampleIDPage->lcdinput[0] >= 0x1d03) && (S_SampleIDPage->lcdinput[0] <= 0x1d07))
+		{
+			SetS_CategoryIndex(S_SampleIDPage->lcdinput[0] - 0x1d03);
 		}
 	}
 }

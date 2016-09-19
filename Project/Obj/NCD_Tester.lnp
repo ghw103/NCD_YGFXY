@@ -92,6 +92,7 @@
 ".\obj\selfcheck_data.o"
 ".\obj\ui_data.o"
 ".\obj\system_data.o"
+".\obj\backdoordata.o"
 ".\obj\ethernetif.o"
 ".\obj\sys_arch.o"
 ".\obj\etharp.o"
