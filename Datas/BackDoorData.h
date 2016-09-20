@@ -14,9 +14,9 @@ typedef struct BackDoorData_tag {
 
 #define	data1_t	20
 #define	data2_t	3
-#define	data3_t	10
-#define	data4_t	20
-#define	data5_t	20
+#define	data3_t	3
+#define	data4_t	10
+#define	data5_t	9
 
 void SetS_TestItemName(void * name);
 void SetS_ItemIndex(unsigned char index);

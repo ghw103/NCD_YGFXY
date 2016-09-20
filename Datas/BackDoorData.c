@@ -93,6 +93,8 @@ unsigned char GetS_CategoryIndex(void)
 
 void SetS_TestIndex(unsigned char index)
 {
+	if(index > 0)
+		index --;
 	S_TestIndex = index;
 }
 
