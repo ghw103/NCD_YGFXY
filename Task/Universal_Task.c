@@ -12,14 +12,10 @@
 #include	"Universal_Task.h"
 #include 	"MLX90614_Driver.h"
 #include	"Temperature_Data.h"
-#include	"System_Data.h"
-#include	"DRV8825_Driver.h"
 #include	"Led_Driver.h"
 
 #include	"OutModel_Fun.h"
 #include	"Universal_Fun.h"
-#include	"WifiFunction.h"
-#include	"Net_Data.h"
 #include	"Motor_Data.h"
 #include	"CardStatues_Data.h"
 

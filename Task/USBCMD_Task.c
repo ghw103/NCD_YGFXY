@@ -27,6 +27,7 @@
 #include	"PlaySong_Task.h"
 #include	"Timer4_Driver.h"
 #include	"Motor_Fun.h"
+#include	"QueueUnits.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -44,7 +45,6 @@
 #define vUSBCMDTask_PRIORITY			( ( unsigned portBASE_TYPE ) 2U )
 const char * USBCMDTaskName = "vUSBCOMTask";
 
-unsigned char m[12]={31,28,31,30,31,30,31,31,30,31,30,31};
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 
@@ -83,27 +83,29 @@ void StartUSBCMDTask(void)
 ************************************************************************/
 static void vUSBCMDTask( void *pvParameters )
 {
-	unsigned short count = 0;
-	mynetbuf netbuf;
+	static unsigned char buf[1000];
+	unsigned char count = 0;
+	
 	while(1)
 	{
-		netbuf.data = MyMalloc(4096);
-		if(netbuf.data)
-		{
-			netbuf.datalen =0 ;
-			while(pdPASS == USB_GetChar(((unsigned char *)netbuf.data)+netbuf.datalen, 10 / portTICK_RATE_MS))
-				netbuf.datalen++;
+/*		count =0 ;
+		while(pdPASS == USB_GetChar(buf+count, 10 / portTICK_RATE_MS))
+			count++;
 			
-			if(netbuf.datalen > 0)
-			{
-				SendDataBySocketA(&netbuf);
-				USB_PutStr(netbuf.data, netbuf.datalen);
-				MyFree(netbuf.data);
-			}
-			else
-				MyFree(netbuf.data);
+		if(count > 0)
+		{
+			SendDataToQueue(GetUsart4TXQueue(), GetUsart4TXMutex(), buf, count, 1, 50 / portTICK_RATE_MS, EnableUsart4TXInterrupt);
 		}
-		vTaskDelay(100);
+		
+		count =0 ;
+		while(pdPASS == ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4RXMutex(), buf+count, 1, 1, 10 / portTICK_RATE_MS))
+			count++;
+			
+		if(count > 0)
+		{
+			USB_PutStr(buf, count);
+		}*/
+		vTaskDelay(1000 / portTICK_RATE_MS);
 	}
 
 }

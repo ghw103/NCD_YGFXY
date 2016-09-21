@@ -5,10 +5,10 @@
 #include	"Define.h"
 #include	"LCD_Driver.h"
 #include	"UI_Data.h"
-#include	"SelfCheck_Task.h"
 #include	"LunchPage.h"
 #include	"MyMem.h"
 #include	"PlaySong_Task.h"
+#include	"SelfTest_Fun.h"
 #include	"SelfCheck_Data.h"
 
 #include 	"FreeRTOS.h"
@@ -106,7 +106,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			/*忽略*/
 			else if(S_SelCheckPage->lcdinput[1] == 0x0002)
 			{
-				SetGB_SelfCheckResult(SelfCheck_OK);
+				SetGB_SelfCheckStatus(SelfCheck_OK);
 				GotoGBChildPage(NULL);
 			}
 		}
@@ -132,7 +132,7 @@ static MyState_TypeDef PageInit(void *  parm)
 	AddNumOfSongToList(46, 0);
 	
 	/*开始初始化任务*/
-	SelfCheckTaskRun();
+	SetGB_SelfCheckStatus(SelfChecking);
 	
 	return My_Pass;
 }
@@ -177,7 +177,7 @@ static void PageClear(void)
 static void RefreshPageValue(void)
 {
 	unsigned char recvdat = 0;
-	if(pdPASS == GetSelfTestTaskState(&recvdat, 10*portTICK_RATE_MS))
+	if(pdPASS == GetSelfCheckStatus(&recvdat, 10*portTICK_RATE_MS))
 	{		
 		/*清除上次的文字*/
 		ClearText(0x1a00, 60);
@@ -190,27 +190,24 @@ static void RefreshPageValue(void)
 		
 		/*有不可忽略的错误*/
 		if((recvdat == DataBasesError)||(recvdat == ErWeiMaError)||(recvdat == ADDAError)||(recvdat == MotorError))
-			SetGB_SelfCheckResult(SelfCheck_Error);
-		/*没有不可忽略错误的前提下，有可忽略的错误*/
-		else if((GetGB_SelfCheckResult() != SelfCheck_Error) && ( (recvdat == WIFIError) || (recvdat == ReadServerError)))
-			SetGB_SelfCheckResult(SelfCheck_Alam);
+			SetGB_SelfCheckStatus(SelfCheck_Error);
 		
 		if(recvdat == SelfCheckOver)
 		{
 			vTaskDelay(1000 / portTICK_RATE_MS);
-			if(GetGB_SelfCheckResult() == SelfCheck_Error)
+			if(GetGB_SelfCheckStatus() == SelfCheck_Error)
 			{
 				SendKeyCode(1);
 				AddNumOfSongToList(49, 0);
 			}
-			else if(GetGB_SelfCheckResult() == SelfCheck_Alam)
+/*			else if(GetGB_SelfCheckResult() == SelfCheck_Alam)
 			{
 				SendKeyCode(2);
 				AddNumOfSongToList(48, 0);
-			}
+			}*/
 			else
 			{
-				SetGB_SelfCheckResult(SelfCheck_OK);
+				SetGB_SelfCheckStatus(SelfCheck_OK);
 				DspLunchPage(NULL);
 				AddNumOfSongToList(50, 0);
 			}

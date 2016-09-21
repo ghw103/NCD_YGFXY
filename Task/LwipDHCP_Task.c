@@ -21,7 +21,7 @@
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
 
-#define LwipDHCPTask_PRIORITY			2			//看门狗任务优先级
+#define LwipDHCPTask_PRIORITY			3			//看门狗任务优先级
 const char * LwipDHCPTaskName = "vLwipDhcpTask";		//看门狗任务名
 
 static DHCP_State_TypeDef GB_DHCPState = DHCP_START;

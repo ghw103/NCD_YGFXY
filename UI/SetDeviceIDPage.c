@@ -69,9 +69,12 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		{
 			if(S_SetDeviceIDPage->ismodify == 1)
 			{
-				S_SetDeviceIDPage->temp_deviceinfo.isfresh = 1;
 				if(My_Pass == SaveDeviceInfo(&(S_SetDeviceIDPage->temp_deviceinfo)))
+				{
 					SendKeyCode(2);
+					SetGB_DeviceInfo(&(S_SetDeviceIDPage->temp_deviceinfo));
+					SetDeviceInIsFresh(true);
+				}
 				else
 					SendKeyCode(1);
 			}

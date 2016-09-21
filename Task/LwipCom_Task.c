@@ -23,7 +23,7 @@
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
 
-#define LwipComTask_PRIORITY			2			//看门狗任务优先级
+#define LwipComTask_PRIORITY			3			//看门狗任务优先级
 const char * LwipComTaskName = "vLwipComTask";		//看门狗任务名
 
 /***************************************************************************************************/
@@ -66,17 +66,13 @@ static void vLwipComTask( void *pvParameters )
 	
 	while(1)
 	{
-		SetGB_LinkState(ReadPHYLinkState());
-
-		if(Link_Down == GetGB_LinkState())
+		if(Link_Down == ReadPHYLinkState())
 		{
 			netif_set_link_down(tempnetif);
-			SetGB_NetCard(Line_Mode);//NetNone);
 		}
-		else if(Link_Up == GetGB_LinkState())
+		else
 		{
 			netif_set_link_up(tempnetif);
-			SetGB_NetCard(Line_Mode);
 		}
 		/* wait 250 ms */
 		vTaskDelay(1000 / portTICK_RATE_MS);

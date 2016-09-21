@@ -33,8 +33,7 @@
  extern "C" {
 #endif
 
-
-#include	"Net_Data.h"
+#include	"Define.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/

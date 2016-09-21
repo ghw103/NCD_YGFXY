@@ -11,7 +11,8 @@
 #include	"UpLoad_Fun.h"
 #include	"ServerFun.h"
 #include	"SDFunction.h"
-#include	"Net_Data.h"
+#include	"System_Data.h"
+#include	"RTC_Driver.h"
 
 #include	"cJSON.h"
 #include	"MyMem.h"
@@ -31,7 +32,8 @@
 /***************************************************************************************************/
 /**************************************局部函数声明*************************************************/
 /***************************************************************************************************/
-static void UpLoadDeviceInfo(void);
+static MyState_TypeDef ReadTime(void);
+static MyState_TypeDef UpLoadDeviceInfo(void);
 static MyState_TypeDef UpLoadTestData(void);
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -42,53 +44,90 @@ static MyState_TypeDef UpLoadTestData(void);
 
 void UpLoadFunction(void)
 {
-	static unsigned short count = 0;
-	unsigned char buf[10];
 	while(1)
 	{
-/*		if(Link_Up == GetGB_NCDServerLinkState())
+		if(My_Pass == ReadTime())
 		{
-			if((count % 10) == 0)
-				UpLoadDeviceInfo();
+			vTaskDelay(1000 / portTICK_RATE_MS);
 			
-			if(My_Pass != UpLoadTestData())
-				vTaskDelay(10000);
+			if(My_Pass == UpLoadDeviceInfo())
+			{
+				vTaskDelay(1000 / portTICK_RATE_MS);
+			}
+			else
+				vTaskDelay(1000 / portTICK_RATE_MS);
 		}
-		count++;*/
-
-		vTaskDelay(1000 / portTICK_RATE_MS);
+		else
+			vTaskDelay(1000 / portTICK_RATE_MS);
 	}
 }
 
+static MyState_TypeDef ReadTime(void)
+{
+	char * buf = NULL;
+	DeviceInfo * deviceinfo = NULL;
+	MyState_TypeDef status = My_Fail;
+	
+	buf = MyMalloc(100);
+	deviceinfo = MyMalloc(sizeof(DeviceInfo));
+	
+	if(buf && deviceinfo)
+	{
+		memset(buf, 0, 100);
+		
+		//读取设备信息
+		GetGB_DeviceInfo(deviceinfo);
+		
+		sprintf(buf, "deviceid=%s", deviceinfo->deviceid);
+		
+		if(My_Pass == UpLoadData("/NCD_YGFXY/rtime.action", buf, strlen(buf)))
+		{
+			RTC_SetTimeData2(buf+10);
+			status = My_Pass;
+		}
+	}
+	MyFree(buf);
+	MyFree(deviceinfo);
+	
+	return status;
+}
 
-static void UpLoadDeviceInfo(void)
+static MyState_TypeDef UpLoadDeviceInfo(void)
 {
 	DeviceInfo * deviceinfo = NULL;
 	char * buf = NULL;
+	MyState_TypeDef status = My_Fail;
 	
-	deviceinfo = MyMalloc(sizeof(DeviceInfo));
-	buf = MyMalloc(2048);
-	
-	if(deviceinfo && buf)
+	if(true == GetDeviceInIsFresh())
 	{
-		if((My_Pass == ReadDeviceInfo(deviceinfo)) && (deviceinfo->crc == CalModbusCRC16Fun1(deviceinfo, sizeof(DeviceInfo)-2)) &&
-			(deviceinfo->isfresh == 1))
+		deviceinfo = MyMalloc(sizeof(DeviceInfo));
+		buf = MyMalloc(2048);
+		
+		if(deviceinfo && buf)
 		{
-			memset(buf, 0, 2048);
+			//读取设备信息
+			GetGB_DeviceInfo(deviceinfo);
 			
-			sprintf(buf, "id1=%s&name=荧光免疫分析仪&manufacture=武汉纽康度生物科技股份有限公司&tel=1234567890&status=在线&address=%s&needmainten=否",
-				deviceinfo->deviceid, deviceinfo->deviceunit);
+			memset(buf, 0, 2048);
 
-			if(My_Pass == UpLoadData("http://123.57.94.39/api/myFluorescenceInfo/", buf, strlen(buf)))
+			sprintf(buf, "dfo.id=%s&dfo.daddr=%s&dfo.dname=%s&dfo.dage=%s&dfo.dsex=%s&dfo.dphone=%s&dfo.djob=%s&dfo.ddesc=%s&dfo.disok=true",
+				deviceinfo->deviceid,  deviceinfo->deviceunit, deviceinfo->deviceuser.user_name, deviceinfo->deviceuser.user_age, deviceinfo->deviceuser.user_sex,
+				deviceinfo->deviceuser.user_phone, deviceinfo->deviceuser.user_job, deviceinfo->deviceuser.user_desc);
+
+			if(My_Pass == UpLoadData("/NCD_YGFXY/up_info.action", buf, strlen(buf)))
 			{
-				deviceinfo->isfresh = 0;
-				SaveDeviceInfo(deviceinfo);
+				SetDeviceInIsFresh(false);
+				status = My_Pass;
 			}
 		}
+		
+		MyFree(deviceinfo);
+		MyFree(buf);
+		
+		return status;
 	}
-	
-	MyFree(deviceinfo);
-	MyFree(buf);
+	else
+		return My_Pass;
 }
 
 static MyState_TypeDef UpLoadTestData(void)

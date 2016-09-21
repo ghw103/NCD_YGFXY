@@ -15,11 +15,10 @@
 #include 	"netconf.h"
 #include 	"tcpip.h"
 #include 	<stdio.h>
-#include	"Net_Data.h"
+#include	"System_Data.h"
 #include 	"stm32f4x7_eth.h"
 #include 	"stm32f4x7_eth_bsp.h"
 #include	"LwIPConfig.h"
-#include	"Net_Data.h"
 #include	"Define.h"
 
 #include	"LwipCom_Task.h"
@@ -61,18 +60,16 @@ static void LwIP_Init(void)
 	struct ip_addr ipaddr;
 	struct ip_addr netmask;
 	struct ip_addr gw;
-	IP_Def myip;
-	NetIP_Type ip_mode;
+	NetData myNetData;
 	
 	ETH_BSP_Config();
 	/* Create tcp_ip stack thread */
 	tcpip_init( NULL, NULL );	
 	
-	GetMyIP(&myip);
-	ip_mode = GetNteIPMode();
+	GetGB_NetConfigureData(&myNetData);
 	
 	/* IP address setting */
-	if(ip_mode == DHCP_Mode)
+	if(myNetData.ipmode == DHCP_Mode)
 	{
 		ipaddr.addr = 0;
 		netmask.addr = 0;
@@ -80,9 +77,9 @@ static void LwIP_Init(void)
 	}
 	else
 	{
-		IP4_ADDR(&ipaddr, myip.ip_1, myip.ip_2, myip.ip_3, myip.ip_4);
+		IP4_ADDR(&ipaddr, myNetData.myip.ip_1, myNetData.myip.ip_2, myNetData.myip.ip_3, myNetData.myip.ip_4);
 		IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1 , NETMASK_ADDR2, NETMASK_ADDR3);
-		IP4_ADDR(&gw, myip.ip_1, myip.ip_2, myip.ip_3, 1);
+		IP4_ADDR(&gw, myNetData.myip.ip_1, myNetData.myip.ip_2, myNetData.myip.ip_3, 1);
 	}
 
 	netif_add(&xnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);
@@ -90,11 +87,11 @@ static void LwIP_Init(void)
 	/*  Registers the default network interface.*/
 	netif_set_default(&xnetif);
 	
-	if(Link_Up == GetGB_LinkState())
+	if(Link_Up == ReadPHYLinkState())
 	{
 		netif_set_up(&xnetif);
 		
-		if(ip_mode == DHCP_Mode)
+		if(myNetData.ipmode == DHCP_Mode)
 			SetGB_DHCPState(DHCP_START);
 	}
 	else
@@ -102,7 +99,7 @@ static void LwIP_Init(void)
 		/*  When the netif link is down this function must be called.*/
 		netif_set_down(&xnetif);
 		
-		if(ip_mode == DHCP_Mode)
+		if(myNetData.ipmode == DHCP_Mode)
 			SetGB_DHCPState(DHCP_LINK_DOWN);
 	}
     
@@ -112,14 +109,10 @@ static void LwIP_Init(void)
 
 void StartEthernet(void)
 {
-	NetIP_Type ip_mode;
-	
-	ip_mode = GetNteIPMode();
-	
 	//* ≥ı ºªØLwIP
 	LwIP_Init();
 	
-	if(ip_mode == DHCP_Mode)
+	if(DHCP_Mode == GetGB_IpModeData())
 		StartvLwipDHCPTask(&xnetif);
 	
 	StartvLwipComTask(&xnetif);
@@ -153,29 +146,25 @@ void ETH_link_callback(struct netif *netif)
 	struct ip_addr netmask;
 	struct ip_addr gw;
 	
-	IP_Def myip;
-	NetIP_Type ip_mode;
+	NetData myNetData;
 	
-	GetMyIP(&myip);
-	ip_mode = GetNteIPMode();
+	GetGB_NetConfigureData(&myNetData);
 		
 	if(netif_is_link_up(netif))
 	{
 		ETH_Start();
 
-		if(ip_mode == DHCP_Mode)
+		if(myNetData.ipmode == DHCP_Mode)
 		{
 			ipaddr.addr = 0;
 			netmask.addr = 0;
 			gw.addr = 0;
-
-			SetGB_DHCPState(DHCP_START);
 		}
 		else
 		{
-			IP4_ADDR(&ipaddr, myip.ip_1, myip.ip_2, myip.ip_3, myip.ip_4);
+			IP4_ADDR(&ipaddr, myNetData.myip.ip_1, myNetData.myip.ip_2, myNetData.myip.ip_3, myNetData.myip.ip_4);
 			IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1 , NETMASK_ADDR2, NETMASK_ADDR3);
-			IP4_ADDR(&gw, myip.ip_1, myip.ip_2, myip.ip_3, 1);
+			IP4_ADDR(&gw, myNetData.myip.ip_1, myNetData.myip.ip_2, myNetData.myip.ip_3, 1);
 		}
 
 		netif_set_addr(&xnetif, &ipaddr , &netmask, &gw);
@@ -187,7 +176,7 @@ void ETH_link_callback(struct netif *netif)
 	{
 		ETH_Stop();
 		
-		if(ip_mode == DHCP_Mode)
+		if(myNetData.ipmode == DHCP_Mode)
 		{
 			SetGB_DHCPState(DHCP_LINK_DOWN);
 			dhcp_stop(netif);

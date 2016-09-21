@@ -77,7 +77,7 @@ void My_USBInit(void)
 {
 	USBD_Init(&USB_OTG_dev,USB_OTG_FS_CORE_ID, &USR_desc, &USBD_CDC_cb, &USR_cb);
 	
-	xRxQueue = xQueueCreate( 64, ( unsigned portBASE_TYPE ) sizeof( signed portCHAR ) );
+	xRxQueue = xQueueCreate( 300, ( unsigned portBASE_TYPE ) sizeof( signed portCHAR ) );
 
 }
 

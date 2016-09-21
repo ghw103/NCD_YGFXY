@@ -13,6 +13,7 @@
 
 #include	"stm32f4xx_gpio.h"
 
+#include	"MyMem.h"
 #include	"Define.h"
 
 #include	<string.h>
@@ -365,8 +366,6 @@ MyState_TypeDef RTC_SetTimeData(MyTime_Def * data)
 	buf[1] = HEX2BCD(data->min);
 	buf[2] = HEX2BCD(data->hour);
 	buf[3] = HEX2BCD(0);
-//	if(RX8025_Write(0, buf, 3) == 0)
-//		return My_Fail;
 	
 	/*ÉèÖÃÈÕÆÚ*/
 	buf[4] = HEX2BCD(data->day);
@@ -377,6 +376,59 @@ MyState_TypeDef RTC_SetTimeData(MyTime_Def * data)
 		return My_Fail;
 	else
 		return My_Pass;
+}
+
+MyState_TypeDef RTC_SetTimeData2(char * buf)
+{
+	unsigned short temp = 0;
+	MyTime_Def temptime;
+	MyState_TypeDef status = My_Fail;
+	
+	char * tempbuf = NULL;
+	
+	tempbuf = MyMalloc(64);
+	
+	if(tempbuf && buf)
+	{
+		memset(tempbuf, 0, 64);
+		memcpy(tempbuf, buf, 4);
+		temp = strtol(tempbuf, NULL, 10);
+		if((temp >= 2000) && (temp < 2100))
+			temptime.year = temp-2000;
+		else
+			goto END;
+		
+		memset(tempbuf, 0, 64);
+		memcpy(tempbuf, buf+4, 2);
+		temp = strtol(tempbuf, NULL, 10);
+		temptime.month = temp;
+			
+		memset(tempbuf, 0, 64);
+		memcpy(tempbuf, buf+6, 2);
+		temp = strtol(tempbuf, NULL, 10);
+		temptime.day = temp;
+			
+		memset(tempbuf, 0, 64);
+		memcpy(tempbuf, buf+8, 2);
+		temp = strtol(tempbuf, NULL, 10);
+		temptime.hour = temp;
+			
+		memset(tempbuf, 0, 64);
+		memcpy(tempbuf, buf+10, 2);
+		temp = strtol(tempbuf, NULL, 10);
+		temptime.min = temp;
+			
+		memset(tempbuf, 0, 64);
+		memcpy(tempbuf, buf+12, 2);
+		temp = strtol(tempbuf, NULL, 10);
+		temptime.sec = temp;
+		
+		status = RTC_SetTimeData(&temptime);
+	}
+	
+	END:
+		MyFree(tempbuf);
+		return status;
 }
 
 void RTC_GetTimeData(MyTime_Def * time)
@@ -392,5 +444,7 @@ void RTC_GetTimeData(MyTime_Def * time)
     time->min = BCD2HEX(buf[1]);
     time->sec = BCD2HEX(buf[0]);	
 }
+
+
 
 /****************************************end of file************************************************/

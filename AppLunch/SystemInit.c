@@ -35,13 +35,6 @@
 #include	"TLV5617_Driver.h"
 #include	"LEDCheck_Driver.h"
 
-#include	"WifiFunction.h"
-#include	"OutModel_Fun.h"
-#include	"Net_Data.h"
-#include	"System_Data.h"
-#include	"Motor_Fun.h"
-#include	"SDFunction.h"
-
 #include	"Delay.h"
 /***************************************************************************************************/
 /**************************************局部变量声明*************************************************/
@@ -141,25 +134,3 @@ void MySystemBSPInit(void)
 	delay_ms(50);
 }
 
-/***************************************************************************************************
-*FunctionName：MySystemModuleInit
-*Description：system module init
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年6月1日14:03:27
-***************************************************************************************************/
-void MySystemDataInit(void)
-{	
-	OutModel_Init();					//排队模块数据初始化
-	
-	CreateNetQueue();					//网络数据初始化
-	
-	InitMutex();						//wifi数据初始化
-	
-	InitMotorData();
-	
-	ReadNetData(GetGB_NetData());		//读取网络设置
-	
-	ReadDeviceInfo(GetGB_DeviceInfo());	//读取设备信息
-}

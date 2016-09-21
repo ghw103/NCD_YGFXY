@@ -20,8 +20,9 @@
 #include	"Motor_Data.h"
 #include	"CardLimit_Driver.h"
 #include	"DRV8825_Driver.h"
+#include	"System_Data.h"
 
-#include	"Define.h"
+#include	"MyMem.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -29,10 +30,11 @@
 #include	"semphr.h"
 
 #include	"stdlib.h"
+#include	<string.h>
 /***************************************************************************************************/
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
-static 	xQueueHandle xTaskQueue;		//发送自检状态数据
+static 	xQueueHandle xSelfCehckQueue;													//发送自检进度数据
 /***************************************************************************************************/
 /**************************************局部函数声明*************************************************/
 /***************************************************************************************************/
@@ -63,7 +65,7 @@ static void GB_DataInit(void);
 ***************************************************************************************************/
 void SelfTest_Function(void)
 {	
-//	GB_DataInit();
+	GB_DataInit();
 	vTaskDelay(500 *portTICK_RATE_MS);
 	
 //	ErWeiMaTest();
@@ -72,7 +74,7 @@ void SelfTest_Function(void)
 	DataBasesCheck();
 	vTaskDelay(500 * portTICK_RATE_MS);
 	
-	WifiModuleTest();
+//	WifiModuleTest();
 	vTaskDelay(500 * portTICK_RATE_MS);
 	
 	ADDACheck();
@@ -81,36 +83,11 @@ void SelfTest_Function(void)
 	MotorCheck();
 	vTaskDelay(500 *portTICK_RATE_MS);
 	
-	
-	
-	SetSelfTestFunState(SelfCheckOver, 10*portTICK_RATE_MS);
+	SetSelfCheckStatus(SelfCheckOver, 10*portTICK_RATE_MS);
 }
 
 /***************************************************************************************************
-*FunctionName：
-*Description：
-*Input：
-*Output：
-*Author：
-*Data：
-***************************************************************************************************/
-portBASE_TYPE SelfTestFun_Init(void)
-{
-	if(xTaskQueue == NULL)
-	{	
-		xTaskQueue = xQueueCreate( 10, ( unsigned portBASE_TYPE ) sizeof( signed portCHAR ) );
-		
-		if(xTaskQueue == NULL)
-			return pdFAIL;
-		
-		while(pdPASS == xSemaphoreTake(xTaskQueue , 0));			//清空信号量
-	}
-	
-	return pdPASS;
-}
-
-/***************************************************************************************************
-*FunctionName：GetSelfTestTaskState
+*FunctionName：ReadSelfCheckStatus
 *Description：Get SelfTest Task State
 *Input：receivedchar -- 返回数据地址
 *		xBlockTime -- 等待时间
@@ -118,10 +95,15 @@ portBASE_TYPE SelfTestFun_Init(void)
 *Author：xsx
 *Data：2016年1月27日10:21:33
 ***************************************************************************************************/
-portBASE_TYPE GetSelfTestFunState(unsigned char * receivedchar , portTickType xBlockTime)
+MyState_TypeDef GetSelfCheckStatus(unsigned char * receivedchar , portTickType xBlockTime)
 {
-	return xQueueReceive( xTaskQueue, receivedchar, xBlockTime );
-
+	if(xSelfCehckQueue == NULL)
+		xSelfCehckQueue = xQueueCreate( 10, ( unsigned portBASE_TYPE ) sizeof( signed portCHAR ) );
+	
+	if(xSelfCehckQueue == NULL)
+		return pdFAIL;
+	
+	return xQueueReceive( xSelfCehckQueue, receivedchar, xBlockTime );
 }
 /***************************************************************************************************
 *FunctionName：SetSelfTestTaskState
@@ -132,9 +114,15 @@ portBASE_TYPE GetSelfTestFunState(unsigned char * receivedchar , portTickType xB
 *Author：xsx
 *Data：2016年1月27日10:22:39
 ***************************************************************************************************/
-portBASE_TYPE SetSelfTestFunState(unsigned char txchar , portTickType xBlockTime)
+MyState_TypeDef SetSelfCheckStatus(unsigned char txchar , portTickType xBlockTime)
 {
-	return xQueueSend( xTaskQueue, &txchar, xBlockTime);
+	if(xSelfCehckQueue == NULL)
+		xSelfCehckQueue = xQueueCreate( 10, ( unsigned portBASE_TYPE ) sizeof( signed portCHAR ) );
+	
+	if(xSelfCehckQueue == NULL)
+		return pdFAIL;
+	
+	return xQueueSend( xSelfCehckQueue, &txchar, xBlockTime);
 }
 
 
@@ -149,13 +137,13 @@ portBASE_TYPE SetSelfTestFunState(unsigned char txchar , portTickType xBlockTime
 static void DataBasesCheck(void)
 {
 	//正在检测存储模块
-	SetSelfTestFunState(DataBasesChecking, 10*portTICK_RATE_MS);
+	SetSelfCheckStatus(DataBasesChecking, 10*portTICK_RATE_MS);
 	vTaskDelay(1000*portTICK_RATE_MS);
 	
 	if(My_Pass == CheckSDFunction())
-		SetSelfTestFunState(DataBasesSuccess, 10*portTICK_RATE_MS);
+		SetSelfCheckStatus(DataBasesSuccess, 10*portTICK_RATE_MS);
 	else
-		SetSelfTestFunState(DataBasesError, 10*portTICK_RATE_MS);
+		SetSelfCheckStatus(DataBasesError, 10*portTICK_RATE_MS);
 	
 	vTaskDelay(1000*portTICK_RATE_MS);
 	
@@ -216,15 +204,15 @@ static MyState_TypeDef ADDASelfTest(void)
 ***************************************************************************************************/
 static void ADDACheck(void)
 {
-	SetSelfTestFunState(ADDAChecking, 10*portTICK_RATE_MS);
+	SetSelfCheckStatus(ADDAChecking, 10*portTICK_RATE_MS);
 	vTaskDelay(1000*portTICK_RATE_MS);
 	
 	if(My_Pass == ADDASelfTest())
 	{
-		SetSelfTestFunState(ADDASuccess, 10*portTICK_RATE_MS);
+		SetSelfCheckStatus(ADDASuccess, 10*portTICK_RATE_MS);
 	}
 	else
-		SetSelfTestFunState(ADDAError, 10*portTICK_RATE_MS);
+		SetSelfCheckStatus(ADDAError, 10*portTICK_RATE_MS);
 }
 
 /***************************************************************************************************
@@ -237,28 +225,28 @@ static void ADDACheck(void)
 ***************************************************************************************************/
 static void ErWeiMaTest(void)
 {
-	SetSelfTestFunState(ErWeiMaChecking, 10*portTICK_RATE_MS);
+	SetSelfCheckStatus(ErWeiMaChecking, 10*portTICK_RATE_MS);
 	vTaskDelay(1000*portTICK_RATE_MS);
 	
 	if(My_Pass == ErWeiMaSelfTest())
 	{
-		SetSelfTestFunState(ErWeiMaSuccess, 10*portTICK_RATE_MS);
+		SetSelfCheckStatus(ErWeiMaSuccess, 10*portTICK_RATE_MS);
 	}
 	else
-		SetSelfTestFunState(ErWeiMaError, 10*portTICK_RATE_MS);
+		SetSelfCheckStatus(ErWeiMaError, 10*portTICK_RATE_MS);
 }
 
 static void WifiModuleTest(void)
 {
-	SetSelfTestFunState(WIFIChecking, 10*portTICK_RATE_MS);
+	SetSelfCheckStatus(WIFIChecking, 10*portTICK_RATE_MS);
 	vTaskDelay(1000*portTICK_RATE_MS);
 	
 	if(My_Pass == WIFICheck())
 	{
-		SetSelfTestFunState(WIFISuccess, 10*portTICK_RATE_MS);
+		SetSelfCheckStatus(WIFISuccess, 10*portTICK_RATE_MS);
 	}
 	else
-		SetSelfTestFunState(WIFIError, 10*portTICK_RATE_MS);
+		SetSelfCheckStatus(WIFIError, 10*portTICK_RATE_MS);
 }
 
 /***************************************************************************************************
@@ -327,24 +315,43 @@ static MyState_TypeDef MotorSelfTest(void)
 ***************************************************************************************************/
 static void MotorCheck(void)
 {
-	SetSelfTestFunState(MotorChecking, 10*portTICK_RATE_MS);
+	SetSelfCheckStatus(MotorChecking, 10*portTICK_RATE_MS);
 	vTaskDelay(1000*portTICK_RATE_MS);
 	
 	if(My_Pass == MotorSelfTest())
 	{
-		SetSelfTestFunState(MotorSuccess, 10*portTICK_RATE_MS);
+		SetSelfCheckStatus(MotorSuccess, 10*portTICK_RATE_MS);
 	}
 	else
-		SetSelfTestFunState(MotorError, 10*portTICK_RATE_MS);
+		SetSelfCheckStatus(MotorError, 10*portTICK_RATE_MS);
 }
 
 static void GB_DataInit(void)
 {
-	SetSelfTestFunState(ReadServerData, 10*portTICK_RATE_MS);
+	NetData *mynetdata = NULL;
+	DeviceInfo *mydeviceinfo;
+	
+	SetSelfCheckStatus(ReadServerData, 10*portTICK_RATE_MS);
 	vTaskDelay(1000*portTICK_RATE_MS);
 	
-	if(My_Pass == ReadNetData(GetGB_NetData()))
-		SetSelfTestFunState(ReadServerSuccess, 10*portTICK_RATE_MS);
-	else
-		SetSelfTestFunState(ReadServerError, 10*portTICK_RATE_MS);
+	mynetdata = MyMalloc(sizeof(NetData));
+	
+	mydeviceinfo = MyMalloc(sizeof(DeviceInfo));
+	
+	if(mynetdata && mydeviceinfo)
+	{
+		memset(mynetdata, 0, sizeof(NetData));
+		memset(mydeviceinfo, 0, sizeof(DeviceInfo));
+		
+		//读取系统网络配置
+		ReadNetData(mynetdata);
+		SetGB_NetConfigureData(mynetdata);
+
+		//读取设备信息
+		ReadDeviceInfo(mydeviceinfo);
+		SetGB_DeviceInfo(mydeviceinfo);
+	}
+	
+	MyFree(mynetdata);
+	MyFree(mydeviceinfo);
 }

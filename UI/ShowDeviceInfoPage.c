@@ -106,8 +106,6 @@ static MyState_TypeDef PageInit(void *  parm)
 	
 	SelectPage(70);
 	
-	ClearPageText();
-	
 	ReadDeviceInfo(&(S_ShowDeviceInfoPageBuffer->s_deviceinfo));
 		
 	showDeviceInfo();
@@ -142,44 +140,13 @@ static void showDeviceInfo(void)
 	if(S_ShowDeviceInfoPageBuffer)
 	{
 		/*显示设备id*/
-		DisText(0x2240, S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceid, strlen(S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceid));
-		
-		/*显示设备名称*/
-		DisText(0x2250, S_ShowDeviceInfoPageBuffer->s_deviceinfo.devicename, strlen(S_ShowDeviceInfoPageBuffer->s_deviceinfo.devicename));
-		
+		DisText(0x2240, S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceid, MaxDeviceIDLen);
+			
 		/*显示使用单位*/
-		DisText(0x2270, S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceunit, strlen(S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceunit));
-		/*显示设备制造商*/
-		DisText(0x2290, S_ShowDeviceInfoPageBuffer->s_deviceinfo.devicemaker, strlen(S_ShowDeviceInfoPageBuffer->s_deviceinfo.devicemaker));
-		
-		/*显示设备制造商联系方式*/
-		DisText(0x22b0, S_ShowDeviceInfoPageBuffer->s_deviceinfo.devicemakerphone, strlen(S_ShowDeviceInfoPageBuffer->s_deviceinfo.devicemakerphone));
-		
+		DisText(0x2270, S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceunit, MaxDeviceUnitLen);
+
 		/*显示责任人*/
-		DisText(0x22c0, S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceuser.user_name, strlen(S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceuser.user_name));
+		DisText(0x22c0, S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceuser.user_name, MaxNameLen);
 	}
 }
-
-static void ClearPageText(void)
-{
-	/*显示设备id*/
-	ClearText(0x2240, 20);
-	
-	/*显示设备名称*/
-	ClearText(0x2250, 50);
-	
-	/*显示设备制造商*/
-	ClearText(0x2270, 50);
-	
-	/*显示设备制造商联系方式*/
-	ClearText(0x2290, 20);
-	
-	/*显示使用单位*/
-	ClearText(0x22b0, 50);
-	
-	/*显示责任人*/
-	ClearText(0x22c0, 10);
-}
-
-
 

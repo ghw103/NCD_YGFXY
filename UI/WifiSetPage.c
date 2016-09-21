@@ -117,7 +117,6 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		else if(S_WifiPageBuffer->lcdinput[0] == 0x2d09)
 		{
 			GBPageBufferFree();
-			SetGB_WifiState(Link_Up);
 			
 			GotoGBParentPage(NULL);
 		}

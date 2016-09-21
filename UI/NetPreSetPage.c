@@ -10,7 +10,6 @@
 #include	"SystemSetPage.h"
 #include	"NetSetPage.h"
 #include	"WifiSetPage.h"
-#include	"ServerSetPage.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -71,13 +70,6 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	{
 		GBPageBufferFree();
 		SetGBChildPage(DspWifiSetPage);
-		GotoGBChildPage(NULL);
-	}
-	/*服务器设置*/
-	else if(pdata[0] == 0x2d02)
-	{
-		GBPageBufferFree();
-		SetGBChildPage(DspServerSetPage);
 		GotoGBChildPage(NULL);
 	}
 	/*返回*/

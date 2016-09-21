@@ -201,7 +201,7 @@ static void AnalysisTestData(void)
 			if(GetChannel() > 0)
 			{
 				SelectChannel(GetChannel() - 1);
-				//SelectChannel(5);
+
 				vTaskDelay(10/portTICK_RATE_MS);
 				return;
 			}

@@ -21,7 +21,49 @@
 /***************************************************************************************************/
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
-static ModelData_DefType GB_S_ModelData;
+static ModelData_DefType GB_S_ModelData = 
+	{
+		.OneModel_Data = 
+			{
+				{
+					.LED_Statues = R_OFF_G_ON,
+					.Time = 0
+				},
+				{
+					.LED_Statues = R_OFF_G_ON,
+					.Time = 0
+				},
+				{
+					.LED_Statues = R_OFF_G_ON,
+					.Time = 0
+				},
+				{
+					.LED_Statues = R_OFF_G_ON,
+					.Time = 0
+				},
+				{
+					.LED_Statues = R_OFF_G_ON,
+					.Time = 0
+				},
+				{
+					.LED_Statues = R_OFF_G_ON,
+					.Time = 0
+				},
+				{
+					.LED_Statues = R_OFF_G_ON,
+					.Time = 0
+				},
+				{
+					.LED_Statues = R_OFF_G_ON,
+					.Time = 0
+				},
+				{
+					.LED_Statues = R_OFF_G_ON,
+					.Time = 0
+				}
+			},
+		.T_Count = 1
+	};
 static xQueueHandle xQueue = NULL;												//按键状态改变
 /***************************************************************************************************/
 /**************************************局部函数声明*************************************************/

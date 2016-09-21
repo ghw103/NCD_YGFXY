@@ -13,7 +13,7 @@
 /***************************************************************************************************/
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
-static SelfCheckResult_TypeDef GB_SelfCheckResult = SelfCheck_NoResult;
+static SelfCheckStatus GB_SelfCheckStatus = SelfCheck_None;
 /***************************************************************************************************/
 /**************************************局部函数声明*************************************************/
 /***************************************************************************************************/
@@ -25,12 +25,12 @@ static SelfCheckResult_TypeDef GB_SelfCheckResult = SelfCheck_NoResult;
 /***************************************************************************************************/
 /***************************************************************************************************/
 
-void SetGB_SelfCheckResult(SelfCheckResult_TypeDef result)
+void SetGB_SelfCheckStatus(SelfCheckStatus status)
 {
-	GB_SelfCheckResult = result;
+	GB_SelfCheckStatus = status;
 }
 
-SelfCheckResult_TypeDef GetGB_SelfCheckResult(void)
+SelfCheckStatus GetGB_SelfCheckStatus(void)
 {
-	return GB_SelfCheckResult;
+	return GB_SelfCheckStatus;
 }

@@ -89,7 +89,7 @@ static void ProcessCMD(unsigned char *buf, unsigned short len, struct netconn *p
 		
 		if(!strncmp( (char *)buf, "Read Device Info", 16 ))
 		{
-			sprintf(pxbuf1, "{\"deviceid\":\"%s\",\"devicestatus\":%d}", ((DeviceInfo *)(GetGB_DeviceInfo()))->deviceid, GetTestStatusFlorLab());
+			sprintf(pxbuf1, "{\"deviceid\":\"%s\",\"devicestatus\":%d}", ((DeviceInfo *)(GetGB_DeviceInfo2()))->deviceid, GetTestStatusFlorLab());
 		}
 		else if(!strncmp( (char *)buf, "Start Test", 10 ))
 		{

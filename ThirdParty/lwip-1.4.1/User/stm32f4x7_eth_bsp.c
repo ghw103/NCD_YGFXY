@@ -65,9 +65,6 @@ void ETH_BSP_Config(void)
 
 	/* Configure the Ethernet MAC/DMA */
 	ETH_MACDMA_Config();
-	
-	/*获取上电时的连接状态*/
-	SetGB_LinkState(ReadPHYLinkState());
 }
 
 /**

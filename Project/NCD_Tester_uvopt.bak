@@ -217,8 +217,8 @@
       <MemoryWindow1>
         <Mm>
           <WinNumber>1</WinNumber>
-          <SubType>0</SubType>
-          <ItemText>0x20003E58</ItemText>
+          <SubType>8</SubType>
+          <ItemText>0x200049c0</ItemText>
         </Mm>
       </MemoryWindow1>
       <Tracepoint>
@@ -1514,7 +1514,7 @@
 
   <Group>
     <GroupName>LwipUser</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2121,7 +2121,7 @@
 
   <Group>
     <GroupName>Fatfs</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

@@ -10,20 +10,24 @@
 /***************************************************************************************************/
 #include	"System_Data.h"
 
-#include	"Define.h"
+#include	"CRC16.h"
 
 #include	<string.h>
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
 static DeviceInfo GB_DeviceInfo;								//设备信息
-static TestData	S_TestData;										//测试数据
+static bool	GB_DeviceInfoIsFresh = true;							//设备信息是否有更新，初始化设置为true，使上电更新一次
+
+static TestData	S_TestData;										//测试数据,用于纽康度生物实验室使用
 
 static unsigned char S_TestStatus = 0;							//测试状态
 
 static unsigned char GB_BarCode[100];							//条码枪数据
 
 static MyTime_Def GB_Time;											//系统时间
+
+static NetData GB_NetData;														//设备网络数据
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -35,16 +39,52 @@ static MyTime_Def GB_Time;											//系统时间
 /***************************************************************************************************/
 /***************************************************************************************************/
 
-void SetGB_DeviceInfo(void *info)
+/*********************************************************************************************/
+/*********************************************************************************************/
+/*********************************************************************************************/
+/*********************************************************************************************/
+/*********************************************************************************************/
+void SetGB_DeviceInfo(DeviceInfo *info)
 {
 	memcpy(&(GB_DeviceInfo), info, sizeof(DeviceInfo));
 }
 
-void * GetGB_DeviceInfo(void)
+void GetGB_DeviceInfo(DeviceInfo *info)
 {
+	if(GB_DeviceInfo.crc != CalModbusCRC16Fun1(&GB_DeviceInfo, sizeof(DeviceInfo)-2))
+	{
+		memset(&GB_DeviceInfo, 0, sizeof(DeviceInfo));
+		GB_DeviceInfo.crc = CalModbusCRC16Fun1(&GB_DeviceInfo, sizeof(DeviceInfo)-2);
+	}
+	memcpy(info, &(GB_DeviceInfo), sizeof(DeviceInfo));
+}
+
+DeviceInfo * GetGB_DeviceInfo2(void)
+{
+	if(GB_DeviceInfo.crc != CalModbusCRC16Fun1(&GB_DeviceInfo, sizeof(DeviceInfo)-2))
+	{
+		memset(&GB_DeviceInfo, 0, sizeof(DeviceInfo));
+		GB_DeviceInfo.crc = CalModbusCRC16Fun1(&GB_DeviceInfo, sizeof(DeviceInfo)-2);
+	}
+	
 	return &GB_DeviceInfo;
 }
 
+void SetDeviceInIsFresh(bool status)
+{
+	GB_DeviceInfoIsFresh = status;
+}
+
+bool GetDeviceInIsFresh(void)
+{
+	return GB_DeviceInfoIsFresh;
+}
+
+/*********************************************************************************************/
+/*********************************************************************************************/
+/*********************************************************************************************/
+/*********************************************************************************************/
+/*********************************************************************************************/
 void * GetTestDataForLab(void)
 {
 	return &S_TestData;
@@ -92,4 +132,37 @@ void SetGB_Time(void * time)
 	memcpy(&GB_Time, time, sizeof(MyTime_Def));
 }
 
+/*********************************************************************************************/
+/*********************************************************************************************/
+/*********************************************************************************************/
+/*********************************************************************************************/
+/*********************************************************************************************/
+void GetGB_NetConfigureData(NetData * netdata)
+{
+	if(GB_NetData.crc != CalModbusCRC16Fun1(&GB_NetData, sizeof(NetData)-2))
+	{
+		GB_NetData.ipmode = DHCP_Mode;
+		GB_NetData.myip.ip_1 = 0;
+		GB_NetData.myip.ip_2 = 0;
+		GB_NetData.myip.ip_3 = 0;
+		GB_NetData.myip.ip_4 = 0;
+		
+		GB_NetData.crc = CalModbusCRC16Fun1(&GB_NetData, sizeof(NetData)-2);
+	}
+	
+	memcpy(netdata, &GB_NetData, sizeof(NetData));
+}
+
+void SetGB_NetConfigureData(NetData * netdata)
+{
+	memcpy(&GB_NetData, netdata, sizeof(NetData));
+}
+
+NetIP_Type GetGB_IpModeData(void)
+{
+	if(GB_NetData.crc == CalModbusCRC16Fun1(&GB_NetData, sizeof(NetData)-2))
+		return GB_NetData.ipmode;
+	else
+		return DHCP_Mode;
+}
 /****************************************end of file************************************************/

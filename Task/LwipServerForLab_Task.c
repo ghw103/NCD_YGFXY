@@ -53,7 +53,7 @@ static void LwipLabServerTask(void *pvParameters)
 
 		if(err == ERR_OK)
 		{
-			/* connection timeout 5000 ms */
+			/* connection timeout 3000 ms */
 			pxNewConnection->recv_timeout = (3000 / portTICK_RATE_MS);
 			ProcessQuest(pxNewConnection);
 		}

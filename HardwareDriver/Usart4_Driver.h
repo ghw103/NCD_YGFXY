@@ -6,8 +6,8 @@
 #include 	"queue.h"
 #include	"semphr.h"
 
-#define xRxQueue4_Len				100
-#define xTxQueue4_Len				200
+#define xRxQueue4_Len				300
+#define xTxQueue4_Len				800
 
 void Usart4_Init(void);
 void EnableUsart4TXInterrupt(void);

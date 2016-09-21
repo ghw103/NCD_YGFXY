@@ -2,7 +2,7 @@
 #define __WIFI_F_H__
 
 #include	"Define.h"
-#include	"Net_Data.h"
+
 
 typedef enum
 { 
@@ -12,7 +12,6 @@ typedef enum
 	PWM_Mode = 3,
 }WIFI_WorkMode_DefType;
 
-MyState_TypeDef WifiModuleInit(void);
 MyState_TypeDef WIFICheck(void);
 
 MyState_TypeDef SetWifiDefaultWorkMode(void);
@@ -22,22 +21,10 @@ MyState_TypeDef ScanApList(WIFI_Def *wifis);
 MyState_TypeDef ConnectWifi(WIFI_Def *wifis);
 MyState_TypeDef RestartWifi(void);
 
-MyState_TypeDef SetWifiSocketA(void);
-MyState_TypeDef GetWifiSocketAState(void);
-MyState_TypeDef CloseSocketA(void);
-MyState_TypeDef SendDataBySocketA(mynetbuf *netbuf);
-MyState_TypeDef RevDataBySocketA(mynetbuf *netbuf);
-
-MyState_TypeDef SetWifiSocketB(void);
-MyState_TypeDef GetWifiSocketBState(void);
-MyState_TypeDef CloseSocketB(void);
 
 MyState_TypeDef CheckWifiMID(void);
 unsigned char GetWifiIndicator(void);
 MyState_TypeDef WifiIsConnectted(void);
 
-void InitMutex(void);
-unsigned char WaitWifiFree(portTickType xBlockTime);
-void SetWifiFree(void);
 #endif
 

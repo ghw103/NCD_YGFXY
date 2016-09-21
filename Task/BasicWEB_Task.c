@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include	"BasicWEB_Task.h"
-#include	"Net_Data.h"
 #include	"MyMem.h"
 
 /* Scheduler includes. */

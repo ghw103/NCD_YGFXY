@@ -4,8 +4,9 @@
 #include	"Define.h"
 
 
-void SetGB_SelfCheckResult(SelfCheckResult_TypeDef result);
-SelfCheckResult_TypeDef GetGB_SelfCheckResult(void);
+void SetGB_SelfCheckStatus(SelfCheckStatus status);
+
+SelfCheckStatus GetGB_SelfCheckStatus(void);
 
 #endif
 

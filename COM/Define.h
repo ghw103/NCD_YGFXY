@@ -2,6 +2,7 @@
 #define _DEFINE_H_H
 
 #include	"stm32f4xx.h"
+#include 	"FreeRTOS.h"
 #include	"ff.h"
 
 #define		NormalCode	0											//正常程序
@@ -30,9 +31,15 @@
 /**********************************************************************************************************/
 typedef enum
 { 
-	My_Pass = 1,		//操作成功
-	My_Fail = 0			//操作失败
+	My_Pass = pdPASS,		//操作成功
+	My_Fail = pdFAIL			//操作失败
 }MyState_TypeDef;
+
+typedef enum
+{ 
+	true = 1,
+	false = 0
+}bool;
 
 typedef enum
 { 
@@ -284,11 +291,7 @@ typedef struct UserTag
 #pragma pack(1)
 typedef struct DeviceInfo_Tag
 {
-	char isfresh;																	//是否有更新，如果是1，则上传数据
 	char deviceid[MaxDeviceIDLen];													//设备id
-	char devicename[MaxDeviceNameLen];												//设备名称
-	char devicemaker[MaxDeviceMakerLen];												//设备制造商
-	char devicemakerphone[MaxDeviceMakerPhoneLen];											//设备制造商电话
 	char deviceunit[MaxDeviceUnitLen];												//设备使用单位
 	User_Type deviceuser;												//设备使用人
 	unsigned short crc;
@@ -333,12 +336,12 @@ typedef enum
 }SelfCheck_TypeDef;
 
 typedef enum
-{ 
-	SelfCheck_NoResult = 0,														//自检未完成
-	SelfCheck_OK = 1,													//自检正常
-	SelfCheck_Error = 2,												//自检有不可忽略的错误
-	SelfCheck_Alam = 3,													//自检有告警项
-}SelfCheckResult_TypeDef;
+{
+	SelfCheck_None = 0,													//自检未开始
+	SelfChecking = 1,
+	SelfCheck_OK = 2,													//自检正常
+	SelfCheck_Error = 3,												//自检有不可忽略的错误
+}SelfCheckStatus;
 /**********************************************************************************************************/
 /**********************************************************************************************************/
 
@@ -374,13 +377,6 @@ typedef struct wifi_Tag
 }WIFI_Def;
 #pragma pack()
 
-/*网卡定义*/
-typedef enum
-{
-	NetNone = 0,														//无网络
-	Line_Mode = 1,														//有线网
-	Wifi_Mode = 2														//wiif
-}NetCard_Type;
 
 typedef struct mynetbuf_tag
 {
@@ -406,28 +402,13 @@ typedef enum
 typedef struct NetData_Tag
 {
 	IP_Def myip;														//我的ip
-	IP_Def serverip;													//服务器ip
+
 	NetIP_Type ipmode;
 	unsigned short crc;
 }NetData;
 #pragma pack()
 
-#define	DefaultNetCard		Line_Mode									//默认网卡
-#define	DefaultIPMode		DHCP_Mode									//ip获取方式，针对有线网
 
-/*超级病例服务器IP*/
-#define	NCD_ServerIP_1		123
-#define	NCD_ServerIP_2		57
-#define	NCD_ServerIP_3		94
-#define	NCD_ServerIP_4 		39
-#define	NCD_ServerPort 		8080
-
-/*客户服务器*/
-#define	User_ServerIP_1		192
-#define	User_ServerIP_2		168
-#define	User_ServerIP_3		1
-#define	User_ServerIP_4		100
-#define	User_ServerPort		9600
 /**********************************************************************************************************/
 /**********************************************************************************************************/
 
