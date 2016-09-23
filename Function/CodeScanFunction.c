@@ -137,7 +137,7 @@ static void ReadBasicCodeData(void)
 static void AnalysisCode(void *pbuf , unsigned short len)
 {
 	unsigned short datalen = 0;
-	unsigned char j=0;
+	unsigned char j=0, i=0;
 	
 	/*清空二维码空间*/
 	memset(S_ReadCodeBuffer->decryptcode, 0, 320);
@@ -246,20 +246,14 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	/*标准曲线*/
 	for(j=0; j<S_ScanQRTaskData->cardQR->ItemBiaoQuNum; j++)
 	{		
-		S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
-		
-		if(S_ReadCodeBuffer->pbuf1)
+		for(i=0; i<3; i++)
 		{
-			memset(S_ReadCodeBuffer->tempbuf, 0, 64);
-			S_ScanQRTaskData->cardQR->ItemBiaoQu[j][0] = strtod(S_ReadCodeBuffer->pbuf1 , (char **)&((S_ReadCodeBuffer->tempbuf)) );
-				
-			S_ScanQRTaskData->cardQR->ItemBiaoQu[j][1] = strtod(S_ReadCodeBuffer->tempbuf , (char **)&((S_ReadCodeBuffer->tempbuf)) );
-				
-			S_ScanQRTaskData->cardQR->ItemBiaoQu[j][2] = strtod(S_ReadCodeBuffer->tempbuf , (char **)&((S_ReadCodeBuffer->tempbuf)) );
+			S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
+			if(S_ReadCodeBuffer->pbuf1)
+				S_ScanQRTaskData->cardQR->ItemBiaoQu[j][i] = strtod(S_ReadCodeBuffer->pbuf1 , NULL);
+			else
+				goto END;
 		}
-		else	
-			goto END;
-
 	}
 		
 	/*读取检测卡反应时间*/
@@ -290,13 +284,13 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	{
 		static char year[10] ,month[10],day[10];
 		memcpy(year, S_ReadCodeBuffer->pbuf1, 4);
-		S_ScanQRTaskData->cardQR->CardBaoZhiQi.RTC_Year = strtol(year , NULL , 10) - 2000;
+		S_ScanQRTaskData->cardQR->CardBaoZhiQi.year = strtol(year , NULL , 10) - 2000;
 
 		memcpy(month, &S_ReadCodeBuffer->pbuf1[4], 2);
-		S_ScanQRTaskData->cardQR->CardBaoZhiQi.RTC_Month = (unsigned char)strtod(month , NULL );
+		S_ScanQRTaskData->cardQR->CardBaoZhiQi.month = (unsigned char)strtod(month , NULL );
 
 		memcpy(day, &S_ReadCodeBuffer->pbuf1[6], 2);
-		S_ScanQRTaskData->cardQR->CardBaoZhiQi.RTC_Date = (unsigned char)strtod(day , NULL );
+		S_ScanQRTaskData->cardQR->CardBaoZhiQi.day = (unsigned char)strtod(day , NULL );
 	}
 	else
 		goto END;
@@ -330,17 +324,17 @@ static MyState_TypeDef CheckCardIsTimeOut(CardCodeInfo * s_CardCodeInfo)
 	{
 		GetGB_Time(&(S_ReadCodeBuffer->temptime));
 		
-		if(s_CardCodeInfo->CardBaoZhiQi.RTC_Year == S_ReadCodeBuffer->temptime.year)
+		if(s_CardCodeInfo->CardBaoZhiQi.year == S_ReadCodeBuffer->temptime.year)
 		{
-			if(s_CardCodeInfo->CardBaoZhiQi.RTC_Month == S_ReadCodeBuffer->temptime.month)
+			if(s_CardCodeInfo->CardBaoZhiQi.month == S_ReadCodeBuffer->temptime.month)
 			{
-				if(s_CardCodeInfo->CardBaoZhiQi.RTC_Date >= S_ReadCodeBuffer->temptime.day)
+				if(s_CardCodeInfo->CardBaoZhiQi.day >= S_ReadCodeBuffer->temptime.day)
 					return My_Pass;
 			}
-			else if(s_CardCodeInfo->CardBaoZhiQi.RTC_Month > S_ReadCodeBuffer->temptime.month)
+			else if(s_CardCodeInfo->CardBaoZhiQi.month > S_ReadCodeBuffer->temptime.month)
 				return My_Pass;
 		}
-		else if(s_CardCodeInfo->CardBaoZhiQi.RTC_Year > S_ReadCodeBuffer->temptime.year)
+		else if(s_CardCodeInfo->CardBaoZhiQi.year > S_ReadCodeBuffer->temptime.year)
 			return My_Pass;
 	}
 	

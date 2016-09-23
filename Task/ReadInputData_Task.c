@@ -46,7 +46,7 @@ static void vReadInDataTask( void *pvParameters );
 ***************************************************************************************************/
 void StartvReadInDataTask(void)
 {
-	xTaskCreate( vReadInDataTask, ReadInDataTaskName, configMINIMAL_STACK_SIZE, NULL, ReadInDataTask_PRIORITY, NULL );
+	xTaskCreate( vReadInDataTask, ReadInDataTaskName, configMINIMAL_STACK_SIZE*2, NULL, ReadInDataTask_PRIORITY, NULL );
 }
 
 /***************************************************************************************************

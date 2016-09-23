@@ -47,20 +47,26 @@ static MyState_TypeDef ReadFileSaveDateInfo(void);
 
 unsigned char DspRecordPage(void *  parm)
 {
-	SetGBParentPage(DspSystemSetPage);
-	SetGBChildPage(DspShowResultPage);
-	SetGBPageUpDate(PageUpDate);
-	SetGBGBPageInput(Input);
-	SetGBPageInit(PageInit);
-	SetGBPageBufferMalloc(PageBufferMalloc);
-	SetGBPageBufferFree(PageBufferFree);
+	SysPage * S_SysPage;
 	
-	if(DspSystemSetPage == GetGBCurrentPage())
-		GBPageInit(parm);
+	S_SysPage = GetGBSysPage();
+	
+	S_SysPage->ParentPage = DspSystemSetPage;
+	S_SysPage->ChildPage = DspShowResultPage;
+	S_SysPage->LCDInput = Input;
+	S_SysPage->PageUpDate = PageUpDate;
+	S_SysPage->PageBufferMalloc = PageBufferMalloc;
+	S_SysPage->PageBufferFree = PageBufferFree;
+	S_SysPage->PageInit = PageInit;
+	
+	if(DspSystemSetPage == S_SysPage->CurrentPage)
+	{
+		S_SysPage->PageInit(parm);
+	}
 	
 	SelectPage(86);
 	
-	SetGBCurrentPage(DspRecordPage);
+	S_SysPage->CurrentPage = DspRecordPage;
 	
 	return 0;
 }
@@ -198,11 +204,11 @@ static MyState_TypeDef PageBufferFree(void)
 static MyState_TypeDef ReadFileSaveDateInfo(void)
 {
 	if(S_RecordPageBuffer)
-	{
-		GetTestDataNum(&(S_RecordPageBuffer->maxdatanum));
+	{	
+		ReadTestDataHead(&(S_RecordPageBuffer->saveddatahead));
 		
-		S_RecordPageBuffer->maxpagenum = ((S_RecordPageBuffer->maxdatanum % DataNumInPage) == 0)?(S_RecordPageBuffer->maxdatanum / DataNumInPage):
-		((S_RecordPageBuffer->maxdatanum / DataNumInPage)+1);
+		S_RecordPageBuffer->maxpagenum = ((S_RecordPageBuffer->saveddatahead.datanum % DataNumInPage) == 0)?(S_RecordPageBuffer->saveddatahead.datanum / DataNumInPage):
+		((S_RecordPageBuffer->saveddatahead.datanum / DataNumInPage)+1);
 	}
 	
 	return My_Pass;

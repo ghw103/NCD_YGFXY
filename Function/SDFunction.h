@@ -17,9 +17,8 @@ void ReadUserData(User_Type * user);
 /*≤‚ ‘ ˝æ›*/
 MyState_TypeDef SaveTestData(TestData *tempdata);
 MyState_TypeDef ReadTestData(TestData *tempdata, unsigned int index, unsigned char readnum);
-MyState_TypeDef GetTestDataNum(unsigned int *num);
-MyState_TypeDef WriteUpLoadIndex(unsigned int index);
-MyState_TypeDef ReadUpLoadIndex(UpLoadIndex *uploadindex);
+MyState_TypeDef ReadIndexPlus(unsigned char num);
+MyState_TypeDef ReadTestDataHead(TestDataSaveHead * head);
 
 /*ip…Ë÷√*/
 MyState_TypeDef SaveNetData(NetData * netdata);

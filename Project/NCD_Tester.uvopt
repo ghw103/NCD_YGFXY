@@ -186,24 +186,7 @@
           <Name>UL2CM3(-O207 -S0 -C0 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_1024 -FS08000000 -FL0100000)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>101</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134244906</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\Function\UpLoad_Fun.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\NCD_Tester\../Function/UpLoad_Fun.c\101</Expression>
-        </Bp>
-      </Breakpoint>
+      <Breakpoint/>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -213,17 +196,17 @@
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>S_RecordPageBuffer</ItemText>
+          <ItemText>myUpLoadTestDataBuffer</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>S_BarCode</ItemText>
+          <ItemText>S_ScanQRTaskData</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>itemdata</ItemText>
+          <ItemText>S_ReadCodeBuffer</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
@@ -235,7 +218,7 @@
         <Mm>
           <WinNumber>1</WinNumber>
           <SubType>8</SubType>
-          <ItemText>0x1FFF7A10</ItemText>
+          <ItemText>0x08000300</ItemText>
         </Mm>
       </MemoryWindow1>
       <Tracepoint>
@@ -1393,7 +1376,7 @@
 
   <Group>
     <GroupName>DataS</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

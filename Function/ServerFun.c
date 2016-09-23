@@ -67,7 +67,7 @@ MyState_TypeDef CommunicateWithServerByLineNet(void *sendnetbuf, void *recvnetbu
 			goto END2;
 		
 		//设置接收数据超时时间100MS
-		myclientdata->clientconn->recv_timeout = 100;
+		myclientdata->clientconn->recv_timeout = 1000;
 		
 		//发送数据
 		if(sendnetbuf)
@@ -176,7 +176,7 @@ MyState_TypeDef UpLoadData(char *URL, void * buf, unsigned short buflen)
 		mybuf.datalen = strlen(mybuf.data);
 		
 		memset(recvbuf.data, 0, 1024);
-		if(My_Pass == CommunicateWithServerByLineNet(&mybuf, &recvbuf, 123, 57, 94, 39, 1024))
+		if(My_Pass == CommunicateWithServerByLineNet(&mybuf, &recvbuf, 123, 57, 94, 39, 1000))
 		{
 			temp = strstr(recvbuf.data, "myresult->");
 			if(temp)
@@ -192,7 +192,7 @@ MyState_TypeDef UpLoadData(char *URL, void * buf, unsigned short buflen)
 		}
 		
 		memset(recvbuf.data, 0, 1024);
-		if(My_Pass == CommunicateWithServerByWifi(&mybuf, &recvbuf, 1024))
+		if(My_Pass == CommunicateWithServerByWifi(&mybuf, &recvbuf, 1000))
 		{
 			temp = strstr(recvbuf.data, "myresult->");
 			if(temp)

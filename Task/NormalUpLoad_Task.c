@@ -43,7 +43,7 @@ static void vNormalUpLoadTask( void *pvParameters );
 
 void StartvNormalUpLoadTask(void)
 {
-	xTaskCreate( vNormalUpLoadTask, NormalUpLoadTaskName, configMINIMAL_STACK_SIZE, NULL, vNormalUpLoadTask_PRIORITY, NULL );
+	xTaskCreate( vNormalUpLoadTask, NormalUpLoadTaskName, configMINIMAL_STACK_SIZE*2, NULL, vNormalUpLoadTask_PRIORITY, NULL );
 }
 
 

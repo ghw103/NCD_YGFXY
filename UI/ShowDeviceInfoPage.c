@@ -24,7 +24,6 @@ static ShowDeviceInfoPageBuffer * S_ShowDeviceInfoPageBuffer = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 static void showDeviceInfo(void);
-static void ClearPageText(void);
 
 static MyState_TypeDef PageInit(void *  parm);
 static void Input(unsigned char *pbuf , unsigned short len);

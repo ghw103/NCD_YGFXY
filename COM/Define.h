@@ -168,7 +168,7 @@ typedef struct CardInfo_Tag
 	unsigned char CardWaitTime;							//检测卡反应时间
 	unsigned short CLineLocation;						//c线位置
 	char	CardPiCi[CardPiCiHaoLen];					//批次号
-	RTC_DateTypeDef	CardBaoZhiQi;						//保质期
+	MyTime_Def	CardBaoZhiQi;						//保质期
 	unsigned short CRC16;								//crc
 }CardCodeInfo;
 #pragma pack()
@@ -480,10 +480,11 @@ typedef struct TestTaskData_tag {
 #pragma pack()
 
 #pragma pack(1)
-typedef struct UpLoadIndex_tag {
-	unsigned int index;
+typedef struct TestDataSaveHead_tag {
+	unsigned int datanum;
+	unsigned int readindex;
 	unsigned short crc;
-}UpLoadIndex;
+}TestDataSaveHead;
 #pragma pack()
 
 /*********************************************************************************************/

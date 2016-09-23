@@ -205,7 +205,7 @@ static void CheckQRCode(void)
 		else if(S_PreReadPageBuffer->scancode == CardCodeScanOK)
 		{
 			//设置倒计时时间
-			timer_set(&(S_PreReadPageBuffer->currenttestdata->timer), S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardWaitTime*60);
+			timer_set(&(S_PreReadPageBuffer->currenttestdata->timer), S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardWaitTime*1);
 			
 			//读取校准参数
 			memcpy(S_PreReadPageBuffer->currenttestdata->testdata.tempadjust.ItemName, S_PreReadPageBuffer->currenttestdata->testdata.temperweima.ItemName, ItemNameLen);
@@ -272,8 +272,8 @@ static void ShowCardInfo(void)
 	sprintf(S_PreReadPageBuffer->buf, "%d", S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardWaitTime*60);
 	DisText(0x1f40, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
 			
-	sprintf(S_PreReadPageBuffer->buf, "20%02d年%02d月%02d日", S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardBaoZhiQi.RTC_Year, S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardBaoZhiQi.RTC_Month,
-		S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardBaoZhiQi.RTC_Date);
+	sprintf(S_PreReadPageBuffer->buf, "20%02d年%02d月%02d日", S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardBaoZhiQi.year, S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardBaoZhiQi.month,
+		S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardBaoZhiQi.day);
 	DisText(0x1f45, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
 }
 static void ShowTemp(void)

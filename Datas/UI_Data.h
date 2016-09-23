@@ -13,7 +13,8 @@ void SetGBSysPage(
 	MyState_TypeDef (*PageBufferMalloc)(void),								//“≥√Êª∫¥Ê…Í«Î
 	MyState_TypeDef (*PageBufferFree)(void)									//“≥√Êª∫¥Ê Õ∑≈
 	);
-
+SysPage * GetGBSysPage(void);
+	
 void SetGBCurrentPage(unsigned char (*CurrentPage)(void * pram));
 unsigned char (*GetGBCurrentPage(void))(void* pram);
 

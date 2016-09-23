@@ -11,7 +11,8 @@ typedef struct Record_tag {
 	unsigned char selectindex;							//选中的索引
 	unsigned char pageindex;							//页面索引
 	
-	unsigned int maxdatanum;
+	TestDataSaveHead saveddatahead;						//数据保存索引
+	
 	unsigned int maxpagenum;
 
 	char buf[300];										//临时缓冲区

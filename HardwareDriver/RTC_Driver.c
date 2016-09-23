@@ -421,7 +421,7 @@ MyState_TypeDef RTC_SetTimeData2(char * buf)
 		memset(tempbuf, 0, 64);
 		memcpy(tempbuf, buf+12, 2);
 		temp = strtol(tempbuf, NULL, 10);
-		temptime.sec = temp;
+		temptime.sec = temp+2;
 		
 		status = RTC_SetTimeData(&temptime);
 	}

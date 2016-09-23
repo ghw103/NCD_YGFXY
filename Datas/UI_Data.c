@@ -69,6 +69,11 @@ void SetGBSysPage(
 	GB_SysPage.PageBufferFree = PageBufferFree;
 }
 
+SysPage * GetGBSysPage(void)
+{
+	return &GB_SysPage;
+}
+
 /***************************************************************************************************
 *FunctionName：SetGBCurrentPage, GetGBCurrentPage
 *Description: 设置，获取当前页面

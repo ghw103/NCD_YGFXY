@@ -44,6 +44,7 @@ static MyState_TypeDef UpLoadTestData(void);
 
 void UpLoadFunction(void)
 {
+	unsigned short i = 0;
 	while(1)
 	{
 		if(My_Pass == ReadTime())
@@ -53,12 +54,25 @@ void UpLoadFunction(void)
 			if(My_Pass == UpLoadDeviceInfo())
 			{
 				vTaskDelay(1000 / portTICK_RATE_MS);
+				
+				i=0;
+				while(i <= 60)
+				{
+					if(My_Pass == UpLoadTestData())
+						i++;
+					else
+						break;
+					
+					vTaskDelay(100 / portTICK_RATE_MS);
+				}
+				
+				vTaskDelay((50-i)*1000 / portTICK_RATE_MS);
 			}
 			else
-				vTaskDelay(1000 / portTICK_RATE_MS);
+				vTaskDelay(60000 / portTICK_RATE_MS);
 		}
 		else
-			vTaskDelay(1000 / portTICK_RATE_MS);
+			vTaskDelay(60000 / portTICK_RATE_MS);
 	}
 }
 
@@ -94,9 +108,11 @@ static MyState_TypeDef ReadTime(void)
 
 static MyState_TypeDef UpLoadDeviceInfo(void)
 {
+	MyState_TypeDef status = My_Fail;
+
 	DeviceInfo * deviceinfo = NULL;
 	char * buf = NULL;
-	MyState_TypeDef status = My_Fail;
+	
 	
 	if(true == GetDeviceInIsFresh())
 	{
@@ -132,62 +148,98 @@ static MyState_TypeDef UpLoadDeviceInfo(void)
 
 static MyState_TypeDef UpLoadTestData(void)
 {
-	TestData * testdata = NULL;
-	char * sendbuf = NULL;
-	DeviceInfo * deviceinfo = NULL;
-	
-	char *tempbuf = NULL;
-	UpLoadIndex uploadindex;
-	char *linebuf = NULL;
-	unsigned short i = 0;
-	
 	MyState_TypeDef statues = My_Fail;
+	unsigned short i=0, j;
 	
-	deviceinfo = MyMalloc(sizeof(DeviceInfo));
-	testdata = MyMalloc(sizeof(TestData));
-	sendbuf = MyMalloc(4096);
-	tempbuf = MyMalloc(2500);
-	linebuf = MyMalloc(10);
+	UpLoadTestDataBuffer * myUpLoadTestDataBuffer = NULL;
 	
-	if(testdata && sendbuf && deviceinfo && linebuf)
+	myUpLoadTestDataBuffer = MyMalloc(sizeof(UpLoadTestDataBuffer));
+	
+	if(myUpLoadTestDataBuffer)
 	{
-		if(My_Pass == ReadUpLoadIndex(&uploadindex))
+		memset(myUpLoadTestDataBuffer, 0, sizeof(UpLoadTestDataBuffer));
+		
+		//读取设备信息
+		GetGB_DeviceInfo(&(myUpLoadTestDataBuffer->deviceinfo));
+		
+		//读取测试数据头,失败则退出
+		if(My_Pass != ReadTestDataHead(&(myUpLoadTestDataBuffer->myTestDataSaveHead)))
+			goto END;
+		
+		//检测数据头是否校验正确，且有数据待发送
+		if((myUpLoadTestDataBuffer->myTestDataSaveHead.crc != CalModbusCRC16Fun1(&(myUpLoadTestDataBuffer->myTestDataSaveHead), sizeof(TestDataSaveHead)-2)) ||
+				myUpLoadTestDataBuffer->myTestDataSaveHead.readindex >= myUpLoadTestDataBuffer->myTestDataSaveHead.datanum)
+			goto END;
+		
+		//读取测试数据,读取失败则退出
+		if(My_Pass != ReadTestData(&(myUpLoadTestDataBuffer->testdata), myUpLoadTestDataBuffer->myTestDataSaveHead.readindex, 1))
+			goto END;
+		
+		//校验读取的数据的正确性,如果不正确，则上传索引+1，略过此数据
+		if(myUpLoadTestDataBuffer->testdata.crc != CalModbusCRC16Fun1(&(myUpLoadTestDataBuffer->testdata), sizeof(TestData)-2))
 		{
-			if((My_Pass == ReadTestData(testdata, uploadindex.index, 1)) && (testdata->crc == CalModbusCRC16Fun1(testdata, sizeof(TestData)-2)) &&
-				(My_Pass == ReadDeviceInfo(deviceinfo)) && (deviceinfo->crc == CalModbusCRC16Fun1(deviceinfo, sizeof(DeviceInfo)-2)) )
-			{
-				memset(sendbuf, 0, 4096);
-				memset(tempbuf, 0, 2500);
-				
-				for(i=0; i<MaxPointLen; i++)
-				{
-					memset(linebuf, 0, 10);
-					sprintf(linebuf, "%d#", testdata->testline.TestPoint[i]);
-					strcat(tempbuf, linebuf);
-				}
-				
-				if(tempbuf)
-				{
-					sprintf(sendbuf, "test_reaction_time=%d&temperature=%2.1f&temperature2=%2.1f&fluorescence_data=%s&Cposition=%d&Baseposition=%d&Tposition=%d&resultratio=%.3f&resultprimitive=%.3f&resultcalibration=%.3f&testSampleID=%s&DeviceID=%.5s&testCardID=%.5s",
-						testdata->time, testdata->TestTemp.E_Temperature, testdata->TestTemp.O_Temperature, tempbuf, testdata->testline.C_Point[1], testdata->testline.B_Point[1],
-						testdata->testline.T_Point[1],testdata->testline.BasicBili, testdata->testline.BasicResult, testdata->testline.AdjustResult, testdata->sampleid, deviceinfo->deviceid, testdata->temperweima.CardPiCi);
-
-					if(My_Pass == UpLoadData("http://123.57.94.39/api/myFluorescenceData/", sendbuf, strlen(sendbuf)))
-					{
-						uploadindex.index++;
-						WriteUpLoadIndex(uploadindex.index);
-						statues = My_Pass;
-					}
-				}
-			}
+			statues = My_Pass;
+			ReadIndexPlus(1);
+			goto END;
 		}
+		
+		//上传检测卡数据
+		memset(myUpLoadTestDataBuffer->sendbuf, 0, 1024);
+
+		sprintf(myUpLoadTestDataBuffer->sendbuf, "tcard.id=%s&tcard.item=%s&tcard.n_v=%.3f&tcard.l_v=%.3f&tcard.h_v=%.3f&tcard.dw=%s&tcard.t_l=%d&tcard.bq_n=%d&tcard.fend=%.3f&tcard.bq1_a=%.3f&tcard.bq1_b=%.3f&tcard.bq1_c=%.3f&tcard.bq2_a=%.3f&tcard.bq2_b=%.3f&tcard.bq2_c=%.3f&tcard.waitt=%d&tcard.c_l=%d&tcard.outt=20%02d%02d%02d",
+			myUpLoadTestDataBuffer->testdata.temperweima.CardPiCi, myUpLoadTestDataBuffer->testdata.temperweima.ItemName, myUpLoadTestDataBuffer->testdata.temperweima.NormalResult, myUpLoadTestDataBuffer->testdata.temperweima.LowstResult, myUpLoadTestDataBuffer->testdata.temperweima.HighestResult,
+			myUpLoadTestDataBuffer->testdata.temperweima.ItemMeasure, myUpLoadTestDataBuffer->testdata.temperweima.ItemLocation, myUpLoadTestDataBuffer->testdata.temperweima.ItemBiaoQuNum, myUpLoadTestDataBuffer->testdata.temperweima.ItemFenDuan, myUpLoadTestDataBuffer->testdata.temperweima.ItemBiaoQu[0][0],
+			myUpLoadTestDataBuffer->testdata.temperweima.ItemBiaoQu[0][1], myUpLoadTestDataBuffer->testdata.temperweima.ItemBiaoQu[0][2],myUpLoadTestDataBuffer->testdata.temperweima.ItemBiaoQu[1][0],	myUpLoadTestDataBuffer->testdata.temperweima.ItemBiaoQu[1][1], myUpLoadTestDataBuffer->testdata.temperweima.ItemBiaoQu[1][2],
+			myUpLoadTestDataBuffer->testdata.temperweima.CardWaitTime, myUpLoadTestDataBuffer->testdata.temperweima.CLineLocation, myUpLoadTestDataBuffer->testdata.temperweima.CardBaoZhiQi.year, myUpLoadTestDataBuffer->testdata.temperweima.CardBaoZhiQi.month, myUpLoadTestDataBuffer->testdata.temperweima.CardBaoZhiQi.day);
+
+		if(My_Pass != UpLoadData("/NCD_YGFXY/upcard.action", myUpLoadTestDataBuffer->sendbuf, strlen(myUpLoadTestDataBuffer->sendbuf)))
+			goto END;
+		
+		//上传测试数据
+		memset(myUpLoadTestDataBuffer->sendbuf, 0, 1024);
+
+		sprintf(myUpLoadTestDataBuffer->sendbuf, "tdata.cid=%s&tdata.did=%s&tdata.testd=20%02d-%02d-%02d %02d:%02d:%02d&tdata.e_t=%.1f&tdata.o_t=%.1f&tdata.outt=%d&tdata.c_l=%d&tdata.t_l=%d&tdata.b_l=%d&tdata.t_c_v=%.3f&tdata.b_v=%.3f&tdata.a_v=%.3f&tdata.sid=%s",
+			myUpLoadTestDataBuffer->testdata.temperweima.CardPiCi, myUpLoadTestDataBuffer->deviceinfo.deviceid, myUpLoadTestDataBuffer->testdata.TestTime.year, myUpLoadTestDataBuffer->testdata.TestTime.month, myUpLoadTestDataBuffer->testdata.TestTime.day,
+			myUpLoadTestDataBuffer->testdata.TestTime.hour, myUpLoadTestDataBuffer->testdata.TestTime.min, myUpLoadTestDataBuffer->testdata.TestTime.sec, myUpLoadTestDataBuffer->testdata.TestTemp.E_Temperature, myUpLoadTestDataBuffer->testdata.TestTemp.O_Temperature,
+			myUpLoadTestDataBuffer->testdata.time, myUpLoadTestDataBuffer->testdata.testline.C_Point[1], myUpLoadTestDataBuffer->testdata.testline.T_Point[1], myUpLoadTestDataBuffer->testdata.testline.B_Point[1], myUpLoadTestDataBuffer->testdata.testline.BasicBili,
+			myUpLoadTestDataBuffer->testdata.testline.BasicResult, myUpLoadTestDataBuffer->testdata.testline.AdjustResult, myUpLoadTestDataBuffer->testdata.sampleid);
+
+		if(My_Pass != UpLoadData("/NCD_YGFXY/updata.action", myUpLoadTestDataBuffer->sendbuf, strlen(myUpLoadTestDataBuffer->sendbuf)))
+			goto END;
+
+		//上传测试曲线
+		for(i=0; i<4; i++)
+		{
+			memset(myUpLoadTestDataBuffer->sendbuf, 0, 1024);
+			sprintf(myUpLoadTestDataBuffer->sendbuf, "testcardid=%s&index=%d&series=[",
+				myUpLoadTestDataBuffer->testdata.temperweima.CardPiCi, i+1);
+			
+			for(j=0; j<110; j++)
+			{
+				if((i == 3) && (j >= 100))
+					break;
+				
+				if(j == 0)
+					sprintf(myUpLoadTestDataBuffer->tempbuf, "%d", myUpLoadTestDataBuffer->testdata.testline.TestPoint[i*110+j]);
+				else
+					sprintf(myUpLoadTestDataBuffer->tempbuf, ",%d", myUpLoadTestDataBuffer->testdata.testline.TestPoint[i*110+j]);
+				strcat(myUpLoadTestDataBuffer->sendbuf, myUpLoadTestDataBuffer->tempbuf);
+			}
+			
+			sprintf(myUpLoadTestDataBuffer->tempbuf, "]");
+			strcat(myUpLoadTestDataBuffer->sendbuf, myUpLoadTestDataBuffer->tempbuf);
+			
+
+			if(My_Pass != UpLoadData("/NCD_YGFXY/upseries.action", myUpLoadTestDataBuffer->sendbuf, strlen(myUpLoadTestDataBuffer->sendbuf)))
+				goto END;
+		}
+		
+		ReadIndexPlus(1);
+		statues = My_Pass;
 	}
 	
-	MyFree(deviceinfo);
-	MyFree(testdata);
-	MyFree(tempbuf);
-	MyFree(sendbuf);
-	MyFree(linebuf);
-	
+	END:
+		MyFree(myUpLoadTestDataBuffer);
+
 	return statues;
 }
