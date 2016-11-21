@@ -9,7 +9,6 @@
 #include	"Test_Fun.h"
 
 #include	"MyTest_Data.h"
-#include	"Temperature_Data.h"
 #include	"System_Data.h"
 #include	"Define.h"
 #include	"SDFunction.h"

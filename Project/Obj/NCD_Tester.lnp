@@ -82,7 +82,6 @@
 ".\obj\sleeppage.o"
 ".\obj\adjustpage.o"
 ".\obj\retestpage.o"
-".\obj\temperature_data.o"
 ".\obj\cardstatues_data.o"
 ".\obj\motor_data.o"
 ".\obj\timer_data.o"

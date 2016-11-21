@@ -358,7 +358,7 @@
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
-            <uC99>0</uC99>
+            <uC99>1</uC99>
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls></MiscControls>
@@ -658,11 +658,6 @@
               <FilePath>..\Task\USBCMD_Task.c</FilePath>
             </File>
             <File>
-              <FileName>SelfCheck_Task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Task\SelfCheck_Task.c</FilePath>
-            </File>
-            <File>
               <FileName>SystemUI_Task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Task\SystemUI_Task.c</FilePath>
@@ -711,6 +706,11 @@
               <FileName>ReadBarCode_Task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Task\ReadBarCode_Task.c</FilePath>
+            </File>
+            <File>
+              <FileName>SystemStart_Task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Task\SystemStart_Task.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -823,11 +823,6 @@
               <FilePath>..\UI\ShowResultPage.c</FilePath>
             </File>
             <File>
-              <FileName>ServerSetPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\ServerSetPage.c</FilePath>
-            </File>
-            <File>
               <FileName>OtherSetPage.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\UI\OtherSetPage.c</FilePath>
@@ -876,11 +871,6 @@
               <FileName>MyTest_Data.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Datas\MyTest_Data.c</FilePath>
-            </File>
-            <File>
-              <FileName>Net_Data.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Datas\Net_Data.c</FilePath>
             </File>
             <File>
               <FileName>SelfCheck_Data.c</FileName>
@@ -1331,16 +1321,6 @@
               <FileName>udp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\ThirdParty\lwip-1.4.1\src\core\udp.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>cJSON</GroupName>
-          <Files>
-            <File>
-              <FileName>cJSON.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\cJSON-master\cJSON.c</FilePath>
             </File>
           </Files>
         </Group>

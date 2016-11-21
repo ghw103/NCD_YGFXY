@@ -848,11 +848,6 @@
           <GroupName>DataS</GroupName>
           <Files>
             <File>
-              <FileName>Temperature_Data.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Datas\Temperature_Data.c</FilePath>
-            </File>
-            <File>
               <FileName>CardStatues_Data.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Datas\CardStatues_Data.c</FilePath>

@@ -9,7 +9,6 @@
 #include	"WaittingCardPage.h"
 #include	"MyTest_Data.h"
 
-#include	"Temperature_Data.h"
 #include	"System_Data.h"
 #include	"SDFunction.h"
 #include	"Test_Task.h"
@@ -124,7 +123,7 @@ static MyState_TypeDef PageInit(void *  parm)
 	S_TestPageBuffer->currenttestdata = GetCurrentTestItem();
 	
 	RefreshPageText();
-	
+
 	StartTest(&(S_TestPageBuffer->currenttestdata->testdata));
 	
 	return My_Pass;
@@ -218,7 +217,7 @@ static void RefreshPageText(void)
 			memcpy(buf, S_TestPageBuffer->currenttestdata->testdata.sampleid, MaxSampleIDLen);
 			DisText(0x2110, buf, strlen(buf));
 			
-			sprintf(buf, "%2.1f", GetCardTemperature());
+			sprintf(buf, "%2.1f", S_TestPageBuffer->currenttestdata->testdata.TestTemp.O_Temperature);
 			DisText(0x2120, buf, strlen(buf));
 			
 			sprintf(buf, "%s", S_TestPageBuffer->currenttestdata->testdata.temperweima.CardPiCi);

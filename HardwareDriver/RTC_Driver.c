@@ -358,9 +358,6 @@ MyState_TypeDef RTC_SetTimeData(MyTime_Def * data)
 {
 	unsigned char buf[7];
 	
-	buf[0] = 0x20;
-	RX8025_Write(0x0e, buf, 1);
-	
 	/*ÉèÖÃÊ±¼ä*/
 	buf[0] = HEX2BCD(data->sec);
 	buf[1] = HEX2BCD(data->min);

@@ -4,7 +4,6 @@
 #include	"Define.h"
 #include	"Motor_Data.h"
 #include	"Timer_Data.h"
-#include	"Temperature_Data.h"
 
 
 

@@ -10,7 +10,6 @@
 /***************************************************************************************************/
 #include 	"MLX90614_Driver.h"
 #include	"Delay.h"
-#include	"Temperature_Data.h"
 /***************************************************************************************************/
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
@@ -376,21 +375,16 @@ static unsigned char PEC_Calculation(unsigned char pec[])
 *Author：xsx
 *Data：2016年3月17日15:46:52
 ***************************************************************************************************/
-void CollecteTemperature(void)
+float GetCardTemperature(void)
 {
-	static double temp = 0.0;
-	
-	/*读取环境温度*/
-	temp = SMBus_ReadMemory(SA, RAM_ACCESS|0x06);
-	temp *= 0.02;
-	temp -= 273.15;
-	SetInnerTemperature(temp);
+	float temp = 0.0;
 	
 	/*读取被测物体温度*/
 	temp = SMBus_ReadMemory(SA, RAM_ACCESS|0x07);
 	temp *= 0.02;
 	temp -= 273.15;
-	SetCardTemperature(temp);
+	
+	return temp;
 }
 
 /*********************************END OF FILE*********************************/

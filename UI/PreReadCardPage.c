@@ -7,12 +7,11 @@
 #include	"UI_Data.h"
 #include	"MyMem.h"
 #include	"MyTest_Data.h"
-
+#include 	"MLX90614_Driver.h"
 #include	"LunchPage.h"
 #include	"CodeScan_Task.h"
 #include	"WaittingCardPage.h"
 #include	"TimeDownNorPage.h"
-#include	"Temperature_Data.h"
 #include	"CodeScanFunction.h"
 #include	"PaiDuiPage.h"
 #include	"CardStatues_Data.h"
@@ -204,8 +203,11 @@ static void CheckQRCode(void)
 		}
 		else if(S_PreReadPageBuffer->scancode == CardCodeScanOK)
 		{
+			//获取检测卡温度
+			S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.O_Temperature = GetCardTemperature();
+			
 			//设置倒计时时间
-			timer_set(&(S_PreReadPageBuffer->currenttestdata->timer), S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardWaitTime*1);
+			timer_set(&(S_PreReadPageBuffer->currenttestdata->timer), S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardWaitTime*60);
 			
 			//读取校准参数
 			memcpy(S_PreReadPageBuffer->currenttestdata->testdata.tempadjust.ItemName, S_PreReadPageBuffer->currenttestdata->testdata.temperweima.ItemName, ItemNameLen);
@@ -230,13 +232,13 @@ static void CheckPreTestCard(void)
 			AddNumOfSongToList(22, 0);
 		}
 
-		else if((S_PreReadPageBuffer->cardpretestresult == PeakNumError)||(S_PreReadPageBuffer->cardpretestresult == ResultIsOK))
+	/*	else if(S_PreReadPageBuffer->cardpretestresult == PeakNumError)
 		{
 			SendKeyCode(3);
 			MotorMoveTo(GetGB_MotorMaxLocation(), 1);
 			AddNumOfSongToList(22, 0);
-		}
-		else if(S_PreReadPageBuffer->cardpretestresult == PeakNumZero)
+		}*/
+		else if(S_PreReadPageBuffer->cardpretestresult == ResultIsOK)
 		{
 			//如果是排队模式，则进入排队界面
 			if((S_PreReadPageBuffer->currenttestdata->testlocation > 0)&&(S_PreReadPageBuffer->currenttestdata->testlocation < PaiDuiWeiNum))
@@ -280,8 +282,6 @@ static void ShowTemp(void)
 {
 	sprintf(S_PreReadPageBuffer->buf, "%2.1f", GetCardTemperature());
 	DisText(0x1f50, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
-		
-	sprintf(S_PreReadPageBuffer->buf, "%2.1f", GetEnviTemperature());
-	DisText(0x1f58, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
+
 }
 

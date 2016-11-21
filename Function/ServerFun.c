@@ -172,7 +172,7 @@ MyState_TypeDef UpLoadData(char *URL, void * buf, unsigned short buflen)
 	if(mybuf.data && recvbuf.data)
 	{
 		memset(mybuf.data, 0, buflen+512);
-		sprintf(mybuf.data, "POST %s HTTP/1.1\nHost: 123.57.94.39:8080\nConnection: keep-alive\nContent-Length: %d\nContent-Type:application/x-www-form-urlencoded;charset=GBK\n\n%s", URL, buflen, (char *)buf);
+		sprintf(mybuf.data, "POST %s HTTP/1.1\nHost: 123.57.94.39:8080\nConnection: keep-alive\nContent-Length: %d\nContent-Type:application/x-www-form-urlencoded;charset=GBK\nAccept-Language: zh-CN,zh;q=0.8\n\n%s", URL, buflen, (char *)buf);
 		mybuf.datalen = strlen(mybuf.data);
 		
 		memset(recvbuf.data, 0, 1024);

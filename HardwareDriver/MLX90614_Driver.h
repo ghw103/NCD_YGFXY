@@ -23,7 +23,7 @@
 #define RAM_TOBJ1		0x07 //To1 address in the eeprom
 
 void SMBus_Init(void);
-void CollecteTemperature(void); //获取温度值
+float GetCardTemperature(void); //获取温度值
 
 #endif
 

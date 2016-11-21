@@ -13,7 +13,6 @@
 #include	"QueueUnits.h"
 
 #include	"System_Data.h"
-#include	"Temperature_Data.h"
 
 #include	"CRC16.h"
 #include	"Define.h"

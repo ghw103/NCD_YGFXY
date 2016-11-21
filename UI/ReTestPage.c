@@ -26,6 +26,7 @@
 #include	"Ads8325_Driver.h"
 #include	"TLV5617_Driver.h"
 #include	"LEDCheck_Driver.h"
+#include 	"MLX90614_Driver.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -119,7 +120,6 @@ static void PageUpDate(void)
 			if(GetCardState() == CardIN)
 			{
 				//检测到插卡，则保持温度和时间
-				S_ReTestPageBuffer->retestdata.testdata.TestTemp.I_Temperature = GetInnerTemperature();
 				S_ReTestPageBuffer->retestdata.testdata.TestTemp.O_Temperature = GetCardTemperature();
 					
 				GetGB_Time(&(S_ReTestPageBuffer->retestdata.testdata.TestTime));

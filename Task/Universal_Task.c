@@ -11,7 +11,6 @@
 
 #include	"Universal_Task.h"
 #include 	"MLX90614_Driver.h"
-#include	"Temperature_Data.h"
 #include	"Led_Driver.h"
 
 #include	"OutModel_Fun.h"
@@ -69,11 +68,7 @@ static void vUniversalTask( void *pvParameters )
 	static unsigned int count = 0;
 	
 	while(1)
-	{
-		/*获取温度，1S 采集一次*/
-		if(count % 100 == 0)
-			CollecteTemperature();
-		
+	{		
 		/*读取时间，500ms采集一次*/
 		if(count % 50 == 0)
 			UpDateGB_Time();
