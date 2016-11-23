@@ -38,7 +38,7 @@
 
 MyState_TypeDef ConnectPrintter(void)
 {
-	unsigned char txbuf[4] = {0x1b, 0x20, 0x02, 0x0d};
+/*	unsigned char txbuf[4] = {0x1b, 0x20, 0x02, 0x0d};
 	
 	if(pdPASS == SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), txbuf, 4, sizeof(unsigned char), 50 / portTICK_RATE_MS, EnableUsart3TXInterrupt))
 	{
@@ -47,9 +47,9 @@ MyState_TypeDef ConnectPrintter(void)
 			if(txbuf[0] == 0x11)
 				return My_Pass;
 		}
-	}
+	}*/
 	
-	return My_Fail;
+	return My_Pass;
 }
 
 void PrintfData(void *data)

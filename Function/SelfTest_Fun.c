@@ -282,7 +282,7 @@ static MyState_TypeDef MotorSelfTest(void)
 		return My_Fail;
 	}
 	
-	MotorMoveTo(10000, 1);
+/*	MotorMoveTo(10000, 1);
 	vTaskDelay(100 / portTICK_RATE_MS);
 
 	SetDRVPowerStatues(NonamalPower);
@@ -301,7 +301,7 @@ static MyState_TypeDef MotorSelfTest(void)
 	{
 		StopMotor();
 		return My_Fail;
-	}
+	}*/
 	
 	return My_Pass;
 }

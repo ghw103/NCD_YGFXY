@@ -9,7 +9,7 @@
 /******************************************头文件***************************************************/
 /***************************************************************************************************/
 #include	"Motor_Data.h"
-
+#include	"Define.h"
 /***************************************************************************************************/
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
@@ -18,7 +18,7 @@ static LimitState_Def GB_BackLimitState = NotLimitted;							//后限位状态
 static unsigned short GB_MotorLocation = 10000;									//电机当前位置
 static unsigned short GB_MotorTargetLocation = 0;								//目标位置
 static DRVDir_Type GB_MotorDir = Reverse;										//电机方向
-static unsigned short GB_MotorMaxLocation = 0;									//电机最大位置
+static unsigned short GB_MotorMaxLocation = MaxLocation;									//电机最大位置
 /***************************************************************************************************/
 /**************************************局部函数声明*************************************************/
 /***************************************************************************************************/
@@ -84,7 +84,7 @@ void SetGB_MotorDir(DRVDir_Type dir)
 
 void SetGB_MotorMaxLocation(unsigned short loc)
 {
-	GB_MotorMaxLocation = loc;
+	//GB_MotorMaxLocation = loc;
 }
 
 unsigned short GetGB_MotorMaxLocation(void)

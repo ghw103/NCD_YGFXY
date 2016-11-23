@@ -282,6 +282,5 @@ static void ShowTemp(void)
 {
 	sprintf(S_PreReadPageBuffer->buf, "%2.1f", GetCardTemperature());
 	DisText(0x1f50, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
-
 }
 

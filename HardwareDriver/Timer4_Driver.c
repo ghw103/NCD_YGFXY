@@ -112,7 +112,7 @@ void TIM4_IRQHandler(void)
 		
 		if(PreLimited)
 		{
-			SetGB_MotorMaxLocation(GetGB_MotorLocation());
+			//SetGB_MotorMaxLocation(GetGB_MotorLocation());
 			
 			if(GetGB_MotorTargetLocation() > GetGB_MotorMaxLocation())
 				SetGB_MotorTargetLocation(GetGB_MotorLocation());
