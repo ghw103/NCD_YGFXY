@@ -190,9 +190,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>257</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134242570</Address>
+          <LineNumber>276</LineNumber>
+          <EnabledFlag>0</EnabledFlag>
+          <Address>134242562</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -201,23 +201,23 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>..\Function\Test_Fun.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\NCD_Tester\../Function/Test_Fun.c\257</Expression>
+          <Expression></Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>276</LineNumber>
+          <LineNumber>228</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
+          <Address>134253978</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\Function\Test_Fun.c</Filename>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\UI\PreReadCardPage.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression></Expression>
+          <Expression>\\NCD_Tester\../UI/PreReadCardPage.c\228</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>

@@ -55,6 +55,9 @@
 #include "netconf.h"
 #include "stm32f4x7_eth.h"
 #include <string.h>
+#include	"DeviceDao.h"
+#include	"Define.h"
+#include	"MyMem.h"
 
 
 #define netifMTU                                (1500)
@@ -389,11 +392,27 @@ void ethernetif_input( void * pvParameters )
 */
 err_t ethernetif_init(struct netif *netif)
 {
-  LWIP_ASSERT("netif != NULL", (netif != NULL));
-
+	DeviceInfo * deviceinfo = NULL;
+	
+	LWIP_ASSERT("netif != NULL", (netif != NULL));
+	
+	
 #if LWIP_NETIF_HOSTNAME
   /* Initialize interface hostname */
-  netif->hostname = "武汉纽康度荧光免疫定量分析仪";
+	
+	deviceinfo = MyMalloc(sizeof(deviceinfo));
+	if(deviceinfo)
+	{
+		//读取设备信息
+		ReadDeviceInfo(deviceinfo);
+		
+		memcpy(netif->hostname, deviceinfo->deviceid, strlen(deviceinfo->deviceid));
+		
+		MyFree(deviceinfo);
+	}
+	else
+		netif->hostname = "ncd-device";
+  
 #endif /* LWIP_NETIF_HOSTNAME */
 
   netif->name[0] = IFNAME0;

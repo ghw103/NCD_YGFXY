@@ -182,7 +182,7 @@ typedef struct ScanQRTaskData_Tag
 }ScanQRTaskData;
 #pragma pack()
 
-#define	MaxLocation			5500						//最大行程
+#define	MaxLocation			6000						//最大行程
 #define	StartTestLocation	700							//测试起始位置
 #define	EndTestLocation		5000						//测试结束为止
 #define	WaittingCardLocation	MaxLocation					//等待插卡的位置
@@ -283,9 +283,6 @@ typedef struct UserTag
 /******************************************设备信息相关定义****************************************************/
 /**********************************************************************************************************/
 #define	MaxDeviceIDLen	21
-#define	MaxDeviceNameLen	51
-#define	MaxDeviceMakerLen	51
-#define	MaxDeviceMakerPhoneLen	21
 #define	MaxDeviceUnitLen	51
 
 #pragma pack(1)
@@ -293,10 +290,11 @@ typedef struct DeviceInfo_Tag
 {
 	char deviceid[MaxDeviceIDLen];													//设备id
 	char deviceunit[MaxDeviceUnitLen];												//设备使用单位
-	User_Type deviceuser;												//设备使用人
+	User_Type deviceuser;															//设备使用人
+	unsigned char isnew;															//设备信息是否有更新
 	unsigned short crc;
 }DeviceInfo;
-#pragma pack() 
+#pragma pack()
 /**********************************************************************************************************/
 /**********************************************************************************************************/
 

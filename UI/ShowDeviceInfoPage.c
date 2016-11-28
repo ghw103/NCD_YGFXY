@@ -13,6 +13,7 @@
 
 #include	"MyMem.h"
 #include	"SDFunction.h"
+#include	"DeviceDao.h"
 #include	"MyTools.h"
 
 #include	<string.h>

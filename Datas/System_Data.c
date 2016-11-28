@@ -16,8 +16,6 @@
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
-static DeviceInfo GB_DeviceInfo;								//设备信息
-static bool	GB_DeviceInfoIsFresh = true;							//设备信息是否有更新，初始化设置为true，使上电更新一次
 
 static TestData	S_TestData;										//测试数据,用于纽康度生物实验室使用
 
@@ -44,41 +42,7 @@ static NetData GB_NetData;														//设备网络数据
 /*********************************************************************************************/
 /*********************************************************************************************/
 /*********************************************************************************************/
-void SetGB_DeviceInfo(DeviceInfo *info)
-{
-	memcpy(&(GB_DeviceInfo), info, sizeof(DeviceInfo));
-}
 
-void GetGB_DeviceInfo(DeviceInfo *info)
-{
-	if(GB_DeviceInfo.crc != CalModbusCRC16Fun1(&GB_DeviceInfo, sizeof(DeviceInfo)-2))
-	{
-		memset(&GB_DeviceInfo, 0, sizeof(DeviceInfo));
-		GB_DeviceInfo.crc = CalModbusCRC16Fun1(&GB_DeviceInfo, sizeof(DeviceInfo)-2);
-	}
-	memcpy(info, &(GB_DeviceInfo), sizeof(DeviceInfo));
-}
-
-DeviceInfo * GetGB_DeviceInfo2(void)
-{
-	if(GB_DeviceInfo.crc != CalModbusCRC16Fun1(&GB_DeviceInfo, sizeof(DeviceInfo)-2))
-	{
-		memset(&GB_DeviceInfo, 0, sizeof(DeviceInfo));
-		GB_DeviceInfo.crc = CalModbusCRC16Fun1(&GB_DeviceInfo, sizeof(DeviceInfo)-2);
-	}
-	
-	return &GB_DeviceInfo;
-}
-
-void SetDeviceInIsFresh(bool status)
-{
-	GB_DeviceInfoIsFresh = status;
-}
-
-bool GetDeviceInIsFresh(void)
-{
-	return GB_DeviceInfoIsFresh;
-}
 
 /*********************************************************************************************/
 /*********************************************************************************************/
@@ -129,7 +93,14 @@ void GetGB_Time(void * time)
 
 void SetGB_Time(void * time)
 {
-	memcpy(&GB_Time, time, sizeof(MyTime_Def));
+	MyTime_Def * temptime = time;
+	temptime->sec = temptime->sec%60;
+	temptime->min = temptime->min%60;
+	temptime->hour = temptime->hour%24;
+	temptime->day = temptime->day%31;
+	temptime->month = temptime->month%12;
+	
+	memcpy(&GB_Time, temptime, sizeof(MyTime_Def));
 }
 
 /*********************************************************************************************/

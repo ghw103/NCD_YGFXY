@@ -9,6 +9,7 @@
 #include	"ShowDeviceInfoPage.h"
 #include	"SDFunction.h"
 #include	"System_Data.h"
+#include	"DeviceDao.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -65,11 +66,12 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		{
 			if(S_SetDeviceInfoPageBuffer->ismodify == 1)
 			{
+				S_SetDeviceInfoPageBuffer->temp_deviceinfo.isnew = 1;
+				
 				if(My_Pass == SaveDeviceInfo(&(S_SetDeviceInfoPageBuffer->temp_deviceinfo)))
 				{
 					SendKeyCode(2);
-					SetGB_DeviceInfo(&(S_SetDeviceInfoPageBuffer->temp_deviceinfo));
-					SetDeviceInIsFresh(true);
+					S_SetDeviceInfoPageBuffer->ismodify = 0;
 				}
 				else
 					SendKeyCode(1);

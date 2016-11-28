@@ -10,7 +10,7 @@ typedef struct UpLoadTestDataBuffer_Tag
 	TestDataSaveHead myTestDataSaveHead;
 	TestData testdata;
 	
-	char sendbuf[1024];
+	char sendbuf[2048];
 	char tempbuf[10];
 }UpLoadTestDataBuffer;
 #pragma pack()

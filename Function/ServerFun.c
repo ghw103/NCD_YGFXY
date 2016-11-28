@@ -13,6 +13,7 @@
 #include	"System_Data.h"
 #include 	"Usart4_Driver.h"
 #include 	"usbd_cdc_vcp.h"
+#include	"LwipDebug_Task.h"
 
 #include	"MyMem.h"
 
@@ -172,27 +173,27 @@ MyState_TypeDef UpLoadData(char *URL, void * buf, unsigned short buflen)
 	if(mybuf.data && recvbuf.data)
 	{
 		memset(mybuf.data, 0, buflen+512);
-		sprintf(mybuf.data, "POST %s HTTP/1.1\nHost: 123.57.94.39:8080\nConnection: keep-alive\nContent-Length: %d\nContent-Type:application/x-www-form-urlencoded;charset=GBK\nAccept-Language: zh-CN,zh;q=0.8\n\n%s", URL, buflen, (char *)buf);
+		sprintf(mybuf.data, "POST %s HTTP/1.1\nHost: 192.168.0.34:8080\nConnection: keep-alive\nContent-Length: %d\nContent-Type:application/x-www-form-urlencoded;charset=GBK\nAccept-Language: zh-CN,zh;q=0.8\n\n%s", URL, buflen, (char *)buf);
 		mybuf.datalen = strlen(mybuf.data);
-		
+			
 		memset(recvbuf.data, 0, 1024);
-		if(My_Pass == CommunicateWithServerByLineNet(&mybuf, &recvbuf, 123, 57, 94, 39, 1000))
+		if(My_Pass == CommunicateWithServerByLineNet(&mybuf, &recvbuf, 192, 168, 0, 34, 2000))
 		{
 			temp = strstr(recvbuf.data, "myresult->");
 			if(temp)
 			{
-				//USB_PutStr("lwip_mode ok\n", 13);
+				//USB_PutStr("\nlwip_mode ok\n", 13);
 				memset(buf, 0, buflen);
 				memcpy(buf, temp, strlen(temp));
 				statues = My_Pass;
 				goto END1;
 			}
 			else
-				;//USB_PutStr("lwip_mode error\n", 16);
+				;//USB_PutStr("\nlwip_mode error\n", 16);
 		}
 		
 		memset(recvbuf.data, 0, 1024);
-		if(My_Pass == CommunicateWithServerByWifi(&mybuf, &recvbuf, 1000))
+		if(My_Pass == CommunicateWithServerByWifi(&mybuf, &recvbuf, 2000))
 		{
 			temp = strstr(recvbuf.data, "myresult->");
 			if(temp)

@@ -10,6 +10,7 @@
 #include	"ShowDeviceInfoPage.h"
 #include	"ReadBarCode_Fun.h"
 #include	"SDFunction.h"
+#include	"DeviceDao.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -69,11 +70,11 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		{
 			if(S_SetDeviceIDPage->ismodify == 1)
 			{
+				S_SetDeviceIDPage->temp_deviceinfo.isnew = 1;
 				if(My_Pass == SaveDeviceInfo(&(S_SetDeviceIDPage->temp_deviceinfo)))
 				{
 					SendKeyCode(2);
-					SetGB_DeviceInfo(&(S_SetDeviceIDPage->temp_deviceinfo));
-					SetDeviceInIsFresh(true);
+					S_SetDeviceIDPage->ismodify = 0;
 				}
 				else
 					SendKeyCode(1);

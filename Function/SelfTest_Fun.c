@@ -22,6 +22,8 @@
 #include	"DRV8825_Driver.h"
 #include	"System_Data.h"
 
+#include	"DeviceDao.h"
+
 #include	"MyMem.h"
 
 #include 	"FreeRTOS.h"
@@ -101,7 +103,7 @@ MyState_TypeDef GetSelfCheckStatus(unsigned char * receivedchar , portTickType x
 		xSelfCehckQueue = xQueueCreate( 10, ( unsigned portBASE_TYPE ) sizeof( signed portCHAR ) );
 	
 	if(xSelfCehckQueue == NULL)
-		return pdFAIL;
+		return My_Fail;
 	
 	return xQueueReceive( xSelfCehckQueue, receivedchar, xBlockTime );
 }
@@ -120,7 +122,7 @@ MyState_TypeDef SetSelfCheckStatus(unsigned char txchar , portTickType xBlockTim
 		xSelfCehckQueue = xQueueCreate( 10, ( unsigned portBASE_TYPE ) sizeof( signed portCHAR ) );
 	
 	if(xSelfCehckQueue == NULL)
-		return pdFAIL;
+		return My_Fail;
 	
 	return xQueueSend( xSelfCehckQueue, &txchar, xBlockTime);
 }
@@ -349,7 +351,6 @@ static void GB_DataInit(void)
 
 		//读取设备信息
 		ReadDeviceInfo(mydeviceinfo);
-		SetGB_DeviceInfo(mydeviceinfo);
 	}
 	
 	MyFree(mynetdata);

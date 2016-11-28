@@ -9,13 +9,11 @@
 /******************************************头文件***************************************************/
 /***************************************************************************************************/
 
-#include	"LwipUserClient_Task.h"
+#include	"LwipDebug_Task.h"
 
-#include	"Net_Data.h"
 #include	"QueueUnits.h"
-#include	"Net_Data.h"
-#include	"SelfCheck_Data.h"
 #include	"MyMem.h"
+#include	"Define.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -28,20 +26,20 @@
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
 
-#define LwipUserClientTask_PRIORITY			2						//客户端任务优先级
-const char * LwipUserClientTaskName = "vLwipUserClientTask";				//客户端任务名
+#define LwipDebugTask_PRIORITY			2						//客户端任务优先级
+const char * LwipDebugTaskName = "vLwipDebugTask";				//客户端任务名
 
 static struct netconn *tcp_clientconn;
 static struct ip_addr server_ipaddr;
+
+static xQueueHandle xDebugDataQueue = NULL ;
 
 /***************************************************************************************************/
 /**************************************局部函数声明*************************************************/
 /***************************************************************************************************/
 
-static void vLwipUserClientTask( void *pvParameters );	//客户端自动连接任务
-
-static void ClientTXHandle(struct netconn *pxNetCon);
-static void ClientRXHandle(struct netconn *pxNetCon);
+static void vLwipDebugTask( void *pvParameters );	//客户端自动连接任务
+static MyState_TypeDef DebugTXHandle(struct netconn *pxNetCon);
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************正文********************************************************/
@@ -57,9 +55,11 @@ static void ClientRXHandle(struct netconn *pxNetCon);
 *Author：xsx
 *Data：2016年4月21日17:15:52
 ***************************************************************************************************/
-void StartvLwipUserClientTask(void)
+void StartvLwipDebugTask(void)
 {
-	xTaskCreate( vLwipUserClientTask, LwipUserClientTaskName, configMINIMAL_STACK_SIZE, NULL, LwipUserClientTask_PRIORITY, NULL );
+	xDebugDataQueue = xQueueCreate(10, sizeof(mynetbuf));
+	
+	xTaskCreate( vLwipDebugTask, LwipDebugTaskName, configMINIMAL_STACK_SIZE, NULL, LwipDebugTask_PRIORITY, NULL );
 }
 
 /***************************************************************************************************
@@ -70,50 +70,49 @@ void StartvLwipUserClientTask(void)
 *Author：xsx
 *Data：2016年4月21日17:15:39
 ***************************************************************************************************/
-static void vLwipUserClientTask( void *pvParameters )
+static void vLwipDebugTask( void *pvParameters )
 {
 	err_t err;
+	
+	IP4_ADDR(&server_ipaddr, 192,168,0,34);
+			
 	while(1)
 	{
-//		if(SelfCheck_OK == GetGB_SelfCheckResult())
+		tcp_clientconn = netconn_new(NETCONN_TCP);
+		if(tcp_clientconn != NULL)
 		{
-			//IP4_ADDR(&server_ipaddr,GetGB_NetData()->serverip.ip_1,GetGB_NetData()->serverip.ip_2,GetGB_NetData()->serverip.ip_3,GetGB_NetData()->serverip.ip_4);
-			IP4_ADDR(&server_ipaddr, 192,168,0,35);
-			while(1)
-			{
-				if(Line_Mode == GetGB_NetCard())														//当前网卡是有线网时
-				{
-					tcp_clientconn = netconn_new(NETCONN_TCP);
-					netconn_bind(tcp_clientconn , IP_ADDR_ANY , 9002);
-					err = netconn_connect(tcp_clientconn,&server_ipaddr,9602);
-					tcp_clientconn->recv_timeout = 10;											//接收超时时间10ms
-					
-					if(err != ERR_OK)
-					{
-						netconn_close( tcp_clientconn );
-						netconn_delete(tcp_clientconn);
-					}
-					else if (err == ERR_OK)
-					{
-						SetGB_UserServerLinkState(Link_Up);
-						while(ESTABLISHED == tcp_clientconn->pcb.tcp->state)									//正常连接后任务挂起
-						{
-							ClientTXHandle(tcp_clientconn);
-							ClientRXHandle(tcp_clientconn);
-							//vTaskDelay(10 / portTICK_RATE_MS);
-						}
+			err = netconn_connect(tcp_clientconn,&server_ipaddr,9600);
+			tcp_clientconn->recv_timeout = 10;											//接收超时时间10ms
 						
-						SetGB_UserServerLinkState(Link_Down);
-						netconn_close( tcp_clientconn );
-						netconn_delete(tcp_clientconn);
-					}
+			if(err != ERR_OK)
+			{
+				netconn_close( tcp_clientconn );
+				netconn_delete(tcp_clientconn);
+			}
+			else if (err == ERR_OK)
+			{
+				while(1)									//正常连接后任务挂起
+				{
+					if(My_Fail == DebugTXHandle(tcp_clientconn))
+						break;
 				}
-				
-				vTaskDelay(10 / portTICK_RATE_MS);
+							
+				netconn_close( tcp_clientconn );
+				netconn_delete(tcp_clientconn);
 			}
 		}
-		vTaskDelay(1000 / portTICK_RATE_MS);
+		
+		
+		vTaskDelay(10 / portTICK_RATE_MS);
 	}
+				
+	vTaskDelay(10 / portTICK_RATE_MS);
+}
+
+
+xQueueHandle GetLwipDebugQueue(void)
+{
+	return xDebugDataQueue;
 }
 
 /***************************************************************************************************
@@ -124,18 +123,22 @@ static void vLwipUserClientTask( void *pvParameters )
 *Author：xsx
 *Data：2016年4月22日16:17:11
 ***************************************************************************************************/
-static void ClientTXHandle(struct netconn *pxNetCon)
+static MyState_TypeDef DebugTXHandle(struct netconn *pxNetCon)
 {
 	mynetbuf sendbuf;
+	err_t err;
 
 	memset(&sendbuf, 0, sizeof(mynetbuf));
 	
-	if(pdPASS == ReceiveDataFromQueue(GetGBUserClientTXQueue(), NULL, &sendbuf, 1, sizeof(mynetbuf), 10*portTICK_RATE_MS))
+	if(pdPASS == ReceiveDataFromQueue(xDebugDataQueue, NULL, &sendbuf, 1, sizeof(mynetbuf), 10*portTICK_RATE_MS))
 	{
-		netconn_write( pxNetCon, sendbuf.data, sendbuf.datalen, NETCONN_COPY );
+		err = netconn_write( pxNetCon, sendbuf.data, sendbuf.datalen, NETCONN_COPY );
 		
-		MyFree(sendbuf.data);
+		if(err != ERR_OK)
+			return My_Fail;
 	}
+	
+	return My_Pass;
 }
 
 /***************************************************************************************************
@@ -146,7 +149,7 @@ static void ClientTXHandle(struct netconn *pxNetCon)
 *Author：xsx
 *Data：2016年4月22日16:17:28
 ***************************************************************************************************/
-static void ClientRXHandle(struct netconn *pxNetCon)
+static MyState_TypeDef DebugRXHandle(struct netconn *pxNetCon)
 {
 	err_t err;
 	struct netbuf *recvbuf;
@@ -172,7 +175,7 @@ static void ClientRXHandle(struct netconn *pxNetCon)
 			}
 			
 			/*正常*/
-			if(pdPASS != SendDataToQueue(GetGBUserClientRXQueue(), NULL, &myrecvbuf, 1, sizeof(mynetbuf), 10 / portTICK_RATE_MS, NULL))
+			if(pdPASS != SendDataToQueue(xDebugDataQueue, NULL, &myrecvbuf, 1, sizeof(mynetbuf), 10 / portTICK_RATE_MS, NULL))
 			//if(pdPASS != SendDataToQueue(GetGBUserClientTXQueue(), GetGBUserClientTXMutex(), &myrecvbuf, 1, 10*portTICK_RATE_MS, NULL))
 				MyFree(myrecvbuf.data);
 		}

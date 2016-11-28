@@ -4,15 +4,6 @@
 
 #include	"Define.h"
 
-//设备信息
-void SetGB_DeviceInfo(DeviceInfo *info);
-void GetGB_DeviceInfo(DeviceInfo *info);
-DeviceInfo * GetGB_DeviceInfo2(void);
-
-//设备信息是否有更新
-void SetDeviceInIsFresh(bool status);
-bool GetDeviceInIsFresh(void);
-
 void * GetTestDataForLab(void);
 void SetTestStatusFlorLab(unsigned char status);
 unsigned char GetTestStatusFlorLab(void);

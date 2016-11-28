@@ -13,6 +13,7 @@
 #include	"SDFunction.h"
 #include	"System_Data.h"
 #include	"RTC_Driver.h"
+#include	"DeviceDao.h"
 
 #include	"cJSON.h"
 #include	"MyMem.h"
@@ -66,13 +67,13 @@ void UpLoadFunction(void)
 					vTaskDelay(100 / portTICK_RATE_MS);
 				}
 				
-				vTaskDelay((50-i)*1000 / portTICK_RATE_MS);
+				vTaskDelay((10-i)*1000 / portTICK_RATE_MS);
 			}
 			else
-				vTaskDelay(60000 / portTICK_RATE_MS);
+				vTaskDelay(10000 / portTICK_RATE_MS);
 		}
 		else
-			vTaskDelay(60000 / portTICK_RATE_MS);
+			vTaskDelay(10000 / portTICK_RATE_MS);
 	}
 }
 
@@ -90,9 +91,9 @@ static MyState_TypeDef ReadTime(void)
 		memset(buf, 0, 100);
 		
 		//读取设备信息
-		GetGB_DeviceInfo(deviceinfo);
+		ReadDeviceInfo(deviceinfo);
 		
-		sprintf(buf, "deviceid=%s", deviceinfo->deviceid);
+		sprintf(buf, "deviceBean.id=%s", deviceinfo->deviceid);
 		
 		if(My_Pass == UpLoadData("/NCD_YGFXY_Server/rtime.action", buf, strlen(buf)))
 		{
@@ -112,38 +113,49 @@ static MyState_TypeDef UpLoadDeviceInfo(void)
 
 	DeviceInfo * deviceinfo = NULL;
 	char * buf = NULL;
+	static unsigned char i=0;
 	
+	deviceinfo = MyMalloc(sizeof(DeviceInfo));
 	
-	if(true == GetDeviceInIsFresh())
+	if(deviceinfo)
 	{
-		deviceinfo = MyMalloc(sizeof(DeviceInfo));
-		buf = MyMalloc(2048);
+		//读取设备信息
+		ReadDeviceInfo(deviceinfo);
 		
-		if(deviceinfo && buf)
+		//如果有更新
+		if(1 == deviceinfo->isnew)
 		{
-			//读取设备信息
-			GetGB_DeviceInfo(deviceinfo);
+			buf = MyMalloc(2048);
 			
-			memset(buf, 0, 2048);
-
-			sprintf(buf, "dfo.id=%s&dfo.daddr=%s&dfo.dname=%s&dfo.dage=%s&dfo.dsex=%s&dfo.dphone=%s&dfo.djob=%s&dfo.ddesc=%s&dfo.disok=true",
-				deviceinfo->deviceid,  deviceinfo->deviceunit, deviceinfo->deviceuser.user_name, deviceinfo->deviceuser.user_age, deviceinfo->deviceuser.user_sex,
-				deviceinfo->deviceuser.user_phone, deviceinfo->deviceuser.user_job, deviceinfo->deviceuser.user_desc);
-
-			if(My_Pass == UpLoadData("/NCD_YGFXY_Server/up_info.action", buf, strlen(buf)))
+			if(buf)
 			{
-				SetDeviceInIsFresh(false);
-				status = My_Pass;
+				memset(buf, 0, 2048);
+
+				sprintf(buf, "deviceBean.id=%s&deviceBean.daddr=%s&deviceBean.name=%s&deviceBean.age=%s&deviceBean.sex=%s&deviceBean.phone=%s&deviceBean.job=%s&deviceBean.dsc=%s&deviceBean.disok=true",
+					deviceinfo->deviceid,  deviceinfo->deviceunit, deviceinfo->deviceuser.user_name, deviceinfo->deviceuser.user_age+i, deviceinfo->deviceuser.user_sex,
+					deviceinfo->deviceuser.user_phone, deviceinfo->deviceuser.user_job, deviceinfo->deviceuser.user_desc);
+				
+				if(My_Pass == UpLoadData("/NCD_YGFXY_Server/d_info.action", buf, strlen(buf)))
+				{
+					i++;
+					deviceinfo->isnew = 0;
+					SaveDeviceInfo(deviceinfo);
+					
+					status = My_Pass;
+				}
+				
+				MyFree(buf);
 			}
 		}
+		else
+			status = My_Pass;
 		
 		MyFree(deviceinfo);
-		MyFree(buf);
 		
 		return status;
 	}
 	else
-		return My_Pass;
+		return My_Fail;
 }
 
 static MyState_TypeDef UpLoadTestData(void)
@@ -160,7 +172,7 @@ static MyState_TypeDef UpLoadTestData(void)
 		memset(myUpLoadTestDataBuffer, 0, sizeof(UpLoadTestDataBuffer));
 		
 		//读取设备信息
-		GetGB_DeviceInfo(&(myUpLoadTestDataBuffer->deviceinfo));
+		ReadDeviceInfo(&(myUpLoadTestDataBuffer->deviceinfo));
 		
 		//读取测试数据头,失败则退出
 		if(My_Pass != ReadTestDataHead(&(myUpLoadTestDataBuffer->myTestDataSaveHead)))
@@ -184,21 +196,23 @@ static MyState_TypeDef UpLoadTestData(void)
 		}
 		
 		//上传测试数据
-		memset(myUpLoadTestDataBuffer->sendbuf, 0, 1024);
+		memset(myUpLoadTestDataBuffer->sendbuf, 0, 2048);
 
-		sprintf(myUpLoadTestDataBuffer->sendbuf, "tdata.cid=%s&tdata.did=%s&tdata.testd=20%02d-%02d-%02d&tdata.testt=%02d:%02d:%02d&tdata.e_t=%.1f&tdata.o_t=%.1f&tdata.outt=%d&tdata.c_l=%d&tdata.t_l=%d&tdata.b_l=%d&tdata.t_c_v=%.3f&tdata.a_p=%.3f&tdata.b_v=%.3f&tdata.a_v=%.3f&tdata.sid=%s",
-			myUpLoadTestDataBuffer->testdata.temperweima.CardPiCi, myUpLoadTestDataBuffer->deviceinfo.deviceid, myUpLoadTestDataBuffer->testdata.TestTime.year, myUpLoadTestDataBuffer->testdata.TestTime.month, myUpLoadTestDataBuffer->testdata.TestTime.day,
-			myUpLoadTestDataBuffer->testdata.TestTime.hour, myUpLoadTestDataBuffer->testdata.TestTime.min, myUpLoadTestDataBuffer->testdata.TestTime.sec, myUpLoadTestDataBuffer->testdata.TestTemp.E_Temperature, myUpLoadTestDataBuffer->testdata.TestTemp.O_Temperature,
+		sprintf(myUpLoadTestDataBuffer->sendbuf, "tdata.cid=%s&tdata.citem=%s&tdata.cdw=%s&tdata.did=%s&tdata.t_name=%s&tdata.sampleid=%s&tdata.testtime=2016-11-24 16:42:12&tdata.e_t=%.1f&tdata.o_t=%.1f&tdata.outt=%d&tdata.c_l=%d&tdata.t_l=%d&tdata.b_l=%d&tdata.t_c_v=%.3f&tdata.a_p=%.3f&tdata.b_v=%.3f&tdata.a_v=%.3f",
+			myUpLoadTestDataBuffer->testdata.temperweima.CardPiCi, myUpLoadTestDataBuffer->testdata.temperweima.ItemName, myUpLoadTestDataBuffer->testdata.temperweima.ItemMeasure, myUpLoadTestDataBuffer->deviceinfo.deviceid, myUpLoadTestDataBuffer->testdata.user.user_name, myUpLoadTestDataBuffer->testdata.sampleid,
+			/*myUpLoadTestDataBuffer->testdata.TestTime.year, myUpLoadTestDataBuffer->testdata.TestTime.month, myUpLoadTestDataBuffer->testdata.TestTime.day,
+			myUpLoadTestDataBuffer->testdata.TestTime.hour, myUpLoadTestDataBuffer->testdata.TestTime.min, myUpLoadTestDataBuffer->testdata.TestTime.sec, */
+			myUpLoadTestDataBuffer->testdata.TestTemp.E_Temperature, myUpLoadTestDataBuffer->testdata.TestTemp.O_Temperature,
 			myUpLoadTestDataBuffer->testdata.time, myUpLoadTestDataBuffer->testdata.testline.C_Point[1], myUpLoadTestDataBuffer->testdata.testline.T_Point[1], myUpLoadTestDataBuffer->testdata.testline.B_Point[1], myUpLoadTestDataBuffer->testdata.testline.BasicBili,
-			myUpLoadTestDataBuffer->testdata.tempadjust.parm, myUpLoadTestDataBuffer->testdata.testline.BasicResult, myUpLoadTestDataBuffer->testdata.testline.AdjustResult, myUpLoadTestDataBuffer->testdata.sampleid);
+			myUpLoadTestDataBuffer->testdata.tempadjust.parm, myUpLoadTestDataBuffer->testdata.testline.BasicResult, myUpLoadTestDataBuffer->testdata.testline.AdjustResult);
 
-		if(My_Pass != UpLoadData("/NCD_YGFXY_Server/updata.action", myUpLoadTestDataBuffer->sendbuf, strlen(myUpLoadTestDataBuffer->sendbuf)))
+		if(My_Pass != UpLoadData("/NCD_YGFXY_Server/uptestdata.action", myUpLoadTestDataBuffer->sendbuf, strlen(myUpLoadTestDataBuffer->sendbuf)))
 			goto END;
 		
 		//上传检测卡数据
-		memset(myUpLoadTestDataBuffer->sendbuf, 0, 1024);
+		memset(myUpLoadTestDataBuffer->sendbuf, 0, 2048);
 
-		sprintf(myUpLoadTestDataBuffer->sendbuf, "tdata.cid=%s&tdata.c_item=%s&tdata.c_n_v=%.3f&tdata.c_l_v=%.3f&tdata.c_h_v=%.3f&tdata.c_dw=%s&tdata.c_t_l=%d&tdata.c_bq_n=%d&tdata.c_fend=%.3f&tdata.c_bq1_a=%.3f&tdata.c_bq1_b=%.3f&tdata.c_bq1_c=%.3f&tdata.c_bq2_a=%.3f&tdata.c_bq2_b=%.3f&tdata.c_bq2_c=%.3f&tdata.c_waitt=%d&tdata.c_c_l=%d&tdata.c_outt=20%02d-%02d-%02d",
+		sprintf(myUpLoadTestDataBuffer->sendbuf, "cardBean.id=%s&cardBean.item=%s&cardBean.n_v=%.3f&cardBean.l_v=%.3f&cardBean.h_v=%.3f&cardBean.dw=%s&cardBean.tl=%d&cardBean.bq_n=%d&cardBean.fend=%.3f&cardBean.bq1_a=%.3f&cardBean.bq1_b=%.3f&cardBean.bq1_c=%.3f&cardBean.bq2_a=%.3f&cardBean.bq2_b=%.3f&cardBean.bq2_c=%.3f&cardBean.waitt=%d&cardBean.cl=%d&cardBean.outt=20%02d-%02d-%02d",
 			myUpLoadTestDataBuffer->testdata.temperweima.CardPiCi, myUpLoadTestDataBuffer->testdata.temperweima.ItemName, myUpLoadTestDataBuffer->testdata.temperweima.NormalResult, myUpLoadTestDataBuffer->testdata.temperweima.LowstResult, myUpLoadTestDataBuffer->testdata.temperweima.HighestResult,
 			myUpLoadTestDataBuffer->testdata.temperweima.ItemMeasure, myUpLoadTestDataBuffer->testdata.temperweima.ItemLocation, myUpLoadTestDataBuffer->testdata.temperweima.ItemBiaoQuNum, myUpLoadTestDataBuffer->testdata.temperweima.ItemFenDuan, myUpLoadTestDataBuffer->testdata.temperweima.ItemBiaoQu[0][0],
 			myUpLoadTestDataBuffer->testdata.temperweima.ItemBiaoQu[0][1], myUpLoadTestDataBuffer->testdata.temperweima.ItemBiaoQu[0][2],myUpLoadTestDataBuffer->testdata.temperweima.ItemBiaoQu[1][0],	myUpLoadTestDataBuffer->testdata.temperweima.ItemBiaoQu[1][1], myUpLoadTestDataBuffer->testdata.temperweima.ItemBiaoQu[1][2],
@@ -210,8 +224,8 @@ static MyState_TypeDef UpLoadTestData(void)
 		//上传测试曲线
 		for(i=0; i<4; i++)
 		{
-			memset(myUpLoadTestDataBuffer->sendbuf, 0, 1024);
-			sprintf(myUpLoadTestDataBuffer->sendbuf, "testcardid=%s&index=%d&series=[",
+			memset(myUpLoadTestDataBuffer->sendbuf, 0, 2048);
+			sprintf(myUpLoadTestDataBuffer->sendbuf, "tdata.cid=%s&sindex=%d&series=[",
 				myUpLoadTestDataBuffer->testdata.temperweima.CardPiCi, i+1);
 			
 			for(j=0; j<110; j++)
@@ -230,11 +244,11 @@ static MyState_TypeDef UpLoadTestData(void)
 			strcat(myUpLoadTestDataBuffer->sendbuf, myUpLoadTestDataBuffer->tempbuf);
 			
 
-			if(My_Pass != UpLoadData("/NCD_YGFXY_Server/upseries.action", myUpLoadTestDataBuffer->sendbuf, strlen(myUpLoadTestDataBuffer->sendbuf)))
+			if(My_Pass != UpLoadData("/NCD_YGFXY_Server/upseriesdata.action", myUpLoadTestDataBuffer->sendbuf, strlen(myUpLoadTestDataBuffer->sendbuf)))
 				goto END;
 		}
 		
-		//上传测试人
+/*		//上传测试人
 		memset(myUpLoadTestDataBuffer->sendbuf, 0, 1024);
 
 		sprintf(myUpLoadTestDataBuffer->sendbuf, "tdata.cid=%s&tdata.t_name=%s&tdata.t_age=%s&tdata.t_sex=%s&tdata.t_phone=%s&tdata.t_job=%s&tdata.t_desc=%s",
@@ -243,7 +257,7 @@ static MyState_TypeDef UpLoadTestData(void)
 			myUpLoadTestDataBuffer->testdata.user.user_desc);
 
 		if(My_Pass != UpLoadData("/NCD_YGFXY_Server/uptester.action", myUpLoadTestDataBuffer->sendbuf, strlen(myUpLoadTestDataBuffer->sendbuf)))
-			goto END;
+			goto END;*/
 		
 		ReadIndexPlus(1);
 		statues = My_Pass;

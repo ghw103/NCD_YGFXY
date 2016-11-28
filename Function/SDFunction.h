@@ -6,10 +6,6 @@
 
 MyState_TypeDef CheckSDFunction(void);
 
-/*读写设备信息*/
-MyState_TypeDef SaveDeviceInfo(DeviceInfo * deviceinfo);
-MyState_TypeDef ReadDeviceInfo(DeviceInfo * deviceinfo);
-
 /*读写操作人*/
 MyState_TypeDef SaveUserData(User_Type * user);
 void ReadUserData(User_Type * user);

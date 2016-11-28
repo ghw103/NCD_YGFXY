@@ -12,6 +12,7 @@
 #include	"LabServer_Fun.h"
 #include	"Test_Fun.h"
 #include	"Test_Task.h"
+#include	"DeviceDao.h"
 
 #include	"System_Data.h"
 #include	"CRC16.h"
@@ -79,7 +80,6 @@ static void ProcessCMD(unsigned char *buf, unsigned short len, struct netconn *p
 	char *pxbuf2;
 	unsigned short temp = 0xffff;
 	unsigned short i=0;
-	ResultState cardpretestresult;
 	
 	pxbuf1 = MyMalloc(4096);
 	pxbuf2 = MyMalloc(10);
@@ -89,7 +89,7 @@ static void ProcessCMD(unsigned char *buf, unsigned short len, struct netconn *p
 		
 		if(!strncmp( (char *)buf, "Read Device Info", 16 ))
 		{
-			sprintf(pxbuf1, "{\"deviceid\":\"%s\",\"devicestatus\":%d}", ((DeviceInfo *)(GetGB_DeviceInfo2()))->deviceid, GetTestStatusFlorLab());
+			//sprintf(pxbuf1, "{\"deviceid\":\"%s\",\"devicestatus\":%d}", ((DeviceInfo *)(GetGB_DeviceInfo2()))->deviceid, GetTestStatusFlorLab());
 		}
 		else if(!strncmp( (char *)buf, "Start Test", 10 ))
 		{
