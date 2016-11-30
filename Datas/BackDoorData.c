@@ -19,7 +19,7 @@
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
-const BackDoorData s_BackDoorData[3]=
+const BackDoorData s_BackDoorData[12]=
 {
 	//PCT
 	{
@@ -40,11 +40,83 @@ const BackDoorData s_BackDoorData[3]=
 	//D_Dimer
 	{
 		.data1 = 0.2,
-		.data2 = {0.2, 0.5, 1, 2, 5, 10},
+		.data2 = {0.2, 0.5, 1, 2, 5, 15},
 		.data3 = {0.5, 1, 5, 5},
 		.data4 = {0.5, 10},
 		.data5 = {0.5, 10}
 	},
+	//CYSC
+	{
+		.data1 = 0.5,
+		.data2 = {0.5, 2, 3, 5, 6, 8},
+		.data3 = {0.5, 3, 6, 6},
+		.data4 = {2, 6},
+		.data5 = {2, 6}
+	},
+	//¦Â-HCG
+	{
+		.data1 = 2.5,
+		.data2 = {2.5, 5, 25, 100, 250, 1000},
+		.data3 = {5, 25, 100, 100},
+		.data4 = {5, 25},
+		.data5 = {5, 25}
+	},
+	//PGI
+	{
+		.data1 = 10,
+		.data2 = {10, 25, 50, 75, 100, 150},
+		.data3 = {25, 50, 100, 100},
+		.data4 = {75, 100},
+		.data5 = {75, 100}
+	},
+	//PGII
+	{
+		.data1 = 6.25,
+		.data2 = {6.25, 12.5, 25, 50, 75, 100},
+		.data3 = {12.5, 25, 75, 75},
+		.data4 = {12.5, 50},
+		.data5 = {12.5, 50}
+	},
+	//NGAL
+	{
+		.data1 = 10,
+		.data2 = {10, 300, 600, 900, 1200, 1500},
+		.data3 = {10, 300, 900, 900},
+		.data4 = {10, 300},
+		.data5 = {10, 300}
+	},
+	//MPO
+	{
+		.data1 = 2,
+		.data2 = {2, 20, 100, 150, 200, 300},
+		.data3 = {20, 100, 200, 300},
+		.data4 = {20, 150},
+		.data5 = {20, 150}
+	},
+	//¦Â2-MG
+	{
+		.data1 = 0.2,
+		.data2 = {1, 2, 6, 9, 12, 18},
+		.data3 = {2, 6, 9},
+		.data4 = {2, 6},
+		.data5 = {2, 6}
+	},
+	//H-FABP
+	{
+		.data1 = 2,
+		.data2 = {2, 6.25, 12.5, 25, 50, 100},
+		.data3 = {6.25, 25, 50},
+		.data4 = {6.25, 25},
+		.data5 = {6.25, 25}
+	},
+	//Lp-PLA2
+	{
+		.data1 = 6,
+		.data2 = {10, 50, 200, 400, 600, 800},
+		.data3 = {50, 200, 400, 400},
+		.data4 = {10, 200},
+		.data5 = {10, 200}
+	}
 };
 
 static unsigned char S_ItemIndex = 0;									//²âÊÔÏîÄ¿
@@ -69,6 +141,24 @@ void SetS_TestItemName(void * name)
 		SetS_ItemIndex(1);
 	else if(CheckStrIsSame("D-Dimer", name, strlen(name)))
 		SetS_ItemIndex(2);
+	else if(CheckStrIsSame("CysC", name, strlen(name)))
+		SetS_ItemIndex(3);
+	else if(CheckStrIsSame("¦Â-HCG", name, strlen(name)))
+		SetS_ItemIndex(4);
+	else if(CheckStrIsSame("PGI", name, strlen(name)))
+		SetS_ItemIndex(5);
+	else if(CheckStrIsSame("PGII", name, strlen(name)))
+		SetS_ItemIndex(6);
+	else if(CheckStrIsSame("NGAL", name, strlen(name)))
+		SetS_ItemIndex(7);
+	else if(CheckStrIsSame("MPO", name, strlen(name)))
+		SetS_ItemIndex(8);
+	else if(CheckStrIsSame("¦Â2-MG", name, strlen(name)))
+		SetS_ItemIndex(9);
+	else if(CheckStrIsSame("H-FABP", name, strlen(name)))
+		SetS_ItemIndex(10);
+	else if(CheckStrIsSame("Lp-PLA2", name, strlen(name)))
+		SetS_ItemIndex(11);
 }
 
 void SetS_ItemIndex(unsigned char index)
@@ -109,10 +199,13 @@ double GetCurrentData(void)
 	double a,b,c;
 	double temp1;
 	
+	b = pow(-1, ((rand()%2)+1));
+	
 	switch(S_CategoryIndex)
 	{
 		case 0:
 			temp1 = s_BackDoorData[S_ItemIndex].data1;
+			b = -1;
 				break;
 		case 1:
 			temp1 = s_BackDoorData[S_ItemIndex].data2[S_TestIndex / data2_t];
@@ -134,8 +227,6 @@ double GetCurrentData(void)
 	a = rand()%101;
 	a *= 0.01;
 	a *= temp1*0.075;
-	
-	b = pow((-1), ((rand()%2)+1));
 	
 	a *= b;
 	

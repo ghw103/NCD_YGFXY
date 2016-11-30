@@ -12,11 +12,12 @@ typedef struct BackDoorData_tag {
 }BackDoorData;
 #pragma pack()
 
-#define	data1_t	20
-#define	data2_t	3
-#define	data3_t	3
-#define	data4_t	10
-#define	data5_t	9
+//每个值测试次数
+#define	data1_t	20											//最低检测线
+#define	data2_t	3											//线性
+#define	data3_t	3											//准确度
+#define	data4_t	10											//重复性
+#define	data5_t	9											//批间差
 
 void SetS_TestItemName(void * name);
 void SetS_ItemIndex(unsigned char index);

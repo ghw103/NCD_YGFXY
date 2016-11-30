@@ -178,7 +178,21 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	/*获取测试项目名称*/
 	S_ReadCodeBuffer->pbuf1 = strtok(NULL, "#");
 	if(S_ReadCodeBuffer->pbuf1)
-		memcpy(S_ScanQRTaskData->cardQR->ItemName, S_ReadCodeBuffer->pbuf1 ,strlen(S_ReadCodeBuffer->pbuf1));
+	{
+		memset(S_ReadCodeBuffer->tempbuf, 0, 64);
+		memcpy(S_ReadCodeBuffer->tempbuf, S_ReadCodeBuffer->pbuf1 ,strlen(S_ReadCodeBuffer->pbuf1));
+		
+		//查找特定字符串
+		S_ReadCodeBuffer->pbuf1 = strstr(S_ReadCodeBuffer->tempbuf, "[1]");
+		if(S_ReadCodeBuffer->pbuf1 != NULL)
+		{
+			memcpy(S_ScanQRTaskData->cardQR->ItemName, S_ReadCodeBuffer->tempbuf , S_ReadCodeBuffer->pbuf1-S_ReadCodeBuffer->tempbuf);
+			memcpy(S_ScanQRTaskData->cardQR->ItemName + strlen(S_ScanQRTaskData->cardQR->ItemName), "β" , strlen("β"));
+			memcpy(S_ScanQRTaskData->cardQR->ItemName + strlen(S_ScanQRTaskData->cardQR->ItemName), S_ReadCodeBuffer->tempbuf + strlen("[1]"), strlen(S_ReadCodeBuffer->tempbuf) - strlen("[1]"));
+		}
+		else
+			memcpy(S_ScanQRTaskData->cardQR->ItemName, S_ReadCodeBuffer->tempbuf ,strlen(S_ReadCodeBuffer->tempbuf));
+	}
 	else
 		goto END;
 		
