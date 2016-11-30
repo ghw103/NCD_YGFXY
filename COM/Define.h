@@ -182,12 +182,13 @@ typedef struct ScanQRTaskData_Tag
 }ScanQRTaskData;
 #pragma pack()
 
-#define	MaxLocation			6000						//×î´óĞĞ³Ì
-#define	StartTestLocation	700							//²âÊÔÆğÊ¼Î»ÖÃ
-#define	EndTestLocation		5000						//²âÊÔ½áÊøÎªÖ¹
+#define	MaxLocation			6500						//×î´óĞĞ³Ì
+#define	StartTestLocation	1250							//²âÊÔÆğÊ¼Î»ÖÃ
+#define	EndTestLocation		4300						//²âÊÔ½áÊøÎªÖ¹
 #define	WaittingCardLocation	MaxLocation					//µÈ´ı²å¿¨µÄÎ»ÖÃ
-#define	AvregeNum		10															//??????????,??????????
-#define	MaxPointLen		(EndTestLocation - StartTestLocation)/AvregeNum				//?????
+#define	AvregeNum		10								//Æ½¾ùÖµÂË²¨¸öÊı
+#define	FilterNum		5								//Æ½»¬ÂË²¨¸öÊı
+#define	MaxPointLen		((EndTestLocation - StartTestLocation)/AvregeNum - FilterNum)	//²âÊÔµã¸öÊı
 
 
 /**********************************************************************************************************/
@@ -196,13 +197,13 @@ typedef struct ScanQRTaskData_Tag
 /**********************************************************************************************************/
 /******************************************ÑùÆ·IDÏà¹Ø¶¨Òå**************************************************/
 /**********************************************************************************************************/
-#define	MaxSampleIDLen	20											//×î´óÖ§³ÖÑùÆ·id³¤¶ÈÎª20
+#define	MaxSampleIDLen	20											//×îóÖ§³ÖÑùÆ·id³¤¶ÈÎª20
 /**********************************************************************************************************/
 /**********************************************************************************************************/
 
 /**********************************************************************************************************/
 /******************************************½çÃæÏà¹Ø¶¨Òå****************************************************/
-/**********************************************************************************************************/
+/***************************************************************************´*******************************/
 
 typedef struct LineInfo_Tag
 {
@@ -430,17 +431,10 @@ typedef struct AdjustData_tag
 
 typedef enum
 {
-	NoResult = 0,
-	ValueIsTooLarge = 1,
-	ValueIsTooSmall = 2,
-	BValueIsTooLarge = 3,
-	BValueIsTooSmall = 6,
-	PeakNumError = 4,
-	ErrorCountOut = 5,
-	MemError = 6,
-	PeakNumZero = 7,									//ÎŞ·å
-	TestInterrupt = 8,
-	ResultIsOK = 99,
+	NoResult = 0,										//»¹Î´²âÊÔ£¬½á¹ûÎ´null
+	NoSample = 1,										//Î´¼ÓÑù
+	TestInterrupt = 8,									//²âÊÔÖĞ¶Ï
+	ResultIsOK = 99,									//²âÊÔ³É¹¦
 }ResultState;
 
 #pragma pack(1)
@@ -467,14 +461,6 @@ typedef struct TestData_tag {
 	unsigned short time;					//³¬Ê±Ê±¼ä
 	unsigned short crc;
 }TestData;
-#pragma pack()
-
-
-#pragma pack(1)
-typedef struct TestTaskData_tag {
-	TestData * testdata;
-	ResultState testresult;
-}TestTaskData;
 #pragma pack()
 
 #pragma pack(1)

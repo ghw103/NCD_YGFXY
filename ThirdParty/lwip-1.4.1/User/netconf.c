@@ -24,12 +24,8 @@
 #include	"LwipCom_Task.h"
 #include	"LwipDHCP_Task.h"
 #include	"BasicWEB_Task.h"
-#include	"LwipDebug_Task.h"
-#if (NormalCode == CodeType)
-#include	"LwipNCDClient_Task.h"
-#else
 #include	"LwipServerForLab_Task.h"
-#endif
+
 /***************************************************************************************************/
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
@@ -120,15 +116,8 @@ void StartEthernet(void)
 
 //	StartBasicWebTask();
 	
-/*	{
-#if (NormalCode == CodeType)
-		StartvLwipNCDClientTask();
-#else
-		StartLwipLabServerTask();
-#endif
-	*/
-//	StartvLwipDebugTask();
-//	}
+	StartLwipLabServerTask();
+
 }
 
 

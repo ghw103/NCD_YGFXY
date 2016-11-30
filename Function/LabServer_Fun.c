@@ -89,7 +89,14 @@ static void ProcessCMD(unsigned char *buf, unsigned short len, struct netconn *p
 		
 		if(!strncmp( (char *)buf, "Read Device Info", 16 ))
 		{
-			//sprintf(pxbuf1, "{\"deviceid\":\"%s\",\"devicestatus\":%d}", ((DeviceInfo *)(GetGB_DeviceInfo2()))->deviceid, GetTestStatusFlorLab());
+			DeviceInfo * deviceinfo = MyMalloc(sizeof(DeviceInfo));
+			if(deviceinfo)
+			{
+				//读取设备信息
+				ReadDeviceInfo(deviceinfo);
+				sprintf(pxbuf1, "{\"deviceid\":\"%s\",\"devicestatus\":%d}", deviceinfo->deviceid, GetTestStatusFlorLab());
+			}
+			MyFree(deviceinfo);
 		}
 		else if(!strncmp( (char *)buf, "Start Test", 10 ))
 		{

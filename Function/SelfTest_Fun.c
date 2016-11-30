@@ -284,26 +284,15 @@ static MyState_TypeDef MotorSelfTest(void)
 		return My_Fail;
 	}
 	
-/*	MotorMoveTo(10000, 1);
-	vTaskDelay(100 / portTICK_RATE_MS);
-
+	
 	SetDRVPowerStatues(NonamalPower);
 	vTaskDelay(100 / portTICK_RATE_MS);
+	MotorMoveTo(MaxLocation, 0);
+	vTaskDelay(100 / portTICK_RATE_MS);
 	
-	count = 0;
-	while(!PreLimited)
-	{
-		vTaskDelay(500 / portTICK_RATE_MS);
-		count++;
-		if(count > 8)
-			break;
-	}
-	
-	if(count > 6)
-	{
-		StopMotor();
+	//走到最大行程，如果前限位触发，则报异常
+	if(PreLimited)
 		return My_Fail;
-	}*/
 	
 	return My_Pass;
 }

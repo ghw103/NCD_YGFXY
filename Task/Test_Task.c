@@ -10,10 +10,7 @@
 /***************************************************************************************************/
 #include	"Test_Task.h"
 #include	"Test_Fun.h"
-
-#if (NormalCode != CodeType)
-	#include	"System_Data.h"
-#endif
+#include	"System_Data.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -31,7 +28,8 @@ const char * TestTaskName = "vTestTask";
 
 static xQueueHandle xStartTestQueue = NULL ;
 static xQueueHandle xTestResultQueue = NULL;
-static TestTaskData S_TestTaskData;
+TestData * testdata;												//测试数据指针
+ResultState resultstatues;											//测试结果状态
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -45,19 +43,18 @@ static void vTestTask( void *pvParameters );
 
 MyState_TypeDef StartvTestTask(void)
 {
+	//创建任务数据队列，同时用于任务启动
 	if(xStartTestQueue == NULL)
 		xStartTestQueue = xQueueCreate(1, sizeof(void *));
 	
 	if(xStartTestQueue == NULL)
 		return My_Fail;
 	
+	//创建任务结果队列
 	if(xTestResultQueue == NULL)
 		xTestResultQueue = xQueueCreate(1, sizeof(ResultState));
 	
 	if(xTestResultQueue == NULL)
-		return My_Fail;
-	
-	if(My_Fail == InitTestFunData())
 		return My_Fail;
 	
 	if(pdFAIL == xTaskCreate( vTestTask, TestTaskName, configMINIMAL_STACK_SIZE, NULL, TestTask_PRIORITY, NULL ))
@@ -71,20 +68,18 @@ static void vTestTask( void *pvParameters )
 {
 	while(1)
 	{
-		if(pdPASS == xQueueReceive( xStartTestQueue, ((void *)&(S_TestTaskData.testdata)), portMAX_DELAY))
+		if(pdPASS == xQueueReceive( xStartTestQueue, &(testdata), portMAX_DELAY))
 		{
-			while(pdPASS == TakeTestResult(&(S_TestTaskData.testresult)))
+			while(pdPASS == TakeTestResult(&resultstatues))
 				;
 			
 			#if (NormalCode != CodeType)
 			
 				SetTestStatusFlorLab(1);
 			#endif
-			TestFunction(&S_TestTaskData);
+			TestFunction(testdata);
 			
-			xQueueSend( xTestResultQueue, &(S_TestTaskData.testresult), 1000/portTICK_RATE_MS );
-				
-			memset(&S_TestTaskData, 0, sizeof(TestTaskData));
+			xQueueSend( xTestResultQueue, &resultstatues, 1000/portTICK_RATE_MS );
 			
 			#if (NormalCode != CodeType)
 			
@@ -105,11 +100,6 @@ MyState_TypeDef StartTest(void * parm)
 		return My_Fail;	
 }
 
-MyState_TypeDef StopTest(void)
-{
-	S_TestTaskData.testresult = TestInterrupt;
-	return My_Pass;
-}
 
 MyState_TypeDef TakeTestResult(ResultState *testsult)
 {

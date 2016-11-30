@@ -364,7 +364,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F4XX,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\AppLunch;..\COM;..\Datas;..\Function;..\HardwareDriver;..\Libraries\CMSIS\Device\ST\STM32F4xx\Include;..\Libraries\STM32F4x7_ETH_Driver\inc;..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\Task;..\ThirdParty\Fatfs\src;..\ThirdParty\lwip-1.4.1\src\include;..\ThirdParty\lwip-1.4.1\src\include\ipv4;..\ThirdParty\lwip-1.4.1\src\include\netif;..\ThirdParty\lwip-1.4.1\src\include\lwip;..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS;..\ThirdParty\lwip-1.4.1\port\STM32F4x7;..\ThirdParty\lwip-1.4.1\User;..\ThirdParty\USB\USB_User;..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc;..\ThirdParty\cJSON-master;..\UI;..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc;..\ThirdParty\USB\STM32_USB_OTG_Driver\inc;..\ThirdParty\FreeRTOS\inc</IncludePath>
+              <IncludePath>..\AppLunch;..\COM;..\Datas;..\Function;..\HardwareDriver;..\Libraries\CMSIS\Device\ST\STM32F4xx\Include;..\Libraries\STM32F4x7_ETH_Driver\inc;..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\Task;..\ThirdParty\Fatfs\src;..\ThirdParty\lwip-1.4.1\src\include;..\ThirdParty\lwip-1.4.1\src\include\ipv4;..\ThirdParty\lwip-1.4.1\src\include\netif;..\ThirdParty\lwip-1.4.1\src\include\lwip;..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS;..\ThirdParty\lwip-1.4.1\port\STM32F4x7;..\ThirdParty\lwip-1.4.1\User;..\ThirdParty\USB\USB_User;..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc;..\ThirdParty\cJSON-master;..\UI;..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc;..\ThirdParty\USB\STM32_USB_OTG_Driver\inc;..\ThirdParty\FreeRTOS\inc;..\Daos</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -712,6 +712,11 @@
               <FileType>1</FileType>
               <FilePath>..\Task\SystemStart_Task.c</FilePath>
             </File>
+            <File>
+              <FileName>LwipDebug_Task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Task\LwipDebug_Task.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -881,6 +886,16 @@
               <FileName>System_Data.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Datas\System_Data.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Daos</GroupName>
+          <Files>
+            <File>
+              <FileName>DeviceDao.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Daos\DeviceDao.c</FilePath>
             </File>
           </Files>
         </Group>

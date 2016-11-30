@@ -11,7 +11,6 @@ MyState_TypeDef StartvTestTask(void);
 MyState_TypeDef StartTest(void * parm);
 
 MyState_TypeDef TakeTestResult(ResultState *testsult);
-MyState_TypeDef StopTest(void);
 
 #endif
 
