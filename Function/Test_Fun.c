@@ -241,6 +241,19 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 	unsigned short i=0;
 	
 	{
+		//计算最大值,平均值
+		S_TempCalData->maxdata = S_TempCalData->testdata->testline.TestPoint[0];
+		S_TempCalData->tempvalue1 = 0;
+		for(i=0; i<MaxPointLen; i++)
+		{
+			if(S_TempCalData->maxdata < S_TempCalData->testdata->testline.TestPoint[i])
+				S_TempCalData->maxdata = S_TempCalData->testdata->testline.TestPoint[i];
+			
+			S_TempCalData->tempvalue1 += S_TempCalData->testdata->testline.TestPoint[i];
+		}
+		
+		//平均值
+		S_TempCalData->average = S_TempCalData->tempvalue1 / MaxPointLen;
 		
 		/*判断测试值是否饱和*/
 		if(S_TempCalData->maxdata >= 4000)
@@ -263,20 +276,6 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 				return;
 			}
 		}
-		
-		//计算最大值,平均值
-		S_TempCalData->maxdata = S_TempCalData->testdata->testline.TestPoint[0];
-		S_TempCalData->tempvalue1 = 0;
-		for(i=0; i<MaxPointLen; i++)
-		{
-			if(S_TempCalData->maxdata < S_TempCalData->testdata->testline.TestPoint[i])
-				S_TempCalData->maxdata = S_TempCalData->testdata->testline.TestPoint[i];
-			
-			S_TempCalData->tempvalue1 += S_TempCalData->testdata->testline.TestPoint[i];
-		}
-		
-		//平均值
-		S_TempCalData->average = S_TempCalData->tempvalue1 / MaxPointLen;
 		
 		//计算标准差
 		S_TempCalData->tempvalue1 = 0;
@@ -316,13 +315,13 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 		for(i=S_TempCalData->testdata->testline.C_Point[1]-5; i<S_TempCalData->testdata->testline.C_Point[1]; i++)
 		{
 			if(S_TempCalData->testdata->testline.TestPoint[i] > S_TempCalData->testdata->testline.TestPoint[i+1])
-				goto END1;
+				goto END2;
 		}
 		//判断峰值前5个点是不是递减，否则，C峰错误
 		for(i=S_TempCalData->testdata->testline.C_Point[1]; i<S_TempCalData->testdata->testline.C_Point[1]+5; i++)
 		{
 			if(S_TempCalData->testdata->testline.TestPoint[i] < S_TempCalData->testdata->testline.TestPoint[i+1])
-				goto END1;
+				goto END2;
 		}
 		
 		//找T线
@@ -413,7 +412,7 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 			S_TempCalData->testdata->testline.BasicResult = 0;
 			S_TempCalData->testdata->testline.AdjustResult = 0;
 			
-			S_TempCalData->resultstatues = NoSample;
+			S_TempCalData->resultstatues = PeakError;
 			
 			return ;
 	}		

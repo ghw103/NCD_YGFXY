@@ -433,6 +433,8 @@ typedef enum
 {
 	NoResult = 0,										//还未测试，结果未null
 	NoSample = 1,										//未加样
+	PeakError = 2,										//检测卡没有C峰
+	MemError = 3,										//内存错误
 	TestInterrupt = 8,									//测试中断
 	ResultIsOK = 99,									//测试成功
 }ResultState;

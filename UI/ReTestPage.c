@@ -405,9 +405,9 @@ static void CheckTestCard(void)
 		{
 			EndOneReTest("测试正常", 8);
 		}
-		else if((S_ReTestPageBuffer->cardpretestresult == PeakNumZero) || (S_ReTestPageBuffer->cardpretestresult == PeakNumError))
+		else if(S_ReTestPageBuffer->cardpretestresult == NoSample)
 		{
-			EndOneReTest("峰错误", 6);
+			EndOneReTest("未加样", 6);
 		}
 		else
 		{

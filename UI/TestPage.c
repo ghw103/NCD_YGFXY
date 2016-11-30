@@ -186,7 +186,7 @@ static void RefreshCurve(void)
 			GetGB_Time(&(GetCurrentTestItem()->testdata.TestTime));
 			SaveTestData(&(GetCurrentTestItem()->testdata));
 		}
-		else if(S_TestPageBuffer->cardpretestresult == PeakNumZero)
+		else if(S_TestPageBuffer->cardpretestresult == PeakError)
 		{
 			/*≤‚ ‘ ß∞‹*/
 			SendKeyCode(2);
