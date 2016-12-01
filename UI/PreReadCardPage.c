@@ -194,13 +194,13 @@ static void CheckQRCode(void)
 			(S_PreReadPageBuffer->scancode == CardCodeScanTimeOut) || (S_PreReadPageBuffer->scancode == CardCodeCRCError))
 		{
 			SendKeyCode(1);
-			MotorMoveTo(GetGB_MotorMaxLocation(), 1);
+			MotorMoveTo(MaxLocation, 1);
 			AddNumOfSongToList(23, 0);
 		}
 		else if(S_PreReadPageBuffer->scancode == CardCodeTimeOut)
 		{
 			SendKeyCode(2);
-			MotorMoveTo(GetGB_MotorMaxLocation(), 1);
+			MotorMoveTo(MaxLocation, 1);
 			AddNumOfSongToList(21, 0);
 		}
 		else if(S_PreReadPageBuffer->scancode == CardCodeScanOK)
@@ -208,7 +208,7 @@ static void CheckQRCode(void)
 			SetS_TestItemName(S_PreReadPageBuffer->currenttestdata->testdata.temperweima.ItemName);
 			
 			//设置倒计时时间
-			timer_set(&(S_PreReadPageBuffer->currenttestdata->timer), S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardWaitTime*1);
+			timer_set(&(S_PreReadPageBuffer->currenttestdata->timer), S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardWaitTime*0);
 			
 			//读取校准参数
 			memcpy(S_PreReadPageBuffer->currenttestdata->testdata.tempadjust.ItemName, S_PreReadPageBuffer->currenttestdata->testdata.temperweima.ItemName, ItemNameLen);
@@ -226,7 +226,7 @@ static void CheckPreTestCard(void)
 {
 	if((S_PreReadPageBuffer) && (My_Pass == TakeTestResult(&(S_PreReadPageBuffer->cardpretestresult))))
 	{
-		if(S_PreReadPageBuffer->cardpretestresult == TestInterrupt)
+/*		if(S_PreReadPageBuffer->cardpretestresult == TestInterrupt)
 		{
 			SendKeyCode(5);
 			MotorMoveTo(GetGB_MotorMaxLocation(), 1);
@@ -241,15 +241,18 @@ static void CheckPreTestCard(void)
 		}
 		else if(S_PreReadPageBuffer->cardpretestresult == PeakNumZero)
 		{
-			//如果是排队模式，则进入排队界面
+*/			//如果是排队模式，则进入排队界面
 			if((S_PreReadPageBuffer->currenttestdata->testlocation > 0)&&(S_PreReadPageBuffer->currenttestdata->testlocation < PaiDuiWeiNum))
 			{
-				MotorMoveTo(GetGB_MotorMaxLocation(), 1);
+				MotorMoveTo(MaxLocation, 1);
 				S_PreReadPageBuffer->currenttestdata->statues = statuesNull;
 				timer_restart(&(S_PreReadPageBuffer->currenttestdata->timer));
 				
 				ClearCardStatuesQueue();
 				PageBufferFree();
+				
+				memset(&(S_PreReadPageBuffer->currenttestdata->testdata.testline), 0, sizeof(TestLine));
+				
 				DspPaiDuiPage(NULL);
 			}
 			else
@@ -258,9 +261,12 @@ static void CheckPreTestCard(void)
 				timer_restart(&(S_PreReadPageBuffer->currenttestdata->timer));
 				
 				PageBufferFree();
+				
+				memset(&(S_PreReadPageBuffer->currenttestdata->testdata.testline), 0, sizeof(TestLine));
+				
 				DspTimeDownNorPage(NULL);
 			}
-		}
+//		}
 	}
 }
 

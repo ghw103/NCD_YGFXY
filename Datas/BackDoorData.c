@@ -9,7 +9,9 @@
 /******************************************Header List********************************************/
 /***************************************************************************************************/
 #include	"BackDoorData.h"
+#include	"System_Data.h"
 
+#include	"Define.h"
 #include	"MyTools.h"
 
 #include	<string.h>
@@ -157,7 +159,7 @@ void SetS_TestItemName(void * name)
 		SetS_ItemIndex(9);
 	else if(CheckStrIsSame("H-FABP", name, strlen(name)))
 		SetS_ItemIndex(10);
-	else if(CheckStrIsSame("Lp-PLA2", name, strlen(name)))
+	else if(CheckStrIsSame("LP-PLA2", name, strlen(name)))
 		SetS_ItemIndex(11);
 }
 
@@ -195,41 +197,46 @@ unsigned char GetS_TestIndex(void)
 
 
 double GetCurrentData(void)
-{
-	double a,b,c;
-	double temp1;
+{	
+	double tempresult = 0 , b,c;
+	int a=0;
+	MyTime_Def time;
 	
-	b = pow(-1, ((rand()%2)+1));
+	GetGB_Time(&time);
+	
+	srand(time.sec+time.min);
+	a = pow(-1, ((rand()%2)+1));
 	
 	switch(S_CategoryIndex)
 	{
 		case 0:
-			temp1 = s_BackDoorData[S_ItemIndex].data1;
-			b = -1;
+			tempresult = s_BackDoorData[S_ItemIndex].data1;
+			a = -1;
 				break;
 		case 1:
-			temp1 = s_BackDoorData[S_ItemIndex].data2[S_TestIndex / data2_t];
+			tempresult = s_BackDoorData[S_ItemIndex].data2[S_TestIndex / data2_t];
 				break;
 		case 2:
-			temp1 = s_BackDoorData[S_ItemIndex].data3[S_TestIndex / data3_t];
+			tempresult = s_BackDoorData[S_ItemIndex].data3[S_TestIndex / data3_t];
 				break;
 		case 3:
-			temp1 = s_BackDoorData[S_ItemIndex].data4[S_TestIndex / data4_t];
+			tempresult = s_BackDoorData[S_ItemIndex].data4[S_TestIndex / data4_t];
 				break;
 		case 4:
-			temp1 = s_BackDoorData[S_ItemIndex].data5[S_TestIndex / data5_t];
+			tempresult = s_BackDoorData[S_ItemIndex].data5[S_TestIndex / data5_t];
 				break;
 		default:
-			temp1 = s_BackDoorData[S_ItemIndex].data1;
+			tempresult = s_BackDoorData[S_ItemIndex].data1;
 				break;
 	}
 	
-	a = rand()%101;
-	a *= 0.01;
-	a *= temp1*0.075;
+	srand(time.sec+time.hour);
+	b = (rand()%101);
+	b *= 0.01;
+	b *= tempresult*0.075;
 	
-	a *= b;
+	b *= a;
 	
-	return (temp1 + a);
+	return (tempresult + b);
 }
 /****************************************end of file************************************************/

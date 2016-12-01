@@ -34,6 +34,7 @@ static void Input(unsigned char *pbuf , unsigned short len);
 static void PageUpDate(void);
 static void AddDataToLine(unsigned short data);
 static void RefreshPageText(void);
+static void ClearPageText(void);
 
 static MyState_TypeDef PageInit(void *  parm);
 static MyState_TypeDef PageBufferMalloc(void);
@@ -110,6 +111,8 @@ static MyState_TypeDef PageInit(void *  parm)
 	/*清空曲线*/
 	ClearLine(0x56);
 	
+	ClearPageText();
+	
 	//初始化测试曲线
 	S_TestPageBuffer->line.MaxData = 0;
 	S_TestPageBuffer->line.MUL_Y = 1;
@@ -123,7 +126,7 @@ static MyState_TypeDef PageInit(void *  parm)
 	/*获取当前测试数据的地址*/
 	S_TestPageBuffer->currenttestdata = GetCurrentTestItem();
 	
-	RefreshPageText();
+//	RefreshPageText();
 	
 	StartTest(&(S_TestPageBuffer->currenttestdata->testdata));
 	
@@ -199,6 +202,15 @@ static void RefreshCurve(void)
 	}
 }
 
+static void ClearPageText(void)
+{
+	ClearText(0x2100, 60);
+	ClearText(0x2110, 60);
+	ClearText(0x2120, 60);
+	ClearText(0x2130, 60);
+	ClearText(0x2140, 60);
+}
+
 static void RefreshPageText(void)
 {
 	char *buf = NULL;
@@ -224,11 +236,11 @@ static void RefreshPageText(void)
 			sprintf(buf, "%s", S_TestPageBuffer->currenttestdata->testdata.temperweima.CardPiCi);
 			DisText(0x2130, buf, strlen(buf));
 			
-			if(S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult <= S_TestPageBuffer->currenttestdata->testdata.temperweima.LowstResult)
+/*			if(S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult <= S_TestPageBuffer->currenttestdata->testdata.temperweima.LowstResult)
 				sprintf(buf, "<%.3f", S_TestPageBuffer->currenttestdata->testdata.temperweima.LowstResult);
 			else if(S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult >= S_TestPageBuffer->currenttestdata->testdata.temperweima.HighestResult)
 				sprintf(buf, ">%.3f", S_TestPageBuffer->currenttestdata->testdata.temperweima.HighestResult);
-			else
+			else*/
 				sprintf(buf, "%.3f", S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult);
 			DisText(0x2140, buf, strlen(buf));
 		}

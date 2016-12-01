@@ -38,7 +38,7 @@
 
 MyState_TypeDef ConnectPrintter(void)
 {
-	unsigned char txbuf[4] = {0x1b, 0x20, 0x02, 0x0d};
+/*	unsigned char txbuf[4] = {0x1b, 0x20, 0x02, 0x0d};
 	
 	if(pdPASS == SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), txbuf, 4, sizeof(unsigned char), 50 / portTICK_RATE_MS, EnableUsart3TXInterrupt))
 	{
@@ -47,9 +47,19 @@ MyState_TypeDef ConnectPrintter(void)
 			if(txbuf[0] == 0x11)
 				return My_Pass;
 		}
-	}
+	}*/
 	
-	return My_Fail;
+	return My_Pass;
+}
+
+static void EnterUnNormalChar(void)
+{
+
+}
+
+static void ExitUnNormalChar(void)
+{
+
 }
 
 void PrintfData(void *data)
@@ -58,6 +68,8 @@ void PrintfData(void *data)
 	TestData * testd = data;
 	MyTime_Def mytime;
 	float tempvalue = 0.0;
+	char * tempbuf = NULL;
+	char tempbuf2[20];
 	
 	printfbuf = MyMalloc(100);
 
@@ -67,51 +79,76 @@ void PrintfData(void *data)
 		sprintf(printfbuf, "------------------------\r");
 		
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, sizeof(unsigned char), 500 / portTICK_RATE_MS);
+		vTaskDelay( 500 / portTICK_RATE_MS);
 		
 		memset(printfbuf, 0, 100);
 		sprintf(printfbuf, "武汉纽康度生物科技股份有限公司\r\r");
 		
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, sizeof(unsigned char), 500 / portTICK_RATE_MS);
+		vTaskDelay( 500 / portTICK_RATE_MS);
 		
 		memset(printfbuf, 0, 100);
 		sprintf(printfbuf, "测试人: %s\r", testd->user.user_name);
 		
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, sizeof(unsigned char), 500 / portTICK_RATE_MS);
+		vTaskDelay( 500 / portTICK_RATE_MS);
 		
 		memset(printfbuf, 0, 100);
 		sprintf(printfbuf, "样品编号: %s\r", testd->sampleid);
 		
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, sizeof(unsigned char), 500 / portTICK_RATE_MS);
+		vTaskDelay( 500 / portTICK_RATE_MS);
 		
 		memset(printfbuf, 0, 100);
-		sprintf(printfbuf, "测试项目: %s\r", testd->temperweima.ItemName);
 		
-		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, sizeof(unsigned char), 500 / portTICK_RATE_MS);
+/*		tempbuf = strstr(testd->temperweima.ItemName, "β");
+		if(tempbuf)
+		{	
+			memset(tempbuf2, 0, 20);
+			memcpy(tempbuf2, testd->temperweima.ItemName, tempbuf - testd->temperweima.ItemName);
+			sprintf(printfbuf, "测试项目: %s", tempbuf2);
+			SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
+			vTaskDelay( 500 / portTICK_RATE_MS);
+			
+			EnterUnNormalChar();		
+			sprintf(printfbuf, "β");
+			SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
+			vTaskDelay( 100 / portTICK_RATE_MS);	
+			ExitUnNormalChar();
+			
+			memset(tempbuf2, 0, 20);
+			memcpy(tempbuf2, tempbuf + 2, strlen(tempbuf + 2));
+			sprintf(printfbuf, "%s\r", tempbuf2);
+			SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
+			vTaskDelay( 100 / portTICK_RATE_MS);
+		}
+		else
+		{*/
+			sprintf(printfbuf, "测试项目: %s\r", testd->temperweima.ItemName);
+			SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
+			vTaskDelay( 500 / portTICK_RATE_MS);
+		//}
+		
 		
 		memset(printfbuf, 0, 100);
 		
 		tempvalue = testd->testline.AdjustResult;
-		if(tempvalue <= testd->temperweima.LowstResult)
+/*		if(tempvalue <= testd->temperweima.LowstResult)
 			sprintf(printfbuf, "测试结果: <%.2f %-8.8s\r", testd->temperweima.LowstResult, testd->temperweima.ItemMeasure);
 		else if(tempvalue >= testd->temperweima.HighestResult)
 			sprintf(printfbuf, "测试结果: >%.2f %-8.8s\r", testd->temperweima.HighestResult, testd->temperweima.ItemMeasure);
-		else
+		else*/
 			sprintf(printfbuf, "测试结果: %.2f %-8.8s\r", testd->testline.AdjustResult, testd->temperweima.ItemMeasure);
 		
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, sizeof(unsigned char), 500 / portTICK_RATE_MS);
+		vTaskDelay( 500 / portTICK_RATE_MS);
 		
 		memset(printfbuf, 0, 100);
 		sprintf(printfbuf, "测试时间: 20%02d-%02d-%02d %02d:%02d:%02d\r", testd->TestTime.year, testd->TestTime.month, testd->TestTime.day
 			, testd->TestTime.hour, testd->TestTime.min, testd->TestTime.sec);
 		
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, sizeof(unsigned char), 500 / portTICK_RATE_MS);
+		vTaskDelay( 500 / portTICK_RATE_MS);
 		
 		memset(printfbuf, 0, 100);
 		GetGB_Time(&mytime);
@@ -119,13 +156,13 @@ void PrintfData(void *data)
 			, mytime.hour, mytime.min, mytime.sec);
 		
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, sizeof(unsigned char), 500 / portTICK_RATE_MS);
+		vTaskDelay( 500 / portTICK_RATE_MS);
 		
 		memset(printfbuf, 0, 100);
 		sprintf(printfbuf, "\r------------------------\r\r\r\r\r\r");
 		
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, sizeof(unsigned char), 5000 / portTICK_RATE_MS);
+		vTaskDelay( 500 / portTICK_RATE_MS);
 	}
 	
 	MyFree(printfbuf);
