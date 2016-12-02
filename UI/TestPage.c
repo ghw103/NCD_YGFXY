@@ -241,7 +241,7 @@ static void RefreshPageText(void)
 			else if(S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult >= S_TestPageBuffer->currenttestdata->testdata.temperweima.HighestResult)
 				sprintf(buf, ">%.3f", S_TestPageBuffer->currenttestdata->testdata.temperweima.HighestResult);
 			else*/
-				sprintf(buf, "%.3f", S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult);
+				sprintf(buf, "%.2f", S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult);
 			DisText(0x2140, buf, strlen(buf));
 		}
 	}
