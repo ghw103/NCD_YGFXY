@@ -7,7 +7,7 @@
 #define	RX_SCK_Group		GPIOB
 #define	RX_SCK_Rcc			RCC_AHB1Periph_GPIOB
 
-#define	RX_SDA_Pin			GPIO_Pin_8
+#define	RX_SDA_Pin			GPIO_Pin_9
 #define	RX_SDA_Group		GPIOB
 #define	RX_SDA_Rcc			RCC_AHB1Periph_GPIOB
 
