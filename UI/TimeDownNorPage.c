@@ -74,7 +74,7 @@ static MyState_TypeDef PageInit(void *  parm)
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
 	
-	SelectPage(65);
+	SelectPage(95);
 	
 	S_TimeDownPageData->currenttestdata = GetCurrentTestItem();
 	
@@ -110,7 +110,7 @@ static void RefreshTimeText(void)
 	if(S_TimeDownPageData)
 	{
 		S_TimeDownPageData->time = timer_surplus(S_TimeDownPageData->S_Timer);
-		DspNum(0x2000 , S_TimeDownPageData->time, 2);
+		DspNum(0x1790 , S_TimeDownPageData->time, 2);
 	}
 }
 

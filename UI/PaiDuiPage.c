@@ -91,7 +91,7 @@ static MyState_TypeDef PageInit(void *pram)
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
 
-	SelectPage(63);
+	SelectPage(93);
 	
 	return My_Pass;
 }

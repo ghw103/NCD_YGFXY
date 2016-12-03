@@ -83,28 +83,28 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_SelCheckPage->lcdinput[0] = (S_SelCheckPage->lcdinput[0]<<8) + pbuf[5];
 		
 		/*如果是错误，弹出菜单*/
-		if(S_SelCheckPage->lcdinput[0] == 0x1a30)
+		if(S_SelCheckPage->lcdinput[0] == 0x1130)
 		{
 			/*数据*/
 			S_SelCheckPage->lcdinput[1] = pbuf[7];
 			S_SelCheckPage->lcdinput[1] = (S_SelCheckPage->lcdinput[1]<<8) + pbuf[8];
 			
 			/*重启*/
-			if(S_SelCheckPage->lcdinput[1] == 0x0001)
+			if(S_SelCheckPage->lcdinput[1] == 0x0000)
 				while(1);
 		}
 		/*如果是告警，弹出菜单*/
-		else if(S_SelCheckPage->lcdinput[0] == 0x1a31)
+		else if(S_SelCheckPage->lcdinput[0] == 0x1131)
 		{
 			/*数据*/
 			S_SelCheckPage->lcdinput[1] = pbuf[7];
 			S_SelCheckPage->lcdinput[1] = (S_SelCheckPage->lcdinput[1]<<8) + pbuf[8];
 			
 			/*重启*/
-			if(S_SelCheckPage->lcdinput[1] == 0x0001)
+			if(S_SelCheckPage->lcdinput[1] == 0x0000)
 				while(1);
 			/*忽略*/
-			else if(S_SelCheckPage->lcdinput[1] == 0x0002)
+			else if(S_SelCheckPage->lcdinput[1] == 0x0001)
 			{
 				SetGB_SelfCheckStatus(SelfCheck_OK);
 				GotoGBChildPage(NULL);
@@ -123,7 +123,7 @@ static MyState_TypeDef PageInit(void *  parm)
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
 	
-	SelectPage(51);
+	SelectPage(81);
 	
 	/*清空当前页面*/
 	PageClear();
@@ -168,10 +168,10 @@ static MyState_TypeDef PageBufferFree(void)
 static void PageClear(void)
 {
 	/*清除上次的文字*/
-	ClearText(0x1a00, 60);
+	ClearText(0x1120, 60);
 	
 	/*更新进度条*/
-	BasicPic(0x1a20, 0, 100, 19, 295, 19+4*selfcheckpicinfo[0],302, 316, 357);
+	BasicPic(0x1110, 0, 100, 19, 295, 19+4*selfcheckpicinfo[0],302, 316, 357);
 }
 
 static void RefreshPageValue(void)
@@ -180,13 +180,13 @@ static void RefreshPageValue(void)
 	if(pdPASS == GetSelfCheckStatus(&recvdat, 10*portTICK_RATE_MS))
 	{		
 		/*清除上次的文字*/
-		ClearText(0x1a00, 60);
+		ClearText(0x1120, 60);
 		
 		/*更新文本*/
-		DisText(0x1a00, (void *)selfchecktextinfo[recvdat], strlen(selfchecktextinfo[recvdat]));				
+		DisText(0x1120, (void *)selfchecktextinfo[recvdat], strlen(selfchecktextinfo[recvdat]));				
 		
 		/*更新进度条*/
-		BasicPic(0x1a20, 1, 100, 19, 295, 19+4*selfcheckpicinfo[recvdat],302, 316, 357);
+		BasicPic(0x1110, 1, 128, 19, 295, 19+4*selfcheckpicinfo[recvdat],302, 316, 357);
 		
 		/*有不可忽略的错误*/
 		if((recvdat == DataBasesError)||(recvdat == ErWeiMaError)||(recvdat == ADDAError)||(recvdat == MotorError))

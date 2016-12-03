@@ -11,7 +11,7 @@
 
 /******************************************************************************************/
 /*****************************************局部变量声明*************************************/
-
+static unsigned short timecount = 0;								//动画时间
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 static void Input(unsigned char *pbuf , unsigned short len);
@@ -68,11 +68,9 @@ static void Input(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void PageUpDate(void)
 {
-	static unsigned short timecount = 0;
-	
 	timecount++;
 	
-	if(timecount >= 500)
+	if(timecount >= 800)
 	{
 		timecount = 0;
 		GotoGBChildPage(NULL);
@@ -91,7 +89,7 @@ static MyState_TypeDef PageInit(void *  parm)
 {
 	SetLEDLight(100);
 	
-	SelectPage(50);
+	SelectPage(0);
 	
 	AddNumOfSongToList(52, 0);
 	

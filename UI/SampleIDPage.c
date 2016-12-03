@@ -61,14 +61,14 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_SampleIDPage->lcdinput[0] = (S_SampleIDPage->lcdinput[0]<<8) + pbuf[5];
 		
 		/*返回*/
-		if(S_SampleIDPage->lcdinput[0] == 0x1d00)
+		if(S_SampleIDPage->lcdinput[0] == 0x1400)
 		{
 			GBPageBufferFree();
 			GotoGBParentPage(NULL);
 		}
 		
 		/*确定*/
-		else if(S_SampleIDPage->lcdinput[0] == 0x1d01)
+		else if(S_SampleIDPage->lcdinput[0] == 0x1401)
 		{
 			if(strlen(S_SampleIDPage->currenttestdata->testdata.sampleid) == 0)
 			{
@@ -82,7 +82,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			}
 		}
 		/*获取输入的id*/
-		else if(S_SampleIDPage->lcdinput[0] == 0x1d10)
+		else if(S_SampleIDPage->lcdinput[0] == 0x1410)
 		{
 			memset(S_SampleIDPage->currenttestdata->testdata.sampleid, 0, MaxSampleIDLen);
 			memcpy(S_SampleIDPage->currenttestdata->testdata.sampleid, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
@@ -113,7 +113,7 @@ static MyState_TypeDef PageInit(void *  parm)
 	//清除之前的条码数据，只有在当前页面扫码才有效
 	CheckBarCodeHasRead();
 	
-	SelectPage(56);
+	SelectPage(86);
 	
 	S_SampleIDPage->currenttestdata = GetCurrentTestItem();
 	
@@ -154,6 +154,6 @@ static void RefreshSampleID(void)
 {
 	if(S_SampleIDPage)
 	{
-		DisText(0x1d10, S_SampleIDPage->currenttestdata->testdata.sampleid, MaxSampleIDLen);
+		DisText(0x1410, S_SampleIDPage->currenttestdata->testdata.sampleid, MaxSampleIDLen);
 	}
 }

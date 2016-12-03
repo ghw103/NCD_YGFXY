@@ -281,7 +281,7 @@ void DspTimeAndTempData(void)
 		sprintf(buftime, " 20%02d-%02d-%02d %02d:%02d:%02d", time->year, time->month, time->day,
 			time->hour, time->min, time->sec);
 	
-		DisText(0x1000, buftime, strlen(buftime));
+		DisText(0x1100, buftime, strlen(buftime));
 	}
 
 	MyFree(time);

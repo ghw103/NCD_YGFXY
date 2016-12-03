@@ -64,73 +64,73 @@ void MySystemBSPInit(void)
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
 	
 	SystemInit();						//手动系统初始化
-	delay_ms(50);
+	delay_ms(10);
 	
 	Led_GPIOInit();						//系统指示灯初始化
-	delay_ms(50);
+	delay_ms(10);
 	
 	Timer4_Init();						//定时器初始化
 	Timer3_Init();						//定时器初始化
-	delay_ms(50);
+	delay_ms(10);
 	
 	Usart3_Init();						//串口3初始化
-	delay_ms(50);
+	delay_ms(5);
 	
 	Usart2_Init();						//串口2初始化
-	delay_ms(50);
+	delay_ms(5);
 	
 	Usart4_Init();						//串口4初始化
-	delay_ms(50);
+	delay_ms(5);
 	
 	Usart6_Init();						//串口6初始化
-	delay_ms(50);
+	delay_ms(5);
 	
 	Usart1_Init();						//串口2初始化
-	delay_ms(50);
+	delay_ms(5);
 
 	ADS_IO_Init();						//ADC IO初始化
-	delay_ms(50);
+	delay_ms(5);
 	
 	DA_IO_Init();						//DA io初始化
-	delay_ms(50);
+	delay_ms(5);
 	
 	Limit_Init();						//限位开关初始化
-	delay_ms(50);
+	delay_ms(5);
 	
 	DRV_Init();							//电机 IO初始化
-	delay_ms(50);
+	delay_ms(5);
 	
 	CodeScanner_GPIOInit();				//二维码初始化
-	delay_ms(50);
+	delay_ms(5);
 	
 	My_USBInit();						//USB端口初始化
-	delay_ms(50);
+	delay_ms(5);
 	
 	SMBus_Init();						//温度检测初始化
-	delay_ms(50);
+	delay_ms(5);
 	
 	RTC_BSPInit();						//RTC初始化
-	delay_ms(50);
+	delay_ms(5);
 	
 	Wifi_GPIOInit();					//WIFI端口初始化
-	delay_ms(50);
+	delay_ms(5);
 	
 	MAX4051_Init();						//采集放大倍数端口初始化
-	delay_ms(50);
+	delay_ms(5);
 	
 	PT8211_GPIOInit();					//音频端口初始化
 	ConfigI2S(16000);
-	delay_ms(50);
+	delay_ms(5);
 
 	TM1623_Init();						//排队模块初始化
-	delay_ms(50);
+	delay_ms(5);
 	
 	LEDCheck_Init();					//检测发光模块的发光二极管状态初始化
-	delay_ms(10);
+	delay_ms(1);
 	
 	FatfsInit();						//文件系统初始化
 	
 	IWDG_Init(3, 2000);					//看门狗初始化,超时时间2S
-	delay_ms(50);
+	delay_ms(5);
 }
 

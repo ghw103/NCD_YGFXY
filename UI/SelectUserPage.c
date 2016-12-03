@@ -77,7 +77,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_UserPageBuffer->lcdinput[0] = (S_UserPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
 		/*返回*/
-		if(S_UserPageBuffer->lcdinput[0] == 0x1c00)
+		if(S_UserPageBuffer->lcdinput[0] == 0x1300)
 		{
 			DeleteCurrentTest();
 			
@@ -86,8 +86,11 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		}
 		
 		/*上翻也*/
-		else if(S_UserPageBuffer->lcdinput[0] == 0x1c02)
+		else if(S_UserPageBuffer->lcdinput[0] == 0x1303)
 		{
+			/*重置倒计时30s，如果超时，则取消此次测试*/
+			timer_set(&(S_UserPageBuffer->timer), 10);
+			
 			if(S_UserPageBuffer->pageindex > 1)
 			{
 				S_UserPageBuffer->pageindex--;
@@ -99,8 +102,11 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			}
 		}
 		/*下翻页*/
-		else if(S_UserPageBuffer->lcdinput[0] == 0x1c03)
+		else if(S_UserPageBuffer->lcdinput[0] == 0x1304)
 		{
+			/*重置倒计时30s，如果超时，则取消此次测试*/
+			timer_set(&(S_UserPageBuffer->timer), 10);
+			
 			if(S_UserPageBuffer->pageindex < (MaxUserNum / MaxPageShowNum))
 			{
 				S_UserPageBuffer->tempuser = &S_UserPageBuffer->user[(S_UserPageBuffer->pageindex)*MaxPageShowNum];
@@ -117,7 +123,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			}
 		}
 		/*确定*/
-		else if(S_UserPageBuffer->lcdinput[0] == 0x1c01)
+		else if(S_UserPageBuffer->lcdinput[0] == 0x1301)
 		{
 			if(S_UserPageBuffer->selectindex != 0)
 			{
@@ -134,13 +140,16 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			}
 		}
 		/*选择操作人*/
-		else if((S_UserPageBuffer->lcdinput[0] >= 0x1c04)&&(S_UserPageBuffer->lcdinput[0] <= 0x1c0d))
+		else if((S_UserPageBuffer->lcdinput[0] >= 0x1305)&&(S_UserPageBuffer->lcdinput[0] <= 0x1309))
 		{
-			S_UserPageBuffer->tempuser = &S_UserPageBuffer->user[(S_UserPageBuffer->pageindex - 1)*MaxPageShowNum + S_UserPageBuffer->lcdinput[0] - 0x1c04];
+			/*重置倒计时30s，如果超时，则取消此次测试*/
+			timer_set(&(S_UserPageBuffer->timer), 10);
+			
+			S_UserPageBuffer->tempuser = &S_UserPageBuffer->user[(S_UserPageBuffer->pageindex - 1)*MaxPageShowNum + S_UserPageBuffer->lcdinput[0] - 0x1305];
 			
 			if(S_UserPageBuffer->tempuser->crc == CalModbusCRC16Fun1(S_UserPageBuffer->tempuser, sizeof(User_Type)-2))
 			{
-				S_UserPageBuffer->selectindex = S_UserPageBuffer->lcdinput[0] - 0x1c04+1;
+				S_UserPageBuffer->selectindex = S_UserPageBuffer->lcdinput[0] - 0x1305+1;
 				SelectUser(S_UserPageBuffer->selectindex);
 			}
 		}
@@ -180,7 +189,7 @@ static MyState_TypeDef PageInit(void * parm)
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
 	
-	SelectPage(54);
+	SelectPage(84);
 	
 	/*重置倒计时30s，如果超时，则取消此次测试*/
 	timer_set(&(S_UserPageBuffer->timer), 10);
@@ -266,10 +275,10 @@ static void ShowList(void)
 	/*显示列表数据*/
 	for(i=0; i<MaxPageShowNum; i++)
 	{
-		ClearText(0x1c10+i*16, 32);
+		ClearText(0x1310+i*8, 16);
 		
 		if(S_UserPageBuffer->tempuser->crc != 0)
-			DisText(0x1c10+i*16, S_UserPageBuffer->tempuser->user_name, strlen(S_UserPageBuffer->tempuser->user_name));
+			DisText(0x1310+i*8, S_UserPageBuffer->tempuser->user_name, strlen(S_UserPageBuffer->tempuser->user_name));
 		
 		S_UserPageBuffer->tempuser++;
 	}
@@ -287,7 +296,7 @@ static void SelectUser(unsigned char index)
 {
 	unsigned char i = 0;
 	
-	BasicPic(0x1cb0, 0, 54, 600, 1, 840, 31, 392, 123+(S_UserPageBuffer->selectindex-1)*34);
+	BasicPic(0x1350, 0, 140, 506, 402, 798, 470, 364, 142+(S_UserPageBuffer->selectindex-1)*72);
 	
 	if((S_UserPageBuffer->selectindex > 0) && (S_UserPageBuffer->selectindex <= MaxPageShowNum))
 	{
@@ -296,7 +305,7 @@ static void SelectUser(unsigned char index)
 		S_UserPageBuffer->tempuser = &(S_UserPageBuffer->user[i]);
 		
 		if(S_UserPageBuffer->tempuser->crc == CalModbusCRC16Fun1(S_UserPageBuffer->tempuser, sizeof(User_Type)-2))
-			BasicPic(0x1cb0, 1, 54, 600, 1, 840, 31, 392, 123+(S_UserPageBuffer->selectindex-1)*34);
+			BasicPic(0x1350, 1, 140, 506, 402, 798, 470, 364, 142+(S_UserPageBuffer->selectindex-1)*72);
 	}
 }
 

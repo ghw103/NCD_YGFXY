@@ -104,7 +104,7 @@ static MyState_TypeDef PageInit(void *  parm)
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
 	
-	SelectPage(66);
+	SelectPage(96);
 	
 	/*Çå¿ÕÇúÏß*/
 	ClearLine(0x56);

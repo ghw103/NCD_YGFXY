@@ -81,9 +81,6 @@ static void vSystemStartTask( void *pvParameters )
 	/*播放音频*/
 	StartvPlaySongTask();
 	
-	/*等待开机动画播放完毕*/
-	vTaskDelay(5000 / portTICK_RATE_MS);
-	
 	/*显示欢迎界面*/
 	DspWelcomePage(NULL);
 	

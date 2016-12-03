@@ -13,7 +13,6 @@
 #include	"SleepPage.h"
 #include	"PlaySong_Task.h"
 #include	"UI_Data.h"
-#include	"MyTest_Data.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -60,80 +59,73 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_LunchPageBuffer->lcdinput[0] = (S_LunchPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
 		/*设置*/
-		if(S_LunchPageBuffer->lcdinput[0] == 0x1b04)
+		if(S_LunchPageBuffer->lcdinput[0] == 0x1205)
 		{
 			GBPageBufferFree();
 			SetGBChildPage(DspSystemSetPage);
 			GotoGBChildPage(NULL);
 		}
 		/*常规测试*/
-		else if(S_LunchPageBuffer->lcdinput[0] == 0x1b00)
+		else if(S_LunchPageBuffer->lcdinput[0] == 0x1200)
 		{	
-			S_LunchPageBuffer->error = CreateANewTest(0);
+			S_LunchPageBuffer->error = CreateANewTest(NormalTestType);
 			/*创建成功*/
-			if(0 == S_LunchPageBuffer->error)
+			if(Error_OK == S_LunchPageBuffer->error)
 			{
 				GBPageBufferFree();
 				SetGBChildPage(DspSelectUserPage);
 				GotoGBChildPage(NULL);
 			}
 			/*禁止常规测试*/
-			else if(1 == S_LunchPageBuffer->error)
+			else if(Error_StopNormalTest == S_LunchPageBuffer->error)
 			{
 				SendKeyCode(2);
 				AddNumOfSongToList(45, 0);
 			}
 			/*创建失败*/
-			else if(3 == S_LunchPageBuffer->error)
+			else if(Error_Mem == S_LunchPageBuffer->error)
 			{
 				SendKeyCode(3);
 				AddNumOfSongToList(41, 0);
 			}
 		}
-		else if(S_LunchPageBuffer->lcdinput[0] == 0x1b01)
+		//批量测试
+		else if(S_LunchPageBuffer->lcdinput[0] == 0x1201)
 		{
-			S_LunchPageBuffer->presscount = 0;
-		}
-		else if(S_LunchPageBuffer->lcdinput[0] == 0x1b02)
-		{
-			S_LunchPageBuffer->presscount++;
-		}
-		else if(S_LunchPageBuffer->lcdinput[0] == 0x1b03)
-		{
-			/*查看排队状态*/
-			if(S_LunchPageBuffer->presscount > 20)
+			//有卡排队，则进入排队界面
+			if(true == IsPaiDuiTestting())
 			{
 				GBPageBufferFree();
 				SetGBChildPage(DspPaiDuiPage);
 				GotoGBChildPage(NULL);
 			}
-			/*批量测试*/
+			//无卡排队则开始创建
 			else
 			{
-				S_LunchPageBuffer->error = CreateANewTest(111);
+				S_LunchPageBuffer->error = CreateANewTest(PaiDuiTestType);
 				/*创建成功*/
-				if(0 == S_LunchPageBuffer->error)
+				if(Error_OK == S_LunchPageBuffer->error)
 				{
 					GBPageBufferFree();
 					SetGBChildPage(DspSelectUserPage);
 					GotoGBChildPage(NULL);
 				}
 				/*排队位置满，不允许*/
-				else if(1 == S_LunchPageBuffer->error)
+				else if(Error_PaiDuiBusy == S_LunchPageBuffer->error)
 				{
 					SendKeyCode(1);
 					AddNumOfSongToList(40, 0);
 				}
 				/*创建失败*/
-				else if(2 == S_LunchPageBuffer->error)
+				else if(Error_Mem == S_LunchPageBuffer->error)
 				{
 					SendKeyCode(3);
 					AddNumOfSongToList(41, 0);
 				}
 				/*有卡即将测试*/
-				else if(3 == S_LunchPageBuffer->error)
+				else if(Error_PaiDuiBusy == S_LunchPageBuffer->error)
 				{
-					SendKeyCode(4);
+					SendKeyCode(1);
 					AddNumOfSongToList(61, 0);
 				}
 			}
@@ -155,7 +147,7 @@ static MyState_TypeDef PageInit(void *  parm)
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
 	
-	SelectPage(52);
+	SelectPage(82);
 	
 	timer_set(&(S_LunchPageBuffer->timer), 30);
 	

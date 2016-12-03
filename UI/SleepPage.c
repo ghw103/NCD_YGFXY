@@ -61,7 +61,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_SleepPageBuffer->lcdinput[0] = (S_SleepPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
 		/*ÉèÖÃ*/
-		if(S_SleepPageBuffer->lcdinput[0] == 0x2f00)
+		if(S_SleepPageBuffer->lcdinput[0] == 0x1D70)
 		{
 			SetLEDLight(100);
 			GBPageBufferFree();
@@ -88,7 +88,7 @@ static MyState_TypeDef PageInit(void *  parm)
 	
 	SetLEDLight(10);
 	
-	SelectPage(115);
+	SelectPage(142);
 	
 	return My_Pass;
 }
@@ -120,7 +120,7 @@ static MyState_TypeDef PageBufferFree(void)
 
 static void DspPageText(void)
 {
-	if(S_SleepPageBuffer)
+/*	if(S_SleepPageBuffer)
 	{
 		GetGB_Time(&(S_SleepPageBuffer->time));
 		
@@ -129,5 +129,5 @@ static void DspPageText(void)
 			S_SleepPageBuffer->time.hour, S_SleepPageBuffer->time.min, S_SleepPageBuffer->time.sec);
 	
 		DisText(0x2f20, S_SleepPageBuffer->buf, strlen(S_SleepPageBuffer->buf));
-	}
+	}*/
 }

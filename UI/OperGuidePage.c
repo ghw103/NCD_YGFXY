@@ -82,7 +82,7 @@ static void PageUpDate(void)
 ***************************************************************************************************/
 static MyState_TypeDef PageInit(void *  parm)
 {
-	SelectPage(60);
+	SelectPage(90);
 	
 	AddNumOfSongToList(48, 0);
 	

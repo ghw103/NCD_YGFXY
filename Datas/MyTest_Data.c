@@ -15,75 +15,95 @@
 #include 	"FreeRTOS.h"
 #include 	"task.h"
 /***************************************************************************************************/
-/**************************************Â±ÄÈÉ®ÂèòÈáèÂ£∞Êòé*************************************************/
+/**************************************±‰¡ø*************************************************/
 /***************************************************************************************************/
-static ItemData * (itemdata[PaiDuiWeiNum]) = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
-static ItemData * CurrentItemData = NULL;
+//≥£πÊ≤‚ ‘ª∫¥Ê
+static ItemData * GB_NormalTestDataBuffer = NULL;
+//≈˙¡ø≤‚ ‘ª∫¥Ê
+static ItemData * (GB_PaiduiTestDataBuffer[PaiDuiWeiNum]) = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+//µ±«∞≤Ÿ◊˜µƒ ˝æ›
+static ItemData * GB_CurrentTestDataBuffer = NULL;
 /***************************************************************************************************/
-/**************************************Â±ÄÈÉ®ÂáΩÊï∞Â£∞Êòé*************************************************/
-/***************************************************************************************************/
-
-/***************************************************************************************************/
-/***************************************************************************************************/
-/***************************************Ê≠£Êñá********************************************************/
-/***************************************************************************************************/
-/***************************************************************************************************/
+/**************************************ƒ⁄≤ø∫Ø ˝*************************************************/
 /***************************************************************************************************/
 
-unsigned char GetUsableLocation(void)
+/***************************************************************************************************/
+/***************************************************************************************************/
+/***************************************’˝Œƒ********************************************************/
+/***************************************************************************************************/
+/***************************************************************************************************/
+/***************************************************************************************************/
+
+/***************************************************************************************************
+*FunctionName: IsPaiDuiTestting
+*Description: ºÏ≤È «∑Òµ±«∞‘⁄Ω¯––≈˙¡ø≤‚ ‘
+*Input: None
+*Output: None
+*Return: 	true -- ”–ø®‘⁄≈≈∂”≤‚ ‘÷–
+*			false -- √ª”–Ω¯––≈˙¡ø≤‚ ‘
+*Author: xsx
+*Date: 2016ƒÍ12‘¬2»’15:10:07
+***************************************************************************************************/
+bool IsPaiDuiTestting(void)
 {
 	unsigned char i=0;
 
-	for(i=1; i<PaiDuiWeiNum; i++)
+	for(i=0; i<PaiDuiWeiNum; i++)
 	{
-		if(itemdata[i] == NULL)
-			return i;
+		if(GB_PaiduiTestDataBuffer[i] != NULL)
+			return true;
 	}
 	
-	return 0xff;
+	return false;
 }
 
-unsigned char CreateANewTest(unsigned char index)
+CreateTestErrorType CreateANewTest(TestType testtype)
 {
-	unsigned char templ = GetUsableLocation();
+	unsigned char i=0;
 	
-	/*”–ø’œ–Œª÷√*/
-	if(0xff != templ)
+	//»Áπ˚ «≥£πÊ≤‚ ‘
+	if(testtype == NormalTestType)
 	{
-		/*»Áπ˚≥£πÊ≤‚ ‘£¨«“Œﬁø®‘⁄≈≈∂”*/
-		if(index == 0)
-		{
-			if(templ == 1)
-				templ = 0;
-			else
-				return 1;
-		}
+		//»Áπ˚≈˙¡ø≤‚ ‘π¶ƒ‹‘⁄ π”√÷–£¨‘ÚΩ˚÷π≥£πÊ≤‚ ‘
+		if(true == IsPaiDuiTestting())
+			return Error_StopNormalTest;
 		
-		if(itemdata[templ] == NULL)
+		//…Í«Î≤‚ ‘ƒ⁄¥Ê
+		GB_NormalTestDataBuffer = (ItemData *)MyMalloc(sizeof(ItemData));
+		
+		//ƒ⁄¥Ê…Í«Î ß∞‹
+		if(GB_NormalTestDataBuffer == NULL)
+			return Error_Mem;
+		else
 		{
-			//”–≈≈∂”µƒø®º¥Ω´≤‚ ‘
-			if((GetMinWaitTime() > 60) || (NULL != CurrentItemData))
-			{
-				itemdata[templ] = (ItemData *)MyMalloc(sizeof(ItemData));
-				if(itemdata[templ])
-				{
-					memset(itemdata[templ], 0, sizeof(ItemData));
-						
-					itemdata[templ]->testlocation = templ;
-						
-					SetCurrentTestItem(itemdata[templ]);
-						
-					return 0;
-				}
-				else
-					return 2;
-			}
-			else
-				return 3;
+			GB_CurrentTestDataBuffer = GB_NormalTestDataBuffer;
+			memset(GB_NormalTestDataBuffer, 0, sizeof(ItemData));
+			return Error_OK;
 		}
 	}
-
-	return 1;
+	else
+	{
+		for(i=0; i<PaiDuiWeiNum; i++)
+		{
+			if(GB_PaiduiTestDataBuffer[i] == NULL)
+			{
+				//…Í«Î≤‚ ‘ƒ⁄¥Ê
+				GB_PaiduiTestDataBuffer[i] = (ItemData *)MyMalloc(sizeof(ItemData));
+				
+				//ƒ⁄¥Ê…Í«Î ß∞‹
+				if(GB_PaiduiTestDataBuffer[i] == NULL)
+					return Error_Mem;
+				else
+				{
+					GB_CurrentTestDataBuffer = GB_PaiduiTestDataBuffer[i];
+					memset(GB_CurrentTestDataBuffer, 0, sizeof(ItemData));
+					return Error_OK;
+				}
+			}
+		}
+		
+		return Error_PaiDuiBusy;
+	}
 }
 
 
@@ -91,7 +111,7 @@ unsigned char CreateANewTest(unsigned char index)
 
 ItemData * GetTestItemByIndex(unsigned char index)
 {
-	return itemdata[index];
+	return GB_PaiduiTestDataBuffer[index];
 }
 
 
@@ -101,11 +121,11 @@ unsigned short GetMinWaitTime(void)
 	unsigned short min = 0xffff;
 	unsigned short temp = 0;
 	
-	for(index = 1; index < PaiDuiWeiNum; index++)
+	for(index = 0; index < PaiDuiWeiNum; index++)
 	{
-		if((itemdata[index])&&((itemdata[index]->statues == statues3) || ((itemdata[index]->statues == statues4))))
+		if((GB_PaiduiTestDataBuffer[index])&&((GB_PaiduiTestDataBuffer[index]->statues == statues3) || ((GB_PaiduiTestDataBuffer[index]->statues == statues4))))
 		{
-			temp = timer_surplus(&(itemdata[index]->timer));
+			temp = timer_surplus(&(GB_PaiduiTestDataBuffer[index]->timer));
 			if(temp < min)
 				min = temp;
 		}
@@ -115,33 +135,49 @@ unsigned short GetMinWaitTime(void)
 }
 
 
-
+/***************************************************************************************************
+*FunctionName: SetCurrentTestItem, GetCurrentTestItem
+*Description: ∂¡–¥µ±«∞≤‚ ‘ª∫¥Ê
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016ƒÍ12‘¬2»’15:54:25
+***************************************************************************************************/
 void SetCurrentTestItem(ItemData * s_itemdata)
 {
-	CurrentItemData = s_itemdata;
+	GB_CurrentTestDataBuffer = s_itemdata;
 }
 
 ItemData * GetCurrentTestItem(void)
 {
-	return CurrentItemData;
+	return GB_CurrentTestDataBuffer;
 }
 
-/*…æ≥˝µ±«∞≤‚ ‘*/
+/***************************************************************************************************
+*FunctionName: DeleteCurrentTest
+*Description: …æ≥˝µ±«∞≤‚ ‘
+*Input: None
+*Output: None
+*Return: My_Pass -- …æ≥˝≥…π¶
+*Author: xsx
+*Date: 2016ƒÍ12‘¬2»’15:55:07
+***************************************************************************************************/
 MyState_TypeDef DeleteCurrentTest(void)
 {
 	ItemData * temp = GetCurrentTestItem();
 	unsigned char i=0;
 	if(temp)
 	{
-		MyFree(temp);
 		memset(temp, 0, sizeof(ItemData));
-		
+		MyFree(temp);
+
 		for(i=0; i<PaiDuiWeiNum; i++)
 		{
-			if(itemdata[i] == temp)
+			if(GB_PaiduiTestDataBuffer[i] == temp)
 			{
-				itemdata[i] = NULL;
-				SetCurrentTestItem(itemdata[i]);
+				GB_PaiduiTestDataBuffer[i] = NULL;
+				SetCurrentTestItem(NULL);
 			}
 		}
 	}

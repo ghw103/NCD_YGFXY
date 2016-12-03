@@ -60,7 +60,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_WaitPageData->lcdinput[0] = (S_WaitPageData->lcdinput[0]<<8) + pbuf[5];
 		
 		/*返回*/
-		if(S_WaitPageData->lcdinput[0] == 0x1e00)
+		if(S_WaitPageData->lcdinput[0] == 0x1450)
 		{
 			GBPageBufferFree();
 			SetGBChildPage(DspSampleIDPage);
@@ -68,7 +68,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		}
 		
 		/*查看操作规程*/
-		else if(S_WaitPageData->lcdinput[0] == 0x1e01)
+		else if(S_WaitPageData->lcdinput[0] == 0x1451)
 		{
 			GBPageBufferFree();
 			SetGBChildPage(DspOperGuidePage);
@@ -114,7 +114,7 @@ static MyState_TypeDef PageInit(void *  parm)
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
 	
-	SelectPage(58);
+	SelectPage(88);
 	
 	MotorMoveTo(WaittingCardLocation, 1);
 	
