@@ -487,6 +487,7 @@ typedef struct TestData_tag {
 	MyTime_Def TestTime;					//测试时间
 	MyTemp_Def TestTemp;					//测试温度
 	unsigned short time;					//超时时间
+	char pihao[20];																		//批号
 	unsigned short crc;
 }TestData;
 #pragma pack()

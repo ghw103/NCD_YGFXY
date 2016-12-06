@@ -17,6 +17,7 @@ typedef struct ItemData_tag {
 	MyPaiDuiStatues statues;															//²âÊÔ½×¶Î
 	unsigned char jieduan;																//²âÊÔ½×¶Î
 	unsigned char testlocation;
+	
 }ItemData;
 
 unsigned char GetUsableLocation(void);

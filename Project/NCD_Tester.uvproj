@@ -847,6 +847,11 @@
               <FileType>1</FileType>
               <FilePath>..\UI\ReTestPage.c</FilePath>
             </File>
+            <File>
+              <FileName>PihaoPage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\UI\PihaoPage.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

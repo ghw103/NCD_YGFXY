@@ -100,6 +100,12 @@ void PrintfData(void *data)
 		vTaskDelay( 500 / portTICK_RATE_MS);
 		
 		memset(printfbuf, 0, 100);
+		sprintf(printfbuf, "ÊÔ¼Á¿¨ÅúºÅ: %s\r", testd->pihao);
+		
+		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
+		vTaskDelay( 500 / portTICK_RATE_MS);
+		
+		memset(printfbuf, 0, 100);
 		
 /*		tempbuf = strstr(testd->temperweima.ItemName, "¦Â");
 		if(tempbuf)

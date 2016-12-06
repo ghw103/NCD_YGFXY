@@ -9,6 +9,7 @@
 #include	"LunchPage.h"
 #include	"SampleIDPage.h"
 #include	"MyTest_Data.h"
+#include	"PihaoPage.h"
 #include	"CRC16.h"
 #include	"SDFunction.h"
 #include	"PlaySong_Task.h"
@@ -52,7 +53,7 @@ static void SelectUser(unsigned char index);
 ***************************************************************************************************/
 unsigned char DspSelectUserPage(void *  parm)
 {
-	SetGBSysPage(DspSelectUserPage, DspLunchPage, DspSampleIDPage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
+	SetGBSysPage(DspSelectUserPage, DspLunchPage, DspPihaoPage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
 	
 	GBPageInit(parm);
 
@@ -122,7 +123,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			if(S_UserPageBuffer->selectindex != 0)
 			{
 				/*以当前选择的操作人作为本次测试数据的操作人*/
-				memcpy(&(S_UserPageBuffer->currenttestdata->testdata.user), S_UserPageBuffer->user, sizeof(User_Type));
+				memcpy(&(S_UserPageBuffer->currenttestdata->testdata.user), S_UserPageBuffer->tempuser, sizeof(User_Type));
 			
 				GBPageBufferFree();
 				GotoGBChildPage(NULL);
