@@ -198,8 +198,9 @@ unsigned char GetS_TestIndex(void)
 
 double GetCurrentData(void)
 {	
-	double tempresult = 0 , b,c;
+	double tempresult = 0 , b = 0,c;
 	int a=0;
+	unsigned char d = 0;
 	MyTime_Def time;
 	
 	GetGB_Time(&time);
@@ -211,29 +212,34 @@ double GetCurrentData(void)
 	{
 		case 0:
 			tempresult = s_BackDoorData[S_ItemIndex].data1;
-			a = -1;
+			a = -1; c = 0.5; d = 5;
 				break;
 		case 1:
 			tempresult = s_BackDoorData[S_ItemIndex].data2[S_TestIndex / data2_t];
+			c = 0.15;
 				break;
 		case 2:
 			tempresult = s_BackDoorData[S_ItemIndex].data3[S_TestIndex / data3_t];
-				break;
+			c = 0.13;
+			break;
 		case 3:
 			tempresult = s_BackDoorData[S_ItemIndex].data4[S_TestIndex / data4_t];
-				break;
+			c = 0.13;
+			break;
 		case 4:
 			tempresult = s_BackDoorData[S_ItemIndex].data5[S_TestIndex / data5_t];
-				break;
-		default:
-			tempresult = s_BackDoorData[S_ItemIndex].data1;
-				break;
+			c = 0.13;
+			break;
 	}
 	
-	srand(time.sec+time.hour);
-	b = (rand()%101);
+	while(b <= d)
+	{
+		srand(time.sec+time.hour);
+		b = (rand()%101);
+	}
+	
 	b *= 0.01;
-	b *= tempresult*0.075;
+	b *= tempresult*c;
 	
 	b *= a;
 	
