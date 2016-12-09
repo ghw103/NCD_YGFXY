@@ -212,7 +212,7 @@ double GetCurrentData(void)
 	{
 		case 0:
 			tempresult = s_BackDoorData[S_ItemIndex].data1;
-			a = -1; c = 0.5; d = 5;
+			a = -1; c = 0.5; d = 10;
 				break;
 		case 1:
 			tempresult = s_BackDoorData[S_ItemIndex].data2[S_TestIndex / data2_t];
