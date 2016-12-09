@@ -10,11 +10,6 @@ MyState_TypeDef CheckSDFunction(void);
 MyState_TypeDef SaveUserData(User_Type * user);
 void ReadUserData(User_Type * user);
 
-/*≤‚ ‘ ˝æ›*/
-MyState_TypeDef SaveTestData(TestData *tempdata);
-MyState_TypeDef ReadTestData(TestData *tempdata, unsigned int index, unsigned char readnum);
-MyState_TypeDef ReadIndexPlus(unsigned char num);
-MyState_TypeDef ReadTestDataHead(TestDataSaveHead * head);
 
 /*ip…Ë÷√*/
 MyState_TypeDef SaveNetData(NetData * netdata);

@@ -36,9 +36,15 @@ static MyState_TypeDef PageBufferFree(void);
 ***************************************************************************************************/
 unsigned char DspWelcomePage(void *  parm)
 {
-	SetGBSysPage(DspWelcomePage, NULL, DspSelfCheckPage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
+	PageInfo * currentpage = NULL;
 	
-	GBPageInit(parm);
+	if(My_Pass == GetCurrentPage(&currentpage))
+	{
+		currentpage->PageInit = PageInit;
+		currentpage->PageUpDate = PageUpDate;
+		
+		currentpage->PageInit(currentpage->pram);
+	}
 	
 	return 0;
 }
@@ -73,7 +79,7 @@ static void PageUpDate(void)
 	if(timecount >= 800)
 	{
 		timecount = 0;
-		GotoGBChildPage(NULL);
+		PageAdvanceTo(DspSelfCheckPage, NULL);
 	}
 }
 

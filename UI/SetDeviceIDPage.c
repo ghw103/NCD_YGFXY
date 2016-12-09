@@ -41,9 +41,19 @@ static MyState_TypeDef PageBufferFree(void);
 
 unsigned char DspSetDeviceIDPage(void *  parm)
 {
-	SetGBSysPage(DspSetDeviceIDPage, DspShowDeviceInfoPage, NULL, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
+	PageInfo * currentpage = NULL;
 	
-	GBPageInit(parm);
+	if(My_Pass == GetCurrentPage(&currentpage))
+	{
+		currentpage->PageInit = PageInit;
+		currentpage->PageUpDate = PageUpDate;
+		currentpage->LCDInput = Input;
+		currentpage->PageBufferMalloc = PageBufferMalloc;
+		currentpage->PageBufferFree = PageBufferFree;
+		currentpage->tempP = &S_SetDeviceIDPage;
+		
+		currentpage->PageInit(currentpage->pram);
+	}
 	
 	return 0;
 }
@@ -60,28 +70,28 @@ static void Input(unsigned char *pbuf , unsigned short len)
 
 		/*修改设备id*/
 		/*返回*/
-		if(S_SetDeviceIDPage->lcdinput[0] == 0x2390)
+		if(S_SetDeviceIDPage->lcdinput[0] == 0x1A50)
 		{
-			GBPageBufferFree();
-			GotoGBParentPage(NULL);
+			PageBufferFree();
+			PageBackTo(ParentPage);
 		}
 		/*确认*/
-		else if(S_SetDeviceIDPage->lcdinput[0] == 0x2391)
+		else if(S_SetDeviceIDPage->lcdinput[0] == 0x1A51)
 		{
 			if(S_SetDeviceIDPage->ismodify == 1)
 			{
 				S_SetDeviceIDPage->temp_deviceinfo.isnew = 1;
 				if(My_Pass == SaveDeviceInfo(&(S_SetDeviceIDPage->temp_deviceinfo)))
 				{
-					SendKeyCode(2);
+					SendKeyCode(1);
 					S_SetDeviceIDPage->ismodify = 0;
 				}
 				else
-					SendKeyCode(1);
+					SendKeyCode(2);
 			}
 		}
 		/*id输入*/
-		else if(S_SetDeviceIDPage->lcdinput[0] == 0x23a0)
+		else if(S_SetDeviceIDPage->lcdinput[0] == 0x1A60)
 		{
 			memset(S_SetDeviceIDPage->temp_deviceinfo.deviceid, 0 , MaxDeviceIDLen);
 			
@@ -104,7 +114,7 @@ static void PageUpDate(void)
 			GetGB_BarCode(S_SetDeviceIDPage->tempbuf);
 			
 			memcpy(S_SetDeviceIDPage->temp_deviceinfo.deviceid, S_SetDeviceIDPage->tempbuf, MaxDeviceIDLen);
-			DisText(0x23a0, S_SetDeviceIDPage->temp_deviceinfo.deviceid, MaxDeviceIDLen);
+			DisText(0x1A60, S_SetDeviceIDPage->temp_deviceinfo.deviceid, MaxDeviceIDLen);
 		
 			S_SetDeviceIDPage->ismodify = 1;
 		}	
@@ -116,12 +126,12 @@ static MyState_TypeDef PageInit(void *  parm)
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
 	
-	SelectPage(74);
+	SelectPage(104);
 	
 	if(parm)
 	{
 		memcpy(&(S_SetDeviceIDPage->temp_deviceinfo), parm, sizeof(DeviceInfo));
-		DisText(0x23a0, S_SetDeviceIDPage->temp_deviceinfo.deviceid, strlen(S_SetDeviceIDPage->temp_deviceinfo.deviceid));
+		DisText(0x1A60, S_SetDeviceIDPage->temp_deviceinfo.deviceid, strlen(S_SetDeviceIDPage->temp_deviceinfo.deviceid));
 		return My_Pass;
 	}
 	

@@ -43,9 +43,19 @@ static MyState_TypeDef PageBufferFree(void);
 
 unsigned char DspSystemSetPage(void *  parm)
 {
-	SetGBSysPage(DspSystemSetPage, DspLunchPage, NULL, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
+	PageInfo * currentpage = NULL;
 	
-	GBPageInit(parm);
+	if(My_Pass == GetCurrentPage(&currentpage))
+	{
+		currentpage->PageInit = PageInit;
+		currentpage->PageUpDate = PageUpDate;
+		currentpage->LCDInput = Input;
+		currentpage->PageBufferMalloc = PageBufferMalloc;
+		currentpage->PageBufferFree = PageBufferFree;
+		currentpage->tempP = &S_SysSetPageBuffer;
+		
+		currentpage->PageInit(currentpage->pram);
+	}
 	
 	return 0;
 }
@@ -59,56 +69,44 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_SysSetPageBuffer->lcdinput[0] = pbuf[4];
 		S_SysSetPageBuffer->lcdinput[0] = (S_SysSetPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
-		/*基本信息*/
-		if(S_SysSetPageBuffer->lcdinput[0] == 0x2200)
+		//基本信息
+		if(S_SysSetPageBuffer->lcdinput[0] == 0x1901)
 		{
-			GBPageBufferFree();
-			SetGBChildPage(DspShowDeviceInfoPage);
-			GotoGBChildPage(NULL);
+			PageBufferFree();
+			PageAdvanceTo(DspShowDeviceInfoPage, NULL);
 		}
-		/*操作人管理*/
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x2201)
+		//操作人管理
+		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1902)
 		{
-			GBPageBufferFree();
-			SetGBChildPage(DspUserMPage);
-			GotoGBChildPage(NULL);
+			PageBufferFree();
+			PageAdvanceTo(DspUserMPage, NULL);
 		}
-		/*网络设置*/
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x2202)
+		//网络设置
+		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1903)
 		{
-			GBPageBufferFree();
-			SetGBChildPage(DspNetPreSetPage);
-			GotoGBChildPage(NULL);
+			PageBufferFree();
+			PageAdvanceTo(DspNetPreSetPage, NULL);
 		}
-		/*数据管理*/
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x2203)
+		//数据管理
+		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1904)
 		{
-			GBPageBufferFree();
-			SetGBChildPage(DspRecordPage);
-			GotoGBChildPage(NULL);
+			PageBufferFree();
+			PageAdvanceTo(DspRecordPage, NULL);
 		}
-		/*校准功能*/
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x2204)
-		{
-			GBPageBufferFree();
-			SetGBChildPage(DspAdjustPage);
-			GotoGBChildPage(NULL);
-		}
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x2230)
+		//校准功能
+		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1908)
 		{
 			if(GetBufLen(&pbuf[7] , 2*pbuf[6]) == 6)
 			{
 				if(pdPASS == CheckStrIsSame(&pbuf[7] , AdjustPassWord ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
 				{
-					GBPageBufferFree();
-					SetGBChildPage(DspAdjustPage);
-					GotoGBChildPage(NULL);
+					PageBufferFree();
+					PageAdvanceTo(DspAdjustPage, NULL);
 				}
 				else if(pdPASS == CheckStrIsSame(&pbuf[7] , TestPassWord ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
 				{
-					GBPageBufferFree();
-					SetGBChildPage(DspReTestPage);
-					GotoGBChildPage(NULL);
+					PageBufferFree();
+					PageAdvanceTo(DspReTestPage, NULL);
 				}
 				else
 					SendKeyCode(1);
@@ -116,18 +114,16 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			else
 					SendKeyCode(1);
 		}
-		/*其他设置*/
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x2205)
+		//其他设置
+		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1905)
 		{
-			GBPageBufferFree();
-			SetGBChildPage(DspOtherSetPage);
-			GotoGBChildPage(NULL);
+			PageBufferFree();
+			PageAdvanceTo(DspOtherSetPage, NULL);
 		}
-		/*返回*/
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x2206)
+		//返回
+		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1900)
 		{
-			GBPageBufferFree();
-			GotoGBParentPage(NULL);
+			PageBackTo(ParentPage);
 		}
 	}
 }
@@ -150,7 +146,7 @@ static MyState_TypeDef PageInit(void *  parm)
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
 	
-	SelectPage(68);
+	SelectPage(98);
 	
 	return My_Pass;
 }

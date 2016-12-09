@@ -10,6 +10,7 @@
 #include	"SystemSetPage.h"
 #include	"NetSetPage.h"
 #include	"WifiSetPage.h"
+#include	"NetInfoPage.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -38,10 +39,19 @@ static MyState_TypeDef PageBufferFree(void);
 
 unsigned char DspNetPreSetPage(void *  parm)
 {
-	SetGBSysPage(DspNetPreSetPage, DspSystemSetPage, NULL, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
+	PageInfo * currentpage = NULL;
 	
-	GBPageInit(parm);
-
+	if(My_Pass == GetCurrentPage(&currentpage))
+	{
+		currentpage->PageInit = PageInit;
+		currentpage->PageUpDate = PageUpDate;
+		currentpage->LCDInput = Input;
+		currentpage->PageBufferMalloc = PageBufferMalloc;
+		currentpage->PageBufferFree = PageBufferFree;
+		
+		currentpage->PageInit(currentpage->pram);
+	}
+	
 	return 0;
 }
 
@@ -59,24 +69,28 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	pdata[0] = (pdata[0]<<8) + pbuf[5];
 	
 	/*有线网设置*/
-	if(pdata[0] == 0x2d00)
+	if(pdata[0] == 0x1C00)
 	{
-		GBPageBufferFree();
-		SetGBChildPage(DspNetSetPage);
-		GotoGBChildPage(NULL);
+		PageBufferFree();
+		PageAdvanceTo(DspNetSetPage, NULL);
 	}
 	/*wifi设置*/
-	else if(pdata[0] == 0x2d01)
+	else if(pdata[0] == 0x1C01)
 	{
-		GBPageBufferFree();
-		SetGBChildPage(DspWifiSetPage);
-		GotoGBChildPage(NULL);
+		PageBufferFree();
+		PageAdvanceTo(DspWifiSetPage, NULL);
+	}
+	//查看网络信息
+	else if(pdata[0] == 0x1C02)
+	{
+		PageBufferFree();
+		PageAdvanceTo(DspNetInfoPage, NULL);
 	}
 	/*返回*/
-	else if(pdata[0] == 0x2d03)
+	else if(pdata[0] == 0x1C03)
 	{
-		GBPageBufferFree();
-		GotoGBParentPage(NULL);
+		PageBufferFree();
+		PageBackTo(ParentPage);
 	}
 
 	MyFree(pdata);
@@ -97,7 +111,7 @@ static void PageUpDate(void)
 ***************************************************************************************************/
 static MyState_TypeDef PageInit(void *  parm)
 {
-	SelectPage(78);
+	SelectPage(108);
 	
 	return My_Pass;
 }

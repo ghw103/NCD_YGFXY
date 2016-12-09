@@ -8,12 +8,13 @@
 #include	"SystemSetPage.h"
 #include	"MyMem.h"
 #include	"TimeDownNorPage.h"
-
+#include	"PreReadCardPage.h"
 #include	"TM1623_Driver.h"
 #include	"OutModel_Fun.h"
 #include	"Motor_Fun.h"
 #include	"CardStatues_Data.h"
 #include	"PlaySong_Task.h"
+#include	"CardLimit_Driver.h"
 
 #include	"MyTest_Data.h"
 #include	"LunchPage.h"
@@ -46,9 +47,19 @@ static MyState_TypeDef PageBufferFree(void);
 
 unsigned char DspPaiDuiPage(void *  parm)
 {
-	SetGBSysPage(DspPaiDuiPage, DspLunchPage, DspTimeDownNorPage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
+	PageInfo * currentpage = NULL;
 	
-	GBPageInit(parm);
+	if(My_Pass == GetCurrentPage(&currentpage))
+	{
+		currentpage->PageInit = PageInit;
+		currentpage->PageUpDate = PageUpDate;
+		currentpage->LCDInput = Input;
+		currentpage->PageBufferMalloc = PageBufferMalloc;
+		currentpage->PageBufferFree = PageBufferFree;
+		currentpage->tempP = &S_PaiDuiPageBuffer;
+		
+		currentpage->PageInit(currentpage->pram);
+	}
 	
 	return 0;
 }
@@ -65,8 +76,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		/*返回*/
 		if(S_PaiDuiPageBuffer->lcdinput[0] == 0x2600)
 		{
-			GBPageBufferFree();
-			GotoGBParentPage(NULL);
+			PageBufferFree();
+			PageBackTo(ParentPage);
 		}
 		/*等待插卡*/
 		else if(S_PaiDuiPageBuffer->lcdinput[0] == 0x00a1)
@@ -121,119 +132,70 @@ static MyState_TypeDef PageBufferFree(void)
 
 static void UpData(void)
 {
-	unsigned char index = 1;
+	unsigned char index = 0;
 	static unsigned char count = 0;
 	
 	/*更新倒计时数据*/
-	for(index=1; index<PaiDuiWeiNum; index++)
+	for(index=0; index<PaiDuiWeiNum; index++)
 	{
 		S_PaiDuiPageBuffer->tempd2 = GetTestItemByIndex(index);
 		
 		if(S_PaiDuiPageBuffer->tempd2)
 		{
-			if((S_PaiDuiPageBuffer->tempd2->statues == statues1)||(S_PaiDuiPageBuffer->tempd2->statues == statues2)||
-				(S_PaiDuiPageBuffer->tempd2->statues == statues4)||(S_PaiDuiPageBuffer->tempd2->statues == statues5)||
-				(S_PaiDuiPageBuffer->tempd2->statues == statues6))
+			//超时
+			if(timerIsStartted(&(S_PaiDuiPageBuffer->tempd2->timer2)))
 			{
-				//显示倒计时
-				ClearText(0x2710+(index-1)*3, 6);
-				sprintf(S_PaiDuiPageBuffer->buf, "%dS", timer_surplus(&(S_PaiDuiPageBuffer->tempd2->timer)));
-				DisText(0x2710+(index-1)*3, S_PaiDuiPageBuffer->buf, strlen(S_PaiDuiPageBuffer->buf));
+				S_PaiDuiPageBuffer->tempvalue1 = timer_Count(&(S_PaiDuiPageBuffer->tempd2->timer2));
+				sprintf(S_PaiDuiPageBuffer->buf, "%dm%ds", S_PaiDuiPageBuffer->tempvalue1/60, S_PaiDuiPageBuffer->tempvalue1%60);
+				DisText(0x17a0+index*5, S_PaiDuiPageBuffer->buf, 8);
 				
+				memset(S_PaiDuiPageBuffer->buf, 0, 8);
+				DisText(0x1710+index*0x10, S_PaiDuiPageBuffer->buf, 8);
+					
+				BasicPic(0x1610+index*16, 0, 100, 15, 0, 22, 570, 55 , 0);
+			}
+			else
+			{
+				S_PaiDuiPageBuffer->tempvalue1 = timer_surplus(&(S_PaiDuiPageBuffer->tempd2->timer));
+				sprintf(S_PaiDuiPageBuffer->buf, "%dm%ds", S_PaiDuiPageBuffer->tempvalue1/60, S_PaiDuiPageBuffer->tempvalue1%60);
+				DisText(0x1710+index*0x10, S_PaiDuiPageBuffer->buf, 8);
+				
+				memset(S_PaiDuiPageBuffer->buf, 0, 8);
+				DisText(0x17a0+index*0x05, S_PaiDuiPageBuffer->buf, 8);
+				
+				S_PaiDuiPageBuffer->tempvalue = S_PaiDuiPageBuffer->tempvalue1;
+				S_PaiDuiPageBuffer->tempvalue /= S_PaiDuiPageBuffer->tempd2->testdata.temperweima.CardWaitTime*60;
+				S_PaiDuiPageBuffer->tempvalue *= 255;
+				S_PaiDuiPageBuffer->tempvalue = 577-S_PaiDuiPageBuffer->tempvalue;
+				BasicPic(0x1610+index*16, 1, 128, 17, (unsigned short)(S_PaiDuiPageBuffer->tempvalue), 22, 577, 59 + index*119, (unsigned short)(S_PaiDuiPageBuffer->tempvalue)-187);
+			}
+				
+			if((S_PaiDuiPageBuffer->tempd2->statues != statues5) && (S_PaiDuiPageBuffer->tempd2->statues != statues6))
+			{
 				//检测卡图标闪烁
 				if((count % 2) == 0)
 					S_PaiDuiPageBuffer->myico.ICO_ID = 23;
 				else
 					S_PaiDuiPageBuffer->myico.ICO_ID = 24;
-				
-				S_PaiDuiPageBuffer->myico.X = 65+((index-1)*119);
-				S_PaiDuiPageBuffer->myico.Y = 100;
-				
-				BasicUI(0x2690+(index-1)*16 ,0x1907 , 1, &(S_PaiDuiPageBuffer->myico) , sizeof(Basic_ICO));
-				
-				//显示倒计时槽
-				S_PaiDuiPageBuffer->tempvalue = timer_surplus(&(S_PaiDuiPageBuffer->tempd2->timer));
-				S_PaiDuiPageBuffer->tempvalue /= S_PaiDuiPageBuffer->tempd2->testdata.temperweima.CardWaitTime*60;
-				S_PaiDuiPageBuffer->tempvalue *= 250;
-				S_PaiDuiPageBuffer->tempvalue = 570-S_PaiDuiPageBuffer->tempvalue;
-				BasicPic(0x2610+(index-1)*16, 1, 100, 15, (unsigned short)(S_PaiDuiPageBuffer->tempvalue), 22, 570, 55 + (index-1)*119, (unsigned short)(S_PaiDuiPageBuffer->tempvalue)-220);
+					
+				S_PaiDuiPageBuffer->myico.X = 69+(index*119);
+				S_PaiDuiPageBuffer->myico.Y = 135;
+					
+				BasicUI(0x1690+index*0x10 ,0x1907 , 1, &(S_PaiDuiPageBuffer->myico) , sizeof(Basic_ICO));
 			}
-			/*倒计时*/
-			else if(S_PaiDuiPageBuffer->tempd2->statues == statues3)
-			{
-				ClearText(0x2710+(index-1)*3, 6);
-				sprintf(S_PaiDuiPageBuffer->buf, "%dS", timer_surplus(&(S_PaiDuiPageBuffer->tempd2->timer)));
-				DisText(0x2710+(index-1)*3, S_PaiDuiPageBuffer->buf, strlen(S_PaiDuiPageBuffer->buf));
-				
-				S_PaiDuiPageBuffer->myico.ICO_ID = 24;
-				
-				S_PaiDuiPageBuffer->myico.X = 65+((index-1)*119);
-				S_PaiDuiPageBuffer->myico.Y = 100;
-				BasicUI(0x2690+(index-1)*16 ,0x1907 , 1, &(S_PaiDuiPageBuffer->myico) , sizeof(Basic_ICO));
-				
-				S_PaiDuiPageBuffer->tempvalue = timer_surplus(&(S_PaiDuiPageBuffer->tempd2->timer));
-				S_PaiDuiPageBuffer->tempvalue /= S_PaiDuiPageBuffer->tempd2->testdata.temperweima.CardWaitTime*60;
-				S_PaiDuiPageBuffer->tempvalue *= 250;
-				S_PaiDuiPageBuffer->tempvalue = 570-S_PaiDuiPageBuffer->tempvalue;
-				BasicPic(0x2610+(index-1)*16, 1, 100, 15, (unsigned short)(S_PaiDuiPageBuffer->tempvalue), 22, 570, 55 + (index-1)*119, (unsigned short)(S_PaiDuiPageBuffer->tempvalue)-220);
-			}
-			/*进入超时处理阶段*/
-			else if(S_PaiDuiPageBuffer->tempd2->statues == statues8)
-			{			
-				ClearText(0x2710+(index-1)*3, 6);
-				sprintf(S_PaiDuiPageBuffer->buf, "%dS", timer_Count(&(S_PaiDuiPageBuffer->tempd2->timer2)));
-				DisText(0x2710+(index-1)*3, S_PaiDuiPageBuffer->buf, strlen(S_PaiDuiPageBuffer->buf));
-				
-				S_PaiDuiPageBuffer->myico.ICO_ID = 24;
-				S_PaiDuiPageBuffer->myico.X = 65+((index-1)*119);
-				S_PaiDuiPageBuffer->myico.Y = 100;
-				
-				BasicUI(0x2690+(index-1)*16 ,0x1907 , 1, &(S_PaiDuiPageBuffer->myico) , sizeof(Basic_ICO));
-			}
-			else if((S_PaiDuiPageBuffer->tempd2->statues == statues9) || (S_PaiDuiPageBuffer->tempd2->statues == statues13) || 
-				(S_PaiDuiPageBuffer->tempd2->statues == statues12))
-			{
-				ClearText(0x2710+(index-1)*3, 6);
-				sprintf(S_PaiDuiPageBuffer->buf, "%dS", timer_Count(&(S_PaiDuiPageBuffer->tempd2->timer2)));
-				DisText(0x2710+(index-1)*3, S_PaiDuiPageBuffer->buf, strlen(S_PaiDuiPageBuffer->buf));
-				
-				if(count % 2 == 0)
-					S_PaiDuiPageBuffer->myico.ICO_ID = 23;
-				else
-					S_PaiDuiPageBuffer->myico.ICO_ID = 24;
-				
-				S_PaiDuiPageBuffer->myico.X = 65+((index-1)*119);
-				S_PaiDuiPageBuffer->myico.Y = 100;
-				
-				BasicUI(0x2690+(index-1)*16 ,0x1907 , 1, &(S_PaiDuiPageBuffer->myico) , sizeof(Basic_ICO));
-			}
-			/*将卡插入卡槽*/
-			else if((S_PaiDuiPageBuffer->tempd2->statues == statues10)||(S_PaiDuiPageBuffer->tempd2->statues == statues11))
-			{
-				ClearText(0x2710+(index-1)*3, 6);
-				sprintf(S_PaiDuiPageBuffer->buf, "%dS", timer_Count(&(S_PaiDuiPageBuffer->tempd2->timer2)));
-				DisText(0x2710+(index-1)*3, S_PaiDuiPageBuffer->buf, strlen(S_PaiDuiPageBuffer->buf));
-				
-				if(count % 2 == 0)
-					S_PaiDuiPageBuffer->myico.ICO_ID = 23;
-				else
-					S_PaiDuiPageBuffer->myico.ICO_ID = 24;
-				
-				S_PaiDuiPageBuffer->myico.X = 65+((index-1)*119);
-				S_PaiDuiPageBuffer->myico.Y = 100;
-				
-				BasicUI(0x2690+(index-1)*16 ,0x1907 , 1, &(S_PaiDuiPageBuffer->myico) , sizeof(Basic_ICO));
-			}
+
 		}
 		else
 		{
 			//清除倒计时时间
-			ClearText(0x2710+(index-1)*3, 6);
+			ClearText(0x1710+index*0x10, 8);
+			ClearText(0x17a0+index*0x05, 8);
 			//显示蓝色卡
 			S_PaiDuiPageBuffer->myico.ICO_ID = 23;
-			S_PaiDuiPageBuffer->myico.X = 65+((index-1)*119);
-			S_PaiDuiPageBuffer->myico.Y = 100;
-			BasicUI(0x2690+(index-1)*16 ,0x1907 , 1, &(S_PaiDuiPageBuffer->myico) , sizeof(Basic_ICO));
+			S_PaiDuiPageBuffer->myico.X = 69+index*119;
+			S_PaiDuiPageBuffer->myico.Y = 135;
+			BasicUI(0x1690+index*0x10 ,0x1907 , 1, &(S_PaiDuiPageBuffer->myico) , sizeof(Basic_ICO));
+			BasicPic(0x1610+index*0x10, 0, 128, 15, 0, 22, 570, 55 , 0);
 		}
 	}
 
@@ -244,321 +206,170 @@ static void UpData(void)
 void CheckTime(void)
 {
 	unsigned char index = 0;
-	CardState_Def tempCardState;
-	KeyChange_Def tempkey;
 	ItemData * temp = NULL;
 	unsigned short tempvalue = 0;
 	
-	//检测测试位置的卡拔插动作
-	if(pdPASS == GetCardStatuesFromQueue(&tempCardState, 10/portTICK_RATE_MS))
-	{
-		temp = GetCurrentTestItem();
-		if(temp)
-		{
-			if(tempCardState == NoCard)
-			{
-				if(temp->statues == statues1)
-					temp->statues = statues2;
-			}
-			else if(tempCardState == CardIN)
-			{
-				if(temp->statues == statues6)
-				{
-					temp->statues = statues7;
-					UpOneModelData(temp->testlocation-1, R_OFF_G_ON, 0);
-					DspTimeDownNorPage(NULL);
-				}
-				else if(temp->statues == statues11)
-				{		
-					temp->statues = statues7;
-					UpOneModelData(temp->testlocation-1, R_OFF_G_ON, 0);
-					DspTimeDownNorPage(NULL);
-				}
-			}
-		}
-	}
-	
-	//检测排队位的卡拔插动作
-	if(pdPASS == GetKeyStatuesFromQueue(&tempkey, 10/portTICK_RATE_MS))
-	{
-		temp = GetTestItemByIndex(tempkey.index);
-		if(temp)
-		{
-			/*检测到有卡拔出排队位*/
-			if(tempkey.keystatues == KEY_NoPressed)
-			{
-				if(temp->statues == statues3)
-				{
-					UpOneModelData(tempkey.index-1, R_ON_G_OFF, 0);
-					temp->statues = statues4;
-					timer_restart(&(temp->timer3));
-					AddNumOfSongToList(tempkey.index+26, 0);
-				}
-				else if(temp->statues == statues5)
-				{
-					temp->statues = statues6;
-				}
-				else if(temp->statues == statues10)
-					temp->statues = statues11;
-			}
-			else if(tempkey.keystatues == KEY_Pressed)
-			{
-				/*等待插入，则转入3状态*/
-				if(temp->statues == statues2)
-				{
-					UpOneModelData(tempkey.index-1, R_ON_G_OFF, 0);
-					temp->statues = statues3;
-					SetCurrentTestItem(NULL);
-				}
-				else if(temp->statues == statues4)
-				{
-					UpOneModelData(tempkey.index-1, R_ON_G_OFF, 0);
-					temp->statues = statues3;
-					timer_restart(&(temp->timer3));
-					AddNumOfSongToList(tempkey.index+26, 0);
-				}
-				else if(temp->statues == statues9)
-				{
-					UpOneModelData(tempkey.index-1, R_ON_G_OFF, 0);
-					temp->statues = statues8;
-				}
-				else if(temp->statues == statues12)
-				{
-					UpOneModelData(tempkey.index-1, R_ON_G_OFF, 0);
-					temp->statues = statues8;
-				}
-				else if(temp->statues == statues13)
-				{
-					UpOneModelData(tempkey.index-1, R_ON_G_OFF, 0);
-					temp->statues = statues8;
-				}
-			}
-		}
-	}
-	
-	for(index=1; index<PaiDuiWeiNum; index++)
+	for(index=0; index<PaiDuiWeiNum; index++)
 	{
 		temp = GetTestItemByIndex(index);
 		
 		if(temp)
 		{
-			/*重置操作倒计时*/
-			if(temp->statues == statuesNull)
+			//进入排队模式
+			if(temp->statues == startpaidui)
 			{
 				temp->statues = statues1;
 				
-				UpOneModelData(index-1, R_ON_G_OFF, 5);
+				UpOneModelData(index, R_ON_G_OFF, 5);
 				//20S提示一次将卡插入排队位
 				timer_set(&(temp->timer3), 10);
-				AddNumOfSongToList(index+26, 0);
+				AddNumOfSongToList(index+19, 0);
 			}
-			else if((temp->statues == statues1)||(temp->statues == statues2))
+			//等待拔出卡槽
+			if(temp->statues == statues1)
 			{
-				tempvalue = timer_surplus(&(temp->timer));
-				//如果检测卡反应时间到
-				if(tempvalue <= 20)
-				{
-					if(temp->statues == statues1)
-					{
-						UpOneModelData(index-1, R_OFF_G_ON, 0);
-						temp->statues = statues7;
-						DspTimeDownNorPage(NULL);
-					}
-					else if(temp->statues == statues2)
-					{
-						UpOneModelData(index-1, R_ON_G_OFF, 5);
-						temp->statues = statues6;
-						timer_restart(&(temp->timer3));
-						AddNumOfSongToList(index+34, 0);
-					}
-				}
-				else if(TimeOut == timer_expired(&(temp->timer3)))
-				{
-					//20S提示一次将卡插入排队位
-					timer_restart(&(temp->timer3));
-					
-					AddNumOfSongToList(index+26, 0);
-				}
+				if(!CardPinIn)
+					temp->statues = statues2;
 			}
-			else if(temp->statues == statues3)
-			{
-				tempvalue = timer_surplus(&(temp->timer));
-				if(0 == tempvalue)
-				{
-					UpOneModelData(index-1, R_ON_G_OFF, 0);
-					timer_restart(&(temp->timer2));
-					temp->statues = statues8;
-					AddNumOfSongToList(index+10, 0);
-				}
-				/*倒计时小于20S，提示插入测试位*/
-				else if(tempvalue < 20)
-				{
-					//如果空闲
-					if(GetCurrentTestItem() == NULL)
-					{
-						SetCurrentTestItem(temp);
-						temp->statues = statues5;
-						
-						UpOneModelData(index-1, R_ON_G_OFF, 5);
-						
-						timer_restart(&(temp->timer3));
-						AddNumOfSongToList(index+34, 0);
-						
-						MotorMoveTo(GetGB_MotorMaxLocation(), 1);
-					}
-				}
-				/*提醒时间快到了*/
-				else if( (tempvalue <= 60) && (tempvalue > 20) )
-				{
-					if(tempvalue < 30)
-					{
-						if((DspPaiDuiPage != GetGBCurrentPage()) && (GetCurrentTestItem() == NULL))
-							DspPaiDuiPage(NULL);
-					}
-					
-					if(TimeOut == timer_expired(&(temp->timer3)))
-					{
-						timer_restart(&(temp->timer3));
-						AddNumOfSongToList(index-1, 0);
-					}
-				}
-			}
+			//等待插入卡槽
 			else if(temp->statues == statues4)
 			{
+				if(CardPinIn)
+				{
+					UpOneModelData(index, R_OFF_G_ON, 0);
+					temp->statues = statues7;
+					PageAdvanceTo(DspPreReadCardPage, NULL);
+				}
+			}
+			//等待插入排队位
+			else if(temp->statues == statues2)
+			{
+				//如果插入排队位，切换到计时或者超时状态
+				if(KEY_Pressed == GetKeyStatues(index))
+				{
+					//超时的时候插入，继续超时计时
+					if(timerIsStartted(&(temp->timer2)))
+						temp->statues = statues6;
+					else
+						temp->statues = statues5;
+						
+					UpOneModelData(index, R_ON_G_OFF, 0);
+						
+					SetCurrentTestItem(NULL);
+				}
+			}
+			//等待拔出排队位
+			else if(temp->statues == statues3)
+			{
+				//如果拔出排队位
+				if(KEY_NoPressed == GetKeyStatues(index))
+				{
+					UpOneModelData(index, R_OFF_G_ON, 0);
+					temp->statues = statues4;
+				}
+			}
+			//倒计时过程中卡拔出
+			else if((temp->statues == statues5) || (temp->statues == statues6))
+			{
+				//如果拔出排队位
+				if(KEY_NoPressed == GetKeyStatues(index))
+				{
+					temp->statues = statues2;
+					UpOneModelData(index, R_ON_G_OFF, 5);
+					AddNumOfSongToList(index+19, 0);
+				}
+			}
+
+			//如果正在倒计时
+			if((timerIsStartted(&(temp->timer))) && (false == timerIsStartted(&(temp->timer2))))
+			{
 				tempvalue = timer_surplus(&(temp->timer));
+				
 				if(0 == tempvalue)
 				{
 					timer_restart(&(temp->timer2));
-					UpOneModelData(index-1, R_ON_G_OFF, 5);
-					temp->statues = statues13;
-					AddNumOfSongToList(index+10, 0);
+					AddNumOfSongToList(index+12, 0);
 				}
-				/*倒计时小于20S，提示插入测试位*/
-				else if(tempvalue < 20)
+				else if(tempvalue <= 30)
 				{
-					//空闲
-					if(GetCurrentTestItem() == NULL)
+					//排队完成
+					if(temp->statues == statues1)
 					{
-						SetCurrentTestItem(temp);
-						temp->statues = statues6;
-						
-						UpOneModelData(index-1, R_ON_G_OFF, 5);
-						
+						UpOneModelData(index, R_OFF_G_ON, 0);
+						temp->statues = statues7;
+						PageAdvanceTo(DspPreReadCardPage, NULL);
+					}
+					//插入卡槽，结束排队
+					else if(temp->statues == statues2)
+					{
+						UpOneModelData(index, R_OFF_G_ON, 0);
+						temp->statues = statues4;
 						timer_restart(&(temp->timer3));
-						AddNumOfSongToList(index+34, 0);
-						
-						MotorMoveTo(GetGB_MotorMaxLocation(), 1);
+						AddNumOfSongToList(index+44, 0);
 					}
-				}
-				if(TimeOut == timer_expired(&(temp->timer3)))
-				{
-					timer_restart(&(temp->timer3));
-					AddNumOfSongToList(index+26, 0);
-				}
-			}
-			else if((temp->statues == statues5) || (temp->statues == statues6))
-			{
-				/*进入超时阶段*/
-				if(TimeOut == timer_expired(&(temp->timer)))
-				{
-					timer_restart(&(temp->timer2));
-					
-					if(statues5 == temp->statues)
+					else if(temp->statues == statues3)
 					{
-						SetCurrentTestItem(NULL);
-						UpOneModelData(index-1, R_ON_G_OFF, 0);
-						temp->statues = statues8;
-						AddNumOfSongToList(index+10, 0);
+						if(TimeOut == timer_expired(&(temp->timer3)))
+						{
+							timer_restart(&(temp->timer3));
+							
+							AddNumOfSongToList(index+36, 0);
+						}
 					}
-					else if(statues6 == temp->statues)
+					else if(temp->statues == statues4)
 					{
-						temp->statues = statues9;
-						UpOneModelData(index-1, R_ON_G_OFF, 5);
-						SetCurrentTestItem(NULL);
-						AddNumOfSongToList(index+10, 0);
-						AddNumOfSongToList(index+26, 2);
+						if(TimeOut == timer_expired(&(temp->timer3)))
+						{
+							timer_restart(&(temp->timer3));
+							
+							AddNumOfSongToList(index+44, 0);
+						}
 					}
-				}
-				/*提示放入卡槽准备测试*/
-				else if(TimeOut == timer_expired(&(temp->timer3)))
-				{
-					timer_restart(&(temp->timer3));
-					AddNumOfSongToList(index+34, 0);
-				}
-			}
-			/*正在超时计时*/
-			else if(temp->statues == statues8)
-			{
-				/*如果超时时，操作空闲*/
-				if((GetMinWaitTime() > 80)&&(GetCurrentTestItem() == NULL))
-				{
-					UpOneModelData(index-1, R_ON_G_OFF, 5);
-					temp->statues = statues10;
-					SetCurrentTestItem(temp);
-					timer_restart(&(temp->timer3));
-					AddNumOfSongToList(index+34, 0);
-				}
-			}
-			/*插入排队位，进入超时*/
-			else if(temp->statues == statues9)
-			{
-				if(TimeOut == timer_expired(&(temp->timer3)))
-				{
-					//20S提示一次将卡插入排队位
-					timer_restart(&(temp->timer3));
-					
-					AddNumOfSongToList(index+26, 0);
-				}
-			}
-			/*正在超时时，有其他排队卡准备要测试了*/
-			else if((temp->statues == statues10)||(temp->statues == statues11))
-			{
-				/*如果超时时，操作空闲*/
-				if(GetMinWaitTime() < 60)
-				{
-					/*如果卡还没拔出来，则直接放弃此次操作*/
-					if(temp->statues == statues10)
+					//如果正在倒计时，则提示拔出排队位，
+					else if(temp->statues == statues5)
 					{
-						UpOneModelData(index-1, R_ON_G_OFF, 0);
-						temp->statues = statues8;
-						SetCurrentTestItem(NULL);
-					}
-					/*如果卡已拔，但是没插入卡槽，则提醒然后放弃此次操作*/
-					else if(temp->statues == statues11)
-					{
-						UpOneModelData(index-1, R_ON_G_OFF, 5);
-						temp->statues = statues12;
-						timer_restart(&(temp->timer3));
-						SetCurrentTestItem(NULL);
-						AddNumOfSongToList(index+26, 0);
+						//如果空闲
+						if(GetCurrentTestItem() == NULL)
+						{
+							SetCurrentTestItem(temp);
+							UpOneModelData(index, R_ON_G_OFF, 5);
+							temp->statues = statues3;
+							timer_restart(&(temp->timer3));
+							AddNumOfSongToList(index+54, 0);
+						}
 					}
 				}
 				else
 				{
-					if(TimeOut == timer_expired(&(temp->timer3)))
-					{
-						timer_restart(&(temp->timer3));
-						AddNumOfSongToList(index+34, 0);
+					//排队完成
+					if((temp->statues == statues1) || (temp->statues == statues2))
+					{						
+						if(TimeOut == timer_expired(&(temp->timer3)))
+						{
+							timer_restart(&(temp->timer3));
+							
+							AddNumOfSongToList(index+28, 0);
+						}
 					}
 				}
 			}
-			else if(temp->statues == statues12)
+			
+			//如果正在超时计时
+			if(timerIsStartted(&(temp->timer2)))
 			{
-				if(TimeOut == timer_expired(&(temp->timer3)))
+				/*如果超时时，操作空闲*/
+				if((GetMinWaitTime() > 60)&&(GetCurrentTestItem() == NULL))
 				{
+					SetCurrentTestItem(temp);
+					UpOneModelData(index, R_ON_G_OFF, 5);
+					temp->statues = statues3;
 					timer_restart(&(temp->timer3));
-					AddNumOfSongToList(index+26, 0);
+					AddNumOfSongToList(index+54, 0);
 				}
-			}
-			else if(temp->statues == statues13)
-			{
-				if(TimeOut == timer_expired(&(temp->timer3)))
-				{
-					timer_restart(&(temp->timer3));
-					AddNumOfSongToList(index+26, 0);
-				}
+				
 			}
 		}
+		
 	}
 }
 

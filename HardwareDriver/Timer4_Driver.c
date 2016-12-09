@@ -12,7 +12,7 @@
 #include	"stm32f4xx_tim.h"
 #include	"CardLimit_Driver.h"
 #include	"DRV8825_Driver.h"
-
+#include	"Define.h"
 #include	"Motor_Fun.h"
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -114,7 +114,7 @@ void TIM4_IRQHandler(void)
 		{
 			//SetGB_MotorMaxLocation(GetGB_MotorLocation());
 			
-			if(GetGB_MotorTargetLocation() > GetGB_MotorMaxLocation())
+			if(GetGB_MotorTargetLocation() > MaxLocation)
 				SetGB_MotorTargetLocation(GetGB_MotorLocation());
 		}
 		

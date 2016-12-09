@@ -10,6 +10,8 @@ typedef struct PreReadPageBuffer_tag {
 	ResultState cardpretestresult;
 	ScanCodeResult scancode;
 	Timer timer2;
+	TestData temptestdata;							//临时测试数据缓冲区
+	CardCodeInfo temperweima;						//临时二维码数据缓冲区
 	char buf[100];
 	unsigned short lcdinput[100];
 }PreReadPageBuffer;

@@ -21,7 +21,7 @@ MyState_TypeDef ScanApList(WIFI_Def *wifis);
 MyState_TypeDef ConnectWifi(WIFI_Def *wifis);
 MyState_TypeDef RestartWifi(void);
 
-
+MyState_TypeDef GetWifiStaIP(IP_Def * ip);
 MyState_TypeDef CheckWifiMID(void);
 unsigned char GetWifiIndicator(void);
 MyState_TypeDef WifiIsConnectted(void);

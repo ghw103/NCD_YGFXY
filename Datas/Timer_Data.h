@@ -11,4 +11,5 @@ TimerState_Def timer_expired(Timer *t);
 unsigned int timer_surplus(Timer *t);
 unsigned int timer_used(Timer *t);
 unsigned int timer_Count(Timer * t);
+bool timerIsStartted(Timer * t);
 #endif

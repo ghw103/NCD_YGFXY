@@ -2,12 +2,13 @@
 #define _UPLOAD_F_H_H
 
 #include	"Define.h"
+#include	"TestDataDao.h"
 
 #pragma pack(1)
 typedef struct UpLoadTestDataBuffer_Tag
 {	
 	DeviceInfo deviceinfo;
-	TestDataSaveHead myTestDataSaveHead;
+	TestDataHead myTestDataSaveHead;
 	TestData testdata;
 	
 	char sendbuf[2048];

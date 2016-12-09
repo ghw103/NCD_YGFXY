@@ -32,7 +32,6 @@ void ToggleLedStatues(unsigned char ledindex);
 
 void ChangeOutModelStatues(void);
 
-unsigned char GetKeyStatuesFromQueue(KeyChange_Def * receivedchar , portTickType xBlockTime);
 TM1623_KEY_State GetKeyStatues(unsigned char index);
 #endif
 

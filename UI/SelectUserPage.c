@@ -52,9 +52,19 @@ static void SelectUser(unsigned char index);
 ***************************************************************************************************/
 unsigned char DspSelectUserPage(void *  parm)
 {
-	SetGBSysPage(DspSelectUserPage, DspLunchPage, DspSampleIDPage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
+	PageInfo * currentpage = NULL;
 	
-	GBPageInit(parm);
+	if(My_Pass == GetCurrentPage(&currentpage))
+	{
+		currentpage->PageInit = PageInit;
+		currentpage->PageUpDate = PageUpDate;
+		currentpage->LCDInput = Input;
+		currentpage->PageBufferMalloc = PageBufferMalloc;
+		currentpage->PageBufferFree = PageBufferFree;
+		currentpage->tempP = &S_UserPageBuffer;
+		
+		currentpage->PageInit(currentpage->pram);
+	}
 
 	return 0;
 }
@@ -81,8 +91,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		{
 			DeleteCurrentTest();
 			
-			GBPageBufferFree();
-			GotoGBParentPage(NULL);
+			PageBufferFree();
+			PageBackTo(ParentPage);
 		}
 		
 		/*上翻也*/
@@ -130,8 +140,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 				/*以当前选择的操作人作为本次测试数据的操作人*/
 				memcpy(&(S_UserPageBuffer->currenttestdata->testdata.user), S_UserPageBuffer->user, sizeof(User_Type));
 			
-				GBPageBufferFree();
-				GotoGBChildPage(NULL);
+				PageBufferFree();
+				PageAdvanceTo(DspSampleIDPage, NULL);
 			}
 			else
 			{
@@ -171,8 +181,8 @@ static void PageUpDate(void)
 		AddNumOfSongToList(8, 0);
 		DeleteCurrentTest();
 		
-		GBPageBufferFree();
-		GotoGBParentPage(NULL);
+		PageBufferFree();
+		PageBackTo(ParentPage);
 	}
 }
 

@@ -37,16 +37,19 @@ static void DspPageText(void);
 
 unsigned char DspSleepPage(void *  parm)
 {
-	SetGBParentPage(GetGBCurrentPage());
-	SetGBCurrentPage(DspSleepPage);
-	SetGBChildPage(NULL);
-	SetGBPageUpDate(PageUpDate);
-	SetGBGBPageInput(Input);
-	SetGBPageInit(PageInit);
-	SetGBPageBufferMalloc(PageBufferMalloc);
-	SetGBPageBufferFree(PageBufferFree);
+	PageInfo * currentpage = NULL;
 	
-	GBPageInit(parm);
+	if(My_Pass == GetCurrentPage(&currentpage))
+	{
+		currentpage->PageInit = PageInit;
+		currentpage->PageUpDate = PageUpDate;
+		currentpage->LCDInput = Input;
+		currentpage->PageBufferMalloc = PageBufferMalloc;
+		currentpage->PageBufferFree = PageBufferFree;
+		currentpage->tempP = &S_SleepPageBuffer;
+		
+		currentpage->PageInit(currentpage->pram);
+	}
 	
 	return 0;
 }
@@ -64,8 +67,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		if(S_SleepPageBuffer->lcdinput[0] == 0x1D70)
 		{
 			SetLEDLight(100);
-			GBPageBufferFree();
-			GotoGBParentPage(NULL);
+			PageBufferFree();
+			PageBackTo(ParentPage);
 		}
 	}
 }

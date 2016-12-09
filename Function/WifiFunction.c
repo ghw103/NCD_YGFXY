@@ -289,6 +289,26 @@ MyState_TypeDef ConnectWifi(WIFI_Def *wifis)
 }
 
 
+MyState_TypeDef GetWifiStaIP(IP_Def * ip)
+{
+	static char txbuf[200] ; 
+	MyState_TypeDef statues = My_Fail;
+	
+	/*发送数据缓冲区*/
+//	txbuf = MyMalloc(500);
+//	if(txbuf)
+	{
+		if(My_Pass == ComWithWIFI("AT+WANN\r", "+ok", txbuf, 200, 50 / portTICK_RATE_MS))
+		{
+			if(!((strstr(txbuf, "DisConnected")) || (strstr(txbuf, "RF Off"))))
+				statues = My_Pass;
+		}
+	}
+//	MyFree(txbuf);
+	
+	return statues;
+}
+
 MyState_TypeDef WifiIsConnectted(void)
 {
 	char *txbuf = NULL; 

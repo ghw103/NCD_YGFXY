@@ -20,6 +20,7 @@
 #include 	"stm32f4x7_eth_bsp.h"
 #include	"LwIPConfig.h"
 #include	"Define.h"
+#include	"NetInfo_Data.h"
 
 #include	"LwipCom_Task.h"
 #include	"LwipDHCP_Task.h"
@@ -77,6 +78,8 @@ static void LwIP_Init(void)
 		IP4_ADDR(&ipaddr, myNetData.myip.ip_1, myNetData.myip.ip_2, myNetData.myip.ip_3, myNetData.myip.ip_4);
 		IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1 , NETMASK_ADDR2, NETMASK_ADDR3);
 		IP4_ADDR(&gw, myNetData.myip.ip_1, myNetData.myip.ip_2, myNetData.myip.ip_3, 1);
+		
+		SetGB_LineNetIP(ipaddr.addr);
 	}
 
 	netif_add(&xnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);

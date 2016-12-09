@@ -62,9 +62,18 @@ static void CheckTestCard(void);
 /***************************************************************************************************/
 unsigned char DspReTestPage(void *  parm)
 {
-	SetGBSysPage(DspReTestPage, DspSystemSetPage, NULL, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
+	PageInfo * currentpage = NULL;
 	
-	GBPageInit(parm);
+	if(My_Pass == GetCurrentPage(&currentpage))
+	{
+		currentpage->PageInit = PageInit;
+		currentpage->PageUpDate = PageUpDate;
+		currentpage->LCDInput = Input;
+		currentpage->PageBufferMalloc = PageBufferMalloc;
+		currentpage->PageBufferFree = PageBufferFree;
+		
+		currentpage->PageInit(currentpage->pram);
+	}
 	
 	return 0;
 }
@@ -83,8 +92,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		{
 			if(S_ReTestPageBuffer->retestdata.reteststatus == 0)
 			{
-				GBPageBufferFree();
-				GotoGBParentPage(NULL);
+				PageBufferFree();
+				PageBackTo(ParentPage);
 			}
 			else
 				SendKeyCode(1);

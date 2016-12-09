@@ -63,10 +63,15 @@ void StartvSystemUITask(void)
 static void vSystemUITask( void *pvParameters )
 {
 	static unsigned int count = 0;
+	PageInfo * currentpage = NULL;
 	
 	while(1)
 	{
-		GBPageUpDate();
+		if(My_Pass == GetCurrentPage(&currentpage))
+		{
+			if(NULL != currentpage->PageUpDate)
+				currentpage->PageUpDate();
+		}
 		
 		/*500ms更新一次时间和环境温度*/
 		if(count % 10 == 0)

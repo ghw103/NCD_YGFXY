@@ -1,40 +1,28 @@
 /***************************************************************************************************
-*FileName:
-*Description:
+*FileName:NetInfo_Data
+*Description: 保存实时有线网和wifi状态
 *Author: xsx_kair
-*Data:
+*Data:2016年12月5日16:11:49
 ***************************************************************************************************/
 
 /***************************************************************************************************/
 /******************************************Header List********************************************/
 /***************************************************************************************************/
-#include	"Test_Task.h"
-#include	"Test_Fun.h"
-#include	"System_Data.h"
+#include	"NetInfo_Data.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
-#include 	"queue.h"
-#include	"semphr.h"
 
 #include	<string.h>
 #include	"stdio.h"
-#include 	"stdlib.h"
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
-#define TestTask_PRIORITY			2
-const char * TestTaskName = "vTestTask";
+static NetInfo_Type GB_NetInfo;												//系统实时网络信息
+/***************************************************************************************************/
+/***************************************************************************************************/
+/***************************************************************************************************/
 
-static xQueueHandle xStartTestQueue = NULL ;						//扫卡数据空间队列，并用于启动扫卡任务
-static TestData * testdata;											//扫卡数据指针
-
-static xQueueHandle xTestResultQueue = NULL;						//扫卡结果队列
-static ResultState resultstatues;									//扫卡结果
-/***************************************************************************************************/
-/***************************************************************************************************/
-/***************************************************************************************************/
-static void vTestTask( void *pvParameters );
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -42,72 +30,87 @@ static void vTestTask( void *pvParameters );
 /***************************************************************************************************/
 /***************************************************************************************************/
 
-MyState_TypeDef StartvTestTask(void)
+/***************************************************************************************************
+*FunctionName: GetGB_NetInfo
+*Description: 读取最新的系统网络信息
+*Input: netinfo -- 网络信息存放地址
+*Output: None
+*Return: None
+*Author: xsx
+*Date: 2016年12月5日16:26:56
+***************************************************************************************************/
+void GetGB_NetInfo(NetInfo_Type * netinfo)
 {
-	//创建任务数据队列，同时用于任务启动
-	if(xStartTestQueue == NULL)
-		xStartTestQueue = xQueueCreate(1, sizeof(void *));
+	vTaskSuspendAll();
 	
-	if(xStartTestQueue == NULL)
-		return My_Fail;
+	memcpy(netinfo, &GB_NetInfo, sizeof(NetInfo_Type));
 	
-	//创建任务结果队列
-	if(xTestResultQueue == NULL)
-		xTestResultQueue = xQueueCreate(1, sizeof(ResultState));
-	
-	if(xTestResultQueue == NULL)
-		return My_Fail;
-	
-	if(pdFAIL == xTaskCreate( vTestTask, TestTaskName, configMINIMAL_STACK_SIZE, NULL, TestTask_PRIORITY, NULL ))
-		return My_Fail;
-	else
-		return My_Pass;
+	xTaskResumeAll();
 }
 
-
-static void vTestTask( void *pvParameters )
+void SetGB_LineNetIP(unsigned int ip)
 {
-	while(1)
-	{
-		if(pdPASS == xQueueReceive( xStartTestQueue, &testdata, portMAX_DELAY))
-		{
-			while(pdPASS == TakeTestResult(&resultstatues))
-				;
-			
-			#if (NormalCode != CodeType)
-			
-				SetTestStatusFlorLab(1);
-			#endif
-			resultstatues = TestFunction(testdata);
-			
-			xQueueSend( xTestResultQueue, &resultstatues, 1000/portTICK_RATE_MS );
-			
-			#if (NormalCode != CodeType)
-			
-				SetTestStatusFlorLab(0);
-			#endif
-		}
-		
-		vTaskDelay(500 * portTICK_RATE_MS);
-	}
+	vTaskSuspendAll();
+	
+	GB_NetInfo.LineIP.ip_4 = (ip >> 24)&0xff;
+	GB_NetInfo.LineIP.ip_3 = (ip >> 16)&0xff;
+	GB_NetInfo.LineIP.ip_2 = (ip >> 8)&0xff;
+	GB_NetInfo.LineIP.ip_1 = (ip >> 0)&0xff;
+	
+	xTaskResumeAll();
 }
 
-
-MyState_TypeDef StartTest(void * parm)
+void SetGB_LineNetMac(unsigned char * mac)
 {
-	if(pdPASS == xQueueSend( xStartTestQueue, &parm, 10*portTICK_RATE_MS ))
-		return My_Pass;
-	else
-		return My_Fail;	
+	vTaskSuspendAll();
+	
+	memcpy(GB_NetInfo.LineMAC, mac, 6);
+	
+	xTaskResumeAll();
 }
 
-
-MyState_TypeDef TakeTestResult(ResultState *testsult)
+void SetGB_LineNetStatus(unsigned char status)
 {
-	if(pdPASS == xQueueReceive( xTestResultQueue, testsult,  10/portTICK_RATE_MS))
-		return My_Pass;
-	else
-		return My_Fail;
+	vTaskSuspendAll();
+	
+	GB_NetInfo.LineStatus = status;
+	
+	xTaskResumeAll();
 }
 
+void SetGB_WifiSSID(char * ssid)
+{
+	vTaskSuspendAll();
+	
+	memcpy(GB_NetInfo.WifiSSID, ssid, strlen(ssid));
+	
+	xTaskResumeAll();
+}
+
+void SetGB_WifiIP(IP_Def * ip)
+{
+	vTaskSuspendAll();
+	
+	memcpy(&(GB_NetInfo.WifiIP), ip, sizeof(IP_Def));
+	
+	xTaskResumeAll();
+}
+
+void SetGB_WifiMAC(unsigned char * mac)
+{
+	vTaskSuspendAll();
+	
+	memcpy(GB_NetInfo.WifiMAC, mac, 6);
+	
+	xTaskResumeAll();
+}
+
+void SetGB_WifiIndicator(unsigned char indicator)
+{	
+	vTaskSuspendAll();
+	
+	GB_NetInfo.WifiIndicator = indicator;
+	
+	xTaskResumeAll();
+}
 /****************************************end of file************************************************/

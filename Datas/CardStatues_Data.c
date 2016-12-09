@@ -17,7 +17,6 @@
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
 static CardState_Def  GB_CardState = NoCard;									//无卡
-static xQueueHandle xQueue = NULL;												//
 /***************************************************************************************************/
 /**************************************局部函数声明*************************************************/
 /***************************************************************************************************/
@@ -29,47 +28,14 @@ static xQueueHandle xQueue = NULL;												//
 /***************************************************************************************************/
 /***************************************************************************************************/
 
-static void CreateQueue(void)
-{
-	if(xQueue == NULL)
-	{
-		xQueue = xQueueCreate( 10, ( unsigned portBASE_TYPE ) sizeof( unsigned char ) );
-	}
-}
 
-void ClearCardStatuesQueue(void)
-{
-	CardState_Def  receivedchar;
-	while(pdPASS == GetCardStatuesFromQueue(&receivedchar, 0))
-		;
-}
-
-unsigned char GetCardStatuesFromQueue(CardState_Def * receivedchar , portTickType xBlockTime)
-{
-	CreateQueue();
-	return xQueueReceive( xQueue, receivedchar, xBlockTime );
-} 
-
-unsigned char SendCardStatuesToQueue(CardState_Def *txchar , portTickType xBlockTime)
-{
-	CreateQueue();
-	return xQueueSend( xQueue, txchar, xBlockTime );
-}
 
 CardState_Def GetCardState(void)
 {
-	CardState_Def temp ;
-	
-
-		temp = GB_CardState;
-
-	
-	return temp;
+	return GB_CardState;
 }
 
 void SetCardState(CardState_Def value)
 {
-
-		GB_CardState = value;
-
+	GB_CardState = value;
 }

@@ -167,135 +167,7 @@ void ReadUserData(User_Type * user)
 	}	
 	MyFree(myfile);
 }
-
-/***************************************************************************************************/
-/***************************************************************************************************/
-/********************************************测试数据***********************************************/
-/***************************************************************************************************/
-/***************************************************************************************************/
-/***************************************************************************************************
-*FunctionName：SaveTestData
-*Description：保存测试数据
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年7月16日19:43:40
-***************************************************************************************************/
-MyState_TypeDef SaveTestData(TestData *tempdata)
-{
-	FatfsFileInfo_Def * myfile = NULL;
-	TestDataSaveHead myTestDataSaveHead;
-	MyState_TypeDef statues = My_Fail;
-	
-	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
-	
-	if(myfile)
-	{
-		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
-		memset(&myTestDataSaveHead, 0, sizeof(TestDataSaveHead));
-		
-		myfile->res = f_open(&(myfile->file), "0:/TD.NCD", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
-			
-		if(FR_OK == myfile->res)
-		{
-			//读取数据头
-			f_lseek(&(myfile->file), 0);
-			f_read(&(myfile->file), &(myTestDataSaveHead), sizeof(TestDataSaveHead), &(myfile->br));
-			
-			if(myTestDataSaveHead.crc != CalModbusCRC16Fun1(&(myTestDataSaveHead), sizeof(TestDataSaveHead)-2))
-			{
-				myTestDataSaveHead.datanum = 0;
-				myTestDataSaveHead.readindex = 0;
-			}
-			
-			myTestDataSaveHead.datanum++;
-			
-			myTestDataSaveHead.crc = CalModbusCRC16Fun1(&(myTestDataSaveHead), sizeof(TestDataSaveHead)-2);
-			
-			//更新数据头
-			f_lseek(&(myfile->file), 0);
-			myfile->res = f_write(&(myfile->file), &(myTestDataSaveHead), sizeof(TestDataSaveHead), &(myfile->bw));
-			if(myfile->res != FR_OK)
-				goto END;
-			
-			f_sync(&(myfile->file));
-			
-			//写入数据
-			f_lseek(&(myfile->file), (myTestDataSaveHead.datanum-1) * sizeof(TestData) + sizeof(TestDataSaveHead));
-				
-			tempdata->crc = CalModbusCRC16Fun1(tempdata, sizeof(TestData)-2);
-			
-			myfile->res = f_write(&(myfile->file), tempdata, sizeof(TestData), &(myfile->bw));
-			
-			f_sync(&(myfile->file));
-			
-			if(FR_OK == myfile->res)
-				statues = My_Pass;
-			
-			END:
-				f_close(&(myfile->file));
-		}
-	}
-	
-	MyFree(myfile);
-	
-	return statues;
-}
-
-/***************************************************************************************************
-*FunctionName：ReadTestData
-*Description：读取测试数据
-*Input：filename -- 待读取数据的文件名
-*		tempdata -- 存放地址，此地址需能存放readnum个数据的空间
-*		index --  读取数据的索引（0开始）
-*		readnum -- 读取的个数
-*Output：None
-*Author：xsx
-*Data：
-***************************************************************************************************/
-MyState_TypeDef ReadTestData(TestData *tempdata, unsigned int index, unsigned char readnum)
-{
-	FatfsFileInfo_Def * myfile = NULL;
-	MyState_TypeDef statues = My_Fail;
-	unsigned char i=0;
-	
-	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
-	
-	if(myfile)
-	{
-		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
-		
-		myfile->res = f_open(&(myfile->file), "0:/TD.NCD", FA_READ);
-		
-		if(FR_OK == myfile->res)
-		{
-			myfile->size = f_size(&(myfile->file));
-			
-			myfile->res = f_lseek(&(myfile->file), index*sizeof(TestData)+sizeof(TestDataSaveHead));
-			if(FR_OK == myfile->res)
-			{
-				for(i=0; i<readnum; i++)
-				{
-					myfile->res = f_read(&(myfile->file), tempdata, sizeof(TestData), &(myfile->br));
-					
-					if((FR_OK == myfile->res) && (sizeof(TestData) == myfile->br))
-						tempdata++;
-					else
-						break;
-				}
-				statues = My_Pass;
-			}
-			
-			f_close(&(myfile->file));
-		}
-	}
-	
-	MyFree(myfile);
-	
-	return statues;
-}
-
-
+/*
 MyState_TypeDef ReadIndexPlus(unsigned char num)
 {
 	FatfsFileInfo_Def * myfile = NULL;
@@ -373,7 +245,7 @@ MyState_TypeDef ReadTestDataHead(TestDataSaveHead * head)
 	
 	return statues;
 }
-
+*/
 /***************************************************************************************************/
 /***************************************************************************************************/
 /*************************************IP设置********************************************************/

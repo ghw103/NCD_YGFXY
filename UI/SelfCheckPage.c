@@ -66,9 +66,19 @@ static void RefreshPageValue(void);
 
 unsigned char DspSelfCheckPage(void *  parm)
 {
-	SetGBSysPage(DspSelfCheckPage, NULL, DspLunchPage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
+	PageInfo * currentpage = NULL;
 	
-	GBPageInit(parm);
+	if(My_Pass == GetCurrentPage(&currentpage))
+	{
+		currentpage->PageInit = PageInit;
+		currentpage->PageUpDate = PageUpDate;
+		currentpage->LCDInput = Input;
+		currentpage->PageBufferMalloc = PageBufferMalloc;
+		currentpage->PageBufferFree = PageBufferFree;
+		currentpage->tempP = &S_SelCheckPage;
+		
+		currentpage->PageInit(currentpage->pram);
+	}
 	
 	return 0;
 }
@@ -107,7 +117,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			else if(S_SelCheckPage->lcdinput[1] == 0x0001)
 			{
 				SetGB_SelfCheckStatus(SelfCheck_OK);
-				GotoGBChildPage(NULL);
+				
+				PageAdvanceTo(DspLunchPage, NULL);
 			}
 		}
 	}
@@ -207,9 +218,12 @@ static void RefreshPageValue(void)
 			}*/
 			else
 			{
-				SetGB_SelfCheckStatus(SelfCheck_OK);
-				DspLunchPage(NULL);
 				AddNumOfSongToList(50, 0);
+				
+				SetGB_SelfCheckStatus(SelfCheck_OK);
+
+				PageAdvanceTo(DspLunchPage, NULL);
+				
 			}
 		}
 	}

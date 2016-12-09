@@ -14,6 +14,7 @@
 #include	"System_Data.h"
 #include	"RTC_Driver.h"
 #include	"DeviceDao.h"
+#include	"NetInfo_Data.h"
 
 #include	"cJSON.h"
 #include	"MyMem.h"
@@ -98,6 +99,7 @@ static MyState_TypeDef ReadTime(void)
 		if(My_Pass == UpLoadData("/NCD_YGFXY_Server/rtime.action", buf, strlen(buf)))
 		{
 			//RTC_SetTimeData2(buf+10);
+			SetGB_LineNetStatus(1);
 			status = My_Pass;
 		}
 	}
@@ -160,7 +162,7 @@ static MyState_TypeDef UpLoadDeviceInfo(void)
 
 static MyState_TypeDef UpLoadTestData(void)
 {
-	MyState_TypeDef statues = My_Fail;
+/*	MyState_TypeDef statues = My_Fail;
 	unsigned short i=0, j;
 	
 	UpLoadTestDataBuffer * myUpLoadTestDataBuffer = NULL;
@@ -200,8 +202,8 @@ static MyState_TypeDef UpLoadTestData(void)
 
 		sprintf(myUpLoadTestDataBuffer->sendbuf, "tdata.cid=%s&tdata.citem=%s&tdata.cdw=%s&tdata.did=%s&tdata.t_name=%s&tdata.sampleid=%s&tdata.testtime=2016-11-24 16:42:12&tdata.e_t=%.1f&tdata.o_t=%.1f&tdata.outt=%d&tdata.c_l=%d&tdata.t_l=%d&tdata.b_l=%d&tdata.t_c_v=%.3f&tdata.a_p=%.3f&tdata.b_v=%.3f&tdata.a_v=%.3f",
 			myUpLoadTestDataBuffer->testdata.temperweima.CardPiCi, myUpLoadTestDataBuffer->testdata.temperweima.ItemName, myUpLoadTestDataBuffer->testdata.temperweima.ItemMeasure, myUpLoadTestDataBuffer->deviceinfo.deviceid, myUpLoadTestDataBuffer->testdata.user.user_name, myUpLoadTestDataBuffer->testdata.sampleid,
-			/*myUpLoadTestDataBuffer->testdata.TestTime.year, myUpLoadTestDataBuffer->testdata.TestTime.month, myUpLoadTestDataBuffer->testdata.TestTime.day,
-			myUpLoadTestDataBuffer->testdata.TestTime.hour, myUpLoadTestDataBuffer->testdata.TestTime.min, myUpLoadTestDataBuffer->testdata.TestTime.sec, */
+			myUpLoadTestDataBuffer->testdata.TestTime.year, myUpLoadTestDataBuffer->testdata.TestTime.month, myUpLoadTestDataBuffer->testdata.TestTime.day,
+			myUpLoadTestDataBuffer->testdata.TestTime.hour, myUpLoadTestDataBuffer->testdata.TestTime.min, myUpLoadTestDataBuffer->testdata.TestTime.sec,
 			myUpLoadTestDataBuffer->testdata.TestTemp.E_Temperature, myUpLoadTestDataBuffer->testdata.TestTemp.O_Temperature,
 			myUpLoadTestDataBuffer->testdata.time, myUpLoadTestDataBuffer->testdata.testline.C_Point[1], myUpLoadTestDataBuffer->testdata.testline.T_Point[1], myUpLoadTestDataBuffer->testdata.testline.B_Point[1], myUpLoadTestDataBuffer->testdata.testline.BasicBili,
 			myUpLoadTestDataBuffer->testdata.tempadjust.parm, myUpLoadTestDataBuffer->testdata.testline.BasicResult, myUpLoadTestDataBuffer->testdata.testline.AdjustResult);
@@ -246,7 +248,7 @@ static MyState_TypeDef UpLoadTestData(void)
 
 			if(My_Pass != UpLoadData("/NCD_YGFXY_Server/upseriesdata.action", myUpLoadTestDataBuffer->sendbuf, strlen(myUpLoadTestDataBuffer->sendbuf)))
 				goto END;
-		}
+		}*/
 		
 /*		//ÉÏ´«²âÊÔÈË
 		memset(myUpLoadTestDataBuffer->sendbuf, 0, 1024);
@@ -259,12 +261,12 @@ static MyState_TypeDef UpLoadTestData(void)
 		if(My_Pass != UpLoadData("/NCD_YGFXY_Server/uptester.action", myUpLoadTestDataBuffer->sendbuf, strlen(myUpLoadTestDataBuffer->sendbuf)))
 			goto END;*/
 		
-		ReadIndexPlus(1);
+/*		ReadIndexPlus(1);
 		statues = My_Pass;
 	}
 	
 	END:
 		MyFree(myUpLoadTestDataBuffer);
 
-	return statues;
+	return statues;*/
 }

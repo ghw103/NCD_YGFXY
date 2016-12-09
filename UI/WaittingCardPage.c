@@ -43,10 +43,20 @@ static MyState_TypeDef PageBufferFree(void);
 
 unsigned char DspWaittingCardPage(void *  parm)
 {
-	SetGBSysPage(DspWaittingCardPage, DspSampleIDPage, DspOperGuidePage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
+	PageInfo * currentpage = NULL;
 	
-	GBPageInit(parm);
-
+	if(My_Pass == GetCurrentPage(&currentpage))
+	{
+		currentpage->PageInit = PageInit;
+		currentpage->PageUpDate = PageUpDate;
+		currentpage->LCDInput = Input;
+		currentpage->PageBufferMalloc = PageBufferMalloc;
+		currentpage->PageBufferFree = PageBufferFree;
+		currentpage->tempP = &S_WaitPageData;
+		
+		currentpage->PageInit(currentpage->pram);
+	}
+	
 	return 0;
 }
 
@@ -62,17 +72,15 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		/*返回*/
 		if(S_WaitPageData->lcdinput[0] == 0x1450)
 		{
-			GBPageBufferFree();
-			SetGBChildPage(DspSampleIDPage);
-			GotoGBChildPage(NULL);
+			PageBufferFree();
+			PageBackTo(ParentPage);
 		}
 		
 		/*查看操作规程*/
 		else if(S_WaitPageData->lcdinput[0] == 0x1451)
 		{
-			GBPageBufferFree();
-			SetGBChildPage(DspOperGuidePage);
-			GotoGBChildPage(NULL);
+			PageBufferFree();
+			PageAdvanceTo(DspOperGuidePage, NULL);
 		}
 	}
 }
@@ -84,9 +92,8 @@ static void PageUpDate(void)
 		/*是否插卡*/
 		if(GetCardState() == CardIN)
 		{
-			GBPageBufferFree();
-			SetGBChildPage(DspPreReadCardPage);
-			GotoGBChildPage(NULL);
+			PageBufferFree();
+			PageAdvanceTo(DspPreReadCardPage, NULL);
 			
 		}
 		/*时间到，未插卡，返回*/
@@ -94,10 +101,8 @@ static void PageUpDate(void)
 		{
 			AddNumOfSongToList(8, 0);
 			
-			GBPageBufferFree();
-			SetGBParentPage(DspLunchPage);
-			GotoGBParentPage(NULL);
-			return;
+			PageBufferFree();
+			PageBackTo(ParentPage);
 		}
 		
 		/*提示插卡*/

@@ -3,7 +3,6 @@
 
 
 #include	"Define.h"
-#include 	"FreeRTOS.h"
 
 typedef enum
 { 
@@ -11,9 +10,7 @@ typedef enum
 	CardIN = 1								//ÓÐ¿¨
 }CardState_Def;
 
-void ClearCardStatuesQueue(void);
-unsigned char GetCardStatuesFromQueue(CardState_Def * receivedchar , portTickType xBlockTime);
-unsigned char SendCardStatuesToQueue(CardState_Def *txchar , portTickType xBlockTime);
+
 CardState_Def GetCardState(void);
 void SetCardState(CardState_Def value);
 

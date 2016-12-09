@@ -41,9 +41,19 @@ static void SetTempIP(unsigned char *buf, unsigned char len);
 
 unsigned char DspNetSetPage(void *  parm)
 {
-	SetGBSysPage(DspNetSetPage, DspNetPreSetPage, NULL, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
+	PageInfo * currentpage = NULL;
 	
-	GBPageInit(parm);
+	if(My_Pass == GetCurrentPage(&currentpage))
+	{
+		currentpage->PageInit = PageInit;
+		currentpage->PageUpDate = PageUpDate;
+		currentpage->LCDInput = Input;
+		currentpage->PageBufferMalloc = PageBufferMalloc;
+		currentpage->PageBufferFree = PageBufferFree;
+		currentpage->tempP = &S_NetSetPageBuffer;
+		
+		currentpage->PageInit(currentpage->pram);
+	}
 	
 	return 0;
 }
@@ -58,7 +68,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_NetSetPageBuffer->lcdinput[0] = (S_NetSetPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
 		/*有线网的ip获取模式*/
-		if(S_NetSetPageBuffer->lcdinput[0] == 0x2d04)
+		if(S_NetSetPageBuffer->lcdinput[0] == 0x1C09)
 		{
 			/*数据*/
 			S_NetSetPageBuffer->lcdinput[1] = pbuf[7];
@@ -77,7 +87,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			}
 		}
 		/*设置IP*/
-		else if(S_NetSetPageBuffer->lcdinput[0] == 0x2d20)
+		else if(S_NetSetPageBuffer->lcdinput[0] == 0x1C10)
 		{
 			if(S_NetSetPageBuffer)
 			{
@@ -86,7 +96,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			}
 		}
 		/*确认修改*/
-		else if(S_NetSetPageBuffer->lcdinput[0] == 0x2d06)
+		else if(S_NetSetPageBuffer->lcdinput[0] == 0x1C05)
 		{
 			if(S_NetSetPageBuffer)
 			{
@@ -103,10 +113,10 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			}
 		}
 		/*返回*/
-		else if(S_NetSetPageBuffer->lcdinput[0] == 0x2d05)
+		else if(S_NetSetPageBuffer->lcdinput[0] == 0x1C04)
 		{
-			GBPageBufferFree();
-			GotoGBParentPage(NULL);
+			PageBufferFree();
+			PageBackTo(ParentPage);
 		}
 	}
 }
@@ -122,7 +132,7 @@ static MyState_TypeDef PageInit(void *  parm)
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
 	
-	SelectPage(80);
+	SelectPage(110);
 	
 	ReadNetData(&(S_NetSetPageBuffer->myNetData));
 
@@ -173,16 +183,16 @@ static void UpPageValue(void)
 		else
 			S_NetSetPageBuffer->buf[0] = 0x00;
 
-		WriteRadioData(0x2d04, S_NetSetPageBuffer->buf, 2);
+		WriteRadioData(0x1C09, S_NetSetPageBuffer->buf, 2);
 		
 		/*更新ip*/
 		if(S_NetSetPageBuffer->myNetData.ipmode == User_Mode)
 		{
 			sprintf((S_NetSetPageBuffer->buf), "%03d.%03d.%03d.%03d", S_NetSetPageBuffer->myNetData.myip.ip_1, S_NetSetPageBuffer->myNetData.myip.ip_2, S_NetSetPageBuffer->myNetData.myip.ip_3, S_NetSetPageBuffer->myNetData.myip.ip_4);
-			DisText(0x2d20, S_NetSetPageBuffer->buf, strlen((S_NetSetPageBuffer->buf)));
+			DisText(0x1C10, S_NetSetPageBuffer->buf, strlen((S_NetSetPageBuffer->buf)));
 		}
 		else
-			ClearText(0x2d20, 15);
+			ClearText(0x1C10, 15);
 	}
 }
 

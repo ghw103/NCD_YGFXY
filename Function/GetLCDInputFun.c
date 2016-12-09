@@ -74,6 +74,7 @@ static void AnalysisCode(void * pbuf, unsigned short len)
 	unsigned char * p = (unsigned char *)pbuf;
 	unsigned short * crc = (unsigned short *)(p+len-2);
 	unsigned short *tempcrc = (unsigned short *)(p+len);
+	PageInfo * currentpage = NULL;
 	
 	*tempcrc = CalModbusCRC16Fun1(p+3, len-2-3);
 	
@@ -86,7 +87,11 @@ static void AnalysisCode(void * pbuf, unsigned short len)
 		
 		else if(p[3] == R_ADDRESS)
 		{
-			GBPageInput(pbuf , len);
+			if(My_Pass == GetCurrentPage(&currentpage))
+			{
+				if(NULL != currentpage->LCDInput)
+					currentpage->LCDInput(pbuf , len);
+			}
 		}
 	}
 

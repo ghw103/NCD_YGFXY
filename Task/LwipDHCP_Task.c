@@ -11,6 +11,7 @@
 
 #include	"LwipDHCP_Task.h"
 #include	"LwIPConfig.h"
+#include	"NetInfo_Data.h"
 
 #include	"MyMem.h"
 
@@ -103,6 +104,8 @@ static void vLwipDHCPTask( void *pvParameters )
 				{
 					IPaddress = 0;
 					
+					SetGB_LineNetIP(IPaddress);
+					
 					dhcp_start(tempnetif);
 					
 					SetGB_DHCPState(DHCP_WAIT_ADDRESS);
@@ -117,7 +120,8 @@ static void vLwipDHCPTask( void *pvParameters )
 					if (IPaddress!=0) 
 					{
 						SetGB_DHCPState(DHCP_ADDRESS_ASSIGNED);					
-
+						
+						SetGB_LineNetIP(IPaddress);
 						/* Stop DHCP */
 						dhcp_stop(tempnetif);
 					}
@@ -135,6 +139,9 @@ static void vLwipDHCPTask( void *pvParameters )
 							IP4_ADDR(&ipaddr, IP_ADDR0 ,IP_ADDR1 , IP_ADDR2 , IP_ADDR3 );
 							IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1, NETMASK_ADDR2, NETMASK_ADDR3);
 							IP4_ADDR(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
+							
+							SetGB_LineNetIP(ipaddr.addr);
+							
 							netif_set_addr(tempnetif, &ipaddr , &netmask, &gw);
 					  
 //							printf(" π”√æ≤Ã¨IP %d.%d.%d.%d\r\n", IP_ADDR0 ,IP_ADDR1 , IP_ADDR2 , IP_ADDR3);

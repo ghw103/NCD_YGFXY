@@ -49,18 +49,12 @@
 
 void CheckCardStatues(void)
 {
-	CardState_Def temps = NoCard;
 	
 	if(CardPinIn)
-		temps = CardIN;
+		SetCardState(CardIN);
 	else
-		temps = NoCard;
-	
-	if(temps != GetCardState())
-	{
-		SetCardState(temps);
-		SendCardStatuesToQueue(&temps, 10*portTICK_RATE_MS);
-	}
+		SetCardState(NoCard);
+
 }
 
 void UpDateGB_Time(void)

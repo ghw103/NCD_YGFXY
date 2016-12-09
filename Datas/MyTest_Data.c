@@ -78,6 +78,8 @@ CreateTestErrorType CreateANewTest(TestType testtype)
 		{
 			GB_CurrentTestDataBuffer = GB_NormalTestDataBuffer;
 			memset(GB_NormalTestDataBuffer, 0, sizeof(ItemData));
+			GB_NormalTestDataBuffer->testlocation = 0;
+			
 			return Error_OK;
 		}
 	}
@@ -97,6 +99,8 @@ CreateTestErrorType CreateANewTest(TestType testtype)
 				{
 					GB_CurrentTestDataBuffer = GB_PaiduiTestDataBuffer[i];
 					memset(GB_CurrentTestDataBuffer, 0, sizeof(ItemData));
+					GB_CurrentTestDataBuffer->testlocation = i + 1;
+					
 					return Error_OK;
 				}
 			}
@@ -123,7 +127,7 @@ unsigned short GetMinWaitTime(void)
 	
 	for(index = 0; index < PaiDuiWeiNum; index++)
 	{
-		if((GB_PaiduiTestDataBuffer[index])&&((GB_PaiduiTestDataBuffer[index]->statues == statues3) || ((GB_PaiduiTestDataBuffer[index]->statues == statues4))))
+		if((GB_PaiduiTestDataBuffer[index])&&(false == timerIsStartted(&(GB_PaiduiTestDataBuffer[index]->timer2))))
 		{
 			temp = timer_surplus(&(GB_PaiduiTestDataBuffer[index]->timer));
 			if(temp < min)

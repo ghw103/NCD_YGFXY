@@ -40,9 +40,19 @@ static MyState_TypeDef PageBufferFree(void);
 
 unsigned char DspShowDeviceInfoPage(void *  parm)
 {
-	SetGBSysPage(DspShowDeviceInfoPage, DspSystemSetPage, DspSetDeviceInfoPage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
+	PageInfo * currentpage = NULL;
 	
-	GBPageInit(parm);
+	if(My_Pass == GetCurrentPage(&currentpage))
+	{
+		currentpage->PageInit = PageInit;
+		currentpage->PageUpDate = PageUpDate;
+		currentpage->LCDInput = Input;
+		currentpage->PageBufferMalloc = PageBufferMalloc;
+		currentpage->PageBufferFree = PageBufferFree;
+		currentpage->tempP = &S_ShowDeviceInfoPageBuffer;
+		
+		currentpage->PageInit(currentpage->pram);
+	}
 	
 	return 0;
 }
@@ -57,39 +67,37 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_ShowDeviceInfoPageBuffer->lcdinput[0] = (S_ShowDeviceInfoPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
 		/*基本信息*/
-		if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x220a)
+		if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1913)
 			S_ShowDeviceInfoPageBuffer->presscount = 0;
 		
-		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x220b)
+		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1914)
 			S_ShowDeviceInfoPageBuffer->presscount++;
 		
-		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x220c)
+		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1915)
 		{
-			if(S_ShowDeviceInfoPageBuffer->presscount > 20)
+			if(S_ShowDeviceInfoPageBuffer->presscount > 15)
 				SendKeyCode(1);
 		}
 		/*获取密码*/
-		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x2230)
+		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1980)
 		{
 			if(pdPASS == CheckStrIsSame(&pbuf[7] , AdminPassWord ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
 			{
-				SetGBChildPage(DspSetDeviceIDPage);
-				GotoGBChildPage(&(S_ShowDeviceInfoPageBuffer->s_deviceinfo));
+				PageAdvanceTo(DspSetDeviceIDPage, &(S_ShowDeviceInfoPageBuffer->s_deviceinfo));
 			}
 			else
 				SendKeyCode(2);
 		}
 		/*返回*/
-		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x2207)
+		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1910)
 		{
-			GBPageBufferFree();
-			GotoGBParentPage(NULL);
+			PageBufferFree();
+			PageBackTo(ParentPage);
 		}
 		/*修改*/
-		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x2208)
+		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1911)
 		{
-			SetGBChildPage(DspSetDeviceInfoPage);
-			GotoGBChildPage(&(S_ShowDeviceInfoPageBuffer->s_deviceinfo));
+			PageAdvanceTo(DspSetDeviceInfoPage, &(S_ShowDeviceInfoPageBuffer->s_deviceinfo));
 		}
 	}
 }
@@ -101,15 +109,15 @@ static void PageUpDate(void)
 
 static MyState_TypeDef PageInit(void *  parm)
 {
-	if(My_Fail == PageBufferMalloc())
-		return My_Fail;
-	
-	SelectPage(70);
-	
-	ReadDeviceInfo(&(S_ShowDeviceInfoPageBuffer->s_deviceinfo));
+	if(My_Pass == PageBufferMalloc())
+	{
+		ReadDeviceInfo(&(S_ShowDeviceInfoPageBuffer->s_deviceinfo));
 		
-	showDeviceInfo();
+		showDeviceInfo();
+	}
 	
+	SelectPage(100);
+
 	return My_Pass;
 }
 
@@ -118,13 +126,15 @@ static MyState_TypeDef PageBufferMalloc(void)
 	if(S_ShowDeviceInfoPageBuffer == NULL)
 	{
 		S_ShowDeviceInfoPageBuffer = MyMalloc(sizeof(ShowDeviceInfoPageBuffer));
-		if(NULL == S_ShowDeviceInfoPageBuffer)
-			return My_Fail;
+		if(S_ShowDeviceInfoPageBuffer)
+		{
+			memset(S_ShowDeviceInfoPageBuffer, 0, sizeof(ShowDeviceInfoPageBuffer));
+		
+			return My_Pass;
+		}
 	}
-	
-	memset(S_ShowDeviceInfoPageBuffer, 0, sizeof(ShowDeviceInfoPageBuffer));
-	
-	return My_Pass;
+
+	return My_Fail;
 }
 
 static MyState_TypeDef PageBufferFree(void)
@@ -140,13 +150,13 @@ static void showDeviceInfo(void)
 	if(S_ShowDeviceInfoPageBuffer)
 	{
 		/*显示设备id*/
-		DisText(0x2240, S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceid, MaxDeviceIDLen);
+		DisText(0x1930, S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceid, MaxDeviceIDLen);
 			
 		/*显示使用单位*/
-		DisText(0x2270, S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceunit, MaxDeviceUnitLen);
+		DisText(0x1950, S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceunit, MaxDeviceUnitLen);
 
 		/*显示责任人*/
-		DisText(0x22c0, S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceuser.user_name, MaxNameLen);
+		DisText(0x1978, S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceuser.user_name, MaxNameLen);
 	}
 }
 

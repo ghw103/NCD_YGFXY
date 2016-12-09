@@ -166,6 +166,7 @@ ResultState TestFunction(void * parm)
 			MotorMoveTo(StartTestLocation, 0);
 		
 			S_TempCalData->resultstatues = NoResult;
+			S_TempCalData->tempvalue1 = 0;
 			
 			for(i=1; i<= steps; i++)
 			{
@@ -183,6 +184,7 @@ ResultState TestFunction(void * parm)
 					
 					
 					S_TempCalData->temptestline[index-1] = (unsigned short)(S_TempCalData->tempvalue1);
+
 
 					//平滑滤波
 					if(index >= FilterNum)
@@ -204,7 +206,7 @@ ResultState TestFunction(void * parm)
 				}
 			}
 			
-			vTaskDelay(10/portTICK_RATE_MS);
+			vTaskDelay(1000/portTICK_RATE_MS);
 			
 			//分析曲线
 			AnalysisTestData(S_TempCalData);
@@ -218,8 +220,6 @@ ResultState TestFunction(void * parm)
 			}
 
 			S_ResultState = S_TempCalData->resultstatues;
-			
-			MotorMoveTo(MaxLocation, 0);
 			
 			MyFree(S_TempCalData);
 				
@@ -255,27 +255,7 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 		//平均值
 		S_TempCalData->average = S_TempCalData->tempvalue1 / MaxPointLen;
 		
-		/*判断测试值是否饱和*/
-		if(S_TempCalData->maxdata >= 4000)
-		{
-			if(GetChannel() > 0)
-			{
-				SelectChannel(GetChannel() - 1);
-
-				vTaskDelay(10/portTICK_RATE_MS);
-				return;
-			}
-		}
-		else if(S_TempCalData->maxdata < 500)
-		{
-			if(GetChannel() < 7)
-			{
-				SelectChannel(GetChannel() + 3);
-
-				vTaskDelay(10/portTICK_RATE_MS);
-				return;
-			}
-		}
+		
 		
 		//计算标准差
 		S_TempCalData->tempvalue1 = 0;
@@ -296,6 +276,28 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 		if(S_TempCalData->CV < 0.01)
 		{
 			goto END1;
+		}
+		
+		/*判断测试值是否饱和*/
+		if(S_TempCalData->maxdata >= 4000)
+		{
+			if(GetChannel() > 0)
+			{
+				SelectChannel(GetChannel() - 1);
+
+				vTaskDelay(10/portTICK_RATE_MS);
+				return;
+			}
+		}
+		else if(S_TempCalData->maxdata < 500)
+		{
+			if(GetChannel() < 7)
+			{
+				SelectChannel(GetChannel() + 3);
+
+				vTaskDelay(10/portTICK_RATE_MS);
+				return;
+			}
 		}
 		
 		//找c线
@@ -384,6 +386,8 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 			S_TempCalData->testdata->testline.AdjustResult =  S_TempCalData->testdata->testline.BasicResult;
 		
 		S_TempCalData->resultstatues = ResultIsOK;
+		
+		return ;
 		
 		//未加样
 		END1:

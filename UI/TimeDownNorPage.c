@@ -39,9 +39,19 @@ static MyState_TypeDef PageBufferFree(void);
 
 unsigned char DspTimeDownNorPage(void *  parm)
 {
-	SetGBSysPage(DspTimeDownNorPage, NULL, DspTestPage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
+	PageInfo * currentpage = NULL;
 	
-	GBPageInit(parm);
+	if(My_Pass == GetCurrentPage(&currentpage))
+	{
+		currentpage->PageInit = PageInit;
+		currentpage->PageUpDate = PageUpDate;
+		currentpage->LCDInput = Input;
+		currentpage->PageBufferMalloc = PageBufferMalloc;
+		currentpage->PageBufferFree = PageBufferFree;
+		currentpage->tempP = &S_TimeDownPageData;
+		
+		currentpage->PageInit(currentpage->pram);
+	}
 	
 	return 0;
 }
@@ -61,8 +71,8 @@ static void PageUpDate(void)
 		RefreshTimeText();
 		if((S_TimeDownPageData)&&(TimeOut == timer_expired(S_TimeDownPageData->S_Timer)))
 		{
-			GBPageBufferFree();
-			GotoGBChildPage(NULL);
+			PageBufferFree();
+			PageAdvanceTo(DspTestPage, NULL);
 		}
 	}
 	

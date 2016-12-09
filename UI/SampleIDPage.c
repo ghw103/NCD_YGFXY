@@ -43,10 +43,19 @@ static void RefreshSampleID(void);
 
 unsigned char DspSampleIDPage(void *  parm)
 {
+	PageInfo * currentpage = NULL;
 	
-	SetGBSysPage(DspSampleIDPage, DspSelectUserPage, DspWaittingCardPage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
-	
-	GBPageInit(parm);
+	if(My_Pass == GetCurrentPage(&currentpage))
+	{
+		currentpage->PageInit = PageInit;
+		currentpage->PageUpDate = PageUpDate;
+		currentpage->LCDInput = Input;
+		currentpage->PageBufferMalloc = PageBufferMalloc;
+		currentpage->PageBufferFree = PageBufferFree;
+		currentpage->tempP = &S_SampleIDPage;
+		
+		currentpage->PageInit(currentpage->pram);
+	}
 
 	return 0;
 }
@@ -63,8 +72,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		/*返回*/
 		if(S_SampleIDPage->lcdinput[0] == 0x1400)
 		{
-			GBPageBufferFree();
-			GotoGBParentPage(NULL);
+			PageBufferFree();
+			PageBackTo(ParentPage);
 		}
 		
 		/*确定*/
@@ -77,8 +86,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			}
 			else
 			{
-				GBPageBufferFree();
-				GotoGBChildPage(NULL);
+				PageBufferFree();
+				PageAdvanceTo(DspWaittingCardPage, NULL);
 			}
 		}
 		/*获取输入的id*/

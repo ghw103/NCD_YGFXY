@@ -3,41 +3,54 @@
 
 #include	"Define.h"
 
-void SetGBSysPage(
-	unsigned char (*CurrentPage)(void * pram), 								//当前页面
-	unsigned char (*ParentPage)(void *  parm),								//父页面
-	unsigned char (*ChildPage)(void *  parm),								//子页面
-	void (*LCDInput)(unsigned char *pbuf , unsigned short len),				//页面输入
-	void (*PageUpDate)(void),												//页面更新
-	MyState_TypeDef (*PageInit)(void * pram),								//页面初始化
-	MyState_TypeDef (*PageBufferMalloc)(void),								//页面缓存申请
-	MyState_TypeDef (*PageBufferFree)(void)									//页面缓存释放
-	);
-SysPage * GetGBSysPage(void);
+//保存一个页面信息
+#pragma pack(1)
+typedef struct PageInfo_Tag
+{
+	unsigned char (*CurrentPage)(void * pram);
+	void * pram;														//传进界面的参数
+	void * tempP;														//备用指针
+	void (*LCDInput)(unsigned char *pbuf , unsigned short len);
+	void (*PageUpDate)(void);
+	MyState_TypeDef (*PageInit)(void * pram);
+	MyState_TypeDef (*PageBufferMalloc)(void);
+	MyState_TypeDef (*PageBufferFree)(void);
 	
-void SetGBCurrentPage(unsigned char (*CurrentPage)(void * pram));
-unsigned char (*GetGBCurrentPage(void))(void* pram);
+	unsigned char (*ParentPage)(void *  parm);
+	unsigned char (*ChildPage)(void *  parm);
+}PageInfo;
+#pragma pack()
 
-void SetGBParentPage(unsigned char (*ParentPage)(void *  parm));
-unsigned char GotoGBParentPage(void *  parm);
+//界面级联，链栈
+#pragma pack(1)
+typedef struct PageStackNode
+{
+    PageInfo * pageinfo;											//当前节点的页面信息
+    struct PageStackNode * lastpagenode;						//上一节点地址
+}PageStackNode;
+#pragma pack()
 
-void SetGBChildPage(unsigned char (*ChildPage)(void *  parm));
-unsigned char GotoGBChildPage(void *  parm);
+#pragma pack(1)
+typedef struct
+{
+    struct PageStackNode * top;									//栈顶节点
+}PageLinkStack;
+#pragma pack()
 
-void SetGBPageUpDate(void (*PageUpDate)(void));
-void GBPageUpDate(void);
+typedef enum
+{ 
+	NoDisplayPage = 0,											//不显示
+	DisplayPage = 1												//显示
+}DisplayType;
 
-void SetGBGBPageInput(void (*LCDInput)(unsigned char *pbuf , unsigned short len));
-void GBPageInput(unsigned char *pbuf , unsigned short len);
+#define	OriginPageIndex			3								//所有子界面的起始界面索引，本系统来说欢迎动画为1，自检为2，主界面为3
+#define	OriginPage				0xff							//回到起始界面的层级
+#define	ParentPage				1								//对于当前界面来说，回父界面，即是切换到前一个界面
 
-void SetGBPageInit(MyState_TypeDef (*PageInit)(void * pram));
-MyState_TypeDef GBPageInit(void * parm);
+MyState_TypeDef PageAdvanceTo(unsigned char (*page)(void * pram), void * pram);
+MyState_TypeDef PageBackTo(unsigned char index);
+MyState_TypeDef GetCurrentPage(PageInfo ** pageinfo);
+MyState_TypeDef PageResetToOrigin(DisplayType distype);
 
-void SetGBPageBufferMalloc(MyState_TypeDef (*PageBufferMalloc)(void));
-MyState_TypeDef GBPageBufferMalloc(void);
-
-void SetGBPageBufferFree(MyState_TypeDef (*PageBufferFree)(void));
-MyState_TypeDef GBPageBufferFree(void);
-	
 #endif
 

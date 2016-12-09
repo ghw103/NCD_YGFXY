@@ -39,9 +39,19 @@ static void SetGB_Time(char *buf, unsigned char len);
 
 unsigned char DspOtherSetPage(void *  parm)
 {
-	SetGBSysPage(DspOtherSetPage, DspSystemSetPage, NULL, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
+	PageInfo * currentpage = NULL;
 	
-	GBPageInit(parm);
+	if(My_Pass == GetCurrentPage(&currentpage))
+	{
+		currentpage->PageInit = PageInit;
+		currentpage->PageUpDate = PageUpDate;
+		currentpage->LCDInput = Input;
+		currentpage->PageBufferMalloc = PageBufferMalloc;
+		currentpage->PageBufferFree = PageBufferFree;
+		currentpage->tempP = &S_OtherSetPageBuffer;
+		
+		currentpage->PageInit(currentpage->pram);
+	}
 	
 	return 0;
 }
@@ -63,8 +73,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		/*返回*/
 		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2c01)
 		{
-			GBPageBufferFree();
-			GotoGBParentPage(NULL);
+			PageBufferFree();
+			PageBackTo(ParentPage);
 		}
 		/*设置时间*/
 		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2c20)

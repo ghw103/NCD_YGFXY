@@ -64,12 +64,11 @@ static ModelData_DefType GB_S_ModelData =
 			},
 		.T_Count = 1
 	};
-static xQueueHandle xQueue = NULL;												//按键状态改变
+
 /***************************************************************************************************/
 /**************************************局部函数声明*************************************************/
 /***************************************************************************************************/
-static unsigned char SendKeyStatuesToQueue(KeyChange_Def *txchar , portTickType xBlockTime);
-static void CreateQueue(void);
+
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************正文********************************************************/
@@ -129,36 +128,6 @@ void OutModel_Init(void)
 	GB_S_ModelData.T_Count = 1;
 }
 
-static void CreateQueue(void)
-{
-	if(xQueue == NULL)
-	{
-		xQueue = xQueueCreate( 10, ( unsigned portBASE_TYPE ) sizeof( KeyChange_Def ) );
-	}
-}
-
-unsigned char GetKeyStatuesFromQueue(KeyChange_Def * receivedchar , portTickType xBlockTime)
-{
-	CreateQueue();
-	return xQueueReceive( xQueue, receivedchar, xBlockTime );
-} 
-
-/************************************************************************
-** 函数名:SendTestDataToQueue
-** 功  能:发送测试数据到队列
-** 输  入:无
-** 输  出:无
-** 返  回：无
-** 备  注：无
-** 时  间:  2015年5月28日 15:07:11
-** 作  者：xsx                                                 
-************************************************************************/
-static unsigned char SendKeyStatuesToQueue(KeyChange_Def *txchar , portTickType xBlockTime)
-{
-	CreateQueue();
-	return xQueueSend( xQueue, txchar, xBlockTime );
-}
-
 /***************************************************************************************************
 *FunctionName：ToggleLedStatues
 *Description：跳变led状态
@@ -186,7 +155,6 @@ void ToggleLedStatues(unsigned char ledindex)
 void ChangeOutModelStatues(void)
 {
 	static unsigned char i=0;
-	KeyChange_Def tempkey;
 	
 	/*读取按键状态*/
 	TM1623_ReadKey();
@@ -199,13 +167,7 @@ void ChangeOutModelStatues(void)
 		else if((GB_S_ModelData.T_Count % GB_S_ModelData.OneModel_Data[i].Time) == 0)
 			ToggleLedStatues(i);
 		
-		tempkey.keystatues = GetTheKeyStatues(i);
-		tempkey.index = i+1;
-		if(tempkey.keystatues != GB_S_ModelData.OneModel_Data[i].Key_Statues)
-		{
-			GB_S_ModelData.OneModel_Data[i].Key_Statues = tempkey.keystatues;
-			SendKeyStatuesToQueue(&tempkey, 10 * portTICK_RATE_MS);
-		}
+		GB_S_ModelData.OneModel_Data[i].Key_Statues = GetTheKeyStatues(i);
 	}
 
 	GB_S_ModelData.T_Count++;

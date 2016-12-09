@@ -33,7 +33,6 @@ static unsigned int TestLineHigh = 76800;	//此数据与曲线显示区域高度有关，如果界
 static void Input(unsigned char *pbuf , unsigned short len);
 static void PageUpDate(void);
 
-static void ClearPage(void);
 static void RefreshText(void);
 static void DspLine(void);
 static void dspIco(void);
@@ -50,10 +49,19 @@ static MyState_TypeDef PageBufferFree(void);
 
 unsigned char DspShowResultPage(void *  parm)
 {	
-	SetGBSysPage(DspShowResultPage, DspRecordPage, NULL, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
+	PageInfo * currentpage = NULL;
 	
-	GBPageInit(parm);
-
+	if(My_Pass == GetCurrentPage(&currentpage))
+	{
+		currentpage->PageInit = PageInit;
+		currentpage->PageUpDate = PageUpDate;
+		currentpage->LCDInput = Input;
+		currentpage->PageBufferMalloc = PageBufferMalloc;
+		currentpage->PageBufferFree = PageBufferFree;
+		
+		currentpage->PageInit(currentpage->pram);
+	}
+	
 	return 0;
 }
 
@@ -67,22 +75,17 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_ShowPageBuffer->lcdinput[0] = (S_ShowPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
 		/*退出*/
-		if(0x2b01 == S_ShowPageBuffer->lcdinput[0])
+		if(0x2001 == S_ShowPageBuffer->lcdinput[0])
 		{
-			GBPageBufferFree();
-			GotoGBParentPage(NULL);
+			PageBufferFree();
+			PageBackTo(ParentPage);
 		}
 		/*打印*/
-		else if(0x2b00 == S_ShowPageBuffer->lcdinput[0])
+		else if(0x2000 == S_ShowPageBuffer->lcdinput[0])
 		{
-			if(My_Pass == ConnectPrintter())
-			{
-				SendKeyCode(1);
-				PrintfData(S_ShowPageBuffer->testdata);
-				SendKeyCode(9);
-			}
-			else
-				SendKeyCode(2);
+			SendKeyCode(1);
+			PrintfData(S_ShowPageBuffer->testdata);
+			SendKeyCode(9);
 		}
 	}
 }
@@ -97,9 +100,7 @@ static MyState_TypeDef PageInit(void *  parm)
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
 	
-	SelectPage(110);
-	
-	ClearPage();
+	SelectPage(147);
 
 	if(parm && S_ShowPageBuffer)
 	{
@@ -138,44 +139,26 @@ static MyState_TypeDef PageBufferFree(void)
 	return My_Pass;
 }
 
-static void ClearPage(void)
-{
-	ClearLine(0x58);
-	
-	ClearText(0x2b10, 30);
-	
-	ClearText(0x2b20, 30);
-	
-	ClearText(0x2b30, 30);
-	
-	ClearText(0x2b40, 30);
-	
-	ClearText(0x2b50, 30);
-
-	DspNum(0x2b70 , 0, 2);
-	DspNum(0x2b78 , 0, 2);	
-
-}
 static void RefreshText(void)
 {
 	if(S_ShowPageBuffer)
 	{
 		memset(S_ShowPageBuffer->tempbuf, 0, 100);
 		sprintf(S_ShowPageBuffer->tempbuf, "%s", S_ShowPageBuffer->testdata->temperweima.ItemName);
-		DisText(0x2b10, S_ShowPageBuffer->tempbuf, strlen(S_ShowPageBuffer->tempbuf));
+		DisText(0x2010, S_ShowPageBuffer->tempbuf, 20);
 				
 		memset(S_ShowPageBuffer->tempbuf, 0, 100);
 		sprintf(S_ShowPageBuffer->tempbuf, "%s", S_ShowPageBuffer->testdata->sampleid);
-		DisText(0x2b20, S_ShowPageBuffer->tempbuf, strlen(S_ShowPageBuffer->tempbuf));
+		DisText(0x201e, S_ShowPageBuffer->tempbuf, 20);
 				
 		sprintf(S_ShowPageBuffer->tempbuf, "%2.1f", S_ShowPageBuffer->testdata->TestTemp.O_Temperature);
-		DisText(0x2b30, S_ShowPageBuffer->tempbuf, strlen(S_ShowPageBuffer->tempbuf));
+		DisText(0x202a, S_ShowPageBuffer->tempbuf, 8);
 				
 		sprintf(S_ShowPageBuffer->tempbuf, "%s", S_ShowPageBuffer->testdata->temperweima.CardPiCi);
-		DisText(0x2b40, S_ShowPageBuffer->tempbuf, strlen(S_ShowPageBuffer->tempbuf));
+		DisText(0x2030, S_ShowPageBuffer->tempbuf, 30);
 				
 		sprintf(S_ShowPageBuffer->tempbuf, "%.2f", S_ShowPageBuffer->testdata->testline.AdjustResult);
-		DisText(0x2b50, S_ShowPageBuffer->tempbuf, strlen(S_ShowPageBuffer->tempbuf));
+		DisText(0x2040, S_ShowPageBuffer->tempbuf, 30);
 
 	}
 }
@@ -189,12 +172,14 @@ static void DspLine(void)
 	
 	unsigned short *p = NULL;
 
+	ClearLine(0x57);
+	
 	for(i=0; i<MaxPointLen;i++)
 	{
 		if(i%10 == 0)
 		{
 			p = &(S_ShowPageBuffer->testdata->testline.TestPoint[i]);
-			DisPlayLine(2 , p , 10);
+			DisPlayLine(1 , p , 10);
 		}
 		
 		if(S_ShowPageBuffer->lineinfo.MaxData <= S_ShowPageBuffer->testdata->testline.TestPoint[i])
@@ -219,10 +204,10 @@ static void DspLine(void)
 		TempY_Scale /= 2.0;																//目前显示2个y轴刻度
 		S_ShowPageBuffer->lineinfo.Y_Scale = (unsigned short)TempY_Scale;
 		
-		SetChartSize(0x2b80 , S_ShowPageBuffer->lineinfo.MUL_Y);
+		SetChartSize(0x2070 , S_ShowPageBuffer->lineinfo.MUL_Y);
 
-		DspNum(0x2b78 , S_ShowPageBuffer->lineinfo.Y_Scale, 2);
-		DspNum(0x2b70 , S_ShowPageBuffer->lineinfo.Y_Scale*2, 2);
+		DspNum(0x200a , S_ShowPageBuffer->lineinfo.Y_Scale, 2);
+		DspNum(0x2009 , S_ShowPageBuffer->lineinfo.Y_Scale*2, 2);
 
 }
 
@@ -259,7 +244,7 @@ static void dspIco(void)
 		tempvalue += 139;										//曲线窗口起始y
 		S_ShowPageBuffer->myico[2].Y = (unsigned short)tempvalue - 5;
 		
-		BasicUI(0x2b60 ,0x1907 , 3, &(S_ShowPageBuffer->myico[0]) , sizeof(Basic_ICO)*3);
+		BasicUI(0x2060 ,0x1907 , 3, &(S_ShowPageBuffer->myico[0]) , sizeof(Basic_ICO)*3);
 	}
 }
 

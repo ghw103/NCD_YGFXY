@@ -47,9 +47,18 @@ static void DspPage3Text(void);
 
 unsigned char DspAdjustPage(void *  parm)
 {
-	SetGBSysPage(DspAdjustPage, DspSystemSetPage, NULL, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
+	PageInfo * currentpage = NULL;
 	
-	GBPageInit(parm);
+	if(My_Pass == GetCurrentPage(&currentpage))
+	{
+		currentpage->PageInit = PageInit;
+		currentpage->PageUpDate = PageUpDate;
+		currentpage->LCDInput = Input;
+		currentpage->PageBufferMalloc = PageBufferMalloc;
+		currentpage->PageBufferFree = PageBufferFree;
+		
+		currentpage->PageInit(currentpage->pram);
+	}
 	
 	return 0;
 }
@@ -66,8 +75,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		/*ÍË³ö*/
 		if(S_AdjustPageBuffer->lcdinput[0] == 0x2f30)
 		{
-			GBPageBufferFree();
-			GotoGBParentPage(NULL);
+			PageBufferFree();
+			PageBackTo(ParentPage);
 		}
 		/*Ð£×¼*/
 		else if(S_AdjustPageBuffer->lcdinput[0] == 0x2f32)
@@ -94,8 +103,8 @@ static void PageUpDate(void)
 {
 /*	if(TimeOut == timer_expired(&(S_AdjustPageBuffer->timer)))
 	{
-		GBPageBufferFree();
-		GotoGBParentPage(NULL);
+		PageBufferFree();
+		PageBackTo(1, NULL);
 	}*/
 	
 	if((S_AdjustPageBuffer) && (S_AdjustPageBuffer->step == 0) && (GetCardState() == CardIN))
@@ -199,8 +208,8 @@ static void CheckQRCode(void)
 		if((S_AdjustPageBuffer->scancode == CardCodeScanFail) || (S_AdjustPageBuffer->scancode == CardCodeCardOut) ||
 			(S_AdjustPageBuffer->scancode == CardCodeScanTimeOut) || (S_AdjustPageBuffer->scancode == CardCodeCRCError))
 		{
-			GBPageBufferFree();
-			GotoGBParentPage(NULL);
+			PageBufferFree();
+			PageBackTo(ParentPage);
 		}
 		else
 		{
@@ -218,8 +227,8 @@ static void CheckPreTestCard(void)
 
 		if(S_AdjustPageBuffer->cardpretestresult != ResultIsOK)
 		{
-			GBPageBufferFree();
-			GotoGBParentPage(NULL);
+			PageBufferFree();
+			PageBackTo(ParentPage);
 		}
 		else 
 		{

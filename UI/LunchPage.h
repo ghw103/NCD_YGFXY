@@ -3,6 +3,7 @@
 
 #include	"Timer_Data.h"
 #include	"MyTest_Data.h"
+#include	"UI_Data.h"
 
 typedef struct LunchPageBuffer_tag {
 	Timer timer;

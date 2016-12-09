@@ -18,9 +18,11 @@
 #define vCodeScanTask_PRIORITY			( ( unsigned portBASE_TYPE ) 2U )
 const char * CodeScanTaskName = "vCodeScanTask";
 
-static xQueueHandle xStartScanQueue = NULL ;			//互斥量，如果接收到数据，则开始扫描二维码，接收的数据为二维码存放地址
-static xQueueHandle xScanResultQueue = NULL;											//发送扫描结果
-static ScanQRTaskData S_ScanQRTaskData;					//二维码扫描任务数据
+static xQueueHandle xStartScanQueue = NULL ;			//扫描二维码数据空间地址的队列，如果接受到空间地址则启动扫描二维码任务
+static CardCodeInfo * cardQR;							//扫描二维码数据空间地址
+
+static xQueueHandle xScanResultQueue = NULL;			//发送扫描结果队列
+static ScanCodeResult scanresult;						//扫码二维码的结果
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 
@@ -76,17 +78,17 @@ static void vCodeScanTask( void *pvParameters )
 {
 	while(1)
 	{
-		if(pdPASS == xQueueReceive( xStartScanQueue, (void *)(&(S_ScanQRTaskData.cardQR)), portMAX_DELAY))
+		if(pdPASS == xQueueReceive( xStartScanQueue, &cardQR, portMAX_DELAY))
 		{
-			TakeScanQRCodeResult(&(S_ScanQRTaskData.scanresult));
-			vTaskDelay(1000 * portTICK_RATE_MS);
-			ScanCodeFun(&S_ScanQRTaskData);										//读取二维码
+			TakeScanQRCodeResult(&scanresult);
 			vTaskDelay(1000 * portTICK_RATE_MS);
 			
+			scanresult = ScanCodeFun(cardQR);										//读取二维码
+			
+			vTaskDelay(10 * portTICK_RATE_MS);
+			
 			/*发送测试结果*/
-			xQueueSend( xScanResultQueue, &(S_ScanQRTaskData.scanresult), 10000/portTICK_RATE_MS );
-				
-			memset(&S_ScanQRTaskData, 0, sizeof(ScanQRTaskData));
+			xQueueSend( xScanResultQueue, &scanresult, 10000/portTICK_RATE_MS );
 		}
 	}
 }
@@ -107,11 +109,6 @@ MyState_TypeDef StartScanQRCode(void * parm)
 		return My_Fail;	
 }
 
-MyState_TypeDef StopScanQRCode(void)
-{
-	S_ScanQRTaskData.scanresult = CardCodeScanFail;
-	return My_Pass;
-}
 
 MyState_TypeDef TakeScanQRCodeResult(ScanCodeResult *scanresult)
 {

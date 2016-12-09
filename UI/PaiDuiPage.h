@@ -10,6 +10,7 @@ typedef struct PaiDuiPageBuffer_tag {
 	Basic_ICO myico;
 	unsigned short tarindex;
 	float tempvalue;
+	unsigned int tempvalue1;
 	char buf[100];
 	char buf2[100];
 	unsigned short lcdinput[100];

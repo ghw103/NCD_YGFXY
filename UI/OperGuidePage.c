@@ -37,9 +37,18 @@ static MyState_TypeDef PageBufferFree(void);
 
 unsigned char DspOperGuidePage(void *  parm)
 {
-	SetGBSysPage(DspOperGuidePage, DspWaittingCardPage, DspWaittingCardPage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
+	PageInfo * currentpage = NULL;
 	
-	GBPageInit(parm);
+	if(My_Pass == GetCurrentPage(&currentpage))
+	{
+		currentpage->PageInit = PageInit;
+		currentpage->PageUpDate = PageUpDate;
+		currentpage->LCDInput = Input;
+		currentpage->PageBufferMalloc = PageBufferMalloc;
+		currentpage->PageBufferFree = PageBufferFree;
+		
+		currentpage->PageInit(currentpage->pram);
+	}
 	
 	return 0;
 }
@@ -60,8 +69,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	/*·µ»Ø*/
 	if(pdata[0] == 0x1e02)
 	{
-		GBPageBufferFree();
-		GotoGBParentPage(NULL);
+		PageBufferFree();
+		PageBackTo(ParentPage);
 	}
 
 	MyFree(pdata);

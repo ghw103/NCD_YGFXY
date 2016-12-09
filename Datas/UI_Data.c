@@ -12,27 +12,29 @@
 
 #include	"UI_Data.h"
 
+#include	"MyMem.h"
 
-
+#include	<string.h>
+#include	"stdio.h"
 
 /***************************************************************************************************/
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
 
-static SysPage GB_SysPage;												//系统界面数据
-
+static PageLinkStack GB_PageLinkStack = 
+{
+	.top = NULL
+};								//页面信息链栈
 
 
 /***************************************************************************************************/
 /**************************************局部函数声明*************************************************/
 /***************************************************************************************************/
+static MyState_TypeDef PageLinkStackPush(PageLinkStack * s_linkstack, PageInfo * pageinfo);
+static MyState_TypeDef PageLinkStackPop(PageLinkStack * s_linkstack, PageInfo ** pageinfo);
+static MyState_TypeDef PageLinkStackTop(PageLinkStack * s_linkstack, PageInfo ** pageinfo);
 
-
-
-
-
-
-
+static MyState_TypeDef PageDetroyBackNum(unsigned char index);
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************正文********************************************************/
@@ -41,189 +43,305 @@ static SysPage GB_SysPage;												//系统界面数据
 /***************************************************************************************************/
 
 /***************************************************************************************************
-*FunctionName：SetGBSysPage
-*Description：一次设置页面所有数据
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年8月3日17:13:18
+*FunctionName: PageAdvanceTo
+*Description:  页面往前切换到某个页面，对于链栈入栈操作，注意此处是直接显示界面，并不是切换指针
+*Input: page -- 前进页面地址
+		pram -- 传递到前进页面参数
+*Output: None
+*Return: My_Fail -- 前进失败
+*		My_Pass -- 前进成功
+*Author: xsx
+*Date: 2016年12月7日15:29:21
 ***************************************************************************************************/
-void SetGBSysPage(
-	unsigned char (*CurrentPage)(void * pram), 								//当前页面
-	unsigned char (*ParentPage)(void *  parm),								//父页面
-	unsigned char (*ChildPage)(void *  parm),								//子页面
-	void (*LCDInput)(unsigned char *pbuf , unsigned short len),				//页面输入
-	void (*PageUpDate)(void),												//页面更新
-	MyState_TypeDef (*PageInit)(void * pram),								//页面初始化
-	MyState_TypeDef (*PageBufferMalloc)(void),								//页面缓存申请
-	MyState_TypeDef (*PageBufferFree)(void)									//页面缓存释放
-	)
+MyState_TypeDef PageAdvanceTo(unsigned char (*page)(void * pram), void * pram)
 {
-	GB_SysPage.CurrentPage = CurrentPage;
-	GB_SysPage.ParentPage = ParentPage;
-	GB_SysPage.ChildPage = ChildPage;
-	GB_SysPage.LCDInput = LCDInput;
-	GB_SysPage.PageUpDate = PageUpDate;
-	GB_SysPage.PageInit = PageInit;
-	GB_SysPage.PageBufferMalloc = PageBufferMalloc;
-	GB_SysPage.PageBufferFree = PageBufferFree;
-}
-
-SysPage * GetGBSysPage(void)
-{
-	return &GB_SysPage;
-}
-
-/***************************************************************************************************
-*FunctionName：SetGBCurrentPage, GetGBCurrentPage
-*Description: 设置，获取当前页面
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年8月3日19:36:13
-***************************************************************************************************/
-void SetGBCurrentPage(unsigned char (*CurrentPage)(void * pram))
-{
-	GB_SysPage.CurrentPage = CurrentPage;
-}
-unsigned char (*GetGBCurrentPage(void))(void* pram)
-{
-	return GB_SysPage.CurrentPage;
+	PageInfo * temppageinfo = NULL;
+	
+	//不允许跳转到无效界面
+	if(NULL == page)
+		return My_Fail;
+	
+	temppageinfo = MyMalloc(sizeof(PageInfo));
+	
+	if(temppageinfo)
+	{
+		memset(temppageinfo, 0, sizeof(PageInfo));
+		temppageinfo->CurrentPage = page;
+		
+		if(My_Pass == PageLinkStackPush(&GB_PageLinkStack, temppageinfo))
+		{
+			temppageinfo->pram = pram;
+			temppageinfo->CurrentPage(temppageinfo->pram);
+			
+			return My_Pass;
+		}
+		else
+		{
+			MyFree(temppageinfo);
+			return My_Fail;
+		}
+	}
+	else
+		return My_Fail;
 }
 
 /***************************************************************************************************
-*FunctionName：SetParentPage
-*Description：设置父页面地址
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年8月3日17:18:36
+*FunctionName: PageDetroyBackNum
+*Description: 往前销毁index个界面
+*Input: index -- 往前销毁的界面数目
+*Output: None
+*Return: My_Fail -- 失败
+*		My_Pass -- 成功
+*Author: xsx
+*Date: 2016年12月8日13:57:33
 ***************************************************************************************************/
-void SetGBParentPage(unsigned char (*ParentPage)(void *  parm))
+static MyState_TypeDef PageDetroyBackNum(unsigned char index)
 {
-	GB_SysPage.ParentPage = ParentPage;
+	PageInfo * temppageinfo = NULL;
+	unsigned char i = index;
+	
+	//先出栈销毁一定深度的界面
+	while(i)
+	{
+		if(My_Pass == PageLinkStackPop(&GB_PageLinkStack, &temppageinfo))
+		{
+			MyFree(temppageinfo);
+			i--;
+		}
+		else
+			break;
+	}
+	
+	return My_Pass;
+}
+/***************************************************************************************************
+*FunctionName: PageBackTo
+*Description: 根据输入，页面返回一定的层数
+*Input: index -- 返回层数，1表示返回上一个页面，2表示返回上上一个页面
+*		pram -- 传入参数到返回的页面
+*Output: 
+*Return: My_Fail -- 失败
+*		My_Pass -- 成功
+*Author: xsx
+*Date: 2016年12月7日15:58:31
+***************************************************************************************************/
+MyState_TypeDef PageBackTo(unsigned char index)
+{
+	PageInfo * temppageinfo = NULL;
+	
+	PageDetroyBackNum(index);
+	
+	//读取当前栈顶界面，且显示
+	if(My_Pass == PageLinkStackTop(&GB_PageLinkStack, &temppageinfo))
+	{	
+		temppageinfo->CurrentPage(temppageinfo->pram);
+		
+		return My_Pass;
+	}
+	else
+		return My_Fail;
 }
 
 /***************************************************************************************************
-*FunctionName：GotoParentPage
-*Description：切换页面到父页面
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年8月3日17:19:02
+*FunctionName: PageResetToOrigin
+*Description: 回主界面
+*Input: None
+*Output: None
+*Return: My_Fail -- 失败
+*		My_Pass -- 成功
+*Author: xsx
+*Date: 2016年12月8日09:01:58
 ***************************************************************************************************/
-unsigned char GotoGBParentPage(void *  parm)
+MyState_TypeDef PageResetToOrigin(DisplayType distype)
 {
-	return GB_SysPage.ParentPage(parm);
+	PageInfo * temppageinfo = NULL;
+	
+	PageDetroyBackNum(OriginPage);
+	
+	if(DisplayPage == distype)
+	{
+		//读取当前栈顶界面，且显示
+		if(My_Pass == PageLinkStackTop(&GB_PageLinkStack, &temppageinfo))
+		{
+			temppageinfo->CurrentPage(temppageinfo->pram);
+			
+			return My_Pass;
+		}
+	}
+	
+	return My_Fail;
 }
 
 /***************************************************************************************************
-*FunctionName：SetChildPage
-*Description：设置子页面
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年8月3日17:19:58
+*FunctionName: GetCurrentPage
+*Description: 读取当前页面
+*Input: pageinfo -- 当前页面数据存放地址
+*Output: None
+*Return: My_Fail -- 失败
+*		My_Pass -- 成功
+*Author: xsx
+*Date: 2016年12月7日16:03:09
 ***************************************************************************************************/
-void SetGBChildPage(unsigned char (*ChildPage)(void *  parm))
+MyState_TypeDef GetCurrentPage(PageInfo ** pageinfo)
 {
-	GB_SysPage.ChildPage = ChildPage;
+	//读取当前栈顶界面
+	if(My_Pass == PageLinkStackTop(&GB_PageLinkStack, pageinfo))
+		return My_Pass;
+	else
+		return My_Fail;
+}
+
+
+/*###################################################################################################
+#########################################链栈的基本操作##############################################
+####################################################################################################*/
+
+/***************************************************************************************************
+*FunctionName: InitPageLinkStack
+*Description: 初始化链栈
+*Input: s_linkstack - 链栈地址
+*Output: None
+*Return: None
+*Author: xsx
+*Date: 2016年12月7日14:47:29
+***************************************************************************************************/
+void InitPageLinkStack(PageLinkStack * s_linkstack)
+{
+	s_linkstack->top = NULL;
 }
 
 /***************************************************************************************************
-*FunctionName：GotoChildPage
-*Description：切换到子页面
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年8月3日17:20:24
+*FunctionName: PageLinkStackIsEmpty
+*Description: 判断链栈是否为空
+*Input: s_linkstack - 链栈地址
+*Output: None
+*Return: 	true -- 链栈空
+*			false -- 链栈不为空
+*Author: xsx
+*Date: 2016年12月7日14:49:37
 ***************************************************************************************************/
-unsigned char GotoGBChildPage(void *  parm)
+bool PageLinkStackIsEmpty(PageLinkStack * s_linkstack)
 {
-	return GB_SysPage.ChildPage(parm);
+	if(NULL == s_linkstack->top)
+		return true;
+	else
+		return false;
 }
 
 /***************************************************************************************************
-*FunctionName：GBPageUpDate
-*Description：刷新当前页面
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年8月3日17:25:20
+*FunctionName: PageLinkStackLength
+*Description: 获得链栈的长度
+*Input: s_linkstack - 链栈地址
+*Output: None
+*Return: len -- 链栈长度
+*Author: xsx
+*Date: 2016年12月7日14:55:19
 ***************************************************************************************************/
-void SetGBPageUpDate(void (*PageUpDate)(void))
+unsigned char PageLinkStackLength(PageLinkStack * s_linkstack)
 {
-	GB_SysPage.PageUpDate = PageUpDate;
-}
-void GBPageUpDate(void)
-{
-	GB_SysPage.PageUpDate();
+	unsigned char len = 0;
+	PageStackNode * tempnode = s_linkstack->top;
+	
+	while(NULL != tempnode)
+	{
+		len++;
+		tempnode = tempnode->lastpagenode;
+	}
+	
+	return len;
 }
 
 /***************************************************************************************************
-*FunctionName：GBPageInput
-*Description：lcd输入
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年8月3日19:44:56
+*FunctionName: PageLinkStackPush
+*Description: 入栈操作
+*Input: s_linkstack -- 链栈地址
+*		pageinfo -- 入栈的值
+*Output: None
+*Return: 	My_Pass -- 入栈成功
+*			My_Fail -- 入栈失败
+*Author: xsx
+*Date: 2016年12月7日15:03:34
 ***************************************************************************************************/
-void SetGBGBPageInput(void (*LCDInput)(unsigned char *pbuf , unsigned short len))
+static MyState_TypeDef PageLinkStackPush(PageLinkStack * s_linkstack, PageInfo * pageinfo)
 {
-	GB_SysPage.LCDInput = LCDInput;
-}
-void GBPageInput(unsigned char *pbuf , unsigned short len)
-{
-	GB_SysPage.LCDInput(pbuf, len);
+	PageStackNode * pagenode = NULL;
+	
+	//不允许入栈空值
+	if(NULL == pageinfo)
+		return My_Fail;
+	
+	pagenode = MyMalloc(sizeof(PageStackNode));
+	
+	if(pagenode)
+	{
+		pagenode->pageinfo = pageinfo;
+		pagenode->lastpagenode = s_linkstack->top;
+		
+		s_linkstack->top = pagenode;
+		
+		return My_Pass;
+	}
+	else
+		return My_Fail;
 }
 
 /***************************************************************************************************
-*FunctionName：GBPageInit
-*Description：初始化当前页面
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年8月3日17:26:42
+*FunctionName: PageLinkStackPop
+*Description: 链栈出栈操作
+*Input: s_linkstack -- 链栈地址
+*		pageinfo -- 出栈数据存放地址
+*Output: None
+*Return: My_Fail -- 出栈失败
+*		My_Pass -- 出栈成功
+*Author: xsx
+*Date: 2016年12月7日15:10:31
 ***************************************************************************************************/
-void SetGBPageInit(MyState_TypeDef (*PageInit)(void * pram))
+static MyState_TypeDef PageLinkStackPop(PageLinkStack * s_linkstack, PageInfo ** pageinfo)
 {
-	GB_SysPage.PageInit = PageInit;
-}
-MyState_TypeDef GBPageInit(void * parm)
-{
-	return GB_SysPage.PageInit(parm);
+	PageStackNode * pagenode = NULL;
+	
+	//栈空或者只有1个节点，则不允许出栈，系统设计最底层节点为主界面
+	if(PageLinkStackLength(s_linkstack) <= OriginPageIndex)
+		return My_Fail;
+
+	//不空
+	else
+	{
+		pagenode = s_linkstack->top;
+		*pageinfo = pagenode->pageinfo;
+		
+		s_linkstack->top = pagenode->lastpagenode;
+		
+		MyFree(pagenode);
+		
+		return My_Pass;
+	}
 }
 
 /***************************************************************************************************
-*FunctionName：GBPageBufferMalloc
-*Description：当前页面缓存申请
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年8月3日17:28:16
+*FunctionName: PageLinkStackTop
+*Description: 读取栈顶节点中的值，但是不删除栈顶节点
+*Input: s_linkstack -- 链栈
+*		pageinfo -- 读取数据的存放地址
+*Output: None
+*Return: My_Fail -- 读取失败
+*		My_Pass -- 读取成功
+*Author: xsx
+*Date: 2016年12月7日15:13:48
 ***************************************************************************************************/
-void SetGBPageBufferMalloc(MyState_TypeDef (*PageBufferMalloc)(void))
-{
-	GB_SysPage.PageBufferMalloc = PageBufferMalloc;
-}
-MyState_TypeDef GBPageBufferMalloc(void)
-{
-	return GB_SysPage.PageBufferMalloc();
+static MyState_TypeDef PageLinkStackTop(PageLinkStack * s_linkstack, PageInfo ** pageinfo)
+{	
+	//栈空
+	if(PageLinkStackIsEmpty(s_linkstack))
+		return My_Fail;
+
+	//不空
+	else
+	{
+		*pageinfo = s_linkstack->top->pageinfo;
+
+		return My_Pass;
+	}
 }
 
-/***************************************************************************************************
-*FunctionName：GBPageBufferFree
-*Description：当前页面缓存释放
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年8月3日17:28:35
-***************************************************************************************************/
-void SetGBPageBufferFree(MyState_TypeDef (*PageBufferFree)(void))
-{
-	GB_SysPage.PageBufferFree = PageBufferFree;
-}
-MyState_TypeDef GBPageBufferFree(void)
-{
-	return GB_SysPage.PageBufferFree();
-}
+

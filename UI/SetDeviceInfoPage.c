@@ -39,9 +39,19 @@ static MyState_TypeDef PageBufferFree(void);
 
 unsigned char DspSetDeviceInfoPage(void *  parm)
 {
-	SetGBSysPage(DspSetDeviceInfoPage, DspShowDeviceInfoPage, NULL, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
+	PageInfo * currentpage = NULL;
 	
-	GBPageInit(parm);
+	if(My_Pass == GetCurrentPage(&currentpage))
+	{
+		currentpage->PageInit = PageInit;
+		currentpage->PageUpDate = PageUpDate;
+		currentpage->LCDInput = Input;
+		currentpage->PageBufferMalloc = PageBufferMalloc;
+		currentpage->PageBufferFree = PageBufferFree;
+		currentpage->tempP = &S_SetDeviceInfoPageBuffer;
+		
+		currentpage->PageInit(currentpage->pram);
+	}
 	
 	return 0;
 }
@@ -56,13 +66,13 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_SetDeviceInfoPageBuffer->lcdinput[0] = (S_SetDeviceInfoPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
 		/*返回*/
-		if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x2300)
+		if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1A00)
 		{
-			GBPageBufferFree();
-			GotoGBParentPage(NULL);
+			PageBufferFree();
+			PageBackTo(ParentPage);
 		}
 		/*确认*/
-		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x2301)
+		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1A01)
 		{
 			if(S_SetDeviceInfoPageBuffer->ismodify == 1)
 			{
@@ -70,57 +80,57 @@ static void Input(unsigned char *pbuf , unsigned short len)
 				
 				if(My_Pass == SaveDeviceInfo(&(S_SetDeviceInfoPageBuffer->temp_deviceinfo)))
 				{
-					SendKeyCode(2);
+					SendKeyCode(1);
 					S_SetDeviceInfoPageBuffer->ismodify = 0;
 				}
 				else
-					SendKeyCode(1);
+					SendKeyCode(2);
 			}
 		}
 		/*姓名*/
-		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x2310)
+		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1A10)
 		{
 			memset(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_name, 0, MaxNameLen);
 			memcpy(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_name, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			S_SetDeviceInfoPageBuffer->ismodify = 1;
 		}
 		/*年龄*/
-		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x2318)
+		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1A15)
 		{
 			memset(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_age, 0, MaxAgeLen);
 			memcpy(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_age, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			S_SetDeviceInfoPageBuffer->ismodify = 1;
 		}
 		/*性别*/
-		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x231b)
+		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1A17)
 		{
 			memset(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_sex, 0, MaxSexLen);
 			memcpy(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_sex, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			S_SetDeviceInfoPageBuffer->ismodify = 1;
 		}
 		/*联系方式*/
-		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x2320)
+		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1A20)
 		{
 			memset(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_phone, 0, MaxPhoneLen);
 			memcpy(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_phone, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			S_SetDeviceInfoPageBuffer->ismodify = 1;
 		}
 		/*职位*/
-		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x2330)
+		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1A28)
 		{
 			memset(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_job, 0, MaxJobLen);
 			memcpy(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_job, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			S_SetDeviceInfoPageBuffer->ismodify = 1;
 		}
 		/*备注*/
-		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x2350)
+		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1A30)
 		{
 			memset(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_desc, 0, MaxDescLen);
 			memcpy(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_desc, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			S_SetDeviceInfoPageBuffer->ismodify = 1;
 		}
 		/*设备使用地址*/
-		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x2370)
+		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1A38)
 		{
 			memset(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceunit, 0, MaxDeviceUnitLen);
 			memcpy(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceunit, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
@@ -139,7 +149,7 @@ static MyState_TypeDef PageInit(void *  parm)
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
 	
-	SelectPage(72);
+	SelectPage(102);
 	
 	if(parm)
 	{

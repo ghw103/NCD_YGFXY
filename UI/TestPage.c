@@ -10,10 +10,11 @@
 #include	"MyTest_Data.h"
 
 #include	"System_Data.h"
-#include	"SDFunction.h"
+#include	"TestDataDao.h"
 #include	"Test_Task.h"
 #include	"LunchPage.h"
 #include	"Printf_Fun.h"
+#include	"Motor_Fun.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -46,9 +47,19 @@ static MyState_TypeDef PageBufferFree(void);
 
 unsigned char DspTestPage(void *  parm)
 {
-	SetGBSysPage(DspTestPage, NULL, DspLunchPage, Input, PageUpDate, PageInit, PageBufferMalloc, PageBufferFree);
+	PageInfo * currentpage = NULL;
 	
-	GBPageInit(parm);
+	if(My_Pass == GetCurrentPage(&currentpage))
+	{
+		currentpage->PageInit = PageInit;
+		currentpage->PageUpDate = PageUpDate;
+		currentpage->LCDInput = Input;
+		currentpage->PageBufferMalloc = PageBufferMalloc;
+		currentpage->PageBufferFree = PageBufferFree;
+		currentpage->tempP = &S_TestPageBuffer;
+		
+		currentpage->PageInit(currentpage->pram);
+	}
 	
 	return 0;
 }
@@ -63,20 +74,20 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_TestPageBuffer->lcdinput[0] = (S_TestPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
 		/*退出*/
-		if(0x2191 == S_TestPageBuffer->lcdinput[0])
+		if(0x1801 == S_TestPageBuffer->lcdinput[0])
 		{
 			if(S_TestPageBuffer->cardpretestresult != NoResult)
 			{
 				DeleteCurrentTest();
 
-				GBPageBufferFree();
-				GotoGBChildPage(NULL);
+				PageBufferFree();
+				PageResetToOrigin(DisplayPage);
 			}
 			else
 				SendKeyCode(7);
 		}
 		/*打印数据*/
-		else if(0x2190 == S_TestPageBuffer->lcdinput[0])
+		else if(0x1800 == S_TestPageBuffer->lcdinput[0])
 		{
 			if(S_TestPageBuffer->cardpretestresult == ResultIsOK)
 			{
@@ -116,8 +127,8 @@ static MyState_TypeDef PageInit(void *  parm)
 	
 	SetChartSize(0x1870 , S_TestPageBuffer->line.MUL_Y);
 	
-	DspNum(0x1860 , S_TestPageBuffer->line.Y_Scale, 2);
-	DspNum(0x1850 , S_TestPageBuffer->line.Y_Scale*2, 2);
+	DspNum(0x180A , S_TestPageBuffer->line.Y_Scale, 2);
+	DspNum(0x1809 , S_TestPageBuffer->line.Y_Scale*2, 2);
 	
 	/*获取当前测试数据的地址*/
 	S_TestPageBuffer->currenttestdata = GetCurrentTestItem();
@@ -169,8 +180,8 @@ static void RefreshCurve(void)
 				
 			SetChartSize(0x1870 , S_TestPageBuffer->line.MUL_Y);
 				
-			DspNum(0x1860 , S_TestPageBuffer->line.Y_Scale, 2);
-			DspNum(0x1850 , S_TestPageBuffer->line.Y_Scale*2, 2);
+			DspNum(0x180A , S_TestPageBuffer->line.Y_Scale, 2);
+			DspNum(0x1809 , S_TestPageBuffer->line.Y_Scale*2, 2);
 		}
 		else
 			AddDataToLine(temp);
@@ -179,12 +190,14 @@ static void RefreshCurve(void)
 	if(My_Pass == TakeTestResult(&(S_TestPageBuffer->cardpretestresult)))
 	{
 		
+		MotorMoveTo(MaxLocation, 1);
+		
 		if(S_TestPageBuffer->cardpretestresult == ResultIsOK)
 		{
 			RefreshPageText();
 				
 			GetGB_Time(&(GetCurrentTestItem()->testdata.TestTime));
-			SaveTestData(&(GetCurrentTestItem()->testdata));
+			WriteTestData(&(GetCurrentTestItem()->testdata));
 		}
 		else if(S_TestPageBuffer->cardpretestresult == PeakError)
 		{
@@ -211,17 +224,17 @@ static void RefreshPageText(void)
 		if((S_TestPageBuffer)&&(S_TestPageBuffer->currenttestdata))
 		{
 			sprintf(buf, "%s", S_TestPageBuffer->currenttestdata->testdata.temperweima.ItemName);
-			DisText(0x2100, buf, strlen(buf));
+			DisText(0x1810, buf, 20);
 			
 			memset(buf, 0, 100);
 			memcpy(buf, S_TestPageBuffer->currenttestdata->testdata.sampleid, MaxSampleIDLen);
-			DisText(0x2110, buf, strlen(buf));
+			DisText(0x1820, buf, 20);
 			
 			sprintf(buf, "%2.1f", S_TestPageBuffer->currenttestdata->testdata.TestTemp.O_Temperature);
-			DisText(0x2120, buf, strlen(buf));
+			DisText(0x182a, buf, 8);
 			
 			sprintf(buf, "%s", S_TestPageBuffer->currenttestdata->testdata.temperweima.CardPiCi);
-			DisText(0x2130, buf, strlen(buf));
+			DisText(0x1830, buf, 30);
 			
 			if(S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult <= S_TestPageBuffer->currenttestdata->testdata.temperweima.LowstResult)
 				sprintf(buf, "<%.3f", S_TestPageBuffer->currenttestdata->testdata.temperweima.LowstResult);
@@ -229,7 +242,7 @@ static void RefreshPageText(void)
 				sprintf(buf, ">%.3f", S_TestPageBuffer->currenttestdata->testdata.temperweima.HighestResult);
 			else
 				sprintf(buf, "%.3f", S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult);
-			DisText(0x2140, buf, strlen(buf));
+			DisText(0x1840, buf, 30);
 		}
 	}
 	MyFree(buf);
@@ -264,12 +277,12 @@ static void RefreshPageText(void)
 		tempvalue += 139;										//曲线窗口起始y
 		S_TestPageBuffer->myico[2].Y = (unsigned short)tempvalue - 5;
 		
-		BasicUI(0x2150 ,0x1907 , 3, &(S_TestPageBuffer->myico[0]) , sizeof(Basic_ICO)*3);
+		BasicUI(0x1860 ,0x1907 , 3, &(S_TestPageBuffer->myico[0]) , sizeof(Basic_ICO)*3);
 	}
 	else
 	{
 		memset(S_TestPageBuffer->myico, 0, sizeof(Basic_ICO)*3);
-		BasicUI(0x2150 ,0x1907 , 3, &S_TestPageBuffer->myico[0] , sizeof(Basic_ICO)*3);
+		BasicUI(0x1860 ,0x1907 , 3, &S_TestPageBuffer->myico[0] , sizeof(Basic_ICO)*3);
 	}
 }
 
@@ -303,10 +316,10 @@ static void AddDataToLine(unsigned short data)
 		TempY_Scale /= 2.0;																//目前显示2个y轴刻度
 		S_TestPageBuffer->line.Y_Scale = (unsigned short)TempY_Scale;
 		
-		SetChartSize(0x2160 , S_TestPageBuffer->line.MUL_Y);
+		SetChartSize(0x1870 , S_TestPageBuffer->line.MUL_Y);
 
-		DspNum(0x2180 , S_TestPageBuffer->line.Y_Scale, 2);
-		DspNum(0x2170 , S_TestPageBuffer->line.Y_Scale*2, 2);
+		DspNum(0x180A , S_TestPageBuffer->line.Y_Scale, 2);
+		DspNum(0x1809 , S_TestPageBuffer->line.Y_Scale*2, 2);
 
 	}
 	DisPlayLine(0 , &tempdata , 1);

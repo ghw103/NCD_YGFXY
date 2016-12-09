@@ -58,6 +58,7 @@
 #include	"DeviceDao.h"
 #include	"Define.h"
 #include	"MyMem.h"
+#include	"NetInfo_Data.h"
 
 
 #define netifMTU                                (1500)
@@ -122,6 +123,7 @@ static void low_level_init(struct netif *netif)
   netif->hwaddr[4] =  (i>>8)&0xff;
   netif->hwaddr[5] =  i&0xff;
 
+	SetGB_LineNetMac(netif->hwaddr);
   /* set netif maximum transfer unit */
   netif->mtu = 1500;
 

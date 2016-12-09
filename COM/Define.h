@@ -80,21 +80,15 @@ typedef struct
 #define	PaiDuiWeiNum	8							//排队位置数目
 typedef enum
 {
-	NotStart = 0,									//没开始,卡在卡槽
-	statues1 = 1,									//等待从卡槽拔出，阶段1和2共用
-	statues2 = 2,									//已从卡槽拔出，等待插入排队位，阶段1和2共用
-	statues3 = 3,									//已插入排队位，等待加样（弹出提示框，加样后确定），阶段1
-	statues4 = 4,									//已加样，倒计时开始，阶段1
-	statues5 = 5,									//时间未到，卡被异常拔出（提示插回），等待插回，阶段1和2共用
-	statues6 = 6,									//异常拔出时已插回，阶段1和2共用
-	statues7 = 7,									//时间小于60S，切回排队界面，阶段1和2共用
-	statues8 = 8,									//时间小于20S，提示将卡放入卡槽，等待从排队拔出状态，阶段1和2共用
-	statues9 = 9,									//等待插入卡槽状态，阶段1和2共用
-	statues10 = 10,									//等待插入卡槽状态，阶段1和2共用
-	statues11 = 11,									//等待插入卡槽状态，阶段1和2共用
-	statues12 = 12,									//等待插入卡槽状态，阶段1和2共用
-	statues13 = 13,									//等待插入卡槽状态，阶段1和2共用
-	statuesNull = 0xff,
+	statuesNull = 0,								//没开始,卡在卡槽
+	statues1 = 1,									//等待从卡槽拔出
+	statues2 = 2,									//等待插入排队位
+	statues3 = 3,									//等待拔出排队位
+	statues4 = 4,									//等待插入卡槽
+	statues5 = 5,									//倒计时中
+	statues6 = 6,									//超时计时中
+	statues7 = 7,									//排队结束
+	startpaidui = 100								//启动排队
 }MyPaiDuiStatues;
 
 
@@ -216,20 +210,6 @@ typedef struct LineInfo_Tag
 	unsigned short MUL_Y;				//Y轴放大倍数
 }LineInfo;
 
-typedef struct SysPage_Tag
-{
-	unsigned char (*CurrentPage)(void * pram);
-	void (*LCDInput)(unsigned char *pbuf , unsigned short len);
-	void (*PageUpDate)(void);
-	MyState_TypeDef (*PageInit)(void * pram);
-	MyState_TypeDef (*PageBufferMalloc)(void);
-	MyState_TypeDef (*PageBufferFree)(void);
-	
-	unsigned char (*ParentPage)(void *  parm);
-	unsigned char (*ChildPage)(void *  parm);
-}SysPage;
-
-#define	DataNumInPage		9							//一页8个数据
 /**********************************************************************************************************/
 /**********************************************************************************************************/
 
@@ -467,14 +447,6 @@ typedef struct TestData_tag {
 	unsigned short time;					//超时时间
 	unsigned short crc;
 }TestData;
-#pragma pack()
-
-#pragma pack(1)
-typedef struct TestDataSaveHead_tag {
-	unsigned int datanum;
-	unsigned int readindex;
-	unsigned short crc;
-}TestDataSaveHead;
 #pragma pack()
 
 /*********************************************************************************************/

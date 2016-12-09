@@ -82,7 +82,7 @@ static void vSystemStartTask( void *pvParameters )
 	StartvPlaySongTask();
 	
 	/*显示欢迎界面*/
-	DspWelcomePage(NULL);
+	PageAdvanceTo(DspWelcomePage, NULL);
 	
 	/*系统界面控制任务*/
 	StartvSystemUITask();

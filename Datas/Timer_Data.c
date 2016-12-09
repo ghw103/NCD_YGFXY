@@ -93,13 +93,16 @@ TimerState_Def timer_expired(Timer *t)
 {
 	if(t)
 	{
-		if((GB_ClockTime - t->start) >= t->interval)
-			return TimeOut;
-		else
-			return TimeNotTo;
+		if(timerIsStartted(t))
+		{
+			if((GB_ClockTime - t->start) >= t->interval)
+				return TimeOut;
+			else
+				return TimeNotTo;
+		}
 	}
-	else
-		return TimeError;
+	
+	return TimeError;
 }
 
 /***************************************************************************************************
@@ -114,13 +117,13 @@ unsigned int timer_surplus(Timer *t)
 {
 	if(t)
 	{
-		if(timer_expired(t) == TimeNotTo)
+		if(timerIsStartted(t))
+		{
 			return (t->interval - (GB_ClockTime - t->start));
-		else
-			return 0;
+		}
 	}
-	else
-		return 0;
+	
+	return 0xffffff;
 }
 
 /***************************************************************************************************
@@ -158,4 +161,26 @@ unsigned int timer_Count(Timer * t)
 		return (GB_ClockTime - t->start);
 	else
 		return 0;
+}
+
+/***************************************************************************************************
+*FunctionName: timerIsStartted
+*Description: 判断定时器是否已经启动
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月8日16:27:47
+***************************************************************************************************/
+bool timerIsStartted(Timer * t)
+{
+	if(t)
+	{
+		if(t->start == 0)
+			return false;
+		else
+			return true;
+	}
+	
+	return false;
 }
