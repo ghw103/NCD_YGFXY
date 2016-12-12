@@ -35,7 +35,7 @@ const BackDoorData s_BackDoorData[12]=
 	{
 		.data1 = 0.5,
 		.data2 = {0.5, 3, 10, 20, 50, 200},
-		.data3 = {0.5, 3, 20, 50},
+		.data3 = {1.03, 5.15, 41.2},
 		.data4 = {3, 10},
 		.data5 = {3, 10}
 	},
