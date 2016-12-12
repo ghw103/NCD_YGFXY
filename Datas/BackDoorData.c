@@ -51,7 +51,7 @@ const BackDoorData s_BackDoorData[12]=
 	{
 		.data1 = 0.5,
 		.data2 = {0.5, 2, 3, 5, 6, 8},
-		.data3 = {0.5, 3, 6, 6},
+		.data3 = {0.5, 1.49, 4.47, 4.47},
 		.data4 = {2, 6},
 		.data5 = {2, 6}
 	},
@@ -59,7 +59,7 @@ const BackDoorData s_BackDoorData[12]=
 	{
 		.data1 = 2.5,
 		.data2 = {2.5, 5, 25, 100, 250, 1000},
-		.data3 = {5, 25, 100, 100},
+		.data3 = {5, 25, 240, 240},
 		.data4 = {5, 25},
 		.data5 = {5, 25}
 	},
@@ -91,7 +91,7 @@ const BackDoorData s_BackDoorData[12]=
 	{
 		.data1 = 2,
 		.data2 = {2, 20, 100, 150, 200, 300},
-		.data3 = {20, 100, 200, 300},
+		.data3 = {20, 42, 84, 200},
 		.data4 = {20, 150},
 		.data5 = {20, 150}
 	},
