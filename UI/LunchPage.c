@@ -51,7 +51,6 @@ unsigned char DspLunchPage(void *  parm)
 		currentpage->LCDInput = Input;
 		currentpage->PageBufferMalloc = PageBufferMalloc;
 		currentpage->PageBufferFree = PageBufferFree;
-		currentpage->tempP = &S_LunchPageBuffer;
 		
 		currentpage->PageInit(currentpage->pram);
 	}
@@ -68,20 +67,20 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_LunchPageBuffer->lcdinput[0] = pbuf[4];
 		S_LunchPageBuffer->lcdinput[0] = (S_LunchPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
-		//
-		if(S_LunchPageBuffer->lcdinput[0] == 0x1205)
+		//设置
+		if(S_LunchPageBuffer->lcdinput[0] == 0x1103)
 		{
 			PageBufferFree();
 			PageAdvanceTo(DspSystemSetPage, NULL);
 		}
 		//查看数据
-		else if(S_LunchPageBuffer->lcdinput[0] == 0x1206)
+		else if(S_LunchPageBuffer->lcdinput[0] == 0x1102)
 		{	
 			PageBufferFree();
 			PageAdvanceTo(DspRecordPage, NULL);
 		}
 		//常规测试
-		else if(S_LunchPageBuffer->lcdinput[0] == 0x1200)
+		else if(S_LunchPageBuffer->lcdinput[0] == 0x1100)
 		{	
 			S_LunchPageBuffer->error = CreateANewTest(NormalTestType);
 			//创建成功
@@ -94,18 +93,18 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			//禁止常规测试
 			else if(Error_StopNormalTest == S_LunchPageBuffer->error)
 			{
-				SendKeyCode(2);
+				SendKeyCode(1);
 				AddNumOfSongToList(45, 0);
 			}
 			//创建失败
 			else if(Error_Mem == S_LunchPageBuffer->error)
 			{
-				SendKeyCode(3);
+				SendKeyCode(2);
 				AddNumOfSongToList(41, 0);
 			}
 		}
 		//批量测试
-		else if(S_LunchPageBuffer->lcdinput[0] == 0x1201)
+		else if(S_LunchPageBuffer->lcdinput[0] == 0x1101)
 		{
 			//有卡排队，则进入排队界面
 			if(true == IsPaiDuiTestting())
@@ -123,23 +122,11 @@ static void Input(unsigned char *pbuf , unsigned short len)
 					PageBufferFree();
 					PageAdvanceTo(DspSelectUserPage, NULL);
 				}
-				//排队位置满，不允许
-				else if(Error_PaiDuiBusy == S_LunchPageBuffer->error)
-				{
-					SendKeyCode(1);
-					AddNumOfSongToList(40, 0);
-				}
 				//创建失败
 				else if(Error_Mem == S_LunchPageBuffer->error)
 				{
-					SendKeyCode(3);
+					SendKeyCode(2);
 					AddNumOfSongToList(41, 0);
-				}
-				//有卡即将测试
-				else if(Error_PaiDuiBusy == S_LunchPageBuffer->error)
-				{
-					SendKeyCode(1);
-					AddNumOfSongToList(61, 0);
 				}
 			}
 		}
@@ -203,7 +190,7 @@ static void DspPageText(void)
 	{
 		memset(S_LunchPageBuffer->buf, 0, 100);
 		sprintf(S_LunchPageBuffer->buf, "V %d.%d.%02d", GB_SoftVersion_1, GB_SoftVersion_2, GB_SoftVersion_3);
-		DisText(0x1b10, S_LunchPageBuffer->buf, strlen(S_LunchPageBuffer->buf));
+		DisText(0x1110, S_LunchPageBuffer->buf, 30);
 	}
 }
 

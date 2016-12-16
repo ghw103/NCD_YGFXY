@@ -48,7 +48,6 @@ unsigned char DspSetDeviceInfoPage(void *  parm)
 		currentpage->LCDInput = Input;
 		currentpage->PageBufferMalloc = PageBufferMalloc;
 		currentpage->PageBufferFree = PageBufferFree;
-		currentpage->tempP = &S_SetDeviceInfoPageBuffer;
 		
 		currentpage->PageInit(currentpage->pram);
 	}
@@ -66,13 +65,13 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_SetDeviceInfoPageBuffer->lcdinput[0] = (S_SetDeviceInfoPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
 		/*返回*/
-		if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1A00)
+		if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1B00)
 		{
 			PageBufferFree();
 			PageBackTo(ParentPage);
 		}
 		/*确认*/
-		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1A01)
+		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1B01)
 		{
 			if(S_SetDeviceInfoPageBuffer->ismodify == 1)
 			{
@@ -88,49 +87,49 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			}
 		}
 		/*姓名*/
-		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1A10)
+		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1B10)
 		{
 			memset(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_name, 0, MaxNameLen);
 			memcpy(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_name, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			S_SetDeviceInfoPageBuffer->ismodify = 1;
 		}
 		/*年龄*/
-		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1A15)
+		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1B20)
 		{
 			memset(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_age, 0, MaxAgeLen);
 			memcpy(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_age, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			S_SetDeviceInfoPageBuffer->ismodify = 1;
 		}
 		/*性别*/
-		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1A17)
+		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1B30)
 		{
 			memset(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_sex, 0, MaxSexLen);
 			memcpy(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_sex, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			S_SetDeviceInfoPageBuffer->ismodify = 1;
 		}
 		/*联系方式*/
-		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1A20)
+		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1B40)
 		{
 			memset(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_phone, 0, MaxPhoneLen);
 			memcpy(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_phone, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			S_SetDeviceInfoPageBuffer->ismodify = 1;
 		}
 		/*职位*/
-		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1A28)
+		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1B50)
 		{
 			memset(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_job, 0, MaxJobLen);
 			memcpy(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_job, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			S_SetDeviceInfoPageBuffer->ismodify = 1;
 		}
 		/*备注*/
-		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1A30)
+		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1B60)
 		{
 			memset(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_desc, 0, MaxDescLen);
 			memcpy(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceuser.user_desc, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			S_SetDeviceInfoPageBuffer->ismodify = 1;
 		}
 		/*设备使用地址*/
-		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1A38)
+		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1B70)
 		{
 			memset(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceunit, 0, MaxDeviceUnitLen);
 			memcpy(S_SetDeviceInfoPageBuffer->temp_deviceinfo.deviceunit, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));

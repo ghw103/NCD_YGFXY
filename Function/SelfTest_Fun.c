@@ -23,7 +23,7 @@
 #include	"System_Data.h"
 
 #include	"DeviceDao.h"
-
+#include	"SelfCheck_Data.h"
 #include	"MyMem.h"
 
 #include 	"FreeRTOS.h"
@@ -36,19 +36,14 @@
 /***************************************************************************************************/
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
-static 	xQueueHandle xSelfCehckQueue;													//发送自检进度数据
+
 /***************************************************************************************************/
 /**************************************局部函数声明*************************************************/
 /***************************************************************************************************/
-static void DataBasesCheck(void);
-static void ErWeiMaTest(void);
-static void WifiModuleTest(void);
 
 static MyState_TypeDef ADDASelfTest(void);
-static void ADDACheck(void);
 
 static MyState_TypeDef MotorSelfTest(void);
-static void MotorCheck(void);
 
 static void GB_DataInit(void);
 /***************************************************************************************************/
@@ -68,88 +63,25 @@ static void GB_DataInit(void);
 void SelfTest_Function(void)
 {	
 	GB_DataInit();
-	vTaskDelay(500 *portTICK_RATE_MS);
+	vTaskDelay(50 *portTICK_RATE_MS);
 	
-//	ErWeiMaTest();
-	vTaskDelay(1000 * portTICK_RATE_MS);
+//	ErWeiMaSelfTest();
 	
-	DataBasesCheck();
-	vTaskDelay(500 * portTICK_RATE_MS);
+	CheckSDFunction();
+	vTaskDelay(50 * portTICK_RATE_MS);
 	
-//	WifiModuleTest();
-	vTaskDelay(500 * portTICK_RATE_MS);
+//	WIFICheck();
+	vTaskDelay(50 * portTICK_RATE_MS);
 	
-	ADDACheck();
-	vTaskDelay(500 *portTICK_RATE_MS);
+	ADDASelfTest();
+	vTaskDelay(50 *portTICK_RATE_MS);
 	
-	MotorCheck();
-	vTaskDelay(500 *portTICK_RATE_MS);
+	MotorSelfTest();
+	vTaskDelay(50 *portTICK_RATE_MS);
 	
-	SetSelfCheckStatus(SelfCheckOver, 10*portTICK_RATE_MS);
+	SetGB_SelfCheckStatus(SelfCheck_OK);
 }
 
-/***************************************************************************************************
-*FunctionName：ReadSelfCheckStatus
-*Description：Get SelfTest Task State
-*Input：receivedchar -- 返回数据地址
-*		xBlockTime -- 等待时间
-*Output：读取状态
-*Author：xsx
-*Data：2016年1月27日10:21:33
-***************************************************************************************************/
-MyState_TypeDef GetSelfCheckStatus(unsigned char * receivedchar , portTickType xBlockTime)
-{
-	if(xSelfCehckQueue == NULL)
-		xSelfCehckQueue = xQueueCreate( 10, ( unsigned portBASE_TYPE ) sizeof( signed portCHAR ) );
-	
-	if(xSelfCehckQueue == NULL)
-		return My_Fail;
-	
-	return xQueueReceive( xSelfCehckQueue, receivedchar, xBlockTime );
-}
-/***************************************************************************************************
-*FunctionName：SetSelfTestTaskState
-*Description：发送自检状态
-*Input：txchar -- 待更新的自检状态
-*		xBlockTime -- 写入等待时间
-*Output：写入状态
-*Author：xsx
-*Data：2016年1月27日10:22:39
-***************************************************************************************************/
-MyState_TypeDef SetSelfCheckStatus(unsigned char txchar , portTickType xBlockTime)
-{
-	if(xSelfCehckQueue == NULL)
-		xSelfCehckQueue = xQueueCreate( 10, ( unsigned portBASE_TYPE ) sizeof( signed portCHAR ) );
-	
-	if(xSelfCehckQueue == NULL)
-		return My_Fail;
-	
-	return xQueueSend( xSelfCehckQueue, &txchar, xBlockTime);
-}
-
-
-/***************************************************************************************************
-*FunctionName：DataBasesCheck
-*Description：存储模块自检
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年1月27日13:37:34
-***************************************************************************************************/
-static void DataBasesCheck(void)
-{
-	//正在检测存储模块
-	SetSelfCheckStatus(DataBasesChecking, 10*portTICK_RATE_MS);
-	vTaskDelay(1000*portTICK_RATE_MS);
-	
-	if(My_Pass == CheckSDFunction())
-		SetSelfCheckStatus(DataBasesSuccess, 10*portTICK_RATE_MS);
-	else
-		SetSelfCheckStatus(DataBasesError, 10*portTICK_RATE_MS);
-	
-	vTaskDelay(1000*portTICK_RATE_MS);
-	
-}
 
 /***************************************************************************************************
 *FunctionName：ADDASelfTest
@@ -196,60 +128,8 @@ static MyState_TypeDef ADDASelfTest(void)
 	else
 		return My_Pass;
 }
-/***************************************************************************************************
-*FunctionName：ADDACheck
-*Description：采集模块自检
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年5月2日09:39:09
-***************************************************************************************************/
-static void ADDACheck(void)
-{
-	SetSelfCheckStatus(ADDAChecking, 10*portTICK_RATE_MS);
-	vTaskDelay(1000*portTICK_RATE_MS);
-	
-	if(My_Pass == ADDASelfTest())
-	{
-		SetSelfCheckStatus(ADDASuccess, 10*portTICK_RATE_MS);
-	}
-	else
-		SetSelfCheckStatus(ADDAError, 10*portTICK_RATE_MS);
-}
 
-/***************************************************************************************************
-*FunctionName：MotorTest
-*Description：电机测试
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年1月27日13:37:34
-***************************************************************************************************/
-static void ErWeiMaTest(void)
-{
-	SetSelfCheckStatus(ErWeiMaChecking, 10*portTICK_RATE_MS);
-	vTaskDelay(1000*portTICK_RATE_MS);
-	
-	if(My_Pass == ErWeiMaSelfTest())
-	{
-		SetSelfCheckStatus(ErWeiMaSuccess, 10*portTICK_RATE_MS);
-	}
-	else
-		SetSelfCheckStatus(ErWeiMaError, 10*portTICK_RATE_MS);
-}
 
-static void WifiModuleTest(void)
-{
-	SetSelfCheckStatus(WIFIChecking, 10*portTICK_RATE_MS);
-	vTaskDelay(1000*portTICK_RATE_MS);
-	
-	if(My_Pass == WIFICheck())
-	{
-		SetSelfCheckStatus(WIFISuccess, 10*portTICK_RATE_MS);
-	}
-	else
-		SetSelfCheckStatus(WIFIError, 10*portTICK_RATE_MS);
-}
 
 /***************************************************************************************************
 *FunctionName：MotorSelfTest
@@ -296,34 +176,12 @@ static MyState_TypeDef MotorSelfTest(void)
 	
 	return My_Pass;
 }
-/***************************************************************************************************
-*FunctionName：MotorCheck
-*Description：电机自检
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年6月27日17:39:59
-***************************************************************************************************/
-static void MotorCheck(void)
-{
-	SetSelfCheckStatus(MotorChecking, 10*portTICK_RATE_MS);
-	vTaskDelay(1000*portTICK_RATE_MS);
-	
-	if(My_Pass == MotorSelfTest())
-	{
-		SetSelfCheckStatus(MotorSuccess, 10*portTICK_RATE_MS);
-	}
-	else
-		SetSelfCheckStatus(MotorError, 10*portTICK_RATE_MS);
-}
+
 
 static void GB_DataInit(void)
 {
 	NetData *mynetdata = NULL;
 	DeviceInfo *mydeviceinfo;
-	
-	SetSelfCheckStatus(ReadServerData, 10*portTICK_RATE_MS);
-	vTaskDelay(1000*portTICK_RATE_MS);
 	
 	mynetdata = MyMalloc(sizeof(NetData));
 	

@@ -52,7 +52,6 @@ unsigned char DspSystemSetPage(void *  parm)
 		currentpage->LCDInput = Input;
 		currentpage->PageBufferMalloc = PageBufferMalloc;
 		currentpage->PageBufferFree = PageBufferFree;
-		currentpage->tempP = &S_SysSetPageBuffer;
 		
 		currentpage->PageInit(currentpage->pram);
 	}
@@ -70,31 +69,31 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_SysSetPageBuffer->lcdinput[0] = (S_SysSetPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
 		//基本信息
-		if(S_SysSetPageBuffer->lcdinput[0] == 0x1901)
+		if(S_SysSetPageBuffer->lcdinput[0] == 0x1900)
 		{
 			PageBufferFree();
 			PageAdvanceTo(DspShowDeviceInfoPage, NULL);
 		}
 		//操作人管理
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1902)
+		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1901)
 		{
 			PageBufferFree();
 			PageAdvanceTo(DspUserMPage, NULL);
 		}
 		//网络设置
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1903)
+		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1902)
 		{
 			PageBufferFree();
 			PageAdvanceTo(DspNetPreSetPage, NULL);
 		}
 		//数据管理
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1904)
+		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1903)
 		{
 			PageBufferFree();
 			PageAdvanceTo(DspRecordPage, NULL);
 		}
 		//校准功能
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1908)
+		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1910)
 		{
 			if(GetBufLen(&pbuf[7] , 2*pbuf[6]) == 6)
 			{
@@ -115,13 +114,13 @@ static void Input(unsigned char *pbuf , unsigned short len)
 					SendKeyCode(1);
 		}
 		//其他设置
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1905)
+		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1904)
 		{
 			PageBufferFree();
 			PageAdvanceTo(DspOtherSetPage, NULL);
 		}
 		//返回
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1900)
+		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1906)
 		{
 			PageBackTo(ParentPage);
 		}

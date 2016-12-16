@@ -9,7 +9,6 @@ typedef struct PageInfo_Tag
 {
 	unsigned char (*CurrentPage)(void * pram);
 	void * pram;														//传进界面的参数
-	void * tempP;														//备用指针
 	void (*LCDInput)(unsigned char *pbuf , unsigned short len);
 	void (*PageUpDate)(void);
 	MyState_TypeDef (*PageInit)(void * pram);
@@ -43,7 +42,7 @@ typedef enum
 	DisplayPage = 1												//显示
 }DisplayType;
 
-#define	OriginPageIndex			3								//所有子界面的起始界面索引，本系统来说欢迎动画为1，自检为2，主界面为3
+#define	OriginPageIndex			2								//所有子界面的起始界面索引，本系统来说欢迎动画为1，自检为2，主界面为3
 #define	OriginPage				0xff							//回到起始界面的层级
 #define	ParentPage				1								//对于当前界面来说，回父界面，即是切换到前一个界面
 
@@ -51,6 +50,6 @@ MyState_TypeDef PageAdvanceTo(unsigned char (*page)(void * pram), void * pram);
 MyState_TypeDef PageBackTo(unsigned char index);
 MyState_TypeDef GetCurrentPage(PageInfo ** pageinfo);
 MyState_TypeDef PageResetToOrigin(DisplayType distype);
-
+unsigned char (*GetParentPage(void))(void* pram);
 #endif
 

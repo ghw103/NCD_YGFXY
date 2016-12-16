@@ -8,6 +8,7 @@
 #include	"System_Data.h"
 #include	"MyMem.h"
 
+#include	"PaiDuiPage.h"
 #include	"MyTest_Data.h"
 #include	"SelectUserPage.h"
 #include	"WaittingCardPage.h"
@@ -52,7 +53,6 @@ unsigned char DspSampleIDPage(void *  parm)
 		currentpage->LCDInput = Input;
 		currentpage->PageBufferMalloc = PageBufferMalloc;
 		currentpage->PageBufferFree = PageBufferFree;
-		currentpage->tempP = &S_SampleIDPage;
 		
 		currentpage->PageInit(currentpage->pram);
 	}
@@ -70,14 +70,17 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_SampleIDPage->lcdinput[0] = (S_SampleIDPage->lcdinput[0]<<8) + pbuf[5];
 		
 		/*返回*/
-		if(S_SampleIDPage->lcdinput[0] == 0x1400)
+		if(S_SampleIDPage->lcdinput[0] == 0x1300)
 		{
+			if(DspPaiDuiPage == GetParentPage())
+				DeleteCurrentTest();
+			
 			PageBufferFree();
 			PageBackTo(ParentPage);
 		}
 		
 		/*确定*/
-		else if(S_SampleIDPage->lcdinput[0] == 0x1401)
+		else if(S_SampleIDPage->lcdinput[0] == 0x1301)
 		{
 			if(strlen(S_SampleIDPage->currenttestdata->testdata.sampleid) == 0)
 			{
@@ -91,7 +94,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			}
 		}
 		/*获取输入的id*/
-		else if(S_SampleIDPage->lcdinput[0] == 0x1410)
+		else if(S_SampleIDPage->lcdinput[0] == 0x1310)
 		{
 			memset(S_SampleIDPage->currenttestdata->testdata.sampleid, 0, MaxSampleIDLen);
 			memcpy(S_SampleIDPage->currenttestdata->testdata.sampleid, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
@@ -163,6 +166,6 @@ static void RefreshSampleID(void)
 {
 	if(S_SampleIDPage)
 	{
-		DisText(0x1410, S_SampleIDPage->currenttestdata->testdata.sampleid, MaxSampleIDLen);
+		DisText(0x1310, S_SampleIDPage->currenttestdata->testdata.sampleid, MaxSampleIDLen);
 	}
 }

@@ -80,18 +80,10 @@ static void AnalysisCode(void * pbuf, unsigned short len)
 	
 	if((p[0] == LCD_Head_1)&&(p[1] == LCD_Head_2)&&(len == (p[2]+3))&&(*crc == *tempcrc))
 	{
-		if(p[3] == R_REGSITER)
+		if(My_Pass == GetCurrentPage(&currentpage))
 		{
-
-		}
-		
-		else if(p[3] == R_ADDRESS)
-		{
-			if(My_Pass == GetCurrentPage(&currentpage))
-			{
-				if(NULL != currentpage->LCDInput)
-					currentpage->LCDInput(pbuf , len);
-			}
+			if(NULL != currentpage->LCDInput)
+				currentpage->LCDInput(pbuf , len);
 		}
 	}
 

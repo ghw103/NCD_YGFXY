@@ -50,7 +50,6 @@ unsigned char DspSetDeviceIDPage(void *  parm)
 		currentpage->LCDInput = Input;
 		currentpage->PageBufferMalloc = PageBufferMalloc;
 		currentpage->PageBufferFree = PageBufferFree;
-		currentpage->tempP = &S_SetDeviceIDPage;
 		
 		currentpage->PageInit(currentpage->pram);
 	}
@@ -70,13 +69,13 @@ static void Input(unsigned char *pbuf , unsigned short len)
 
 		/*修改设备id*/
 		/*返回*/
-		if(S_SetDeviceIDPage->lcdinput[0] == 0x1A50)
+		if(S_SetDeviceIDPage->lcdinput[0] == 0x1c00)
 		{
 			PageBufferFree();
 			PageBackTo(ParentPage);
 		}
 		/*确认*/
-		else if(S_SetDeviceIDPage->lcdinput[0] == 0x1A51)
+		else if(S_SetDeviceIDPage->lcdinput[0] == 0x1C01)
 		{
 			if(S_SetDeviceIDPage->ismodify == 1)
 			{
@@ -91,7 +90,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			}
 		}
 		/*id输入*/
-		else if(S_SetDeviceIDPage->lcdinput[0] == 0x1A60)
+		else if(S_SetDeviceIDPage->lcdinput[0] == 0x1C10)
 		{
 			memset(S_SetDeviceIDPage->temp_deviceinfo.deviceid, 0 , MaxDeviceIDLen);
 			
@@ -114,7 +113,7 @@ static void PageUpDate(void)
 			GetGB_BarCode(S_SetDeviceIDPage->tempbuf);
 			
 			memcpy(S_SetDeviceIDPage->temp_deviceinfo.deviceid, S_SetDeviceIDPage->tempbuf, MaxDeviceIDLen);
-			DisText(0x1A60, S_SetDeviceIDPage->temp_deviceinfo.deviceid, MaxDeviceIDLen);
+			DisText(0x1C10, S_SetDeviceIDPage->temp_deviceinfo.deviceid, MaxDeviceIDLen);
 		
 			S_SetDeviceIDPage->ismodify = 1;
 		}	
@@ -131,7 +130,7 @@ static MyState_TypeDef PageInit(void *  parm)
 	if(parm)
 	{
 		memcpy(&(S_SetDeviceIDPage->temp_deviceinfo), parm, sizeof(DeviceInfo));
-		DisText(0x1A60, S_SetDeviceIDPage->temp_deviceinfo.deviceid, strlen(S_SetDeviceIDPage->temp_deviceinfo.deviceid));
+		DisText(0x1C10, S_SetDeviceIDPage->temp_deviceinfo.deviceid, strlen(S_SetDeviceIDPage->temp_deviceinfo.deviceid));
 		return My_Pass;
 	}
 	

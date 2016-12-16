@@ -17,12 +17,12 @@
 /***************************************************************************************************/
 /**************************************变量*************************************************/
 /***************************************************************************************************/
-//常规测试缓存
-static ItemData * GB_NormalTestDataBuffer = NULL;
-//批量测试缓存
-static ItemData * (GB_PaiduiTestDataBuffer[PaiDuiWeiNum]) = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
-//当前操作的数据
-static ItemData * GB_CurrentTestDataBuffer = NULL;
+//测试数据缓冲区
+static TestBuffer GB_TestBuffer = {
+	.NormalTestDataBuffer = NULL,
+	.PaiduiTestDataBuffer = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL},
+	.CurrentTestDataBuffer = NULL,
+};
 /***************************************************************************************************/
 /**************************************内部函数*************************************************/
 /***************************************************************************************************/
@@ -50,7 +50,7 @@ bool IsPaiDuiTestting(void)
 
 	for(i=0; i<PaiDuiWeiNum; i++)
 	{
-		if(GB_PaiduiTestDataBuffer[i] != NULL)
+		if(GB_TestBuffer.PaiduiTestDataBuffer[i] != NULL)
 			return true;
 	}
 	
@@ -61,6 +61,9 @@ CreateTestErrorType CreateANewTest(TestType testtype)
 {
 	unsigned char i=0;
 	
+	if(GB_TestBuffer.CurrentTestDataBuffer != NULL)
+		return Error_PaiduiTesting;
+	
 	//如果是常规测试
 	if(testtype == NormalTestType)
 	{
@@ -69,44 +72,50 @@ CreateTestErrorType CreateANewTest(TestType testtype)
 			return Error_StopNormalTest;
 		
 		//申请测试内存
-		GB_NormalTestDataBuffer = (ItemData *)MyMalloc(sizeof(ItemData));
+		GB_TestBuffer.NormalTestDataBuffer = (ItemData *)MyMalloc(sizeof(ItemData));
 		
 		//内存申请失败
-		if(GB_NormalTestDataBuffer == NULL)
+		if(GB_TestBuffer.NormalTestDataBuffer == NULL)
 			return Error_Mem;
 		else
 		{
-			GB_CurrentTestDataBuffer = GB_NormalTestDataBuffer;
-			memset(GB_NormalTestDataBuffer, 0, sizeof(ItemData));
-			GB_NormalTestDataBuffer->testlocation = 0;
+			GB_TestBuffer.CurrentTestDataBuffer = GB_TestBuffer.NormalTestDataBuffer;
+			memset(GB_TestBuffer.CurrentTestDataBuffer, 0, sizeof(ItemData));
+			GB_TestBuffer.NormalTestDataBuffer->testlocation = 0;
 			
 			return Error_OK;
 		}
 	}
 	else
 	{
+		if(60 > GetMinWaitTime())
+			return Error_PaiDuiBusy;
+		
 		for(i=0; i<PaiDuiWeiNum; i++)
 		{
-			if(GB_PaiduiTestDataBuffer[i] == NULL)
+			if(GB_TestBuffer.PaiduiTestDataBuffer[i] == NULL)
 			{
 				//申请测试内存
-				GB_PaiduiTestDataBuffer[i] = (ItemData *)MyMalloc(sizeof(ItemData));
+				GB_TestBuffer.PaiduiTestDataBuffer[i] = (ItemData *)MyMalloc(sizeof(ItemData));
 				
 				//内存申请失败
-				if(GB_PaiduiTestDataBuffer[i] == NULL)
+				if(GB_TestBuffer.PaiduiTestDataBuffer[i] == NULL)
 					return Error_Mem;
 				else
 				{
-					GB_CurrentTestDataBuffer = GB_PaiduiTestDataBuffer[i];
-					memset(GB_CurrentTestDataBuffer, 0, sizeof(ItemData));
-					GB_CurrentTestDataBuffer->testlocation = i + 1;
+					GB_TestBuffer.CurrentTestDataBuffer = GB_TestBuffer.PaiduiTestDataBuffer[i];
+					memset(GB_TestBuffer.CurrentTestDataBuffer, 0, sizeof(ItemData));
+					GB_TestBuffer.CurrentTestDataBuffer->testlocation = i + 1;
+					
+					//复制排队共用操作人到当前测试数据中，如果是第一次创建排队，后面选择操作人则会覆盖此次操作
+					memcpy(&(GB_TestBuffer.CurrentTestDataBuffer->testdata.user), &(GB_TestBuffer.PaiduiUser), sizeof(User_Type));
 					
 					return Error_OK;
 				}
 			}
 		}
 		
-		return Error_PaiDuiBusy;
+		return Error_PaiduiFull;
 	}
 }
 
@@ -115,7 +124,7 @@ CreateTestErrorType CreateANewTest(TestType testtype)
 
 ItemData * GetTestItemByIndex(unsigned char index)
 {
-	return GB_PaiduiTestDataBuffer[index];
+	return GB_TestBuffer.PaiduiTestDataBuffer[index];
 }
 
 
@@ -127,9 +136,11 @@ unsigned short GetMinWaitTime(void)
 	
 	for(index = 0; index < PaiDuiWeiNum; index++)
 	{
-		if((GB_PaiduiTestDataBuffer[index])&&(false == timerIsStartted(&(GB_PaiduiTestDataBuffer[index]->timer2))))
+		if((GB_TestBuffer.PaiduiTestDataBuffer[index])&&
+			(timerIsStartted(&(GB_TestBuffer.PaiduiTestDataBuffer[index]->timer)))&&
+			(false == timerIsStartted(&(GB_TestBuffer.PaiduiTestDataBuffer[index]->timer2))))
 		{
-			temp = timer_surplus(&(GB_PaiduiTestDataBuffer[index]->timer));
+			temp = timer_surplus(&(GB_TestBuffer.PaiduiTestDataBuffer[index]->timer));
 			if(temp < min)
 				min = temp;
 		}
@@ -150,12 +161,12 @@ unsigned short GetMinWaitTime(void)
 ***************************************************************************************************/
 void SetCurrentTestItem(ItemData * s_itemdata)
 {
-	GB_CurrentTestDataBuffer = s_itemdata;
+	GB_TestBuffer.CurrentTestDataBuffer = s_itemdata;
 }
 
 ItemData * GetCurrentTestItem(void)
 {
-	return GB_CurrentTestDataBuffer;
+	return GB_TestBuffer.CurrentTestDataBuffer;
 }
 
 /***************************************************************************************************
@@ -169,22 +180,34 @@ ItemData * GetCurrentTestItem(void)
 ***************************************************************************************************/
 MyState_TypeDef DeleteCurrentTest(void)
 {
-	ItemData * temp = GetCurrentTestItem();
-	unsigned char i=0;
-	if(temp)
-	{
-		memset(temp, 0, sizeof(ItemData));
-		MyFree(temp);
 
-		for(i=0; i<PaiDuiWeiNum; i++)
-		{
-			if(GB_PaiduiTestDataBuffer[i] == temp)
-			{
-				GB_PaiduiTestDataBuffer[i] = NULL;
-				SetCurrentTestItem(NULL);
-			}
-		}
+	if(GB_TestBuffer.CurrentTestDataBuffer)
+	{
+		if(GB_TestBuffer.CurrentTestDataBuffer->testlocation == 0)
+			GB_TestBuffer.NormalTestDataBuffer = NULL;
+		else
+			GB_TestBuffer.PaiduiTestDataBuffer[GB_TestBuffer.CurrentTestDataBuffer->testlocation-1] = NULL;
+
+		MyFree(GB_TestBuffer.CurrentTestDataBuffer);
+		
+		GB_TestBuffer.CurrentTestDataBuffer = NULL;
 	}
 	return My_Pass;
+}
+
+void SetPaiduiUser(User_Type * user)
+{
+	if(user)
+	{
+		memcpy(&(GB_TestBuffer.PaiduiUser), user, sizeof(User_Type));
+	}
+}
+
+void GetPaiduiUser(User_Type * user)
+{
+	if(user)
+	{
+		memcpy(user, &(GB_TestBuffer.PaiduiUser), sizeof(User_Type));
+	}
 }
 

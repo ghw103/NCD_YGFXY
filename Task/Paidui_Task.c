@@ -1,89 +1,47 @@
 /***************************************************************************************************
-*FileName:
-*Description:
+*FileName: Paidui_Task
+*Description: 控制排队流程
 *Author: xsx_kair
-*Data:
+*Data: 2016年12月13日11:44:32
 ***************************************************************************************************/
 
 /***************************************************************************************************/
 /******************************************Header List********************************************/
 /***************************************************************************************************/
-#include	"SystemStart_Task.h"
+#include	"Paidui_Task.h"
 
-#include	"ReadInputData_Task.h"
-#include	"SystemUI_Task.h"
-#include	"Iwdg_Task.h"
-#include	"Universal_Task.h"
-#include	"PlaySong_Task.h"
-#include	"user_fatfs.h"
-#include	"WelcomePage.h"
-#include	"SelfTest_Fun.h"
-#include	"UI_Data.h"
-
-#include	"Define.h"
+#include	"Paidui_Fun.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
-#define	SystemStartTask_PRIORITY			2
-const char * SystemStartTaskName = "vSystemStartTask";
+
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
-static void vSystemStartTask( void *pvParameters );
+static void PaiduiTask(void * parm);
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
 /****************************************File Start*************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
-/***************************************************************************************************
-*FunctionName: StartSystemStartTask
-*Description: 创建系统初始化任务
-*Input: 
-*Output: 
-*Author: xsx
-*Date: 2016年9月21日11:58:17
-***************************************************************************************************/
-void StartSystemStartTask(void)
+
+void StartPaiduiTask(void)
 {
-	xTaskCreate( vSystemStartTask, SystemStartTaskName, configMINIMAL_STACK_SIZE, NULL, SystemStartTask_PRIORITY, NULL );
+	xTaskCreate( PaiduiTask, "PaiduiTask", configMINIMAL_STACK_SIZE, NULL, ( ( unsigned portBASE_TYPE ) 2U ), NULL );
 }
 
-/***************************************************************************************************
-*FunctionName: vSystemStartTask
-*Description: 系统初始化以及自检，启动
-*Input: 
-*Output: 
-*Author: xsx
-*Date: 2016年9月21日11:58:46
-***************************************************************************************************/
-static void vSystemStartTask( void *pvParameters )
+static void PaiduiTask(void * parm)
 {
-	/*开启看门狗任务*/
-	StartvIwdgTask();
-	
-	/*通用任务*/
-	StartvUniversalTask();
-	
-	/*播放音频*/
-	StartvPlaySongTask();
-	
-	/*显示欢迎界面*/
-	PageAdvanceTo(DspWelcomePage, NULL);
-	
-	/*系统界面控制任务*/
-	StartvSystemUITask();
-	
-	/*读取输入数据任务*/
-	StartvReadInDataTask();
-	
-	/*开始自检*/
-	SelfTest_Function();
-	
-	vTaskDelete(NULL);
+	while(1)
+	{
+		PaiDuiHandler();
+		
+		vTaskDelay(500 / portTICK_RATE_MS);
+	}
 }
 
 /****************************************end of file************************************************/

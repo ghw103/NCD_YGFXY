@@ -117,7 +117,7 @@ void StartEthernet(void)
 	
 	StartvLwipComTask(&xnetif);
 
-//	StartBasicWebTask();
+	StartBasicWebTask();
 	
 	StartLwipLabServerTask();
 

@@ -8,7 +8,7 @@ MyState_TypeDef CheckSDFunction(void);
 
 /*¶ÁĞ´²Ù×÷ÈË*/
 MyState_TypeDef SaveUserData(User_Type * user);
-void ReadUserData(User_Type * user);
+MyState_TypeDef ReadUserData(User_Type * user);
 
 
 /*ipÉèÖÃ*/

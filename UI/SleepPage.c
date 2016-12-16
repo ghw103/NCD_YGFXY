@@ -46,7 +46,6 @@ unsigned char DspSleepPage(void *  parm)
 		currentpage->LCDInput = Input;
 		currentpage->PageBufferMalloc = PageBufferMalloc;
 		currentpage->PageBufferFree = PageBufferFree;
-		currentpage->tempP = &S_SleepPageBuffer;
 		
 		currentpage->PageInit(currentpage->pram);
 	}

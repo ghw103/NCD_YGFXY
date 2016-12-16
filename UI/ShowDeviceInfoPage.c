@@ -49,7 +49,6 @@ unsigned char DspShowDeviceInfoPage(void *  parm)
 		currentpage->LCDInput = Input;
 		currentpage->PageBufferMalloc = PageBufferMalloc;
 		currentpage->PageBufferFree = PageBufferFree;
-		currentpage->tempP = &S_ShowDeviceInfoPageBuffer;
 		
 		currentpage->PageInit(currentpage->pram);
 	}
@@ -67,35 +66,35 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_ShowDeviceInfoPageBuffer->lcdinput[0] = (S_ShowDeviceInfoPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
 		/*基本信息*/
-		if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1913)
+		if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1a03)
 			S_ShowDeviceInfoPageBuffer->presscount = 0;
 		
-		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1914)
+		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1a04)
 			S_ShowDeviceInfoPageBuffer->presscount++;
 		
-		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1915)
+		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1a05)
 		{
 			if(S_ShowDeviceInfoPageBuffer->presscount > 15)
-				SendKeyCode(1);
+				SendKeyCode(2);
 		}
 		/*获取密码*/
-		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1980)
+		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1a10)
 		{
 			if(pdPASS == CheckStrIsSame(&pbuf[7] , AdminPassWord ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
 			{
 				PageAdvanceTo(DspSetDeviceIDPage, &(S_ShowDeviceInfoPageBuffer->s_deviceinfo));
 			}
 			else
-				SendKeyCode(2);
+				SendKeyCode(1);
 		}
 		/*返回*/
-		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1910)
+		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1a00)
 		{
 			PageBufferFree();
 			PageBackTo(ParentPage);
 		}
 		/*修改*/
-		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1911)
+		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1a01)
 		{
 			PageAdvanceTo(DspSetDeviceInfoPage, &(S_ShowDeviceInfoPageBuffer->s_deviceinfo));
 		}
@@ -150,13 +149,13 @@ static void showDeviceInfo(void)
 	if(S_ShowDeviceInfoPageBuffer)
 	{
 		/*显示设备id*/
-		DisText(0x1930, S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceid, MaxDeviceIDLen);
+		DisText(0x1a40, S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceid, MaxDeviceIDLen);
 			
 		/*显示使用单位*/
-		DisText(0x1950, S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceunit, MaxDeviceUnitLen);
+		DisText(0x1a60, S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceunit, MaxDeviceUnitLen);
 
 		/*显示责任人*/
-		DisText(0x1978, S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceuser.user_name, MaxNameLen);
+		DisText(0x1a90, S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceuser.user_name, MaxNameLen);
 	}
 }
 

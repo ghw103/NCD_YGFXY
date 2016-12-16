@@ -8,6 +8,8 @@
 #include	"MyMem.h"
 #include	"WaittingCardPage.h"
 #include	"MyTest_Data.h"
+#include	"PaiDuiPage.h"
+#include	"CardLimit_Driver.h"
 
 #include	"System_Data.h"
 #include	"TestDataDao.h"
@@ -56,7 +58,6 @@ unsigned char DspTestPage(void *  parm)
 		currentpage->LCDInput = Input;
 		currentpage->PageBufferMalloc = PageBufferMalloc;
 		currentpage->PageBufferFree = PageBufferFree;
-		currentpage->tempP = &S_TestPageBuffer;
 		
 		currentpage->PageInit(currentpage->pram);
 	}
@@ -78,13 +79,27 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		{
 			if(S_TestPageBuffer->cardpretestresult != NoResult)
 			{
+				if(CardPinIn)
+				{
+					SendKeyCode(5);
+					return;
+				}
+				
+				//删除当前测试
 				DeleteCurrentTest();
-
-				PageBufferFree();
-				PageResetToOrigin(DisplayPage);
+				
+				//如果还有卡在排队，则直接跳到排队界面
+				if(IsPaiDuiTestting())
+				{
+					PageResetToOrigin(NoDisplayPage);
+					PageAdvanceTo(DspPaiDuiPage, NULL);
+				}
+				else
+					PageResetToOrigin(DisplayPage);
 			}
+			//正在测试不允许退出
 			else
-				SendKeyCode(7);
+				SendKeyCode(4);
 		}
 		/*打印数据*/
 		else if(0x1800 == S_TestPageBuffer->lcdinput[0])
@@ -95,10 +110,10 @@ static void Input(unsigned char *pbuf , unsigned short len)
 				{
 					SendKeyCode(6);
 					PrintfData(&(S_TestPageBuffer->currenttestdata->testdata));
-					SendKeyCode(9);
+					SendKeyCode(16);
 				}
 				else
-					SendKeyCode(8);
+					SendKeyCode(4);
 			}
 		}
 	}
@@ -127,8 +142,8 @@ static MyState_TypeDef PageInit(void *  parm)
 	
 	SetChartSize(0x1870 , S_TestPageBuffer->line.MUL_Y);
 	
-	DspNum(0x180A , S_TestPageBuffer->line.Y_Scale, 2);
-	DspNum(0x1809 , S_TestPageBuffer->line.Y_Scale*2, 2);
+	DspNum(0x180B , S_TestPageBuffer->line.Y_Scale, 2);
+	DspNum(0x180A , S_TestPageBuffer->line.Y_Scale*2, 2);
 	
 	/*获取当前测试数据的地址*/
 	S_TestPageBuffer->currenttestdata = GetCurrentTestItem();
@@ -180,8 +195,8 @@ static void RefreshCurve(void)
 				
 			SetChartSize(0x1870 , S_TestPageBuffer->line.MUL_Y);
 				
-			DspNum(0x180A , S_TestPageBuffer->line.Y_Scale, 2);
-			DspNum(0x1809 , S_TestPageBuffer->line.Y_Scale*2, 2);
+			DspNum(0x180B , S_TestPageBuffer->line.Y_Scale, 2);
+			DspNum(0x180A , S_TestPageBuffer->line.Y_Scale*2, 2);
 		}
 		else
 			AddDataToLine(temp);
@@ -231,10 +246,10 @@ static void RefreshPageText(void)
 			DisText(0x1820, buf, 20);
 			
 			sprintf(buf, "%2.1f", S_TestPageBuffer->currenttestdata->testdata.TestTemp.O_Temperature);
-			DisText(0x182a, buf, 8);
+			DisText(0x1830, buf, 8);
 			
 			sprintf(buf, "%s", S_TestPageBuffer->currenttestdata->testdata.temperweima.CardPiCi);
-			DisText(0x1830, buf, 30);
+			DisText(0x1840, buf, 30);
 			
 			if(S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult <= S_TestPageBuffer->currenttestdata->testdata.temperweima.LowstResult)
 				sprintf(buf, "<%.3f", S_TestPageBuffer->currenttestdata->testdata.temperweima.LowstResult);
@@ -242,7 +257,7 @@ static void RefreshPageText(void)
 				sprintf(buf, ">%.3f", S_TestPageBuffer->currenttestdata->testdata.temperweima.HighestResult);
 			else
 				sprintf(buf, "%.3f", S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult);
-			DisText(0x1840, buf, 30);
+			DisText(0x1850, buf, 30);
 		}
 	}
 	MyFree(buf);
@@ -277,12 +292,12 @@ static void RefreshPageText(void)
 		tempvalue += 139;										//曲线窗口起始y
 		S_TestPageBuffer->myico[2].Y = (unsigned short)tempvalue - 5;
 		
-		BasicUI(0x1860 ,0x1907 , 3, &(S_TestPageBuffer->myico[0]) , sizeof(Basic_ICO)*3);
+		BasicUI(0x1880 ,0x1907 , 3, &(S_TestPageBuffer->myico[0]) , sizeof(Basic_ICO)*3);
 	}
 	else
 	{
 		memset(S_TestPageBuffer->myico, 0, sizeof(Basic_ICO)*3);
-		BasicUI(0x1860 ,0x1907 , 3, &S_TestPageBuffer->myico[0] , sizeof(Basic_ICO)*3);
+		BasicUI(0x1880 ,0x1907 , 3, &S_TestPageBuffer->myico[0] , sizeof(Basic_ICO)*3);
 	}
 }
 
@@ -318,8 +333,8 @@ static void AddDataToLine(unsigned short data)
 		
 		SetChartSize(0x1870 , S_TestPageBuffer->line.MUL_Y);
 
-		DspNum(0x180A , S_TestPageBuffer->line.Y_Scale, 2);
-		DspNum(0x1809 , S_TestPageBuffer->line.Y_Scale*2, 2);
+		DspNum(0x180B , S_TestPageBuffer->line.Y_Scale, 2);
+		DspNum(0x180A , S_TestPageBuffer->line.Y_Scale*2, 2);
 
 	}
 	DisPlayLine(0 , &tempdata , 1);

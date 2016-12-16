@@ -13,7 +13,6 @@
 #include	"System_Data.h"
 #include 	"Usart4_Driver.h"
 #include 	"usbd_cdc_vcp.h"
-#include	"LwipDebug_Task.h"
 
 #include	"MyMem.h"
 

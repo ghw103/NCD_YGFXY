@@ -48,7 +48,6 @@ unsigned char DspTimeDownNorPage(void *  parm)
 		currentpage->LCDInput = Input;
 		currentpage->PageBufferMalloc = PageBufferMalloc;
 		currentpage->PageBufferFree = PageBufferFree;
-		currentpage->tempP = &S_TimeDownPageData;
 		
 		currentpage->PageInit(currentpage->pram);
 	}
@@ -120,7 +119,7 @@ static void RefreshTimeText(void)
 	if(S_TimeDownPageData)
 	{
 		S_TimeDownPageData->time = timer_surplus(S_TimeDownPageData->S_Timer);
-		DspNum(0x1790 , S_TimeDownPageData->time, 2);
+		DspNum(0x1700 , S_TimeDownPageData->time, 2);
 	}
 }
 

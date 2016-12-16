@@ -653,11 +653,6 @@
               <FilePath>..\Task\CodeScan_Task.c</FilePath>
             </File>
             <File>
-              <FileName>USBCMD_Task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Task\USBCMD_Task.c</FilePath>
-            </File>
-            <File>
               <FileName>SystemUI_Task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Task\SystemUI_Task.c</FilePath>
@@ -712,11 +707,6 @@
               <FileType>1</FileType>
               <FilePath>..\Task\SystemStart_Task.c</FilePath>
             </File>
-            <File>
-              <FileName>LwipDebug_Task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Task\LwipDebug_Task.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -726,11 +716,6 @@
               <FileName>WelcomePage.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\UI\WelcomePage.c</FilePath>
-            </File>
-            <File>
-              <FileName>SelfCheckPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\SelfCheckPage.c</FilePath>
             </File>
             <File>
               <FileName>LunchPage.c</FileName>

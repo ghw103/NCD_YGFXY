@@ -69,25 +69,25 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	pdata[0] = (pdata[0]<<8) + pbuf[5];
 	
 	/*有线网设置*/
-	if(pdata[0] == 0x1C00)
+	if(pdata[0] == 0x1E01)
 	{
 		PageBufferFree();
 		PageAdvanceTo(DspNetSetPage, NULL);
 	}
 	/*wifi设置*/
-	else if(pdata[0] == 0x1C01)
+	else if(pdata[0] == 0x1E02)
 	{
 		PageBufferFree();
 		PageAdvanceTo(DspWifiSetPage, NULL);
 	}
 	//查看网络信息
-	else if(pdata[0] == 0x1C02)
+	else if(pdata[0] == 0x1E03)
 	{
 		PageBufferFree();
 		PageAdvanceTo(DspNetInfoPage, NULL);
 	}
 	/*返回*/
-	else if(pdata[0] == 0x1C03)
+	else if(pdata[0] == 0x1E00)
 	{
 		PageBufferFree();
 		PageBackTo(ParentPage);

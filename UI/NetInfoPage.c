@@ -51,7 +51,6 @@ unsigned char DspNetInfoPage(void *  parm)
 		currentpage->LCDInput = Input;
 		currentpage->PageBufferMalloc = PageBufferMalloc;
 		currentpage->PageBufferFree = PageBufferFree;
-		currentpage->tempP = &S_NetInfoPageBuffer;
 		
 		currentpage->PageInit(currentpage->pram);
 	}

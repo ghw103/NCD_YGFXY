@@ -92,15 +92,8 @@ void GetGB_Time(void * time)
 }
 
 void SetGB_Time(void * time)
-{
-	MyTime_Def * temptime = time;
-	temptime->sec = temptime->sec%60;
-	temptime->min = temptime->min%60;
-	temptime->hour = temptime->hour%24;
-	temptime->day = temptime->day%31;
-	temptime->month = temptime->month%12;
-	
-	memcpy(&GB_Time, temptime, sizeof(MyTime_Def));
+{	
+	memcpy(&GB_Time, time, sizeof(MyTime_Def));
 }
 
 /*********************************************************************************************/

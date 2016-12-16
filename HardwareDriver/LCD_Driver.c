@@ -30,6 +30,7 @@ static unsigned char tempbuf[100];
 /**************************************局部函数声明*************************************************/
 /***************************************************************************************************/
 static void WriteLCDRegister(unsigned char reg, void *data, unsigned char len);
+static void ReadLCDRegister(unsigned char reg, unsigned char len);
 static void WriteLCDData(unsigned short addr, void *data, unsigned char len);
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -72,6 +73,45 @@ static void WriteLCDRegister(unsigned char reg, void *data, unsigned char len)
 		*q++ = *p++;
 	
 	CalModbusCRC16Fun2(txdat+3, len + 2, q);
+	
+	SendDataToQueue(GetUsart6TXQueue(), GetUsart6TXMutex(), txdat, txdat[2]+3, 1, 50 / portTICK_RATE_MS, EnableUsart6TXInterrupt);
+	
+	MyFree(txdat);
+}
+
+/***************************************************************************************************
+*FunctionName: ReadLCDRegister
+*Description: 读取屏幕寄存器值
+*Input: reg -- 寄存器地址
+*		len -- 读取长度
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月12日11:01:48
+***************************************************************************************************/
+static void ReadLCDRegister(unsigned char reg, unsigned char len)
+{			
+	char *q = NULL;
+	unsigned char i=0;
+	
+	txdat = MyMalloc(16);
+	if(txdat == NULL)
+		return;
+	
+	memset(txdat, 0, 16);
+	q = txdat;
+	
+	*q++ = LCD_Head_1;
+	*q++ = LCD_Head_2;
+	*q++ = 1 + 4;
+	
+	*q++ = R_REGSITER;
+	
+	*q++ = reg;
+
+	*q++ = len;
+	
+	CalModbusCRC16Fun2(txdat+3, 1 + 2, q);
 	
 	SendDataToQueue(GetUsart6TXQueue(), GetUsart6TXMutex(), txdat, txdat[2]+3, 1, 50 / portTICK_RATE_MS, EnableUsart6TXInterrupt);
 	
@@ -123,6 +163,20 @@ void SelectPage(unsigned short index)
 	tempbuf[0] = index >> 8;
 	tempbuf[1] = index;
 	WriteLCDRegister(0x03, tempbuf, 2);
+}
+
+/***************************************************************************************************
+*FunctionName: ReadCurrentPageId
+*Description: 读取当前页面id
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月12日11:02:58
+***************************************************************************************************/
+void ReadCurrentPageId(void)
+{
+	ReadLCDRegister(0x03, 2);
 }
 
 /***************************************************************************************************
@@ -281,7 +335,7 @@ void DspTimeAndTempData(void)
 		sprintf(buftime, " 20%02d-%02d-%02d %02d:%02d:%02d", time->year, time->month, time->day,
 			time->hour, time->min, time->sec);
 	
-		DisText(0x1100, buftime, strlen(buftime));
+		DisText(0x1000, buftime, strlen(buftime));
 	}
 
 	MyFree(time);

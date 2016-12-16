@@ -172,14 +172,6 @@ typedef struct CardInfo_Tag
 #pragma pack()
 
 
-#pragma pack(1)
-typedef struct ScanQRTaskData_Tag
-{
-	CardCodeInfo * cardQR;
-	ScanCodeResult scanresult;
-}ScanQRTaskData;
-#pragma pack()
-
 #define	MaxLocation			6500						//最大行程
 #define	StartTestLocation	1250							//测试起始位置
 #define	EndTestLocation		4300						//测试结束为止

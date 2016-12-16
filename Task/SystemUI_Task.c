@@ -12,13 +12,10 @@
 #include	"SystemUI_Task.h"
 #include	"UI_Data.h"
 #include	"LCD_Driver.h"
-#include	"PaiDuiPage.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
 
-#include	"stdio.h"
-#include	"string.h"
 
 /***************************************************************************************************/
 /**************************************局部变量声明*************************************************/
@@ -76,9 +73,6 @@ static void vSystemUITask( void *pvParameters )
 		/*500ms更新一次时间和环境温度*/
 		if(count % 10 == 0)
 			DspTimeAndTempData();
-		
-		if(count % 100 == 0)
-			CheckTime();
 		
 		count++;
 		

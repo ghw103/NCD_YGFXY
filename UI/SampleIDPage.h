@@ -4,6 +4,7 @@
 #include	"Define.h"
 #include	"Timer_Data.h"
 #include	"MyTest_Data.h"
+#include	"UI_Data.h"
 
 typedef struct SampleIDPage_tag {
 	Timer timer;															//一个计时器

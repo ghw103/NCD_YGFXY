@@ -54,7 +54,6 @@ unsigned char DspRecordPage(void *  parm)
 		currentpage->LCDInput = Input;
 		currentpage->PageBufferMalloc = PageBufferMalloc;
 		currentpage->PageBufferFree = PageBufferFree;
-		currentpage->tempP = &S_RecordPageBuffer;
 		
 		currentpage->PageInit(currentpage->pram);
 	}
@@ -72,19 +71,19 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_RecordPageBuffer->lcdinput[0] = (S_RecordPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
 		/*返回*/
-		if(S_RecordPageBuffer->lcdinput[0] == 0x1E00)
+		if(S_RecordPageBuffer->lcdinput[0] == 0x2000)
 		{
 			PageBufferFree();
 			PageBackTo(ParentPage);
 		}
 		//查看
-		else if(S_RecordPageBuffer->lcdinput[0] == 0x1E01)
+		else if(S_RecordPageBuffer->lcdinput[0] == 0x2001)
 		{
 			if((S_RecordPageBuffer->selectindex > 0) && (S_RecordPageBuffer->selectindex <= S_RecordPageBuffer->readTestDataPackage.readDataNum))
 				PageAdvanceTo(DspShowResultPage, &S_RecordPageBuffer->readTestDataPackage.testData[S_RecordPageBuffer->selectindex-1]);
 		}
 		/*上一页*/
-		else if(S_RecordPageBuffer->lcdinput[0] == 0x1E03)
+		else if(S_RecordPageBuffer->lcdinput[0] == 0x2002)
 		{
 			if(S_RecordPageBuffer->pageindex > 1)
 				S_RecordPageBuffer->pageindex -= 1;
@@ -94,7 +93,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			ShowRecord(S_RecordPageBuffer->pageindex);
 		}
 		/*下一页*/
-		else if(S_RecordPageBuffer->lcdinput[0] == 0x1E04)
+		else if(S_RecordPageBuffer->lcdinput[0] == 0x2003)
 		{
 			if(S_RecordPageBuffer->pageindex < S_RecordPageBuffer->maxpagenum)
 				S_RecordPageBuffer->pageindex += 1;
@@ -104,18 +103,18 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			ShowRecord(S_RecordPageBuffer->pageindex);
 		}
 		//选择数据
-		else if((S_RecordPageBuffer->lcdinput[0] >= 0x1E05)&&(S_RecordPageBuffer->lcdinput[0] <= 0x1E0C))
+		else if((S_RecordPageBuffer->lcdinput[0] >= 0x2004)&&(S_RecordPageBuffer->lcdinput[0] <= 0x200b))
 		{
 			
-			S_RecordPageBuffer->tempvalue1 = S_RecordPageBuffer->lcdinput[0] - 0x1E05 + 1;
+			S_RecordPageBuffer->tempvalue1 = S_RecordPageBuffer->lcdinput[0] - 0x2004 + 1;
 			if(S_RecordPageBuffer->tempvalue1 <= S_RecordPageBuffer->readTestDataPackage.readDataNum)
 			{
-				S_RecordPageBuffer->selectindex = (S_RecordPageBuffer->lcdinput[0] - 0x1E05 + 1);
-				BasicPic(0x1E10, 1, 128, 37, 520, 970, 559, 36, 148+(S_RecordPageBuffer->selectindex - 1)*39);
+				S_RecordPageBuffer->selectindex = (S_RecordPageBuffer->lcdinput[0] - 0x2004 + 1);
+				BasicPic(0x2020, 1, 137, 83, 417, 1012, 454, 36, 148+(S_RecordPageBuffer->selectindex - 1)*39);
 			}
 		}
 		//跳页
-		else if(S_RecordPageBuffer->lcdinput[0] == 0x1fb0)
+		else if(S_RecordPageBuffer->lcdinput[0] == 0x2010)
 		{
 			S_RecordPageBuffer->tempvalue1 = strtol((char *)(&pbuf[7]), NULL, 10);
 			if( (S_RecordPageBuffer->tempvalue1 > 0) && (S_RecordPageBuffer->tempvalue1 <= S_RecordPageBuffer->maxpagenum))
@@ -200,7 +199,7 @@ static MyState_TypeDef ShowRecord(unsigned char pageindex)
 		S_RecordPageBuffer->maxpagenum = ((S_RecordPageBuffer->readTestDataPackage.testDataHead.datanum % DataShowNumInPage) == 0)?(S_RecordPageBuffer->readTestDataPackage.testDataHead.datanum / DataShowNumInPage):
 		((S_RecordPageBuffer->readTestDataPackage.testDataHead.datanum / DataShowNumInPage)+1);
 		
-		BasicPic(0x1E10, 0, 100, 39, 522, 968, 556, 39, 140+(S_RecordPageBuffer->selectindex)*36);
+		BasicPic(0x2020, 0, 100, 39, 522, 968, 556, 39, 140+(S_RecordPageBuffer->selectindex)*36);
 		
 		S_RecordPageBuffer->tempdata = &(S_RecordPageBuffer->readTestDataPackage.testData[0]);
 		for(i=0; i<DataShowNumInPage; i++)
@@ -214,10 +213,10 @@ static MyState_TypeDef ShowRecord(unsigned char pageindex)
 				S_RecordPageBuffer->tempdata->TestTime.hour, S_RecordPageBuffer->tempdata->TestTime.min, S_RecordPageBuffer->tempdata->TestTime.sec,
 				S_RecordPageBuffer->tempdata->user.user_name);
 				
-				DisText(0x1e20+(i)*0x30, S_RecordPageBuffer->buf, 95);
+				DisText(0x2030+(i)*0x40, S_RecordPageBuffer->buf, 120);
 			}
 			else
-				ClearText(0x1e20+(i)*0x30, 95);
+				ClearText(0x2030+(i)*0x40, 120);
 			
 			S_RecordPageBuffer->tempdata++;
 		}

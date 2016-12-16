@@ -6,6 +6,7 @@
 #define	MaxSendDataLen		xTxQueue6_Len-20							//发给屏幕的数据最大长度
 
 void SelectPage(unsigned short index);
+void ReadCurrentPageId(void);
 void DisText(unsigned short addr, void *data, unsigned short len);
 void ClearText(unsigned short addr, unsigned short len);
 void WriteRadioData(unsigned short addr, void *data, unsigned short len);

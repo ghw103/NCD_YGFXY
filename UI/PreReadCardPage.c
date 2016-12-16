@@ -62,7 +62,6 @@ unsigned char DspPreReadCardPage(void *  parm)
 		currentpage->LCDInput = Input;
 		currentpage->PageBufferMalloc = PageBufferMalloc;
 		currentpage->PageBufferFree = PageBufferFree;
-		currentpage->tempP = &S_PreReadPageBuffer;
 		
 		currentpage->PageInit(currentpage->pram);
 	}
@@ -80,8 +79,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_PreReadPageBuffer->lcdinput[0] = (S_PreReadPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
 		/*二维码读取失败，过期，已使用*/
-		if((S_PreReadPageBuffer->lcdinput[0] == 0x1500) || (S_PreReadPageBuffer->lcdinput[0] == 0x1501) || (S_PreReadPageBuffer->lcdinput[0] == 0x1502)
-			|| (S_PreReadPageBuffer->lcdinput[0] == 0x1504) || (S_PreReadPageBuffer->lcdinput[0] == 0x1505))
+		if((S_PreReadPageBuffer->lcdinput[0] >= 0x1400) && (S_PreReadPageBuffer->lcdinput[0] <= 0x1404))
 		{
 			/*数据*/
 			S_PreReadPageBuffer->lcdinput[1] = pbuf[7];
@@ -100,31 +98,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 				
 				PageBufferFree();
 
-				PageBackTo(ParentPage);
-			}
-		}
-		/*排队模式，与之前注册的卡id不同*/
-		else if(S_PreReadPageBuffer->lcdinput[0] == 0x1503)
-		{
-			/*数据*/
-			S_PreReadPageBuffer->lcdinput[1] = pbuf[7];
-			S_PreReadPageBuffer->lcdinput[1] = (S_PreReadPageBuffer->lcdinput[1]<<8) + pbuf[8];
-			
-			/*取消测试*/
-			if(S_PreReadPageBuffer->lcdinput[1] == 0x0000)
-			{
-				DeleteCurrentTest();
-				
-				PageBufferFree();
-				PageBackTo(ParentPage);
-			}
-			/*继续测试*/
-			else if(S_PreReadPageBuffer->lcdinput[1] == 0x0001)
-			{
-				DeleteCurrentTest();
-				
-				PageBufferFree();
-				PageBackTo(ParentPage);
+				PageResetToOrigin(DisplayPage);
 			}
 		}
 	}
@@ -142,10 +116,10 @@ static MyState_TypeDef PageInit(void *  parm)
 	if(My_Pass == PageBufferMalloc())
 	{
 		/*清除界面*/
-		ClearText(0x1520, 30);
-		ClearText(0x1530, 30);
-		ClearText(0x1540, 10);
-		ClearText(0x1545, 20);
+		ClearText(0x1420, 30);
+		ClearText(0x1430, 30);
+		ClearText(0x1440, 10);
+		ClearText(0x1450, 30);
 		
 		S_PreReadPageBuffer->currenttestdata = GetCurrentTestItem();
 		
@@ -186,7 +160,7 @@ static MyState_TypeDef PageBufferFree(void)
 static void CheckQRCode(void)
 {
 	if((S_PreReadPageBuffer) && (My_Pass == TakeScanQRCodeResult(&(S_PreReadPageBuffer->scancode))))
-	{
+	{		
 		if((S_PreReadPageBuffer->scancode == CardCodeScanFail) || (S_PreReadPageBuffer->scancode == CardCodeCardOut) ||
 			(S_PreReadPageBuffer->scancode == CardCodeScanTimeOut) || (S_PreReadPageBuffer->scancode == CardCodeCRCError))
 		{
@@ -196,7 +170,7 @@ static void CheckQRCode(void)
 		}
 		else if(S_PreReadPageBuffer->scancode == CardCodeTimeOut)
 		{
-			SendKeyCode(2);
+			SendKeyCode(4);
 			MotorMoveTo(MaxLocation, 1);
 			AddNumOfSongToList(21, 0);
 		}
@@ -214,7 +188,7 @@ static void CheckQRCode(void)
 				memcpy(&(S_PreReadPageBuffer->currenttestdata->testdata.temperweima), &(S_PreReadPageBuffer->temperweima), sizeof(CardCodeInfo));
 				
 				//设置倒计时时间
-				timer_set(&(S_PreReadPageBuffer->currenttestdata->timer), S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardWaitTime*4);
+				timer_set(&(S_PreReadPageBuffer->currenttestdata->timer), S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardWaitTime*20);
 			
 				//读取校准参数
 				memcpy(S_PreReadPageBuffer->currenttestdata->testdata.tempadjust.ItemName, S_PreReadPageBuffer->currenttestdata->testdata.temperweima.ItemName, ItemNameLen);
@@ -227,7 +201,10 @@ static void CheckQRCode(void)
 			{
 				//校验试机卡编号
 				if(pdFAIL == CheckStrIsSame(S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardPiCi, S_PreReadPageBuffer->temperweima.CardPiCi, CardPiCiHaoLen))
-					SendKeyCode(4);
+				{
+					SendKeyCode(2);
+					MotorMoveTo(MaxLocation, 1);
+				}
 				else
 				{
 					PageBufferFree();
@@ -245,13 +222,13 @@ static void CheckPreTestCard(void)
 	{
 		if(S_PreReadPageBuffer->cardpretestresult == TestInterrupt)
 		{
-			SendKeyCode(5);
+			SendKeyCode(1);
 			MotorMoveTo(MaxLocation, 1);
 			AddNumOfSongToList(22, 0);
 		}
 	/*	else if(S_PreReadPageBuffer->cardpretestresult == NoSample)
 		{
-			SendKeyCode(6);
+			SendKeyCode(5);
 			MotorMoveTo(GetGB_MotorMaxLocation(), 1);
 			AddNumOfSongToList(22, 0);
 		}*/
@@ -291,20 +268,20 @@ static void CheckPreTestCard(void)
 static void ShowCardInfo(void)
 {
 	sprintf(S_PreReadPageBuffer->buf, "%s", S_PreReadPageBuffer->temperweima.ItemName);
-	DisText(0x1520, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
+	DisText(0x1420, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
 			
 	sprintf(S_PreReadPageBuffer->buf, "%s", S_PreReadPageBuffer->temperweima.CardPiCi);
-	DisText(0x1530, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
+	DisText(0x1430, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
 			
 	sprintf(S_PreReadPageBuffer->buf, "%d", S_PreReadPageBuffer->temperweima.CardWaitTime*60);
-	DisText(0x1540, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
+	DisText(0x1440, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
 			
 	sprintf(S_PreReadPageBuffer->buf, "20%02d年%02d月%02d日", S_PreReadPageBuffer->temperweima.CardBaoZhiQi.year, S_PreReadPageBuffer->temperweima.CardBaoZhiQi.month,
 		S_PreReadPageBuffer->temperweima.CardBaoZhiQi.day);
-	DisText(0x1545, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
+	DisText(0x1450, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
 	
 	sprintf(S_PreReadPageBuffer->buf, "%2.1f", S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.O_Temperature);
-	DisText(0x1550, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
+	DisText(0x1460, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
 }
 
 

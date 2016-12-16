@@ -191,6 +191,30 @@ MyState_TypeDef GetCurrentPage(PageInfo ** pageinfo)
 		return My_Fail;
 }
 
+/***************************************************************************************************
+*FunctionName: GetParentPage
+*Description: 读取当前页面的父页面
+*Input: pageinfo -- 当前页面数据存放地址
+*Output: None
+*Return: My_Fail -- 失败
+*		My_Pass -- 成功
+*Author: xsx
+*Date: 2016年12月7日16:03:09
+***************************************************************************************************/
+unsigned char (*GetParentPage(void))(void* pram)
+{
+	PageStackNode * tempnode = GB_PageLinkStack.top;
+	
+	if(tempnode)
+	{
+		if(tempnode->lastpagenode)
+		{
+			return tempnode->lastpagenode->pageinfo->CurrentPage;
+		}
+	}
+	
+	return NULL;
+}
 
 /*###################################################################################################
 #########################################链栈的基本操作##############################################
@@ -273,7 +297,7 @@ static MyState_TypeDef PageLinkStackPush(PageLinkStack * s_linkstack, PageInfo *
 	pagenode = MyMalloc(sizeof(PageStackNode));
 	
 	if(pagenode)
-	{
+	{		
 		pagenode->pageinfo = pageinfo;
 		pagenode->lastpagenode = s_linkstack->top;
 		
@@ -307,6 +331,13 @@ static MyState_TypeDef PageLinkStackPop(PageLinkStack * s_linkstack, PageInfo **
 	//不空
 	else
 	{
+		//删除当前页面的数据空间
+		if(s_linkstack->top)
+		{
+			if(s_linkstack->top->pageinfo->PageBufferFree)
+				s_linkstack->top->pageinfo->PageBufferFree();
+		}
+		
 		pagenode = s_linkstack->top;
 		*pageinfo = pagenode->pageinfo;
 		

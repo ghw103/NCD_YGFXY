@@ -17,6 +17,14 @@
 /*****************************************局部变量声明*************************************/
 const char wavfilename[63][20]=
 {
+	"0:/Audio/ncd_1.wav\0",
+	"0:/Audio/ncd_2.wav\0",
+	"0:/Audio/ncd_3.wav\0",
+	"0:/Audio/ncd_4.wav\0",
+	"0:/Audio/ncd_5.wav\0",
+	"0:/Audio/ncd_6.wav\0",
+	"0:/Audio/ncd_7.wav\0",
+	"0:/Audio/ncd_8.wav\0",
 	"0:/Audio/ncd_9.wav\0",
 	"0:/Audio/ncd_10.wav\0",
 	"0:/Audio/ncd_11.wav\0",

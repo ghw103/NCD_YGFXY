@@ -48,7 +48,6 @@ unsigned char DspOtherSetPage(void *  parm)
 		currentpage->LCDInput = Input;
 		currentpage->PageBufferMalloc = PageBufferMalloc;
 		currentpage->PageBufferFree = PageBufferFree;
-		currentpage->tempP = &S_OtherSetPageBuffer;
 		
 		currentpage->PageInit(currentpage->pram);
 	}
@@ -66,18 +65,18 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_OtherSetPageBuffer->lcdinput[0] = (S_OtherSetPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
 		/*重启*/
-		if(S_OtherSetPageBuffer->lcdinput[0] == 0x2c00)
+		if(S_OtherSetPageBuffer->lcdinput[0] == 0x2400)
 		{
 			while(1);
 		}
 		/*返回*/
-		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2c01)
+		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2401)
 		{
 			PageBufferFree();
 			PageBackTo(ParentPage);
 		}
 		/*设置时间*/
-		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2c20)
+		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2410)
 		{
 			SetGB_Time((char *)(&pbuf[7]), GetBufLen(&pbuf[7] , 2*pbuf[6]));
 		}
@@ -94,7 +93,7 @@ static MyState_TypeDef PageInit(void *  parm)
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
 	
-	SelectPage(94);
+	SelectPage(122);
 	
 	return My_Pass;
 }

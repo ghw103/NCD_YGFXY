@@ -52,7 +52,6 @@ unsigned char DspWaittingCardPage(void *  parm)
 		currentpage->LCDInput = Input;
 		currentpage->PageBufferMalloc = PageBufferMalloc;
 		currentpage->PageBufferFree = PageBufferFree;
-		currentpage->tempP = &S_WaitPageData;
 		
 		currentpage->PageInit(currentpage->pram);
 	}
@@ -70,17 +69,10 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_WaitPageData->lcdinput[0] = (S_WaitPageData->lcdinput[0]<<8) + pbuf[5];
 		
 		/*返回*/
-		if(S_WaitPageData->lcdinput[0] == 0x1450)
+		if(S_WaitPageData->lcdinput[0] == 0x1303)
 		{
 			PageBufferFree();
 			PageBackTo(ParentPage);
-		}
-		
-		/*查看操作规程*/
-		else if(S_WaitPageData->lcdinput[0] == 0x1451)
-		{
-			PageBufferFree();
-			PageAdvanceTo(DspOperGuidePage, NULL);
 		}
 	}
 }
@@ -89,6 +81,14 @@ static void PageUpDate(void)
 {
 	if(S_WaitPageData)
 	{
+		
+		/*提示插卡*/
+		if(TimeOut == timer_expired(&(S_WaitPageData->timer2)))
+		{
+			AddNumOfSongToList(43, 0);
+			timer_restart(&(S_WaitPageData->timer2));
+		}
+		
 		/*是否插卡*/
 		if(GetCardState() == CardIN)
 		{
@@ -105,12 +105,7 @@ static void PageUpDate(void)
 			PageBackTo(ParentPage);
 		}
 		
-		/*提示插卡*/
-		if(TimeOut == timer_expired(&(S_WaitPageData->timer2)))
-		{
-			AddNumOfSongToList(43, 0);
-			timer_restart(&(S_WaitPageData->timer2));
-		}
+		
 	}
 }
 

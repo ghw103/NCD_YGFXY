@@ -50,7 +50,6 @@ unsigned char DspNetSetPage(void *  parm)
 		currentpage->LCDInput = Input;
 		currentpage->PageBufferMalloc = PageBufferMalloc;
 		currentpage->PageBufferFree = PageBufferFree;
-		currentpage->tempP = &S_NetSetPageBuffer;
 		
 		currentpage->PageInit(currentpage->pram);
 	}
@@ -68,7 +67,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		S_NetSetPageBuffer->lcdinput[0] = (S_NetSetPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
 		/*有线网的ip获取模式*/
-		if(S_NetSetPageBuffer->lcdinput[0] == 0x1C09)
+		if(S_NetSetPageBuffer->lcdinput[0] == 0x1E09)
 		{
 			/*数据*/
 			S_NetSetPageBuffer->lcdinput[1] = pbuf[7];
@@ -87,7 +86,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			}
 		}
 		/*设置IP*/
-		else if(S_NetSetPageBuffer->lcdinput[0] == 0x1C10)
+		else if(S_NetSetPageBuffer->lcdinput[0] == 0x1E10)
 		{
 			if(S_NetSetPageBuffer)
 			{
@@ -96,7 +95,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			}
 		}
 		/*确认修改*/
-		else if(S_NetSetPageBuffer->lcdinput[0] == 0x1C05)
+		else if(S_NetSetPageBuffer->lcdinput[0] == 0x1E05)
 		{
 			if(S_NetSetPageBuffer)
 			{
@@ -113,7 +112,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			}
 		}
 		/*返回*/
-		else if(S_NetSetPageBuffer->lcdinput[0] == 0x1C04)
+		else if(S_NetSetPageBuffer->lcdinput[0] == 0x1E04)
 		{
 			PageBufferFree();
 			PageBackTo(ParentPage);
@@ -183,16 +182,16 @@ static void UpPageValue(void)
 		else
 			S_NetSetPageBuffer->buf[0] = 0x00;
 
-		WriteRadioData(0x1C09, S_NetSetPageBuffer->buf, 2);
+		WriteRadioData(0x1E09, S_NetSetPageBuffer->buf, 2);
 		
 		/*更新ip*/
 		if(S_NetSetPageBuffer->myNetData.ipmode == User_Mode)
 		{
 			sprintf((S_NetSetPageBuffer->buf), "%03d.%03d.%03d.%03d", S_NetSetPageBuffer->myNetData.myip.ip_1, S_NetSetPageBuffer->myNetData.myip.ip_2, S_NetSetPageBuffer->myNetData.myip.ip_3, S_NetSetPageBuffer->myNetData.myip.ip_4);
-			DisText(0x1C10, S_NetSetPageBuffer->buf, strlen((S_NetSetPageBuffer->buf)));
+			DisText(0x1E10, S_NetSetPageBuffer->buf, strlen((S_NetSetPageBuffer->buf)));
 		}
 		else
-			ClearText(0x1C10, 15);
+			ClearText(0x1E10, 15);
 	}
 }
 
