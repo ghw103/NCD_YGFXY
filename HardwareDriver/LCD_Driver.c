@@ -180,6 +180,20 @@ void ReadCurrentPageId(void)
 }
 
 /***************************************************************************************************
+*FunctionName: ReadLcdSoftVersion
+*Description: 读取屏幕的软件版本
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月19日14:40:12
+***************************************************************************************************/
+void ReadLcdSoftVersion(void)
+{
+	ReadLCDRegister(0x00, 1);
+}
+
+/***************************************************************************************************
 *FunctionName：SendKeyCode
 *Description：键控功能
 *Input：None

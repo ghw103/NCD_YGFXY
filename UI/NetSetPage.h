@@ -2,9 +2,11 @@
 #define __NETSET_P_H__
 
 #include	"Define.h"
+#include	"SystemSet_Data.h"
 
 typedef struct NetSetPageBuffer_tag {
-	NetData myNetData;
+	NetSet myNetSet;
+	SystemSetData mySystemSetData;
 	char buf[100];
 	unsigned char ischanged;
 	unsigned short lcdinput[100];

@@ -703,11 +703,6 @@
               <FilePath>..\Task\LwipServerForLab_Task.c</FilePath>
             </File>
             <File>
-              <FileName>ReadBarCode_Task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Task\ReadBarCode_Task.c</FilePath>
-            </File>
-            <File>
               <FileName>SystemStart_Task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Task\SystemStart_Task.c</FilePath>
@@ -892,20 +887,25 @@
               <FileType>1</FileType>
               <FilePath>..\Datas\NetInfo_Data.c</FilePath>
             </File>
+            <File>
+              <FileName>SystemSet_Data.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Datas\SystemSet_Data.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>Daos</GroupName>
           <Files>
             <File>
-              <FileName>DeviceDao.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Daos\DeviceDao.c</FilePath>
-            </File>
-            <File>
               <FileName>TestDataDao.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Daos\TestDataDao.c</FilePath>
+            </File>
+            <File>
+              <FileName>SystemSet_Dao.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Daos\SystemSet_Dao.c</FilePath>
             </File>
           </Files>
         </Group>

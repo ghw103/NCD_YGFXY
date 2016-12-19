@@ -93,8 +93,6 @@ static void prvweb_ParseHTMLRequest( struct netconn *pxNetCon )
 	struct netbuf *pxRxBuffer;
 	err_t err;
 	static char buf[100];
-	unsigned char i=0;
-
 	/* We expect to immediately get data. */
 	err = netconn_recv( pxNetCon, &pxRxBuffer);
 	

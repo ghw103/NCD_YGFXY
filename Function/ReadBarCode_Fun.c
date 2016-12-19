@@ -14,19 +14,16 @@
 
 #include	"QueueUnits.h"
 
-#include	"System_Data.h"
-
 #include	<string.h>
 #include	"stdio.h"
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
-static xSemaphoreHandle xBarCodeSemaphore;													//读取到条码，通知
-static char S_BarCode[100];
+
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
-static void SendBarCodeSemaphore(void);
+
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -34,43 +31,42 @@ static void SendBarCodeSemaphore(void);
 /***************************************************************************************************/
 /***************************************************************************************************/
 
-void ReadBarCodeFunction(void)
+/***************************************************************************************************
+*FunctionName: ReadBarCodeFunction
+*Description: 读取条码枪的数据
+*Input: codebuf -- 数据保存地址
+*		len -- 要读取的数据长度
+*Output: 
+*Return: 成功读取数据的长度
+*Author: xsx
+*Date: 2016年12月16日16:00:36
+***************************************************************************************************/
+unsigned char ReadBarCodeFunction(char * codebuf, unsigned char len)
 {
+	unsigned char rxlen = 0;
 	
-	memset(S_BarCode, 0, 100);
-	
-	ReceiveDataFromQueue(GetUsart1RXQueue(), GetUsart1RXMutex(), S_BarCode, 100, 1, 10 / portTICK_RATE_MS);	
-	
-	if(strlen(S_BarCode) > 1)
+	if(codebuf)
 	{
-		if(S_BarCode[strlen(S_BarCode)-1] == 0x0d)
-			S_BarCode[strlen(S_BarCode)-1] = 0;
+		memset(codebuf, 0, len);
 		
-		SetGB_BarCode(S_BarCode);
+		ReceiveDataFromQueue(GetUsart1RXQueue(), GetUsart1RXMutex(), codebuf, len, 1, 20 / portTICK_RATE_MS);	
 		
-		memset(S_BarCode, 0, 100);
+		rxlen = strlen(codebuf);
 		
-		SendBarCodeSemaphore();
+		if(rxlen > 1)
+		{
+			if(codebuf[rxlen-1] == 0x0d)
+			{
+				codebuf[rxlen-1] = 0;
+				rxlen -= 1;
+				
+				return rxlen;
+			}
+		}
 	}
+	
+	return 0;
 }
 
-MyState_TypeDef CheckBarCodeHasRead(void)
-{
-	if(NULL == xBarCodeSemaphore)
-		vSemaphoreCreateBinary(xBarCodeSemaphore);
-	
-	if(pdPASS == xSemaphoreTake(xBarCodeSemaphore, 10 / portTICK_RATE_MS))
-		return My_Pass;
-	else
-		return My_Fail;
-}
-
-static void SendBarCodeSemaphore(void)
-{
-	if(NULL == xBarCodeSemaphore)
-		vSemaphoreCreateBinary(xBarCodeSemaphore);
-	
-	xSemaphoreGive(xBarCodeSemaphore);
-}
 
 /****************************************end of file************************************************/

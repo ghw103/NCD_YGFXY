@@ -10,13 +10,10 @@
 /***************************************************************************************************/
 #include	"UpLoad_Fun.h"
 #include	"ServerFun.h"
-#include	"SDFunction.h"
-#include	"System_Data.h"
 #include	"RTC_Driver.h"
-#include	"DeviceDao.h"
-#include	"NetInfo_Data.h"
+#include	"SystemSet_Data.h"
+#include	"SystemSet_Dao.h"
 
-#include	"cJSON.h"
 #include	"MyMem.h"
 #include	"CRC16.h"
 
@@ -81,30 +78,32 @@ void UpLoadFunction(void)
 static MyState_TypeDef ReadTime(void)
 {
 	char * buf = NULL;
-	DeviceInfo * deviceinfo = NULL;
+	SystemSetData * systemSetData = NULL;
 	MyState_TypeDef status = My_Fail;
 	
 	buf = MyMalloc(100);
-	deviceinfo = MyMalloc(sizeof(DeviceInfo));
+	systemSetData = MyMalloc(sizeof(SystemSetData));
 	
-	if(buf && deviceinfo)
+	if(buf && systemSetData)
 	{
 		memset(buf, 0, 100);
 		
-		//读取设备信息
-		ReadDeviceInfo(deviceinfo);
+		getSystemSetData(systemSetData);
 		
-		sprintf(buf, "deviceBean.id=%s", deviceinfo->deviceid);
-		
-		if(My_Pass == UpLoadData("/NCD_YGFXY_Server/rtime.action", buf, strlen(buf)))
+		if(systemSetData->crc == CalModbusCRC16Fun1(systemSetData, sizeof(SystemSetData) - 2))
 		{
-			//RTC_SetTimeData2(buf+10);
-			SetGB_LineNetStatus(1);
-			status = My_Pass;
+			sprintf(buf, "deviceBean.id=%s", systemSetData->deviceInfo.deviceid);
+		
+			if(My_Pass == UpLoadData("/NCD_YGFXY_Server/rtime.action", buf, strlen(buf)))
+			{
+				//RTC_SetTimeData2(buf+10);
+				//SetGB_LineNetStatus(1);
+				status = My_Pass;
+			}
 		}
 	}
 	MyFree(buf);
-	MyFree(deviceinfo);
+	MyFree(systemSetData);
 	
 	return status;
 }
@@ -113,46 +112,49 @@ static MyState_TypeDef UpLoadDeviceInfo(void)
 {
 	MyState_TypeDef status = My_Fail;
 
-	DeviceInfo * deviceinfo = NULL;
+	SystemSetData * systemSetData = NULL;
 	char * buf = NULL;
 	static unsigned char i=0;
 	
-	deviceinfo = MyMalloc(sizeof(DeviceInfo));
+	systemSetData = MyMalloc(sizeof(SystemSetData));
 	
-	if(deviceinfo)
+	if(systemSetData)
 	{
-		//读取设备信息
-		ReadDeviceInfo(deviceinfo);
+		getSystemSetData(systemSetData);
 		
-		//如果有更新
-		if(1 == deviceinfo->isnew)
+		if(systemSetData->crc == CalModbusCRC16Fun1(systemSetData, sizeof(SystemSetData) - 2)) 
 		{
-			buf = MyMalloc(2048);
-			
-			if(buf)
+			if(systemSetData->deviceInfo.isnew)
 			{
-				memset(buf, 0, 2048);
-
-				sprintf(buf, "deviceBean.id=%s&deviceBean.daddr=%s&deviceBean.name=%s&deviceBean.age=%s&deviceBean.sex=%s&deviceBean.phone=%s&deviceBean.job=%s&deviceBean.dsc=%s&deviceBean.disok=true",
-					deviceinfo->deviceid,  deviceinfo->deviceunit, deviceinfo->deviceuser.user_name, deviceinfo->deviceuser.user_age+i, deviceinfo->deviceuser.user_sex,
-					deviceinfo->deviceuser.user_phone, deviceinfo->deviceuser.user_job, deviceinfo->deviceuser.user_desc);
+				buf = MyMalloc(2048);
 				
-				if(My_Pass == UpLoadData("/NCD_YGFXY_Server/d_info.action", buf, strlen(buf)))
+				if(buf)
 				{
-					i++;
-					deviceinfo->isnew = 0;
-					SaveDeviceInfo(deviceinfo);
+					memset(buf, 0, 2048);
+
+					sprintf(buf, "deviceBean.id=%s&deviceBean.daddr=%s&deviceBean.name=%s&deviceBean.age=%s&deviceBean.sex=%s&deviceBean.phone=%s&deviceBean.job=%s&deviceBean.dsc=%s&deviceBean.disok=true",
+						systemSetData->deviceInfo.deviceid,  systemSetData->deviceInfo.deviceunit, systemSetData->deviceInfo.deviceuser.user_name, systemSetData->deviceInfo.deviceuser.user_age+i, 
+						systemSetData->deviceInfo.deviceuser.user_sex,	systemSetData->deviceInfo.deviceuser.user_phone, systemSetData->deviceInfo.deviceuser.user_job, systemSetData->deviceInfo.deviceuser.user_desc);
 					
-					status = My_Pass;
+					if(My_Pass == UpLoadData("/NCD_YGFXY_Server/d_info.action", buf, strlen(buf)))
+					{
+						i++;
+						systemSetData->deviceInfo.isnew = false ;
+						
+						if(My_Pass == SaveSystemSetData(systemSetData))
+						{
+							setSystemSetData(systemSetData);
+							status = My_Pass;
+						}
+					}
+					MyFree(buf);
 				}
-				
-				MyFree(buf);
 			}
+			else
+				status = My_Pass;
 		}
-		else
-			status = My_Pass;
 		
-		MyFree(deviceinfo);
+		MyFree(systemSetData);
 		
 		return status;
 	}

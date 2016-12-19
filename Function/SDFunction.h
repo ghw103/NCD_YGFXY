@@ -4,16 +4,9 @@
 #include	"Define.h"
 #include	"MyTest_Data.h"
 
-MyState_TypeDef CheckSDFunction(void);
-
 /*读写操作人*/
 MyState_TypeDef SaveUserData(User_Type * user);
 MyState_TypeDef ReadUserData(User_Type * user);
-
-
-/*ip设置*/
-MyState_TypeDef SaveNetData(NetData * netdata);
-MyState_TypeDef ReadNetData(NetData * netdata);
 
 /*WIFI设置*/
 MyState_TypeDef SaveWifiData(WIFI_Def * wifi);

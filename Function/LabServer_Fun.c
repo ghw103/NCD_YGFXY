@@ -12,7 +12,7 @@
 #include	"LabServer_Fun.h"
 #include	"Test_Fun.h"
 #include	"Test_Task.h"
-#include	"DeviceDao.h"
+#include	"SystemSet_Dao.h"
 
 #include	"System_Data.h"
 #include	"CRC16.h"
@@ -93,7 +93,7 @@ static void ProcessCMD(unsigned char *buf, unsigned short len, struct netconn *p
 			if(deviceinfo)
 			{
 				//读取设备信息
-				ReadDeviceInfo(deviceinfo);
+				getDeviceInfo(deviceinfo);
 				sprintf(pxbuf1, "{\"deviceid\":\"%s\",\"devicestatus\":%d}", deviceinfo->deviceid, GetTestStatusFlorLab());
 			}
 			MyFree(deviceinfo);

@@ -20,11 +20,12 @@
 #include	"Motor_Data.h"
 #include	"CardLimit_Driver.h"
 #include	"DRV8825_Driver.h"
-#include	"System_Data.h"
+#include	"SystemSet_Data.h"
 
-#include	"DeviceDao.h"
+#include	"SystemSet_Dao.h"
 #include	"SelfCheck_Data.h"
 #include	"MyMem.h"
+#include	"CRC16.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -45,7 +46,7 @@ static MyState_TypeDef ADDASelfTest(void);
 
 static MyState_TypeDef MotorSelfTest(void);
 
-static void GB_DataInit(void);
+static MyState_TypeDef GB_DataInit(void);
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************正文********************************************************/
@@ -66,9 +67,6 @@ void SelfTest_Function(void)
 	vTaskDelay(50 *portTICK_RATE_MS);
 	
 //	ErWeiMaSelfTest();
-	
-	CheckSDFunction();
-	vTaskDelay(50 * portTICK_RATE_MS);
 	
 //	WIFICheck();
 	vTaskDelay(50 * portTICK_RATE_MS);
@@ -178,28 +176,39 @@ static MyState_TypeDef MotorSelfTest(void)
 }
 
 
-static void GB_DataInit(void)
+static MyState_TypeDef GB_DataInit(void)
 {
-	NetData *mynetdata = NULL;
-	DeviceInfo *mydeviceinfo;
+	SystemSetData * systemSetData = NULL;
+	MyState_TypeDef status = My_Fail;
 	
-	mynetdata = MyMalloc(sizeof(NetData));
+	systemSetData = MyMalloc(sizeof(SystemSetData));
 	
-	mydeviceinfo = MyMalloc(sizeof(DeviceInfo));
-	
-	if(mynetdata && mydeviceinfo)
+	if(systemSetData)
 	{
-		memset(mynetdata, 0, sizeof(NetData));
-		memset(mydeviceinfo, 0, sizeof(DeviceInfo));
+		//读取SD卡中的配置文件
+		ReadSystemSetData(systemSetData);
 		
-		//读取系统网络配置
-		ReadNetData(mynetdata);
-		SetGB_NetConfigureData(mynetdata);
-
-		//读取设备信息
-		ReadDeviceInfo(mydeviceinfo);
+		//如果crc错误表示配置文件出错，需要使用默认配置
+		if(systemSetData->crc != CalModbusCRC16Fun1(systemSetData, sizeof(SystemSetData) - 2))
+		{
+			//恢复默认设置
+			setDefaultSetData(systemSetData);
+			
+			//保存默认设置
+			if(My_Pass == SaveSystemSetData(systemSetData))
+			{
+				setSystemSetData(systemSetData);
+				status = My_Pass;
+			}
+		}
+		else
+		{
+			setSystemSetData(systemSetData);
+			status = My_Pass;
+		}
 	}
 	
-	MyFree(mynetdata);
-	MyFree(mydeviceinfo);
+	MyFree(systemSetData);
+	
+	return status;
 }

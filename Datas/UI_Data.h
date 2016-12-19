@@ -14,9 +14,6 @@ typedef struct PageInfo_Tag
 	MyState_TypeDef (*PageInit)(void * pram);
 	MyState_TypeDef (*PageBufferMalloc)(void);
 	MyState_TypeDef (*PageBufferFree)(void);
-	
-	unsigned char (*ParentPage)(void *  parm);
-	unsigned char (*ChildPage)(void *  parm);
 }PageInfo;
 #pragma pack()
 

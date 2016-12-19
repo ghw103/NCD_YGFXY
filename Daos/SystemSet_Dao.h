@@ -1,13 +1,11 @@
 /****************************************file start****************************************************/
-#ifndef DEVICEDAO_H_H
-#define DEVICEDAO_H_H
+#ifndef	SYSTEMSET_DAO_H
+#define	SYSTEMSET_DAO_H
 
-#include	"Define.h"
+#include	"SystemSet_Data.h"
 
-
-/*读写设备信息*/
-MyState_TypeDef SaveDeviceInfo(DeviceInfo * deviceinfo);
-MyState_TypeDef ReadDeviceInfo(DeviceInfo * deviceinfo);
+MyState_TypeDef SaveSystemSetData(SystemSetData * systemSetData);
+MyState_TypeDef ReadSystemSetData(SystemSetData * systemSetData);
 
 #endif
 

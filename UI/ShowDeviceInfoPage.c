@@ -10,10 +10,8 @@
 #include	"LCD_Driver.h"
 
 #include	"UI_Data.h"
-
+#include	"SystemSet_Dao.h"
 #include	"MyMem.h"
-#include	"SDFunction.h"
-#include	"DeviceDao.h"
 #include	"MyTools.h"
 
 #include	<string.h>
@@ -82,7 +80,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		{
 			if(pdPASS == CheckStrIsSame(&pbuf[7] , AdminPassWord ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
 			{
-				PageAdvanceTo(DspSetDeviceIDPage, &(S_ShowDeviceInfoPageBuffer->s_deviceinfo));
+				PageAdvanceTo(DspSetDeviceIDPage, NULL);
 			}
 			else
 				SendKeyCode(1);
@@ -90,13 +88,12 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		/*返回*/
 		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1a00)
 		{
-			PageBufferFree();
 			PageBackTo(ParentPage);
 		}
 		/*修改*/
 		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1a01)
 		{
-			PageAdvanceTo(DspSetDeviceInfoPage, &(S_ShowDeviceInfoPageBuffer->s_deviceinfo));
+			PageAdvanceTo(DspSetDeviceInfoPage, NULL);
 		}
 	}
 }
@@ -110,7 +107,7 @@ static MyState_TypeDef PageInit(void *  parm)
 {
 	if(My_Pass == PageBufferMalloc())
 	{
-		ReadDeviceInfo(&(S_ShowDeviceInfoPageBuffer->s_deviceinfo));
+		getSystemSetData(&(S_ShowDeviceInfoPageBuffer->systemSetData));
 		
 		showDeviceInfo();
 	}
@@ -131,9 +128,10 @@ static MyState_TypeDef PageBufferMalloc(void)
 		
 			return My_Pass;
 		}
+		return My_Fail; 
 	}
 
-	return My_Fail;
+	return My_Pass;
 }
 
 static MyState_TypeDef PageBufferFree(void)
@@ -149,13 +147,13 @@ static void showDeviceInfo(void)
 	if(S_ShowDeviceInfoPageBuffer)
 	{
 		/*显示设备id*/
-		DisText(0x1a40, S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceid, MaxDeviceIDLen);
+		DisText(0x1a40, S_ShowDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceid, MaxDeviceIDLen);
 			
 		/*显示使用单位*/
-		DisText(0x1a60, S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceunit, MaxDeviceUnitLen);
+		DisText(0x1a60, S_ShowDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceunit, MaxDeviceUnitLen);
 
 		/*显示责任人*/
-		DisText(0x1a90, S_ShowDeviceInfoPageBuffer->s_deviceinfo.deviceuser.user_name, MaxNameLen);
+		DisText(0x1a90, S_ShowDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_name, MaxNameLen);
 	}
 }
 

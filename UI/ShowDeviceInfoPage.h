@@ -1,13 +1,12 @@
 #ifndef __SDEVICEINFO_P_H__
 #define __SDEVICEINFO_P_H__
 
-
-#include	"Define.h"
+#include	"SystemSet_Data.h"
 
 typedef struct ShowDeviceInfoPageBuffer_Tag
 {
 	unsigned char presscount;
-	DeviceInfo s_deviceinfo;
+	SystemSetData systemSetData;
 	unsigned short lcdinput[100];
 }ShowDeviceInfoPageBuffer;
 

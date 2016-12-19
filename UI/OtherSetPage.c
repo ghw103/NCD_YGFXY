@@ -4,6 +4,7 @@
 #include	"OtherSetPage.h"
 #include	"SystemSetPage.h"
 
+#include	"SystemSet_Dao.h"
 #include	"LCD_Driver.h"
 #include	"RTC_Driver.h"
 #include	"Define.h"
@@ -72,13 +73,95 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		/*返回*/
 		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2401)
 		{
-			PageBufferFree();
 			PageBackTo(ParentPage);
 		}
 		/*设置时间*/
 		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2410)
 		{
 			SetGB_Time((char *)(&pbuf[7]), GetBufLen(&pbuf[7] , 2*pbuf[6]));
+		}
+		//静音和自动打印设置
+		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2402)
+		{
+			/*数据*/
+			S_OtherSetPageBuffer->lcdinput[1] = pbuf[7];
+			S_OtherSetPageBuffer->lcdinput[1] = (S_OtherSetPageBuffer->lcdinput[1]<<8) + pbuf[8];
+			
+			//自动打印
+			if(S_OtherSetPageBuffer->lcdinput[1] & 0x8000)
+				S_OtherSetPageBuffer->mySystemSetData.isAutoPrint = true;
+			else
+				S_OtherSetPageBuffer->mySystemSetData.isAutoPrint = false;
+			
+			//静音
+			if(S_OtherSetPageBuffer->lcdinput[1] & 0x4000)
+				S_OtherSetPageBuffer->mySystemSetData.isMute = true;
+			else
+				S_OtherSetPageBuffer->mySystemSetData.isMute = false;
+			
+			if(My_Pass == SaveSystemSetData(&(S_OtherSetPageBuffer->mySystemSetData)))
+			{
+				SendKeyCode(1);
+				//保存成功，更新内存中的数据
+				setSystemSetData(&(S_OtherSetPageBuffer->mySystemSetData));
+			}
+			else
+				SendKeyCode(2);
+		}
+		//进入休眠时间
+		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2420)
+		{
+			memset(S_OtherSetPageBuffer->buf, 0, 50);
+			memcpy(S_OtherSetPageBuffer->buf, (char *)(&pbuf[7]), GetBufLen(&pbuf[7] , 2*pbuf[6]));
+			
+			S_OtherSetPageBuffer->tempvalue = strtol(S_OtherSetPageBuffer->buf, NULL, 10);
+			
+			if(S_OtherSetPageBuffer->tempvalue > 600)
+				S_OtherSetPageBuffer->tempvalue = 600;
+			
+			S_OtherSetPageBuffer->mySystemSetData.ledSleepTime = S_OtherSetPageBuffer->tempvalue;
+			
+			memset(S_OtherSetPageBuffer->buf, 0, 50);
+			sprintf(S_OtherSetPageBuffer->buf, "%d", S_OtherSetPageBuffer->tempvalue);
+			DisText(0x2420, S_OtherSetPageBuffer->buf, strlen(S_OtherSetPageBuffer->buf));
+			
+			if(My_Pass == SaveSystemSetData(&(S_OtherSetPageBuffer->mySystemSetData)))
+			{
+				SendKeyCode(1);
+				//保存成功，更新内存中的数据
+				setSystemSetData(&(S_OtherSetPageBuffer->mySystemSetData));
+			}
+			else
+				SendKeyCode(2);
+		}	
+		//进入屏幕亮度
+		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2430)
+		{
+			memset(S_OtherSetPageBuffer->buf, 0, 50);
+			memcpy(S_OtherSetPageBuffer->buf, (char *)(&pbuf[7]), GetBufLen(&pbuf[7] , 2*pbuf[6]));
+			
+			S_OtherSetPageBuffer->tempvalue = strtol(S_OtherSetPageBuffer->buf, NULL, 10);
+			
+			if(S_OtherSetPageBuffer->tempvalue > 100)
+				S_OtherSetPageBuffer->tempvalue = 100;
+			if(S_OtherSetPageBuffer->tempvalue < 10)
+				S_OtherSetPageBuffer->tempvalue = 10;
+			
+			S_OtherSetPageBuffer->mySystemSetData.ledSleepTime = S_OtherSetPageBuffer->tempvalue;
+			
+			memset(S_OtherSetPageBuffer->buf, 0, 50);
+			sprintf(S_OtherSetPageBuffer->buf, "%d", S_OtherSetPageBuffer->tempvalue);
+			DisText(0x2430, S_OtherSetPageBuffer->buf, strlen(S_OtherSetPageBuffer->buf));
+			
+			if(My_Pass == SaveSystemSetData(&(S_OtherSetPageBuffer->mySystemSetData)))
+			{
+				SetLEDLight(S_OtherSetPageBuffer->tempvalue);
+				SendKeyCode(1);
+				//保存成功，更新内存中的数据
+				setSystemSetData(&(S_OtherSetPageBuffer->mySystemSetData));
+			}
+			else
+				SendKeyCode(2);
 		}
 	}
 }
@@ -90,8 +173,8 @@ static void PageUpDate(void)
 
 static MyState_TypeDef PageInit(void *  parm)
 {
-	if(My_Fail == PageBufferMalloc())
-		return My_Fail;
+	if(My_Pass == PageBufferMalloc())
+		getSystemSetData(&(S_OtherSetPageBuffer->mySystemSetData));
 	
 	SelectPage(122);
 	
@@ -103,11 +186,16 @@ static MyState_TypeDef PageBufferMalloc(void)
 	if(NULL == S_OtherSetPageBuffer)
 	{
 		S_OtherSetPageBuffer = MyMalloc(sizeof(OtherSetPageBuffer));
-		if(NULL == S_OtherSetPageBuffer)
+		if(S_OtherSetPageBuffer)
+		{
+			memset(S_OtherSetPageBuffer, 0, sizeof(OtherSetPageBuffer));
+			
+			return My_Pass;
+		}
+		else
 			return My_Fail;
 	}
 	
-	memset(S_OtherSetPageBuffer, 0, sizeof(OtherSetPageBuffer));
 	return My_Pass;
 }
 

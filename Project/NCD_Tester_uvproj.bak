@@ -632,6 +632,11 @@
               <FileType>1</FileType>
               <FilePath>..\Function\Printf_Fun.c</FilePath>
             </File>
+            <File>
+              <FileName>Paidui_Fun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Function\Paidui_Fun.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -706,6 +711,11 @@
               <FileName>SystemStart_Task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Task\SystemStart_Task.c</FilePath>
+            </File>
+            <File>
+              <FileName>Paidui_Task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Task\Paidui_Task.c</FilePath>
             </File>
           </Files>
         </Group>

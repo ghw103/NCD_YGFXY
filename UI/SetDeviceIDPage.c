@@ -9,8 +9,7 @@
 #include	"MyMem.h"
 #include	"ShowDeviceInfoPage.h"
 #include	"ReadBarCode_Fun.h"
-#include	"SDFunction.h"
-#include	"DeviceDao.h"
+#include	"SystemSet_Dao.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -79,10 +78,12 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		{
 			if(S_SetDeviceIDPage->ismodify == 1)
 			{
-				S_SetDeviceIDPage->temp_deviceinfo.isnew = 1;
-				if(My_Pass == SaveDeviceInfo(&(S_SetDeviceIDPage->temp_deviceinfo)))
+				S_SetDeviceIDPage->systemSetData.deviceInfo.isnew = true;
+				if(My_Pass == SaveSystemSetData(&(S_SetDeviceIDPage->systemSetData)))
 				{
 					SendKeyCode(1);
+					//保存成功，更新内存中的数据
+					setSystemSetData(&(S_SetDeviceIDPage->systemSetData));
 					S_SetDeviceIDPage->ismodify = 0;
 				}
 				else
@@ -92,12 +93,12 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		/*id输入*/
 		else if(S_SetDeviceIDPage->lcdinput[0] == 0x1C10)
 		{
-			memset(S_SetDeviceIDPage->temp_deviceinfo.deviceid, 0 , MaxDeviceIDLen);
+			memset(S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid, 0 , MaxDeviceIDLen);
 			
 			if(MaxDeviceIDLen >= GetBufLen(&pbuf[7] , 2*pbuf[6]))
-				memcpy(S_SetDeviceIDPage->temp_deviceinfo.deviceid, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
+				memcpy(S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			else
-				memcpy(S_SetDeviceIDPage->temp_deviceinfo.deviceid, &pbuf[7], MaxDeviceIDLen);
+				memcpy(S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid, &pbuf[7], MaxDeviceIDLen);
 				
 			S_SetDeviceIDPage->ismodify = 1;
 		}
@@ -108,32 +109,28 @@ static void PageUpDate(void)
 {
 	if(S_SetDeviceIDPage)
 	{
-		if(My_Pass == CheckBarCodeHasRead())
+		if(ReadBarCodeFunction((char *)(S_SetDeviceIDPage->tempbuf), 100) > 0)
 		{
-			GetGB_BarCode(S_SetDeviceIDPage->tempbuf);
+			memcpy(S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid, S_SetDeviceIDPage->tempbuf, MaxDeviceIDLen);
 			
-			memcpy(S_SetDeviceIDPage->temp_deviceinfo.deviceid, S_SetDeviceIDPage->tempbuf, MaxDeviceIDLen);
-			DisText(0x1C10, S_SetDeviceIDPage->temp_deviceinfo.deviceid, MaxDeviceIDLen);
+			DisText(0x1C10, S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid, MaxDeviceIDLen);
 		
 			S_SetDeviceIDPage->ismodify = 1;
-		}	
+		}		
 	}
 }
 
 static MyState_TypeDef PageInit(void *  parm)
 {
-	if(My_Fail == PageBufferMalloc())
-		return My_Fail;
-	
-	SelectPage(104);
-	
-	if(parm)
+	if(My_Pass == PageBufferMalloc())
 	{
-		memcpy(&(S_SetDeviceIDPage->temp_deviceinfo), parm, sizeof(DeviceInfo));
-		DisText(0x1C10, S_SetDeviceIDPage->temp_deviceinfo.deviceid, strlen(S_SetDeviceIDPage->temp_deviceinfo.deviceid));
-		return My_Pass;
+		getSystemSetData(&(S_SetDeviceIDPage->systemSetData));
+	
+		DisText(0x1C10, S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid, strlen(S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid));
 	}
 	
+	SelectPage(104);
+		
 	return My_Fail;
 }
 
@@ -143,11 +140,15 @@ static MyState_TypeDef PageBufferMalloc(void)
 	{
 		S_SetDeviceIDPage = (SetDeviceIDPage *)MyMalloc(sizeof(SetDeviceIDPage));
 			
-		if(NULL == S_SetDeviceIDPage)
+		if(S_SetDeviceIDPage)
+		{
+			memset(S_SetDeviceIDPage, 0, sizeof(SetDeviceIDPage));
+	
+			return My_Pass;
+		}
+		else
 			return My_Fail;
 	}
-	
-	memset(S_SetDeviceIDPage, 0, sizeof(SetDeviceIDPage));
 	
 	return My_Pass;
 }

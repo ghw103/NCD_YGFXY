@@ -11,7 +11,6 @@
 
 #include	"LunchPage.h"
 
-#include	"ReadBarCode_Task.h"
 #include	"Test_Task.h"
 #include 	"netconf.h"
 #include	"NormalUpLoad_Task.h"
@@ -86,10 +85,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 				
 				//动画播放到末尾81号页面,且自检完成
 				if((81 == S_WelcomePageBuffer->lcdinput[0]) && (SelfCheck_None != GetGB_SelfCheckStatus()))
-				{
-					/*创建读取条码枪任务*/
-					StartBarCodeTask();
-					
+				{					
 					/*开启测试任务*/
 					StartvTestTask();
 					
@@ -127,11 +123,14 @@ static void Input(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void PageUpDate(void)
 {
-	if(TimeOut == timer_expired(&(S_WelcomePageBuffer->timer)))
+	if(S_WelcomePageBuffer)
 	{
-		ReadCurrentPageId();
-		
-		timer_reset(&(S_WelcomePageBuffer->timer));
+		if(TimeOut == timer_expired(&(S_WelcomePageBuffer->timer)))
+		{
+			ReadCurrentPageId();
+
+			timer_reset(&(S_WelcomePageBuffer->timer));
+		}
 	}
 }
 
@@ -195,6 +194,7 @@ static MyState_TypeDef PageBufferMalloc(void)
 ***************************************************************************************************/
 static MyState_TypeDef PageBufferFree(void)
 {
+	memset(S_WelcomePageBuffer, 0, sizeof(WelcomePageBuffer));
 	MyFree(S_WelcomePageBuffer);
 	S_WelcomePageBuffer = NULL;
 	return My_Pass;

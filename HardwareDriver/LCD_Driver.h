@@ -7,6 +7,7 @@
 
 void SelectPage(unsigned short index);
 void ReadCurrentPageId(void);
+void ReadLcdSoftVersion(void);
 void DisText(unsigned short addr, void *data, unsigned short len);
 void ClearText(unsigned short addr, unsigned short len);
 void WriteRadioData(unsigned short addr, void *data, unsigned short len);

@@ -163,6 +163,9 @@ static void PageUpDate(void)
 						//创建成功
 						if(Error_OK == S_PaiDuiPageBuffer->error)
 						{
+							//创建成功，则使电机远离，防止用户拔卡
+							MotorMoveTo(1000, 1);
+							
 							PageAdvanceTo(DspSampleIDPage, NULL);
 								
 							return;

@@ -55,9 +55,10 @@
 #include "netconf.h"
 #include "stm32f4x7_eth.h"
 #include <string.h>
-#include	"DeviceDao.h"
+#include	"SystemSet_Data.h"
 #include	"Define.h"
 #include	"MyMem.h"
+#include	"CRC16.h"
 #include	"NetInfo_Data.h"
 
 
@@ -402,13 +403,16 @@ err_t ethernetif_init(struct netif *netif)
 #if LWIP_NETIF_HOSTNAME
   /* Initialize interface hostname */
 	
-	deviceinfo = MyMalloc(sizeof(deviceinfo));
+	deviceinfo = MyMalloc(sizeof(DeviceInfo));
 	if(deviceinfo)
 	{
 		//读取设备信息
-		ReadDeviceInfo(deviceinfo);
+		getDeviceInfo(deviceinfo);
 		
-		memcpy(netif->hostname, deviceinfo->deviceid, strlen(deviceinfo->deviceid));
+		if(deviceinfo->crc == CalModbusCRC16Fun1(deviceinfo, sizeof(DeviceInfo) - 2))
+			memcpy(netif->hostname, deviceinfo->deviceid, strlen(deviceinfo->deviceid));
+		else
+			netif->hostname = "ncd-device";
 		
 		MyFree(deviceinfo);
 	}

@@ -259,19 +259,7 @@ typedef struct UserTag
 /**********************************************************************************************************/
 /******************************************设备信息相关定义****************************************************/
 /**********************************************************************************************************/
-#define	MaxDeviceIDLen	21
-#define	MaxDeviceUnitLen	51
 
-#pragma pack(1)
-typedef struct DeviceInfo_Tag
-{
-	char deviceid[MaxDeviceIDLen];													//设备id
-	char deviceunit[MaxDeviceUnitLen];												//设备使用单位
-	User_Type deviceuser;															//设备使用人
-	unsigned char isnew;															//设备信息是否有更新
-	unsigned short crc;
-}DeviceInfo;
-#pragma pack()
 /**********************************************************************************************************/
 /**********************************************************************************************************/
 
@@ -320,6 +308,20 @@ typedef enum
 /**********************************************************************************************************/
 /**********************************************************************************************************/
 
+#define	MaxDeviceIDLen	21
+#define	MaxDeviceUnitLen	51
+
+/*设备信息设置*/
+#pragma pack(1)
+typedef struct DeviceInfo_Tag
+{
+	char deviceid[MaxDeviceIDLen];													//设备id
+	char deviceunit[MaxDeviceUnitLen];												//设备使用单位
+	User_Type deviceuser;															//设备使用人
+	bool isnew;															//设备信息是否有更新
+	unsigned short crc;
+}DeviceInfo;
+#pragma pack()
 
 /**********************************************************************************************************/
 /******************************************网络相关定义****************************************************/
@@ -365,6 +367,8 @@ typedef enum
 	Link_Up = 1
 }LinkState_TypeDef;
 
+
+
 /*ip获取方式*/
 typedef enum
 {
@@ -373,15 +377,17 @@ typedef enum
 }NetIP_Type;
 
 
+
+/*有线网设置*/
 #pragma pack(1)
-typedef struct NetData_Tag
+typedef struct NetSet_Tag
 {
 	IP_Def myip;														//我的ip
-
 	NetIP_Type ipmode;
 	unsigned short crc;
-}NetData;
+}NetSet;
 #pragma pack()
+
 
 
 /**********************************************************************************************************/

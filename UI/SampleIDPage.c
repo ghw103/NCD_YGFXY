@@ -104,16 +104,14 @@ static void Input(unsigned char *pbuf , unsigned short len)
 
 static void PageUpDate(void)
 {
-	if(NULL != S_SampleIDPage)
+	if(S_SampleIDPage)
 	{
-		if(My_Pass == CheckBarCodeHasRead())
+		if(ReadBarCodeFunction((char *)(S_SampleIDPage->tempbuf), 100) > 0)
 		{
-			GetGB_BarCode(S_SampleIDPage->tempbuf);
-			
 			memset(S_SampleIDPage->currenttestdata->testdata.sampleid, 0, MaxSampleIDLen);
 			memcpy(S_SampleIDPage->currenttestdata->testdata.sampleid, S_SampleIDPage->tempbuf, MaxSampleIDLen);
 			RefreshSampleID();
-		}	
+		}
 	}
 }
 
@@ -121,9 +119,6 @@ static MyState_TypeDef PageInit(void *  parm)
 {
 	if(My_Fail == PageBufferMalloc())
 		return My_Fail;
-	
-	//清除之前的条码数据，只有在当前页面扫码才有效
-	CheckBarCodeHasRead();
 	
 	SelectPage(86);
 	
