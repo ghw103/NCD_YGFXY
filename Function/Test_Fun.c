@@ -151,7 +151,7 @@ ResultState TestFunction(void * parm)
 		SetGB_CLineValue(0);
 		vTaskDelay(10/portTICK_RATE_MS);
 		
-		SelectChannel(4);
+		SelectChannel(0);
 		vTaskDelay(10/portTICK_RATE_MS);
 		
 		SMBUS_SCK_L();

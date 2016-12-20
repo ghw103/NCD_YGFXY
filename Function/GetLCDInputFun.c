@@ -74,17 +74,12 @@ static void AnalysisCode(void * pbuf, unsigned short len)
 	unsigned char * p = (unsigned char *)pbuf;
 	unsigned short * crc = (unsigned short *)(p+len-2);
 	unsigned short *tempcrc = (unsigned short *)(p+len);
-	PageInfo * currentpage = NULL;
-	
+
 	*tempcrc = CalModbusCRC16Fun1(p+3, len-2-3);
 	
 	if((p[0] == LCD_Head_1)&&(p[1] == LCD_Head_2)&&(len == (p[2]+3))&&(*crc == *tempcrc))
 	{
-		if(My_Pass == GetCurrentPage(&currentpage))
-		{
-			if(NULL != currentpage->LCDInput)
-				currentpage->LCDInput(pbuf , len);
-		}
+		activityInputFunction(pbuf, len);
 	}
 
 }

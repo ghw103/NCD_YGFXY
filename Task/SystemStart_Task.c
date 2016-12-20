@@ -10,7 +10,6 @@
 /***************************************************************************************************/
 #include	"SystemStart_Task.h"
 
-#include	"ReadInputData_Task.h"
 #include	"SystemUI_Task.h"
 #include	"Iwdg_Task.h"
 #include	"Universal_Task.h"
@@ -72,13 +71,10 @@ static void vSystemStartTask( void *pvParameters )
 	StartvPlaySongTask();
 	
 	/*显示欢迎界面*/
-	PageAdvanceTo(DspWelcomePage, NULL);
+	startActivity(createWelcomeActivity, NULL);
 	
 	/*系统界面控制任务*/
 	StartvSystemUITask();
-	
-	/*读取输入数据任务*/
-	StartvReadInDataTask();
 	
 	/*开始自检*/
 	SelfTest_Function();

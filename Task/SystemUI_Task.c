@@ -10,6 +10,7 @@
 /***************************************************************************************************/
 
 #include	"SystemUI_Task.h"
+#include	"GetLCDInputFun.h"
 #include	"UI_Data.h"
 #include	"LCD_Driver.h"
 
@@ -60,15 +61,12 @@ void StartvSystemUITask(void)
 static void vSystemUITask( void *pvParameters )
 {
 	static unsigned int count = 0;
-	PageInfo * currentpage = NULL;
 	
 	while(1)
 	{
-		if(My_Pass == GetCurrentPage(&currentpage))
-		{
-			if(NULL != currentpage->PageUpDate)
-				currentpage->PageUpDate();
-		}
+		GetLCDInputData();
+		
+		activityFreshFunction();
 		
 		/*500ms更新一次时间和环境温度*/
 		if(count % 10 == 0)

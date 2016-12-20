@@ -13,7 +13,7 @@ typedef struct LunchPageBuffer_tag {
 	CreateTestErrorType error;
 }LunchPageBuffer;
 
-unsigned char DspLunchPage(void *  parm);
+MyState_TypeDef createLunchActivity(Activity * thizActivity, void * pram);
 
 #endif
 

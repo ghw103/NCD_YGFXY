@@ -15,8 +15,8 @@
 
 #include	"PlaySong_Task.h"
 
-#include	"PaiDuiPage.h"
-#include	"PreReadCardPage.h"
+//#include	"PaiDuiPage.h"
+//#include	"PreReadCardPage.h"
 
 #include	"CardStatues_Data.h"
 #include	"UI_Data.h"
@@ -50,7 +50,7 @@ void PaiDuiHandler(void)
 	unsigned char index = 0;
 	ItemData * temp = NULL;
 	unsigned short tempvalue = 0;
-	PageInfo * currentpage = NULL;
+/*	PageInfo * currentpage = NULL;
 	
 	for(index=0; index<PaiDuiWeiNum; index++)
 	{
@@ -224,7 +224,7 @@ void PaiDuiHandler(void)
 					}
 				}
 				
-				/*如果超时时，操作空闲*/
+				//如果超时时，操作空闲
 				if((temp->statues == statues6) && (GetMinWaitTime() > 60) && (GetCurrentTestItem() == NULL))
 				{
 					SetCurrentTestItem(temp);
@@ -237,7 +237,7 @@ void PaiDuiHandler(void)
 			}
 		}
 		
-	}
+	}*/
 }
 
 /****************************************end of file************************************************/

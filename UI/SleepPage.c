@@ -22,11 +22,15 @@
 static SleepPageBuffer *S_SleepPageBuffer = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
-static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpDate(void);
-static MyState_TypeDef PageInit(void *  parm);
-static MyState_TypeDef PageBufferMalloc(void);
-static MyState_TypeDef PageBufferFree(void);
+static void activityStart(void);
+static void activityInput(unsigned char *pbuf , unsigned short len);
+static void activityFresh(void);
+static void activityHide(void);
+static void activityResume(void);
+static void activityDestroy(void);
+
+static MyState_TypeDef activityBufferMalloc(void);
+static void activityBufferFree(void);
 
 static void DspPageText(void);
 /******************************************************************************************/
@@ -36,26 +40,37 @@ static void DspPageText(void);
 /******************************************************************************************/
 /******************************************************************************************/
 
-unsigned char DspSleepPage(void *  parm)
+/***************************************************************************************************
+*FunctionName: createWelcomeActivity
+*Description: 创建欢迎界面
+*Input: thizActivity -- 当前界面
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月20日16:21:51
+***************************************************************************************************/
+MyState_TypeDef createSleepActivity(Activity * thizActivity, void * pram)
 {
-	PageInfo * currentpage = NULL;
+	if(NULL == thizActivity)
+		return My_Fail;
 	
-	if(My_Pass == GetCurrentPage(&currentpage))
+	if(My_Pass == activityBufferMalloc())
 	{
-		currentpage->PageInit = PageInit;
-		currentpage->PageUpDate = PageUpDate;
-		currentpage->LCDInput = Input;
-		currentpage->PageBufferMalloc = PageBufferMalloc;
-		currentpage->PageBufferFree = PageBufferFree;
+		InitActivity(thizActivity, "SleepActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
-		currentpage->PageInit(currentpage->pram);
+		return My_Pass;
 	}
 	
-	return 0;
+	return My_Fail;
 }
 
-
-static void Input(unsigned char *pbuf , unsigned short len)
+static void activityStart(void)
+{
+	SetLEDLight(10);
+	
+	SelectPage(142);
+}
+static void activityInput(unsigned char *pbuf , unsigned short len)
 {
 	if(S_SleepPageBuffer)
 	{
@@ -66,14 +81,11 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		/*设置*/
 		if(S_SleepPageBuffer->lcdinput[0] == 0x1D70)
 		{
-			SetLEDLight(100);
-			PageBufferFree();
-			PageBackTo(ParentPage);
+			backToActivity("LunchActivity");
 		}
 	}
 }
-
-static void PageUpDate(void)
+static void activityFresh(void)
 {
 	if(S_SleepPageBuffer)
 	{
@@ -83,36 +95,42 @@ static void PageUpDate(void)
 		S_SleepPageBuffer->count++;
 	}
 }
-
-static MyState_TypeDef PageInit(void *  parm)
+static void activityHide(void)
 {
-	if(My_Fail == PageBufferMalloc())
-		return My_Fail;
+
+}
+static void activityResume(void)
+{
+
+}
+static void activityDestroy(void)
+{
+	SetLEDLight(100);
 	
-	SetLEDLight(10);
-	
-	SelectPage(142);
-	
-	return My_Pass;
+	activityBufferFree();
 }
 
-static MyState_TypeDef PageBufferMalloc(void)
+static MyState_TypeDef activityBufferMalloc(void)
 {
 	if(NULL == S_SleepPageBuffer)
 	{
 		S_SleepPageBuffer = MyMalloc(sizeof(SleepPageBuffer));
-		if(NULL == S_SleepPageBuffer)
-			return My_Fail;
+		
+		if(S_SleepPageBuffer)
+		{
+			memset(S_SleepPageBuffer, 0, sizeof(SleepPageBuffer));
+			
+			return My_Pass;
+		}
 	}
-	memset(S_SleepPageBuffer, 0, sizeof(SleepPageBuffer));
-	return My_Pass;
+
+	return My_Fail;
 }
 
-static MyState_TypeDef PageBufferFree(void)
+static void activityBufferFree(void)
 {
 	MyFree(S_SleepPageBuffer);
 	S_SleepPageBuffer = NULL;
-	return My_Pass;
 }
 
 /***************************************************************************************************/

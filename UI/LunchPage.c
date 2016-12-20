@@ -26,11 +26,15 @@
 static LunchPageBuffer * S_LunchPageBuffer = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
-static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpDate(void);
-static MyState_TypeDef PageInit(void *  parm);
-static MyState_TypeDef PageBufferMalloc(void);
-static MyState_TypeDef PageBufferFree(void);
+static void activityStart(void);
+static void activityInput(unsigned char *pbuf , unsigned short len);
+static void activityFresh(void);
+static void activityHide(void);
+static void activityResume(void);
+static void activityDestroy(void);
+
+static MyState_TypeDef activityBufferMalloc(void);
+static void activityBufferFree(void);
 
 static void DspPageText(void);
 /******************************************************************************************/
@@ -40,26 +44,34 @@ static void DspPageText(void);
 /******************************************************************************************/
 /******************************************************************************************/
 
-unsigned char DspLunchPage(void *  parm)
+MyState_TypeDef createLunchActivity(Activity * thizActivity, void * pram)
 {
-	PageInfo * currentpage = NULL;
+	if(NULL == thizActivity)
+		return My_Fail;
 	
-	if(My_Pass == GetCurrentPage(&currentpage))
+	if(My_Pass == activityBufferMalloc())
 	{
-		currentpage->PageInit = PageInit;
-		currentpage->PageUpDate = PageUpDate;
-		currentpage->LCDInput = Input;
-		currentpage->PageBufferMalloc = PageBufferMalloc;
-		currentpage->PageBufferFree = PageBufferFree;
+		InitActivity(thizActivity, "LunchActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
-		currentpage->PageInit(currentpage->pram);
+		return My_Pass;
 	}
 	
-	return 0;
+	return My_Fail;
 }
 
+static void activityStart(void)
+{
+	if(S_LunchPageBuffer)
+	{
+		timer_set(&(S_LunchPageBuffer->timer), 10);
+	
+		DspPageText();
+	}
+	
+	SelectPage(82);
 
-static void Input(unsigned char *pbuf , unsigned short len)
+}
+static void activityInput(unsigned char *pbuf , unsigned short len)
 {
 	if(S_LunchPageBuffer)
 	{
@@ -70,14 +82,12 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		//设置
 		if(S_LunchPageBuffer->lcdinput[0] == 0x1103)
 		{
-			PageBufferFree();
-			PageAdvanceTo(DspSystemSetPage, NULL);
+
 		}
 		//查看数据
 		else if(S_LunchPageBuffer->lcdinput[0] == 0x1102)
 		{	
-			PageBufferFree();
-			PageAdvanceTo(DspRecordPage, NULL);
+
 		}
 		//常规测试
 		else if(S_LunchPageBuffer->lcdinput[0] == 0x1100)
@@ -86,9 +96,9 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			//创建成功
 			if(Error_OK == S_LunchPageBuffer->error)
 			{
-				PageBufferFree();
+				//PageBufferFree();
 				
-				PageAdvanceTo(DspSelectUserPage, NULL);
+				//PageAdvanceTo(DspSelectUserPage, NULL);
 			}
 			//禁止常规测试
 			else if(Error_StopNormalTest == S_LunchPageBuffer->error)
@@ -109,8 +119,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 			//有卡排队，则进入排队界面
 			if(true == IsPaiDuiTestting())
 			{
-				PageBufferFree();
-				PageAdvanceTo(DspPaiDuiPage, NULL);
+				//PageBufferFree();
+				//PageAdvanceTo(DspPaiDuiPage, NULL);
 			}
 			//无卡排队则开始创建
 			else
@@ -119,8 +129,8 @@ static void Input(unsigned char *pbuf , unsigned short len)
 				//创建成功
 				if(Error_OK == S_LunchPageBuffer->error)
 				{
-					PageBufferFree();
-					PageAdvanceTo(DspSelectUserPage, NULL);
+					//PageBufferFree();
+					//PageAdvanceTo(DspSelectUserPage, NULL);
 				}
 				//创建失败
 				else if(Error_Mem == S_LunchPageBuffer->error)
@@ -132,31 +142,32 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		}
 	}
 }
-
-static void PageUpDate(void)
+static void activityFresh(void)
 {
-	if(TimeOut == timer_expired(&(S_LunchPageBuffer->timer)))
+	if( S_LunchPageBuffer && (TimeOut == timer_expired(&(S_LunchPageBuffer->timer))))
 	{
-		PageBufferFree();
-		PageAdvanceTo(DspSleepPage, NULL);
+		startActivity(createSleepActivity, NULL);
 	}
 }
+static void activityHide(void)
+{
 
-static MyState_TypeDef PageInit(void *  parm)
-{	
-	if(My_Pass == PageBufferMalloc())
+}
+static void activityResume(void)
+{
+	if(S_LunchPageBuffer)
 	{
-		timer_set(&(S_LunchPageBuffer->timer), 30);
-	
-		DspPageText();
+		timer_set(&(S_LunchPageBuffer->timer), 10);
 	}
 	
 	SelectPage(82);
-	
-	return My_Pass;
+}
+static void activityDestroy(void)
+{
+	activityBufferFree();
 }
 
-static MyState_TypeDef PageBufferMalloc(void)
+static MyState_TypeDef activityBufferMalloc(void)
 {
 	if(NULL == S_LunchPageBuffer)
 	{
@@ -172,11 +183,10 @@ static MyState_TypeDef PageBufferMalloc(void)
 	return My_Fail;
 }
 
-static MyState_TypeDef PageBufferFree(void)
+static void activityBufferFree(void)
 {
 	MyFree(S_LunchPageBuffer);
 	S_LunchPageBuffer = NULL;
-	return My_Pass;
 }
 
 /***************************************************************************************************/

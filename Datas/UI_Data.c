@@ -21,20 +21,13 @@
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
 
-static PageLinkStack GB_PageLinkStack = 
-{
-	.top = NULL
-};								//页面信息链栈
+static LinkStack GB_ActivityLinkStack;	
 
 
 /***************************************************************************************************/
 /**************************************局部函数声明*************************************************/
 /***************************************************************************************************/
-static MyState_TypeDef PageLinkStackPush(PageLinkStack * s_linkstack, PageInfo * pageinfo);
-static MyState_TypeDef PageLinkStackPop(PageLinkStack * s_linkstack, PageInfo ** pageinfo);
-static MyState_TypeDef PageLinkStackTop(PageLinkStack * s_linkstack, PageInfo ** pageinfo);
 
-static MyState_TypeDef PageDetroyBackNum(unsigned char index);
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************正文********************************************************/
@@ -43,336 +36,149 @@ static MyState_TypeDef PageDetroyBackNum(unsigned char index);
 /***************************************************************************************************/
 
 /***************************************************************************************************
-*FunctionName: PageAdvanceTo
-*Description:  页面往前切换到某个页面，对于链栈入栈操作，注意此处是直接显示界面，并不是切换指针
-*Input: page -- 前进页面地址
-		pram -- 传递到前进页面参数
-*Output: None
-*Return: My_Fail -- 前进失败
-*		My_Pass -- 前进成功
-*Author: xsx
-*Date: 2016年12月7日15:29:21
-***************************************************************************************************/
-MyState_TypeDef PageAdvanceTo(unsigned char (*page)(void * pram), void * pram)
-{
-	PageInfo * temppageinfo = NULL;
-	
-	//不允许跳转到无效界面
-	if(NULL == page)
-		return My_Fail;
-	
-	temppageinfo = MyMalloc(sizeof(PageInfo));
-	
-	if(temppageinfo)
-	{
-		memset(temppageinfo, 0, sizeof(PageInfo));
-		temppageinfo->CurrentPage = page;
-		
-		if(My_Pass == PageLinkStackPush(&GB_PageLinkStack, temppageinfo))
-		{
-			temppageinfo->pram = pram;
-			temppageinfo->CurrentPage(temppageinfo->pram);
-			
-			return My_Pass;
-		}
-		else
-		{
-			MyFree(temppageinfo);
-			return My_Fail;
-		}
-	}
-	else
-		return My_Fail;
-}
-
-/***************************************************************************************************
-*FunctionName: PageDetroyBackNum
-*Description: 往前销毁index个界面
-*Input: index -- 往前销毁的界面数目
-*Output: None
-*Return: My_Fail -- 失败
-*		My_Pass -- 成功
-*Author: xsx
-*Date: 2016年12月8日13:57:33
-***************************************************************************************************/
-static MyState_TypeDef PageDetroyBackNum(unsigned char index)
-{
-	PageInfo * temppageinfo = NULL;
-	unsigned char i = index;
-	
-	//先出栈销毁一定深度的界面
-	while(i)
-	{
-		if(My_Pass == PageLinkStackPop(&GB_PageLinkStack, &temppageinfo))
-		{
-			MyFree(temppageinfo);
-			i--;
-		}
-		else
-			break;
-	}
-	
-	return My_Pass;
-}
-/***************************************************************************************************
-*FunctionName: PageBackTo
-*Description: 根据输入，页面返回一定的层数
-*Input: index -- 返回层数，1表示返回上一个页面，2表示返回上上一个页面
-*		pram -- 传入参数到返回的页面
+*FunctionName: startActivity
+*Description: 启动一个新的activity
+*Input: pageCreate -- activity的创建函数
+*		pram -- 传入的参数
 *Output: 
-*Return: My_Fail -- 失败
-*		My_Pass -- 成功
+*Return: MyState_TypeDef -- 启动成功与否
 *Author: xsx
-*Date: 2016年12月7日15:58:31
+*Date: 2016年12月20日11:16:59
 ***************************************************************************************************/
-MyState_TypeDef PageBackTo(unsigned char index)
+MyState_TypeDef startActivity(MyState_TypeDef (* pageCreate)(Activity * thizactivity, void * pram), void * pram)
 {
-	PageInfo * temppageinfo = NULL;
+	Activity * activity = NULL;
 	
-	PageDetroyBackNum(index);
-	
-	//读取当前栈顶界面，且显示
-	if(My_Pass == PageLinkStackTop(&GB_PageLinkStack, &temppageinfo))
-	{	
-		temppageinfo->CurrentPage(temppageinfo->pram);
-		
-		return My_Pass;
-	}
-	else
+	if(NULL == pageCreate)
 		return My_Fail;
-}
-
-/***************************************************************************************************
-*FunctionName: PageResetToOrigin
-*Description: 回主界面
-*Input: None
-*Output: None
-*Return: My_Fail -- 失败
-*		My_Pass -- 成功
-*Author: xsx
-*Date: 2016年12月8日09:01:58
-***************************************************************************************************/
-MyState_TypeDef PageResetToOrigin(DisplayType distype)
-{
-	PageInfo * temppageinfo = NULL;
 	
-	PageDetroyBackNum(OriginPage);
+	//为新页面申请内存
+	activity = MyMalloc(sizeof(Activity));
 	
-	if(DisplayPage == distype)
+	if(activity)
 	{
-		//读取当前栈顶界面，且显示
-		if(My_Pass == PageLinkStackTop(&GB_PageLinkStack, &temppageinfo))
+		memset(activity, 0, sizeof(Activity));
+		
+		activity->pageCreate = pageCreate;
+		
+		//新页面入栈
+		if(My_Pass == StackPush(&GB_ActivityLinkStack, activity))
 		{
-			temppageinfo->CurrentPage(temppageinfo->pram);
-			
-			return My_Pass;
+			//执行页面创建,创建成功则显示
+			if(My_Pass == activity->pageCreate(activity, pram))
+			{
+				//新页面显示
+				if(activity->pageStart)
+					activity->pageStart();
+				
+				return My_Pass;
+			}
+			//创建失败，则出栈此页面，并销毁
+			else
+				StackPop(&GB_ActivityLinkStack, NULL, true);
 		}
+		
+		//入栈失败，则销毁
+		MyFree(activity);
 	}
 	
 	return My_Fail;
 }
 
 /***************************************************************************************************
-*FunctionName: GetCurrentPage
-*Description: 读取当前页面
-*Input: pageinfo -- 当前页面数据存放地址
-*Output: None
-*Return: My_Fail -- 失败
-*		My_Pass -- 成功
+*FunctionName: backToActivity
+*Description: 回退
+*Input: 
+*Output: 
+*Return: 
 *Author: xsx
-*Date: 2016年12月7日16:03:09
+*Date: 2016年12月20日11:53:00
 ***************************************************************************************************/
-MyState_TypeDef GetCurrentPage(PageInfo ** pageinfo)
+MyState_TypeDef backToActivity(char * pageName)
 {
-	//读取当前栈顶界面
-	if(My_Pass == PageLinkStackTop(&GB_PageLinkStack, pageinfo))
-		return My_Pass;
-	else
-		return My_Fail;
-}
-
-/***************************************************************************************************
-*FunctionName: GetParentPage
-*Description: 读取当前页面的父页面
-*Input: pageinfo -- 当前页面数据存放地址
-*Output: None
-*Return: My_Fail -- 失败
-*		My_Pass -- 成功
-*Author: xsx
-*Date: 2016年12月7日16:03:09
-***************************************************************************************************/
-unsigned char (*GetParentPage(void))(void* pram)
-{
-	PageStackNode * tempnode = GB_PageLinkStack.top;
+	Activity * activity = NULL;
 	
-	if(tempnode)
+	if(NULL == pageName)
+		return My_Fail;
+	
+	while(My_Pass == StackTop(&GB_ActivityLinkStack, &activity))
 	{
-		if(tempnode->lastpagenode)
+		if(0 == strcmp(activity->pageName, pageName))
 		{
-			return tempnode->lastpagenode->pageinfo->CurrentPage;
+			if(activity->pageResume)
+				activity->pageResume();
+			
+			return My_Pass;
 		}
+		else
+			StackPop(&GB_ActivityLinkStack, NULL, false);
 	}
 	
-	return NULL;
-}
-
-/*###################################################################################################
-#########################################链栈的基本操作##############################################
-####################################################################################################*/
-
-/***************************************************************************************************
-*FunctionName: InitPageLinkStack
-*Description: 初始化链栈
-*Input: s_linkstack - 链栈地址
-*Output: None
-*Return: None
-*Author: xsx
-*Date: 2016年12月7日14:47:29
-***************************************************************************************************/
-void InitPageLinkStack(PageLinkStack * s_linkstack)
-{
-	s_linkstack->top = NULL;
+	return My_Fail;
 }
 
 /***************************************************************************************************
-*FunctionName: PageLinkStackIsEmpty
-*Description: 判断链栈是否为空
-*Input: s_linkstack - 链栈地址
-*Output: None
-*Return: 	true -- 链栈空
-*			false -- 链栈不为空
+*FunctionName: InitActivity
+*Description: 初始化一个页面的事件函数
+*Input: 
+*Output: 
+*Return: 
 *Author: xsx
-*Date: 2016年12月7日14:49:37
+*Date: 2016年12月20日16:26:14
 ***************************************************************************************************/
-bool PageLinkStackIsEmpty(PageLinkStack * s_linkstack)
+void InitActivity(Activity * activity, char * activityName, void (* pageStart)(void), 
+	void (* pageInput)(unsigned char *pbuf , unsigned short len), 
+	void (* pageFresh)(void),
+	void (* pageHide)(void),
+	void (* pageResume)(void),
+	void (* pageDestroy)(void))
 {
-	if(NULL == s_linkstack->top)
-		return true;
-	else
-		return false;
+	activity->pageName = activityName;
+	activity->pageStart = pageStart;
+	activity->pageInput = pageInput;
+	activity->pageFresh = pageFresh;
+	activity->pageHide = pageHide;
+	activity->pageResume = pageResume;
+	activity->pageDestroy = pageDestroy;
 }
 
 /***************************************************************************************************
-*FunctionName: PageLinkStackLength
-*Description: 获得链栈的长度
-*Input: s_linkstack - 链栈地址
-*Output: None
-*Return: len -- 链栈长度
+*FunctionName: activityInputFunction
+*Description: UI系统的输入接口
+*Input: 
+*Output: 
+*Return: 
 *Author: xsx
-*Date: 2016年12月7日14:55:19
+*Date: 2016年12月20日16:27:52
 ***************************************************************************************************/
-unsigned char PageLinkStackLength(PageLinkStack * s_linkstack)
+void activityInputFunction(unsigned char *pbuf , unsigned short len)
 {
-	unsigned char len = 0;
-	PageStackNode * tempnode = s_linkstack->top;
+	Activity * activity = NULL;
 	
-	while(NULL != tempnode)
+	if(My_Pass == StackTop(&GB_ActivityLinkStack, &activity))
 	{
-		len++;
-		tempnode = tempnode->lastpagenode;
+		if( (activity) && (activity->pageInput))
+			activity->pageInput(pbuf, len);
 	}
-	
-	return len;
 }
 
 /***************************************************************************************************
-*FunctionName: PageLinkStackPush
-*Description: 入栈操作
-*Input: s_linkstack -- 链栈地址
-*		pageinfo -- 入栈的值
-*Output: None
-*Return: 	My_Pass -- 入栈成功
-*			My_Fail -- 入栈失败
+*FunctionName: activityFreshFunction
+*Description: UI系统的刷新接口
+*Input: 
+*Output: 
+*Return: 
 *Author: xsx
-*Date: 2016年12月7日15:03:34
+*Date: 2016年12月20日16:28:30
 ***************************************************************************************************/
-static MyState_TypeDef PageLinkStackPush(PageLinkStack * s_linkstack, PageInfo * pageinfo)
+void activityFreshFunction(void)
 {
-	PageStackNode * pagenode = NULL;
+	Activity * activity = NULL;
 	
-	//不允许入栈空值
-	if(NULL == pageinfo)
-		return My_Fail;
-	
-	pagenode = MyMalloc(sizeof(PageStackNode));
-	
-	if(pagenode)
-	{		
-		pagenode->pageinfo = pageinfo;
-		pagenode->lastpagenode = s_linkstack->top;
-		
-		s_linkstack->top = pagenode;
-		
-		return My_Pass;
-	}
-	else
-		return My_Fail;
-}
-
-/***************************************************************************************************
-*FunctionName: PageLinkStackPop
-*Description: 链栈出栈操作
-*Input: s_linkstack -- 链栈地址
-*		pageinfo -- 出栈数据存放地址
-*Output: None
-*Return: My_Fail -- 出栈失败
-*		My_Pass -- 出栈成功
-*Author: xsx
-*Date: 2016年12月7日15:10:31
-***************************************************************************************************/
-static MyState_TypeDef PageLinkStackPop(PageLinkStack * s_linkstack, PageInfo ** pageinfo)
-{
-	PageStackNode * pagenode = NULL;
-	
-	//栈空或者只有1个节点，则不允许出栈，系统设计最底层节点为主界面
-	if(PageLinkStackLength(s_linkstack) <= OriginPageIndex)
-		return My_Fail;
-
-	//不空
-	else
+	if(My_Pass == StackTop(&GB_ActivityLinkStack, &activity))
 	{
-		//删除当前页面的数据空间
-		if(s_linkstack->top)
-		{
-			if(s_linkstack->top->pageinfo->PageBufferFree)
-				s_linkstack->top->pageinfo->PageBufferFree();
-		}
-		
-		pagenode = s_linkstack->top;
-		*pageinfo = pagenode->pageinfo;
-		
-		s_linkstack->top = pagenode->lastpagenode;
-		
-		MyFree(pagenode);
-		
-		return My_Pass;
+		if( (activity) && (activity->pageFresh))
+			activity->pageFresh();
 	}
 }
-
-/***************************************************************************************************
-*FunctionName: PageLinkStackTop
-*Description: 读取栈顶节点中的值，但是不删除栈顶节点
-*Input: s_linkstack -- 链栈
-*		pageinfo -- 读取数据的存放地址
-*Output: None
-*Return: My_Fail -- 读取失败
-*		My_Pass -- 读取成功
-*Author: xsx
-*Date: 2016年12月7日15:13:48
-***************************************************************************************************/
-static MyState_TypeDef PageLinkStackTop(PageLinkStack * s_linkstack, PageInfo ** pageinfo)
-{	
-	//栈空
-	if(PageLinkStackIsEmpty(s_linkstack))
-		return My_Fail;
-
-	//不空
-	else
-	{
-		*pageinfo = s_linkstack->top->pageinfo;
-
-		return My_Pass;
-	}
-}
-
 

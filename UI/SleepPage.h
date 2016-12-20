@@ -1,6 +1,7 @@
 #ifndef __SLEEP_P_H__
 #define __SLEEP_P_H__
 
+#include	"UI_Data.h"
 #include	"Define.h"
 #include	"Timer_Data.h"
 
@@ -17,7 +18,7 @@ typedef struct SleepPageBuffer_tag {
 }SleepPageBuffer;
 
 
-unsigned char DspSleepPage(void *  parm);
+MyState_TypeDef createSleepActivity(Activity * thizActivity, void * pram);
 
 #endif
 

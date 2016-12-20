@@ -688,11 +688,6 @@
               <FilePath>..\Task\NormalUpLoad_Task.c</FilePath>
             </File>
             <File>
-              <FileName>ReadInputData_Task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Task\ReadInputData_Task.c</FilePath>
-            </File>
-            <File>
               <FileName>Test_Task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Task\Test_Task.c</FilePath>
@@ -728,119 +723,9 @@
               <FilePath>..\UI\LunchPage.c</FilePath>
             </File>
             <File>
-              <FileName>SelectUserPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\SelectUserPage.c</FilePath>
-            </File>
-            <File>
-              <FileName>SampleIDPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\SampleIDPage.c</FilePath>
-            </File>
-            <File>
-              <FileName>WaittingCardPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\WaittingCardPage.c</FilePath>
-            </File>
-            <File>
-              <FileName>PreReadCardPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\PreReadCardPage.c</FilePath>
-            </File>
-            <File>
-              <FileName>TimeDownNorPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\TimeDownNorPage.c</FilePath>
-            </File>
-            <File>
-              <FileName>TestPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\TestPage.c</FilePath>
-            </File>
-            <File>
-              <FileName>SystemSetPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\SystemSetPage.c</FilePath>
-            </File>
-            <File>
-              <FileName>AdjustPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\AdjustPage.c</FilePath>
-            </File>
-            <File>
-              <FileName>NetInfoPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\NetInfoPage.c</FilePath>
-            </File>
-            <File>
-              <FileName>NetPreSetPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\NetPreSetPage.c</FilePath>
-            </File>
-            <File>
-              <FileName>NetSetPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\NetSetPage.c</FilePath>
-            </File>
-            <File>
-              <FileName>OperGuidePage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\OperGuidePage.c</FilePath>
-            </File>
-            <File>
-              <FileName>OtherSetPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\OtherSetPage.c</FilePath>
-            </File>
-            <File>
-              <FileName>PaiDuiPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\PaiDuiPage.c</FilePath>
-            </File>
-            <File>
-              <FileName>RecordPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\RecordPage.c</FilePath>
-            </File>
-            <File>
-              <FileName>ReTestPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\ReTestPage.c</FilePath>
-            </File>
-            <File>
-              <FileName>SetDeviceIDPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\SetDeviceIDPage.c</FilePath>
-            </File>
-            <File>
-              <FileName>SetDeviceInfoPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\SetDeviceInfoPage.c</FilePath>
-            </File>
-            <File>
-              <FileName>ShowDeviceInfoPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\ShowDeviceInfoPage.c</FilePath>
-            </File>
-            <File>
-              <FileName>ShowResultPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\ShowResultPage.c</FilePath>
-            </File>
-            <File>
               <FileName>SleepPage.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\UI\SleepPage.c</FilePath>
-            </File>
-            <File>
-              <FileName>UserMPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\UserMPage.c</FilePath>
-            </File>
-            <File>
-              <FileName>WifiSetPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\UI\WifiSetPage.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1016,6 +901,11 @@
               <FileName>MyMem.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\COM\MyMem.c</FilePath>
+            </File>
+            <File>
+              <FileName>MyStack.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\COM\MyStack.c</FilePath>
             </File>
           </Files>
         </Group>

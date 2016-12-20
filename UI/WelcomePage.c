@@ -24,11 +24,15 @@
 static WelcomePageBuffer * S_WelcomePageBuffer = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
-static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpDate(void);
-static MyState_TypeDef PageInit(void *  parm);
-static MyState_TypeDef PageBufferMalloc(void);
-static MyState_TypeDef PageBufferFree(void);
+static void activityStart(void);
+static void activityInput(unsigned char *pbuf , unsigned short len);
+static void activityFresh(void);
+static void activityHide(void);
+static void activityResume(void);
+static void activityDestroy(void);
+
+static MyState_TypeDef activityBufferMalloc(void);
+static void activityBufferFree(void);
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -37,41 +41,62 @@ static MyState_TypeDef PageBufferFree(void);
 /******************************************************************************************/
 
 /***************************************************************************************************
-*FunctionName：DspWelcomePage
-*Description：欢迎界面
-*Input：parm -- 参数
-*Output：None
-*Author：xsx
-*Data：2016年6月27日08:53:22
+*FunctionName: createWelcomeActivity
+*Description: 创建欢迎界面
+*Input: thizActivity -- 当前界面
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月20日16:21:51
 ***************************************************************************************************/
-unsigned char DspWelcomePage(void *  parm)
+MyState_TypeDef createWelcomeActivity(Activity * thizActivity, void * pram)
 {
-	PageInfo * currentpage = NULL;
+	if(NULL == thizActivity)
+		return My_Fail;
 	
-	if(My_Pass == GetCurrentPage(&currentpage))
+	if(My_Pass == activityBufferMalloc())
 	{
-		currentpage->PageInit = PageInit;
-		currentpage->PageUpDate = PageUpDate;
-		currentpage->LCDInput = Input;
-		currentpage->PageBufferMalloc = PageBufferMalloc;
-		currentpage->PageBufferFree = PageBufferFree;
+		InitActivity(thizActivity, "WelcomeActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
-		currentpage->PageInit(currentpage->pram);
+		return My_Pass;
 	}
 	
-	return 0;
+	return My_Fail;
 }
 
 /***************************************************************************************************
-*FunctionName：Input
-*Description：接收lcd输入
-*Input：pbuf -- 输入数据
-*		len -- 输入数据长度
-*Output：None
-*Author：xsx
-*Data：2016年6月27日08:54:10
+*FunctionName: activityStart
+*Description: 显示当前界面
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月20日16:22:23
 ***************************************************************************************************/
-static void Input(unsigned char *pbuf , unsigned short len)
+static void activityStart(void)
+{
+	if(S_WelcomePageBuffer)
+	{
+		timer_set(&(S_WelcomePageBuffer->timer), 1);
+	}
+	
+	SetLEDLight(100);
+	
+	SelectPage(0);
+	
+	AddNumOfSongToList(52, 0);
+}
+
+/***************************************************************************************************
+*FunctionName: activityInput
+*Description: 当前界面输入
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月20日16:22:42
+***************************************************************************************************/
+static void activityInput(unsigned char *pbuf , unsigned short len)
 {
 	if(S_WelcomePageBuffer)
 	{
@@ -101,8 +126,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 					//开始排队任务
 					StartPaiduiTask();
 					
-					PageBufferFree();
-					PageAdvanceTo(DspLunchPage, NULL);
+					startActivity(createLunchActivity, NULL);
 				}
 			}
 		}
@@ -114,14 +138,15 @@ static void Input(unsigned char *pbuf , unsigned short len)
 }
 
 /***************************************************************************************************
-*FunctionName：PageUpData
-*Description：界面数据更新，10ms执行一次
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年6月27日08:55:02
+*FunctionName: activityFresh
+*Description: 当前界面刷新
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月20日16:22:56
 ***************************************************************************************************/
-static void PageUpDate(void)
+static void activityFresh(void)
 {
 	if(S_WelcomePageBuffer)
 	{
@@ -134,29 +159,30 @@ static void PageUpDate(void)
 	}
 }
 
-/***************************************************************************************************
-*FunctionName：PageInit
-*Description：当前界面初始化
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年6月27日08:55:25
-***************************************************************************************************/
-static MyState_TypeDef PageInit(void *  parm)
+
+static void activityHide(void)
 {
-	if(My_Pass == PageBufferMalloc())
-	{
-		timer_set(&(S_WelcomePageBuffer->timer), 1);
-	}
-	
-	SetLEDLight(100);
-	
-	SelectPage(0);
-	
-	AddNumOfSongToList(52, 0);
-	
-	return My_Pass;
+
 }
+static void activityResume(void)
+{
+	
+}
+
+/***************************************************************************************************
+*FunctionName: activityFinish
+*Description: 
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 
+***************************************************************************************************/
+static void activityDestroy(void)
+{
+	activityBufferFree();
+}
+
 
 /***************************************************************************************************
 *FunctionName：PageBufferMalloc
@@ -166,7 +192,7 @@ static MyState_TypeDef PageInit(void *  parm)
 *Author：xsx
 *Data：2016年6月27日08:56:02
 ***************************************************************************************************/
-static MyState_TypeDef PageBufferMalloc(void)
+static MyState_TypeDef activityBufferMalloc(void)
 {
 	if(NULL == S_WelcomePageBuffer)
 	{
@@ -192,12 +218,10 @@ static MyState_TypeDef PageBufferMalloc(void)
 *Author：xsx
 *Data：2016年6月27日08:56:21
 ***************************************************************************************************/
-static MyState_TypeDef PageBufferFree(void)
+static void activityBufferFree(void)
 {
-	memset(S_WelcomePageBuffer, 0, sizeof(WelcomePageBuffer));
 	MyFree(S_WelcomePageBuffer);
 	S_WelcomePageBuffer = NULL;
-	return My_Pass;
 }
 
 

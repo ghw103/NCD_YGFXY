@@ -162,10 +162,6 @@ void ETH_link_callback(struct netif *netif)
 			IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1 , NETMASK_ADDR2, NETMASK_ADDR3);
 			IP4_ADDR(&gw, myNetData.myip.ip_1, myNetData.myip.ip_2, myNetData.myip.ip_3, 1);
 		}
-		
-		IP4_ADDR(&ipaddr, 192,168,0,33);
-		IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1 , NETMASK_ADDR2, NETMASK_ADDR3);
-		IP4_ADDR(&gw, 192,168,0,1);
 
 		netif_set_addr(&xnetif, &ipaddr , &netmask, &gw);
     
