@@ -49,7 +49,7 @@ static void activityBufferFree(void);
 *Author: xsx
 *Date: 2016年12月20日16:21:51
 ***************************************************************************************************/
-MyState_TypeDef createWelcomeActivity(Activity * thizActivity, void * pram)
+MyState_TypeDef createWelcomeActivity(Activity * thizActivity, Intent * pram)
 {
 	if(NULL == thizActivity)
 		return My_Fail;
@@ -126,6 +126,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 					//开始排队任务
 					StartPaiduiTask();
 					
+					destroyTopActivity();
 					startActivity(createLunchActivity, NULL);
 				}
 			}
@@ -164,6 +165,7 @@ static void activityHide(void)
 {
 
 }
+
 static void activityResume(void)
 {
 	

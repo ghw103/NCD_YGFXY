@@ -3,6 +3,7 @@
 
 #include	"Define.h"
 #include	"SystemSet_Data.h"
+#include	"UI_Data.h"
 
 typedef struct OtherSetPageBuffer_tag {
 	MyTime_Def temptime;
@@ -13,7 +14,7 @@ typedef struct OtherSetPageBuffer_tag {
 	unsigned short tempvalue;
 }OtherSetPageBuffer;
 
-unsigned char DspOtherSetPage(void *  parm);
+MyState_TypeDef createOtherSetActivity(Activity * thizActivity, Intent * pram);
 
 #endif
 

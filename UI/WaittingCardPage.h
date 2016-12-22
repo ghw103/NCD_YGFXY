@@ -3,6 +3,7 @@
 
 #include	"Timer_Data.h"
 #include	"MyTest_Data.h"
+#include	"UI_Data.h"
 
 typedef struct WaitPage_tag {
 	Timer timer;				//µÈ´ý²å¿¨Ê±¼ä
@@ -11,7 +12,7 @@ typedef struct WaitPage_tag {
 	unsigned short lcdinput[100];
 }WaitPageData;
 
-unsigned char DspWaittingCardPage(void *  parm);
+MyState_TypeDef createWaittingCardActivity(Activity * thizActivity, Intent * pram);
 
 #endif
 

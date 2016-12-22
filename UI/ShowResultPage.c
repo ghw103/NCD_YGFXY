@@ -4,9 +4,9 @@
 #include	"ShowResultPage.h"
 #include	"Define.h"
 #include	"LCD_Driver.h"
-#include	"UI_Data.h"
 #include	"MyMem.h"
 #include	"Test_Fun.h"
+#include	"Intent.h"
 
 #include	"MyTest_Data.h"
 #include	"System_Data.h"
@@ -29,44 +29,87 @@ static ShowPageBuffer * S_ShowPageBuffer = NULL;
 static unsigned int TestLineHigh = 76800;	//此数据与曲线显示区域高度有关，如果界面不改，此数不改
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
-
-static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpDate(void);
-
 static void RefreshText(void);
 static void DspLine(void);
 static void dspIco(void);
 
-static MyState_TypeDef PageInit(void *  parm);
-static MyState_TypeDef PageBufferMalloc(void);
-static MyState_TypeDef PageBufferFree(void);
+static void activityStart(void);
+static void activityInput(unsigned char *pbuf , unsigned short len);
+static void activityFresh(void);
+static void activityHide(void);
+static void activityResume(void);
+static void activityDestroy(void);
+static MyState_TypeDef activityBufferMalloc(void);
+static void activityBufferFree(void);
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
-
-unsigned char DspShowResultPage(void *  parm)
-{	
-	PageInfo * currentpage = NULL;
+/***************************************************************************************************
+*FunctionName: createSelectUserActivity
+*Description: 创建选择操作人界面
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:00:09
+***************************************************************************************************/
+MyState_TypeDef createShowResultActivity(Activity * thizActivity, Intent * pram)
+{
+	if(NULL == thizActivity)
+		return My_Fail;
 	
-	if(My_Pass == GetCurrentPage(&currentpage))
+	if(My_Pass == activityBufferMalloc())
 	{
-		currentpage->PageInit = PageInit;
-		currentpage->PageUpDate = PageUpDate;
-		currentpage->LCDInput = Input;
-		currentpage->PageBufferMalloc = PageBufferMalloc;
-		currentpage->PageBufferFree = PageBufferFree;
+		InitActivity(thizActivity, "ShowResultActivity\0", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
-		currentpage->PageInit(currentpage->pram);
+		//如果传入参数，
+		if(pram)
+		{
+			readIntent(pram, &(S_ShowPageBuffer->testdata), sizeof(TestData));
+		}
+		
+		return My_Pass;
 	}
 	
-	return 0;
+	return My_Fail;
 }
 
+/***************************************************************************************************
+*FunctionName: activityStart
+*Description: 显示主界面
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:00:32
+***************************************************************************************************/
+static void activityStart(void)
+{
+	if(S_ShowPageBuffer)
+	{
+		RefreshText();
+			
+		DspLine();
+			
+		dspIco();
+	}
+	
+	SelectPage(147);
+}
 
-static void Input(unsigned char *pbuf , unsigned short len)
+/***************************************************************************************************
+*FunctionName: activityInput
+*Description: 界面输入
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:00:59
+***************************************************************************************************/
+static void activityInput(unsigned char *pbuf , unsigned short len)
 {
 	if(S_ShowPageBuffer)
 	{
@@ -77,66 +120,115 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		/*退出*/
 		if(0x2301 == S_ShowPageBuffer->lcdinput[0])
 		{
-			PageBufferFree();
-			PageBackTo(ParentPage);
+			backToFatherActivity();
 		}
 		/*打印*/
 		else if(0x2300 == S_ShowPageBuffer->lcdinput[0])
 		{
 			SendKeyCode(1);
-			PrintfData(S_ShowPageBuffer->testdata);
+			PrintfData(&(S_ShowPageBuffer->testdata));
 			SendKeyCode(16);
 		}
 	}
 }
 
-static void PageUpDate(void)
+/***************************************************************************************************
+*FunctionName: activityFresh
+*Description: 界面刷新
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:01:16
+***************************************************************************************************/
+static void activityFresh(void)
 {
 
 }
 
-static MyState_TypeDef PageInit(void *  parm)
+/***************************************************************************************************
+*FunctionName: activityHide
+*Description: 隐藏界面时要做的事
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:01:40
+***************************************************************************************************/
+static void activityHide(void)
 {
-	if(My_Fail == PageBufferMalloc())
-		return My_Fail;
-	
-	SelectPage(147);
 
-	if(parm && S_ShowPageBuffer)
-	{
-		S_ShowPageBuffer->testdata = parm;
-		
-		RefreshText();
-		
-		DspLine();
-		
-		dspIco();
-	}
-	
-	return My_Pass;
 }
 
-static MyState_TypeDef PageBufferMalloc(void)
-{	
+/***************************************************************************************************
+*FunctionName: activityResume
+*Description: 界面恢复显示时要做的事
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:01:58
+***************************************************************************************************/
+static void activityResume(void)
+{
+
+}
+
+/***************************************************************************************************
+*FunctionName: activityDestroy
+*Description: 界面销毁
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:02:15
+***************************************************************************************************/
+static void activityDestroy(void)
+{
+	activityBufferFree();
+}
+
+/***************************************************************************************************
+*FunctionName: activityBufferMalloc
+*Description: 界面数据内存申请
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 
+***************************************************************************************************/
+static MyState_TypeDef activityBufferMalloc(void)
+{
 	if(NULL == S_ShowPageBuffer)
 	{
-		S_ShowPageBuffer = (ShowPageBuffer *)MyMalloc(sizeof(ShowPageBuffer));
-			
-		if(NULL == S_ShowPageBuffer)
+		S_ShowPageBuffer = MyMalloc(sizeof(ShowPageBuffer));
+		
+		if(S_ShowPageBuffer)
+		{
+			memset(S_ShowPageBuffer, 0, sizeof(ShowPageBuffer));
+	
+			return My_Pass;
+		}
+		else
 			return My_Fail;
 	}
-	
-	memset(S_ShowPageBuffer, 0, sizeof(ShowPageBuffer));
-		
-	return My_Pass;
+	else
+		return My_Pass;
 }
 
-static MyState_TypeDef PageBufferFree(void)
+/***************************************************************************************************
+*FunctionName: activityBufferFree
+*Description: 界面内存释放
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:03:10
+***************************************************************************************************/
+static void activityBufferFree(void)
 {
 	MyFree(S_ShowPageBuffer);
 	S_ShowPageBuffer = NULL;
-	
-	return My_Pass;
 }
 
 static void RefreshText(void)
@@ -144,20 +236,20 @@ static void RefreshText(void)
 	if(S_ShowPageBuffer)
 	{
 		memset(S_ShowPageBuffer->tempbuf, 0, 100);
-		sprintf(S_ShowPageBuffer->tempbuf, "%s", S_ShowPageBuffer->testdata->temperweima.ItemName);
+		sprintf(S_ShowPageBuffer->tempbuf, "%s", S_ShowPageBuffer->testdata.temperweima.ItemName);
 		DisText(0x2310, S_ShowPageBuffer->tempbuf, 20);
 				
 		memset(S_ShowPageBuffer->tempbuf, 0, 100);
-		sprintf(S_ShowPageBuffer->tempbuf, "%s", S_ShowPageBuffer->testdata->sampleid);
+		sprintf(S_ShowPageBuffer->tempbuf, "%s", S_ShowPageBuffer->testdata.sampleid);
 		DisText(0x2320, S_ShowPageBuffer->tempbuf, 20);
 				
-		sprintf(S_ShowPageBuffer->tempbuf, "%2.1f", S_ShowPageBuffer->testdata->TestTemp.O_Temperature);
+		sprintf(S_ShowPageBuffer->tempbuf, "%2.1f", S_ShowPageBuffer->testdata.TestTemp.O_Temperature);
 		DisText(0x2330, S_ShowPageBuffer->tempbuf, 8);
 				
-		sprintf(S_ShowPageBuffer->tempbuf, "%s", S_ShowPageBuffer->testdata->temperweima.CardPiCi);
+		sprintf(S_ShowPageBuffer->tempbuf, "%s", S_ShowPageBuffer->testdata.temperweima.CardPiCi);
 		DisText(0x2340, S_ShowPageBuffer->tempbuf, 30);
 				
-		sprintf(S_ShowPageBuffer->tempbuf, "%.2f", S_ShowPageBuffer->testdata->testline.AdjustResult);
+		sprintf(S_ShowPageBuffer->tempbuf, "%.2f", S_ShowPageBuffer->testdata.testline.AdjustResult);
 		DisText(0x2350, S_ShowPageBuffer->tempbuf, 30);
 
 	}
@@ -178,12 +270,12 @@ static void DspLine(void)
 	{
 		if(i%10 == 0)
 		{
-			p = &(S_ShowPageBuffer->testdata->testline.TestPoint[i]);
+			p = &(S_ShowPageBuffer->testdata.testline.TestPoint[i]);
 			DisPlayLine(1 , p , 10);
 		}
 		
-		if(S_ShowPageBuffer->lineinfo.MaxData <= S_ShowPageBuffer->testdata->testline.TestPoint[i])
-			S_ShowPageBuffer->lineinfo.MaxData = S_ShowPageBuffer->testdata->testline.TestPoint[i];
+		if(S_ShowPageBuffer->lineinfo.MaxData <= S_ShowPageBuffer->testdata.testline.TestPoint[i])
+			S_ShowPageBuffer->lineinfo.MaxData = S_ShowPageBuffer->testdata.testline.TestPoint[i];
 	}
 	
 	////////////////////////针对当前曲线最大值计算y轴放大倍数//////////////////////////////////////
@@ -218,8 +310,8 @@ static void dspIco(void)
 	{
 		//在曲线上标记出T,C,基线
 		S_ShowPageBuffer->myico[0].ICO_ID = 22;
-		S_ShowPageBuffer->myico[0].X = 505+S_ShowPageBuffer->testdata->testline.T_Point[1]-5;
-		tempvalue = S_ShowPageBuffer->testdata->testline.T_Point[0];
+		S_ShowPageBuffer->myico[0].X = 505+S_ShowPageBuffer->testdata.testline.T_Point[1]-5;
+		tempvalue = S_ShowPageBuffer->testdata.testline.T_Point[0];
 		tempvalue /= S_ShowPageBuffer->lineinfo.Y_Scale*2;
 		tempvalue = 1-tempvalue;
 		tempvalue *= 302;										//曲线窗口宽度
@@ -227,8 +319,8 @@ static void dspIco(void)
 		S_ShowPageBuffer->myico[0].Y = (unsigned short)tempvalue - 5;
 		
 		S_ShowPageBuffer->myico[1].ICO_ID = 22;
-		S_ShowPageBuffer->myico[1].X = 505+S_ShowPageBuffer->testdata->testline.C_Point[1]-5;
-		tempvalue = S_ShowPageBuffer->testdata->testline.C_Point[0];
+		S_ShowPageBuffer->myico[1].X = 505+S_ShowPageBuffer->testdata.testline.C_Point[1]-5;
+		tempvalue = S_ShowPageBuffer->testdata.testline.C_Point[0];
 		tempvalue /= S_ShowPageBuffer->lineinfo.Y_Scale*2;
 		tempvalue = 1-tempvalue;
 		tempvalue *= 302;										//曲线窗口宽度
@@ -236,8 +328,8 @@ static void dspIco(void)
 		S_ShowPageBuffer->myico[1].Y = (unsigned short)tempvalue - 5;
 		
 		S_ShowPageBuffer->myico[2].ICO_ID = 22;
-		S_ShowPageBuffer->myico[2].X = 505+S_ShowPageBuffer->testdata->testline.B_Point[1]-5;
-		tempvalue = S_ShowPageBuffer->testdata->testline.B_Point[0];
+		S_ShowPageBuffer->myico[2].X = 505+S_ShowPageBuffer->testdata.testline.B_Point[1]-5;
+		tempvalue = S_ShowPageBuffer->testdata.testline.B_Point[0];
 		tempvalue /= S_ShowPageBuffer->lineinfo.Y_Scale*2;
 		tempvalue = 1-tempvalue;
 		tempvalue *= 302;										//曲线窗口宽度

@@ -45,7 +45,7 @@ static LinkStack GB_ActivityLinkStack;
 *Author: xsx
 *Date: 2016年12月20日11:16:59
 ***************************************************************************************************/
-MyState_TypeDef startActivity(MyState_TypeDef (* pageCreate)(Activity * thizactivity, void * pram), void * pram)
+MyState_TypeDef startActivity(MyState_TypeDef (* pageCreate)(Activity * thizactivity, Intent * pram), Intent * pram)
 {
 	Activity * activity = NULL;
 	
@@ -59,7 +59,7 @@ MyState_TypeDef startActivity(MyState_TypeDef (* pageCreate)(Activity * thizacti
 	{
 		memset(activity, 0, sizeof(Activity));
 		
-		activity->pageCreate = pageCreate;
+		activity->pageCreate = (MyState_TypeDef (*)(void * thizactivity, Intent * pram))pageCreate;
 		
 		//新页面入栈
 		if(My_Pass == StackPush(&GB_ActivityLinkStack, activity))
@@ -75,7 +75,7 @@ MyState_TypeDef startActivity(MyState_TypeDef (* pageCreate)(Activity * thizacti
 			}
 			//创建失败，则出栈此页面，并销毁
 			else
-				StackPop(&GB_ActivityLinkStack, NULL, true);
+				StackPop(&GB_ActivityLinkStack, true);
 		}
 		
 		//入栈失败，则销毁
@@ -111,12 +111,85 @@ MyState_TypeDef backToActivity(char * pageName)
 			return My_Pass;
 		}
 		else
-			StackPop(&GB_ActivityLinkStack, NULL, false);
+			StackPop(&GB_ActivityLinkStack, false);
 	}
 	
 	return My_Fail;
 }
 
+/***************************************************************************************************
+*FunctionName: backToFatherActivity
+*Description: 返回父页面
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日10:52:37
+***************************************************************************************************/
+MyState_TypeDef backToFatherActivity(void)
+{
+	Activity * activity = NULL;
+	
+	//出栈当前页面
+	StackPop(&GB_ActivityLinkStack, false);
+	
+	if(My_Pass == StackTop(&GB_ActivityLinkStack, &activity))
+	{
+		if(activity->pageResume)
+			activity->pageResume();
+			
+		return My_Pass;
+	}
+	
+	return My_Fail;
+}
+
+/***************************************************************************************************
+*FunctionName: getFatherActivityName
+*Description: 获取父页面名字
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日11:03:51
+***************************************************************************************************/
+char * getFatherActivityName(void)
+{
+	if((GB_ActivityLinkStack.top) && (GB_ActivityLinkStack.top->lastStackNode) && (GB_ActivityLinkStack.top->lastStackNode->activity))
+		return GB_ActivityLinkStack.top->lastStackNode->activity->pageName;
+	
+	return NULL;
+}
+
+/***************************************************************************************************
+*FunctionName: getCurrentActivityName
+*Description: 获取当前页面名字
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日11:03:51
+***************************************************************************************************/
+char * getCurrentActivityName(void)
+{
+	if((GB_ActivityLinkStack.top) && (GB_ActivityLinkStack.top->activity))
+		return GB_ActivityLinkStack.top->activity->pageName;
+	
+	return NULL;
+}
+/***************************************************************************************************
+*FunctionName: destroyTopActivity
+*Description: 销毁栈顶页面
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:42:32
+***************************************************************************************************/
+void destroyTopActivity(void)
+{
+	StackPop(&GB_ActivityLinkStack, false);
+}
 /***************************************************************************************************
 *FunctionName: InitActivity
 *Description: 初始化一个页面的事件函数

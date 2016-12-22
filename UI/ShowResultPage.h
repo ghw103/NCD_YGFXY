@@ -2,16 +2,17 @@
 #define __SHOWRESULT_P_H__
 
 #include	"MyTest_Data.h"
+#include	"UI_Data.h"
 
 typedef struct ShowPageBuffer_tag {
 	char tempbuf[100];
 	Basic_ICO myico[3];
-	TestData * testdata;
+	TestData testdata;
 	LineInfo lineinfo;
 	unsigned short lcdinput[100];
 }ShowPageBuffer;
 
-unsigned char DspShowResultPage(void *  parm);
+MyState_TypeDef createShowResultActivity(Activity * thizActivity, Intent * pram);
 
 #endif
 

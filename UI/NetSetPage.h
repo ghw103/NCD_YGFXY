@@ -3,6 +3,7 @@
 
 #include	"Define.h"
 #include	"SystemSet_Data.h"
+#include	"UI_Data.h"
 
 typedef struct NetSetPageBuffer_tag {
 	NetSet myNetSet;
@@ -13,7 +14,7 @@ typedef struct NetSetPageBuffer_tag {
 }NetSetPageBuffer;
 
 
-unsigned char DspNetSetPage(void *  parm);
+MyState_TypeDef createNetSetActivity(Activity * thizActivity, Intent * pram);
 
 #endif
 

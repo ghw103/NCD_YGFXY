@@ -206,7 +206,7 @@ ResultState TestFunction(void * parm)
 				}
 			}
 			
-			vTaskDelay(1000/portTICK_RATE_MS);
+			vTaskDelay(1500/portTICK_RATE_MS);
 			
 			//分析曲线
 			AnalysisTestData(S_TempCalData);
@@ -270,10 +270,10 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 		S_TempCalData->stdev = sqrt(S_TempCalData->stdev);
 		
 		//计算变异系数
-		S_TempCalData->CV = S_TempCalData->stdev / S_TempCalData->average;
+		S_TempCalData->CV1 = S_TempCalData->stdev / S_TempCalData->average;
 		
 		//如果变异系数小于1%，说明采集的为直线，未加样
-		if(S_TempCalData->CV < 0.01)
+		if(S_TempCalData->CV1 < 0.01)
 		{
 			goto END1;
 		}
@@ -289,7 +289,7 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 				return;
 			}
 		}
-		else if(S_TempCalData->maxdata < 500)
+		else if(S_TempCalData->maxdata < 200)
 		{
 			if(GetChannel() < 7)
 			{
@@ -302,7 +302,7 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 		
 		//找c线
 		S_TempCalData->testdata->testline.C_Point[0] = 0;
-		for(i=S_TempCalData->testdata->temperweima.CLineLocation-40; i<S_TempCalData->testdata->temperweima.CLineLocation+40; i++)
+		for(i=S_TempCalData->testdata->temperweima.CLineLocation-20; i<S_TempCalData->testdata->temperweima.CLineLocation+20; i++)
 		{
 			if(S_TempCalData->testdata->testline.C_Point[0] < S_TempCalData->testdata->testline.TestPoint[i])
 			{
@@ -312,23 +312,41 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 		}
 		
 		//判断C线是不是真实存在
-		
-		//判断峰值前5个点是不是递增，否则，C峰错误
-		for(i=S_TempCalData->testdata->testline.C_Point[1]-5; i<S_TempCalData->testdata->testline.C_Point[1]; i++)
+		S_TempCalData->tempvalue1 = 0;
+		for(i=S_TempCalData->testdata->testline.C_Point[1] - 15; i<S_TempCalData->testdata->testline.C_Point[1] + 15; i++)
 		{
-			if(S_TempCalData->testdata->testline.TestPoint[i] > S_TempCalData->testdata->testline.TestPoint[i+1])
-				goto END2;
+			S_TempCalData->tempvalue1 += S_TempCalData->testdata->testline.TestPoint[i];
 		}
-		//判断峰值前5个点是不是递减，否则，C峰错误
-		for(i=S_TempCalData->testdata->testline.C_Point[1]; i<S_TempCalData->testdata->testline.C_Point[1]+5; i++)
+		
+		//平均值
+		S_TempCalData->average = S_TempCalData->tempvalue1 / 30;
+		
+		
+		
+		//计算标准差
+		S_TempCalData->tempvalue1 = 0;
+		for(i=S_TempCalData->testdata->testline.C_Point[1] - 15; i<S_TempCalData->testdata->testline.C_Point[1] + 15; i++)
 		{
-			if(S_TempCalData->testdata->testline.TestPoint[i] < S_TempCalData->testdata->testline.TestPoint[i+1])
-				goto END2;
+			S_TempCalData->tempvalue2 = S_TempCalData->testdata->testline.TestPoint[i];
+			S_TempCalData->tempvalue2 -= S_TempCalData->average;
+			S_TempCalData->tempvalue2 *= S_TempCalData->tempvalue2;
+			S_TempCalData->tempvalue1 += S_TempCalData->tempvalue2;
+		}
+		S_TempCalData->stdev = S_TempCalData->tempvalue1 / 30;
+		S_TempCalData->stdev = sqrt(S_TempCalData->stdev);
+		
+		//计算变异系数
+		S_TempCalData->CV2 = S_TempCalData->stdev / S_TempCalData->average;
+		
+		//如果变异系数小于1%，说明采集的为直线，未加样
+		if(S_TempCalData->CV2 < 0.01)
+		{
+			goto END2;
 		}
 		
 		//找T线
 		S_TempCalData->testdata->testline.T_Point[0] = 0;
-		for(i=S_TempCalData->testdata->temperweima.ItemLocation-40; i<S_TempCalData->testdata->temperweima.ItemLocation+40; i++)
+		for(i=S_TempCalData->testdata->temperweima.ItemLocation-20; i<S_TempCalData->testdata->temperweima.ItemLocation+20; i++)
 		{
 			if(S_TempCalData->testdata->testline.T_Point[0] < S_TempCalData->testdata->testline.TestPoint[i])
 			{
@@ -336,9 +354,7 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 				S_TempCalData->testdata->testline.T_Point[1] = i;
 			}
 		}
-		
-		
-		
+
 		//找基线
 		S_TempCalData->testdata->testline.B_Point[0] = 0xffff;
 		for(i=S_TempCalData->testdata->testline.T_Point[1]; i<S_TempCalData->testdata->testline.C_Point[1]; i++)
@@ -358,23 +374,27 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 		S_TempCalData->testdata->testline.BasicBili = S_TempCalData->tempvalue2;
 				
 		/*根据分段，计算原始结果*/
-		if((S_TempCalData->testdata->testline.BasicBili < S_TempCalData->testdata->temperweima.ItemFenDuan) || (S_TempCalData->testdata->temperweima.ItemBiaoQuNum == 1))
+		if((S_TempCalData->testdata->testline.BasicBili < S_TempCalData->testdata->temperweima.ItemFenDuan) || (S_TempCalData->testdata->temperweima.ItemFenDuan == 0))
 		{
-			S_TempCalData->testdata->testline.BasicResult = S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->testline.BasicBili;
+			S_TempCalData->testdata->testline.BasicResult = S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->testline.BasicBili;
 			S_TempCalData->testdata->testline.BasicResult *= S_TempCalData->testdata->temperweima.ItemBiaoQu[0][0];
 					
-			S_TempCalData->testdata->testline.BasicResult += (S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->temperweima.ItemBiaoQu[0][1]);
+			S_TempCalData->testdata->testline.BasicResult += (S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->temperweima.ItemBiaoQu[0][1]);
 					
-			S_TempCalData->testdata->testline.BasicResult += S_TempCalData->testdata->temperweima.ItemBiaoQu[0][2];
+			S_TempCalData->testdata->testline.BasicResult += (S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->temperweima.ItemBiaoQu[0][2]);
+			
+			S_TempCalData->testdata->testline.BasicResult += S_TempCalData->testdata->temperweima.ItemBiaoQu[0][3];
 		}
 		else
 		{
-			S_TempCalData->testdata->testline.BasicResult = S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->testline.BasicBili;
+			S_TempCalData->testdata->testline.BasicResult = S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->testline.BasicBili;
 			S_TempCalData->testdata->testline.BasicResult *= S_TempCalData->testdata->temperweima.ItemBiaoQu[1][0];
 					
-			S_TempCalData->testdata->testline.BasicResult += (S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->temperweima.ItemBiaoQu[1][1]);
+			S_TempCalData->testdata->testline.BasicResult += (S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->temperweima.ItemBiaoQu[1][1]);
 					
-			S_TempCalData->testdata->testline.BasicResult += S_TempCalData->testdata->temperweima.ItemBiaoQu[1][2];
+			S_TempCalData->testdata->testline.BasicResult += (S_TempCalData->testdata->temperweima.ItemBiaoQu[1][2] * S_TempCalData->testdata->testline.BasicBili);
+			
+			S_TempCalData->testdata->testline.BasicResult += S_TempCalData->testdata->temperweima.ItemBiaoQu[1][3];
 		}
 				
 		if(S_TempCalData->testdata->testline.BasicResult < 0)
@@ -386,7 +406,8 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 			S_TempCalData->testdata->testline.AdjustResult =  S_TempCalData->testdata->testline.BasicResult;
 		
 		S_TempCalData->resultstatues = ResultIsOK;
-		
+		S_TempCalData->testdata->testline.BasicBili = S_TempCalData->CV1;
+			S_TempCalData->testdata->testline.BasicResult = S_TempCalData->CV2;
 		return ;
 		
 		//未加样
@@ -397,8 +418,8 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 			S_TempCalData->testdata->testline.T_Point[1] = 0;
 			S_TempCalData->testdata->testline.T_Point[0] = 0;
 			S_TempCalData->testdata->testline.T_Point[1] = 0;
-			S_TempCalData->testdata->testline.BasicBili = 0;
-			S_TempCalData->testdata->testline.BasicResult = 0;
+			S_TempCalData->testdata->testline.BasicBili = S_TempCalData->CV1;
+			S_TempCalData->testdata->testline.BasicResult = S_TempCalData->CV2;
 			S_TempCalData->testdata->testline.AdjustResult = 0;
 			
 			S_TempCalData->resultstatues = NoSample;
@@ -412,8 +433,8 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 			S_TempCalData->testdata->testline.T_Point[1] = 0;
 			S_TempCalData->testdata->testline.T_Point[0] = 0;
 			S_TempCalData->testdata->testline.T_Point[1] = 0;
-			S_TempCalData->testdata->testline.BasicBili = 0;
-			S_TempCalData->testdata->testline.BasicResult = 0;
+			S_TempCalData->testdata->testline.BasicBili = S_TempCalData->CV1;
+			S_TempCalData->testdata->testline.BasicResult = S_TempCalData->CV2;
 			S_TempCalData->testdata->testline.AdjustResult = 0;
 			
 			S_TempCalData->resultstatues = PeakError;

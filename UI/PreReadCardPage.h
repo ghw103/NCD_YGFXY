@@ -4,6 +4,7 @@
 #include	"Define.h"
 #include	"MyTest_Data.h"
 #include	"Test_Fun.h"
+#include	"UI_Data.h"
 
 typedef struct PreReadPageBuffer_tag {
 	ItemData * currenttestdata;
@@ -14,9 +15,11 @@ typedef struct PreReadPageBuffer_tag {
 	CardCodeInfo temperweima;						//临时二维码数据缓冲区
 	char buf[100];
 	unsigned short lcdinput[100];
+	LineInfo line;
+	Basic_ICO myico[3];
 }PreReadPageBuffer;
 
-unsigned char DspPreReadCardPage(void *  parm);
+MyState_TypeDef createPreReadCardActivity(Activity * thizActivity, Intent * pram);
 
 #endif
 

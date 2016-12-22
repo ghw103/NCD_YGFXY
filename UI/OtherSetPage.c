@@ -9,7 +9,6 @@
 #include	"RTC_Driver.h"
 #include	"Define.h"
 #include	"MyMem.h"
-#include	"UI_Data.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -24,11 +23,14 @@
 static OtherSetPageBuffer *S_OtherSetPageBuffer = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
-static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpDate(void);
-static MyState_TypeDef PageInit(void *  parm);
-static MyState_TypeDef PageBufferMalloc(void);
-static MyState_TypeDef PageBufferFree(void);
+static void activityStart(void);
+static void activityInput(unsigned char *pbuf , unsigned short len);
+static void activityFresh(void);
+static void activityHide(void);
+static void activityResume(void);
+static void activityDestroy(void);
+static MyState_TypeDef activityBufferMalloc(void);
+static void activityBufferFree(void);
 
 static void SetGB_Time(char *buf, unsigned char len);
 /******************************************************************************************/
@@ -38,26 +40,59 @@ static void SetGB_Time(char *buf, unsigned char len);
 /******************************************************************************************/
 /******************************************************************************************/
 
-unsigned char DspOtherSetPage(void *  parm)
+/***************************************************************************************************
+*FunctionName: createSelectUserActivity
+*Description: 创建选择操作人界面
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:00:09
+***************************************************************************************************/
+MyState_TypeDef createOtherSetActivity(Activity * thizActivity, Intent * pram)
 {
-	PageInfo * currentpage = NULL;
+	if(NULL == thizActivity)
+		return My_Fail;
 	
-	if(My_Pass == GetCurrentPage(&currentpage))
+	if(My_Pass == activityBufferMalloc())
 	{
-		currentpage->PageInit = PageInit;
-		currentpage->PageUpDate = PageUpDate;
-		currentpage->LCDInput = Input;
-		currentpage->PageBufferMalloc = PageBufferMalloc;
-		currentpage->PageBufferFree = PageBufferFree;
+		InitActivity(thizActivity, "OtherSetActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
-		currentpage->PageInit(currentpage->pram);
+		return My_Pass;
 	}
 	
-	return 0;
+	return My_Fail;
 }
 
+/***************************************************************************************************
+*FunctionName: activityStart
+*Description: 显示主界面
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:00:32
+***************************************************************************************************/
+static void activityStart(void)
+{
+	if(S_OtherSetPageBuffer)
+	{
+		getSystemSetData(&(S_OtherSetPageBuffer->mySystemSetData));
+	}
 
-static void Input(unsigned char *pbuf , unsigned short len)
+	SelectPage(122);
+}
+
+/***************************************************************************************************
+*FunctionName: activityInput
+*Description: 界面输入
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:00:59
+***************************************************************************************************/
+static void activityInput(unsigned char *pbuf , unsigned short len)
 {
 	if(S_OtherSetPageBuffer)
 	{
@@ -73,7 +108,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		/*返回*/
 		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2401)
 		{
-			PageBackTo(ParentPage);
+			backToFatherActivity();
 		}
 		/*设置时间*/
 		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2410)
@@ -166,44 +201,103 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	}
 }
 
-static void PageUpDate(void)
+/***************************************************************************************************
+*FunctionName: activityFresh
+*Description: 界面刷新
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:01:16
+***************************************************************************************************/
+static void activityFresh(void)
 {
 
 }
 
-static MyState_TypeDef PageInit(void *  parm)
+/***************************************************************************************************
+*FunctionName: activityHide
+*Description: 隐藏界面时要做的事
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:01:40
+***************************************************************************************************/
+static void activityHide(void)
 {
-	if(My_Pass == PageBufferMalloc())
-		getSystemSetData(&(S_OtherSetPageBuffer->mySystemSetData));
-	
-	SelectPage(122);
-	
-	return My_Pass;
+
 }
 
-static MyState_TypeDef PageBufferMalloc(void)
+/***************************************************************************************************
+*FunctionName: activityResume
+*Description: 界面恢复显示时要做的事
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:01:58
+***************************************************************************************************/
+static void activityResume(void)
+{
+
+}
+
+/***************************************************************************************************
+*FunctionName: activityDestroy
+*Description: 界面销毁
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:02:15
+***************************************************************************************************/
+static void activityDestroy(void)
+{
+	activityBufferFree();
+}
+
+/***************************************************************************************************
+*FunctionName: activityBufferMalloc
+*Description: 界面数据内存申请
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 
+***************************************************************************************************/
+static MyState_TypeDef activityBufferMalloc(void)
 {
 	if(NULL == S_OtherSetPageBuffer)
 	{
 		S_OtherSetPageBuffer = MyMalloc(sizeof(OtherSetPageBuffer));
+		
 		if(S_OtherSetPageBuffer)
 		{
 			memset(S_OtherSetPageBuffer, 0, sizeof(OtherSetPageBuffer));
-			
+	
 			return My_Pass;
 		}
 		else
 			return My_Fail;
 	}
-	
-	return My_Pass;
+	else
+		return My_Pass;
 }
 
-static MyState_TypeDef PageBufferFree(void)
+/***************************************************************************************************
+*FunctionName: activityBufferFree
+*Description: 界面内存释放
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:03:10
+***************************************************************************************************/
+static void activityBufferFree(void)
 {
 	MyFree(S_OtherSetPageBuffer);
 	S_OtherSetPageBuffer = NULL;
-	return My_Pass;
 }
 
 /***************************************************************************************************/

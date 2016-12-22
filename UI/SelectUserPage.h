@@ -4,6 +4,7 @@
 #include	"Define.h"
 #include	"MyTest_Data.h"
 #include	"Timer_Data.h"
+#include	"UI_Data.h"
 
 typedef struct UserPage_tag {
 	unsigned char selectindex;										//选中的索引
@@ -15,7 +16,7 @@ typedef struct UserPage_tag {
 	unsigned short lcdinput[100];									//lcd输入解析
 }UserPageBuffer;
 
-unsigned char DspSelectUserPage(void *  parm);
+MyState_TypeDef createSelectUserActivity(Activity * thizActivity, Intent * pram);
 
 #endif
 

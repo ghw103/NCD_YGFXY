@@ -5,6 +5,7 @@
 #include	"MyTest_Data.h"
 #include	"Test_Fun.h"
 #include	"Define.h"
+#include	"UI_Data.h"
 
 typedef struct AdjustPageBuffer_tag {
 	Timer timer;
@@ -19,7 +20,7 @@ typedef struct AdjustPageBuffer_tag {
 	unsigned char error;
 }AdjustPageBuffer;
 
-unsigned char DspAdjustPage(void *  parm);
+MyState_TypeDef createAdjActivity(Activity * thizActivity, Intent * pram);
 
 #endif
 

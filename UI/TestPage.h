@@ -3,6 +3,7 @@
 
 #include	"MyTest_Data.h"
 #include	"Test_Fun.h"
+#include	"UI_Data.h"
 
 typedef struct TestPageBuffer_tag {
 	ItemData * currenttestdata;
@@ -14,7 +15,7 @@ typedef struct TestPageBuffer_tag {
 }TestPageBuffer;
 
 
-unsigned char DspTestPage(void *  parm);
+MyState_TypeDef createTestActivity(Activity * thizActivity, Intent * pram);
 
 #endif
 

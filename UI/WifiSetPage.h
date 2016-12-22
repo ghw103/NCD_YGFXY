@@ -2,7 +2,7 @@
 #define __WIFISET_P_H__
 
 #include	"Define.h"
-
+#include	"UI_Data.h"
 
 typedef struct WifiPageBuffer_tag {
 	unsigned char pageindex;							//Ò³ÃæË÷Òý
@@ -14,7 +14,7 @@ typedef struct WifiPageBuffer_tag {
 	unsigned short lcdinput[100];
 }WifiPageBuffer;
 
-unsigned char DspWifiSetPage(void *  parm);
+MyState_TypeDef createWifiSetActivity(Activity * thizActivity, Intent * pram);
 
 #endif
 

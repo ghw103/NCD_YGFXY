@@ -2,7 +2,7 @@
 #define __USERM_P_H__
 
 #include	"Define.h"
-
+#include	"UI_Data.h"
 
 typedef struct UserMPageBuffer_tag {
 	unsigned char selectindex;										//选中的索引
@@ -15,7 +15,7 @@ typedef struct UserMPageBuffer_tag {
 	unsigned short lcdinput[100];
 }UserMPageBuffer;
 
-unsigned char DspUserMPage(void *  parm);
+MyState_TypeDef createUserManagerActivity(Activity * thizActivity, Intent * pram);
 
 #endif
 

@@ -90,7 +90,7 @@ MyState_TypeDef StackPush(LinkStack * linkStack, Activity * activity)
 *Author: xsx
 *Date: 2016年12月20日08:50:28
 ***************************************************************************************************/
-MyState_TypeDef StackPop(LinkStack * linkStack, Activity ** activity, bool isResume)
+MyState_TypeDef StackPop(LinkStack * linkStack, bool isResume)
 {
 	StackNode * stackNode = NULL;
 	
@@ -101,12 +101,12 @@ MyState_TypeDef StackPop(LinkStack * linkStack, Activity ** activity, bool isRes
 	//不空
 	else
 	{
-		//销毁出栈的页面
+		//销毁activity页面数据
 		if((linkStack->top->activity) && (linkStack->top->activity->pageDestroy))
 			linkStack->top->activity->pageDestroy();
 		
-		if(*activity)
-			*activity = linkStack->top->activity;
+		//销毁activity
+		MyFree(linkStack->top->activity);
 		
 		stackNode = linkStack->top;
 		

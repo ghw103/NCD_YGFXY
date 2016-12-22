@@ -2,6 +2,7 @@
 #define __RETSET_P_H__
 
 #include	"Define.h"
+#include	"UI_Data.h"
 
 typedef struct ReTestPageBuffer_tag {
 	unsigned short lcdinput[100];
@@ -14,7 +15,7 @@ typedef struct ReTestPageBuffer_tag {
 }ReTestPageBuffer;
 
 
-unsigned char DspReTestPage(void *  parm);
+MyState_TypeDef createReTestActivity(Activity * thizActivity, Intent * pram);
 
 #endif
 

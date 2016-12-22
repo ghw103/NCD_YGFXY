@@ -2,11 +2,8 @@
 /*****************************************头文件*******************************************/
 
 #include	"SelectUserPage.h"
-#include	"Define.h"
 #include	"LCD_Driver.h"
-#include	"UI_Data.h"
 #include	"MyMem.h"
-#include	"LunchPage.h"
 #include	"SampleIDPage.h"
 #include	"MyTest_Data.h"
 #include	"CRC16.h"
@@ -27,12 +24,14 @@ static UserPageBuffer * S_UserPageBuffer = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 
-static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpDate(void);
-
-static MyState_TypeDef PageInit(void *  parm);
-static MyState_TypeDef PageBufferMalloc(void);
-static MyState_TypeDef PageBufferFree(void);
+static void activityStart(void);
+static void activityInput(unsigned char *pbuf , unsigned short len);
+static void activityFresh(void);
+static void activityHide(void);
+static void activityResume(void);
+static void activityDestroy(void);
+static MyState_TypeDef activityBufferMalloc(void);
+static void activityBufferFree(void);
 
 static void ShowList(void);
 static void SelectUser(unsigned char index);
@@ -42,42 +41,75 @@ static void SelectUser(unsigned char index);
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
-/***************************************************************************************************
-*FunctionName：DspSelectUserPage
-*Description：显示选择操作人界面
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年6月29日08:39:45
-***************************************************************************************************/
-unsigned char DspSelectUserPage(void *  parm)
-{
-	PageInfo * currentpage = NULL;
-	
-	if(My_Pass == GetCurrentPage(&currentpage))
-	{
-		currentpage->PageInit = PageInit;
-		currentpage->PageUpDate = PageUpDate;
-		currentpage->LCDInput = Input;
-		currentpage->PageBufferMalloc = PageBufferMalloc;
-		currentpage->PageBufferFree = PageBufferFree;
-		
-		currentpage->PageInit(currentpage->pram);
-	}
 
-	return 0;
+/***************************************************************************************************
+*FunctionName: createSelectUserActivity
+*Description: 创建选择操作人界面
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:00:09
+***************************************************************************************************/
+MyState_TypeDef createSelectUserActivity(Activity * thizActivity, Intent * pram)
+{
+	if(NULL == thizActivity)
+		return My_Fail;
+	
+	if(My_Pass == activityBufferMalloc())
+	{
+		InitActivity(thizActivity, "SelectUserActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
+		
+		return My_Pass;
+	}
+	
+	return My_Fail;
 }
 
 /***************************************************************************************************
-*FunctionName：Input
-*Description：当前界面的按键输入
-*Input：pbuf -- 按键指令
-*		len -- 指令长度
-*Output：None
-*Author：xsx
-*Data：2016年6月29日08:40:22
+*FunctionName: activityStart
+*Description: 显示主界面
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:00:32
 ***************************************************************************************************/
-static void Input(unsigned char *pbuf , unsigned short len)
+static void activityStart(void)
+{
+	if(S_UserPageBuffer)
+	{
+		/*重置倒计时30s，如果超时，则取消此次测试*/
+		timer_set(&(S_UserPageBuffer->timer), 10);
+	
+		/*获取当前测试的数据指针*/
+		S_UserPageBuffer->currenttestdata = GetCurrentTestItem();
+	
+		/*读取所有操作人*/
+		ReadUserData(S_UserPageBuffer->user);
+	
+		S_UserPageBuffer->pageindex = 1;
+		S_UserPageBuffer->selectindex = 0;
+	
+		ShowList();
+		SelectUser(S_UserPageBuffer->selectindex);
+	
+		AddNumOfSongToList(45, 0);
+	}
+	
+	SelectPage(84);
+}
+
+/***************************************************************************************************
+*FunctionName: activityInput
+*Description: 界面输入
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:00:59
+***************************************************************************************************/
+static void activityInput(unsigned char *pbuf , unsigned short len)
 {
 	if(S_UserPageBuffer)
 	{
@@ -90,8 +122,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		{
 			DeleteCurrentTest();
 			
-			PageBufferFree();
-			PageBackTo(ParentPage);
+			backToActivity(lunchActivityName);
 		}
 		
 		/*上翻也*/
@@ -143,8 +174,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 				/*以当前选择的操作人作为本次测试数据的操作人*/
 				memcpy(&(S_UserPageBuffer->currenttestdata->testdata.user), S_UserPageBuffer->tempuser, sizeof(User_Type));
 			
-				PageBufferFree();
-				PageAdvanceTo(DspSampleIDPage, NULL);
+				startActivity(createSampleActivity, NULL);
 			}
 			else
 			{
@@ -165,98 +195,118 @@ static void Input(unsigned char *pbuf , unsigned short len)
 }
 
 /***************************************************************************************************
-*FunctionName：PageUpData
-*Description：当前页面刷新
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年6月29日08:40:47
+*FunctionName: activityFresh
+*Description: 界面刷新
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:01:16
 ***************************************************************************************************/
-static void PageUpDate(void)
+static void activityFresh(void)
 {
 	if(TimeOut == timer_expired(&(S_UserPageBuffer->timer)))
 	{
 		AddNumOfSongToList(8, 0);
-		DeleteCurrentTest();
 		
-		PageBufferFree();
-		PageBackTo(ParentPage);
+		DeleteCurrentTest();
+			
+		backToActivity(lunchActivityName);
 	}
 }
 
 /***************************************************************************************************
-*FunctionName：PageInit
-*Description：页面初始化
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年6月29日08:41:15
+*FunctionName: activityHide
+*Description: 隐藏界面时要做的事
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:01:40
 ***************************************************************************************************/
-static MyState_TypeDef PageInit(void * parm)
+static void activityHide(void)
 {
-	if(My_Fail == PageBufferMalloc())
-		return My_Fail;
+
+}
+
+/***************************************************************************************************
+*FunctionName: activityResume
+*Description: 界面恢复显示时要做的事
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:01:58
+***************************************************************************************************/
+static void activityResume(void)
+{
+	if(S_UserPageBuffer)
+	{
+		/*重置倒计时30s，如果超时，则取消此次测试*/
+		timer_set(&(S_UserPageBuffer->timer), 10);
+	}
 	
 	SelectPage(84);
-	
-	/*重置倒计时30s，如果超时，则取消此次测试*/
-	timer_set(&(S_UserPageBuffer->timer), 10);
-	
-	/*获取当前测试的数据指针*/
-	S_UserPageBuffer->currenttestdata = GetCurrentTestItem();
-	
-	/*读取所有操作人*/
-	ReadUserData(S_UserPageBuffer->user);
-	
-	S_UserPageBuffer->pageindex = 1;
-	S_UserPageBuffer->selectindex = 0;
-	
-	ShowList();
-	SelectUser(S_UserPageBuffer->selectindex);
-	
-	AddNumOfSongToList(45, 0);
-	
-	return My_Pass;
 }
 
 /***************************************************************************************************
-*FunctionName：PageBufferMalloc
-*Description：当前页面缓存申请
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年6月29日08:41:50
+*FunctionName: activityDestroy
+*Description: 界面销毁
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:02:15
 ***************************************************************************************************/
-static MyState_TypeDef PageBufferMalloc(void)
-{	
+static void activityDestroy(void)
+{
+	activityBufferFree();
+}
+
+/***************************************************************************************************
+*FunctionName: activityBufferMalloc
+*Description: 界面数据内存申请
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 
+***************************************************************************************************/
+static MyState_TypeDef activityBufferMalloc(void)
+{
 	if(NULL == S_UserPageBuffer)
 	{
-		S_UserPageBuffer = (UserPageBuffer *)MyMalloc(sizeof(UserPageBuffer));
-			
-		if(NULL == S_UserPageBuffer)
+		S_UserPageBuffer = MyMalloc(sizeof(UserPageBuffer));
+		
+		if(S_UserPageBuffer)	
+		{
+			memset(S_UserPageBuffer, 0, sizeof(UserPageBuffer));
+	
+			return My_Pass;
+		}
+		else
 			return My_Fail;
 	}
-	
-	memset(S_UserPageBuffer, 0, sizeof(UserPageBuffer));
-		
-	return My_Pass;
+	else
+		return My_Pass;
 }
 
 /***************************************************************************************************
-*FunctionName：PageBufferFree
-*Description：当前页面的缓存释放
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年6月29日08:42:07
+*FunctionName: activityBufferFree
+*Description: 界面内存释放
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:03:10
 ***************************************************************************************************/
-static MyState_TypeDef PageBufferFree(void)
+static void activityBufferFree(void)
 {
 	MyFree(S_UserPageBuffer);
 	S_UserPageBuffer = NULL;
-	
-	return My_Pass;
 }
+
+
 
 /***************************************************************************************************/
 /***************************************************************************************************/

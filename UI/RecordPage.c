@@ -12,7 +12,6 @@
 #include	"ShowResultPage.h"
 #include	"CRC16.h"
 #include	"Printf_Fun.h"
-#include	"UI_Data.h"
 #include	"System_Data.h"
 
 #include 	"FreeRTOS.h"
@@ -28,12 +27,14 @@
 static RecordPageBuffer * S_RecordPageBuffer = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
-static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpDate(void);
-
-static MyState_TypeDef PageInit(void *parm);
-static MyState_TypeDef PageBufferMalloc(void);
-static MyState_TypeDef PageBufferFree(void);
+static void activityStart(void);
+static void activityInput(unsigned char *pbuf , unsigned short len);
+static void activityFresh(void);
+static void activityHide(void);
+static void activityResume(void);
+static void activityDestroy(void);
+static MyState_TypeDef activityBufferMalloc(void);
+static void activityBufferFree(void);
 
 static MyState_TypeDef ShowRecord(unsigned char pageindex);
 /******************************************************************************************/
@@ -43,26 +44,61 @@ static MyState_TypeDef ShowRecord(unsigned char pageindex);
 /******************************************************************************************/
 /******************************************************************************************/
 
-unsigned char DspRecordPage(void *  parm)
+/***************************************************************************************************
+*FunctionName: createSelectUserActivity
+*Description: 创建选择操作人界面
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:00:09
+***************************************************************************************************/
+MyState_TypeDef createRecordActivity(Activity * thizActivity, Intent * pram)
 {
-	PageInfo * currentpage = NULL;
+	if(NULL == thizActivity)
+		return My_Fail;
 	
-	if(My_Pass == GetCurrentPage(&currentpage))
+	if(My_Pass == activityBufferMalloc())
 	{
-		currentpage->PageInit = PageInit;
-		currentpage->PageUpDate = PageUpDate;
-		currentpage->LCDInput = Input;
-		currentpage->PageBufferMalloc = PageBufferMalloc;
-		currentpage->PageBufferFree = PageBufferFree;
+		InitActivity(thizActivity, "RecordActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
-		currentpage->PageInit(currentpage->pram);
+		return My_Pass;
 	}
 	
-	return 0;
+	return My_Fail;
 }
 
+/***************************************************************************************************
+*FunctionName: activityStart
+*Description: 显示主界面
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:00:32
+***************************************************************************************************/
+static void activityStart(void)
+{
+	if(S_RecordPageBuffer)
+	{
+		S_RecordPageBuffer->selectindex = 0;
+		S_RecordPageBuffer->pageindex = 1;
+		ShowRecord(S_RecordPageBuffer->pageindex);
+	}
+	
+	SelectPage(114);
+}
 
-static void Input(unsigned char *pbuf , unsigned short len)
+/***************************************************************************************************
+*FunctionName: activityInput
+*Description: 界面输入
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:00:59
+***************************************************************************************************/
+static void activityInput(unsigned char *pbuf , unsigned short len)
 {
 	if(S_RecordPageBuffer)
 	{
@@ -73,14 +109,13 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		/*返回*/
 		if(S_RecordPageBuffer->lcdinput[0] == 0x2000)
 		{
-			PageBufferFree();
-			PageBackTo(ParentPage);
+			backToFatherActivity();
 		}
 		//查看
 		else if(S_RecordPageBuffer->lcdinput[0] == 0x2001)
 		{
 			if((S_RecordPageBuffer->selectindex > 0) && (S_RecordPageBuffer->selectindex <= S_RecordPageBuffer->readTestDataPackage.readDataNum))
-				PageAdvanceTo(DspShowResultPage, &S_RecordPageBuffer->readTestDataPackage.testData[S_RecordPageBuffer->selectindex-1]);
+				startActivity(createShowResultActivity, createIntent(&S_RecordPageBuffer->readTestDataPackage.testData[S_RecordPageBuffer->selectindex-1], sizeof(TestData)));
 		}
 		/*上一页*/
 		else if(S_RecordPageBuffer->lcdinput[0] == 0x2002)
@@ -129,49 +164,103 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	}
 }
 
-static void PageUpDate(void)
+/***************************************************************************************************
+*FunctionName: activityFresh
+*Description: 界面刷新
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:01:16
+***************************************************************************************************/
+static void activityFresh(void)
 {
 
 }
 
-static MyState_TypeDef PageInit(void *parm)
+/***************************************************************************************************
+*FunctionName: activityHide
+*Description: 隐藏界面时要做的事
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:01:40
+***************************************************************************************************/
+static void activityHide(void)
 {
-	if(My_Pass == PageBufferMalloc())
-	{
-		S_RecordPageBuffer->selectindex = 0;
-		S_RecordPageBuffer->pageindex = 1;
-		ShowRecord(S_RecordPageBuffer->pageindex);
-	}
-	
+
+}
+
+/***************************************************************************************************
+*FunctionName: activityResume
+*Description: 界面恢复显示时要做的事
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:01:58
+***************************************************************************************************/
+static void activityResume(void)
+{
 	SelectPage(114);
-	
-	return My_Pass;
 }
 
-static MyState_TypeDef PageBufferMalloc(void)
-{	
+/***************************************************************************************************
+*FunctionName: activityDestroy
+*Description: 界面销毁
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:02:15
+***************************************************************************************************/
+static void activityDestroy(void)
+{
+	activityBufferFree();
+}
+
+/***************************************************************************************************
+*FunctionName: activityBufferMalloc
+*Description: 界面数据内存申请
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 
+***************************************************************************************************/
+static MyState_TypeDef activityBufferMalloc(void)
+{
 	if(NULL == S_RecordPageBuffer)
 	{
-		S_RecordPageBuffer = (RecordPageBuffer *)MyMalloc(sizeof(RecordPageBuffer));
+		S_RecordPageBuffer = MyMalloc(sizeof(RecordPageBuffer));
 		
-		
-		if(NULL == S_RecordPageBuffer)
-			return My_Fail;
-		
-		memset(S_RecordPageBuffer, 0, sizeof(RecordPageBuffer));
-		
-		return My_Pass;
-	}
+		if(S_RecordPageBuffer)
+		{
+			memset(S_RecordPageBuffer, 0, sizeof(RecordPageBuffer));
 	
-	return My_Fail;
+			return My_Pass;
+		}
+		else
+			return My_Fail;
+	}
+	else
+		return My_Pass;
 }
 
-static MyState_TypeDef PageBufferFree(void)
+/***************************************************************************************************
+*FunctionName: activityBufferFree
+*Description: 界面内存释放
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:03:10
+***************************************************************************************************/
+static void activityBufferFree(void)
 {
 	MyFree(S_RecordPageBuffer);
 	S_RecordPageBuffer = NULL;
-	
-	return My_Pass;
 }
 
 /***************************************************************************************************/

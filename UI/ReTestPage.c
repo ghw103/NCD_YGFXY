@@ -15,7 +15,6 @@
 
 #include	"SystemSetPage.h"
 #include	"PlaySong_Task.h"
-#include	"UI_Data.h"
 #include	"CardStatues_Data.h"
 #include	"CodeScan_Task.h"
 #include	"Test_Task.h"
@@ -42,11 +41,14 @@ static ReTestPageBuffer * S_ReTestPageBuffer = NULL;
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
-static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpDate(void);
-static MyState_TypeDef PageInit(void *  parm);
-static MyState_TypeDef PageBufferMalloc(void);
-static MyState_TypeDef PageBufferFree(void);
+static void activityStart(void);
+static void activityInput(unsigned char *pbuf , unsigned short len);
+static void activityFresh(void);
+static void activityHide(void);
+static void activityResume(void);
+static void activityDestroy(void);
+static MyState_TypeDef activityBufferMalloc(void);
+static void activityBufferFree(void);
 
 static void SetReTestCount(char *str, unsigned char len);
 static void StartReTest(void);
@@ -60,26 +62,67 @@ static void CheckTestCard(void);
 /****************************************File Start*************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
-unsigned char DspReTestPage(void *  parm)
+/***************************************************************************************************
+*FunctionName: createSelectUserActivity
+*Description: 创建选择操作人界面
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:00:09
+***************************************************************************************************/
+MyState_TypeDef createReTestActivity(Activity * thizActivity, Intent * pram)
 {
-	PageInfo * currentpage = NULL;
+	if(NULL == thizActivity)
+		return My_Fail;
 	
-	if(My_Pass == GetCurrentPage(&currentpage))
+	if(My_Pass == activityBufferMalloc())
 	{
-		currentpage->PageInit = PageInit;
-		currentpage->PageUpDate = PageUpDate;
-		currentpage->LCDInput = Input;
-		currentpage->PageBufferMalloc = PageBufferMalloc;
-		currentpage->PageBufferFree = PageBufferFree;
+		InitActivity(thizActivity, "ReTestActivity\0", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
-		currentpage->PageInit(currentpage->pram);
+		return My_Pass;
 	}
 	
-	return 0;
+	return My_Fail;
 }
 
+/***************************************************************************************************
+*FunctionName: activityStart
+*Description: 显示主界面
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:00:32
+***************************************************************************************************/
+static void activityStart(void)
+{
+	if(S_ReTestPageBuffer)
+	{
+		//清除其他不是测试音频的队列数据
+		while(My_Pass == TakeAudioPlayStatus(&(S_ReTestPageBuffer->playstatus)))
+			;
+		
+		timer_set(&(S_ReTestPageBuffer->timer), 10);
+		
+		memset(S_ReTestPageBuffer->buf, 0, 100);
+		sprintf(S_ReTestPageBuffer->buf, "Stopped");
+		DisText(0x300c, S_ReTestPageBuffer->buf, strlen(S_ReTestPageBuffer->buf));
+	}
+	
+	SelectPage(117);
+}
 
-static void Input(unsigned char *pbuf , unsigned short len)
+/***************************************************************************************************
+*FunctionName: activityInput
+*Description: 界面输入
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:00:59
+***************************************************************************************************/
+static void activityInput(unsigned char *pbuf , unsigned short len)
 {
 	if(S_ReTestPageBuffer)
 	{
@@ -92,8 +135,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		{
 			if(S_ReTestPageBuffer->retestdata.reteststatus == 0)
 			{
-				PageBufferFree();
-				PageBackTo(ParentPage);
+				backToFatherActivity();
 			}
 			else
 				SendKeyCode(1);
@@ -120,7 +162,16 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	}
 }
 
-static void PageUpDate(void)
+/***************************************************************************************************
+*FunctionName: activityFresh
+*Description: 界面刷新
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:01:16
+***************************************************************************************************/
+static void activityFresh(void)
 {
 	if(S_ReTestPageBuffer)
 	{
@@ -196,45 +247,89 @@ static void PageUpDate(void)
 	}
 }
 
-static MyState_TypeDef PageInit(void *  parm)
+/***************************************************************************************************
+*FunctionName: activityHide
+*Description: 隐藏界面时要做的事
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:01:40
+***************************************************************************************************/
+static void activityHide(void)
 {
-	if(My_Fail == PageBufferMalloc())
-		return My_Fail;
-	
-	SelectPage(117);
-	
-	//清除其他不是测试音频的队列数据
-	while(My_Pass == TakeAudioPlayStatus(&(S_ReTestPageBuffer->playstatus)))
-		;
-	
-	timer_set(&(S_ReTestPageBuffer->timer), 10);
-	
-	memset(S_ReTestPageBuffer->buf, 0, 100);
-	sprintf(S_ReTestPageBuffer->buf, "Stopped");
-	DisText(0x300c, S_ReTestPageBuffer->buf, strlen(S_ReTestPageBuffer->buf));
-	
-	return My_Pass;
+
 }
 
-static MyState_TypeDef PageBufferMalloc(void)
+/***************************************************************************************************
+*FunctionName: activityResume
+*Description: 界面恢复显示时要做的事
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:01:58
+***************************************************************************************************/
+static void activityResume(void)
+{
+
+}
+
+/***************************************************************************************************
+*FunctionName: activityDestroy
+*Description: 界面销毁
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:02:15
+***************************************************************************************************/
+static void activityDestroy(void)
+{
+	activityBufferFree();
+}
+
+/***************************************************************************************************
+*FunctionName: activityBufferMalloc
+*Description: 界面数据内存申请
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 
+***************************************************************************************************/
+static MyState_TypeDef activityBufferMalloc(void)
 {
 	if(NULL == S_ReTestPageBuffer)
 	{
 		S_ReTestPageBuffer = MyMalloc(sizeof(ReTestPageBuffer));
-		if(NULL == S_ReTestPageBuffer)	
+		
+		if(S_ReTestPageBuffer)
+		{
+			memset(S_ReTestPageBuffer, 0, sizeof(ReTestPageBuffer));
+	
+			return My_Pass;
+		}
+		else
 			return My_Fail;
 	}
-	
-	memset(S_ReTestPageBuffer, 0, sizeof(ReTestPageBuffer));
-	
-	return My_Pass;
+	else
+		return My_Pass;
 }
 
-static MyState_TypeDef PageBufferFree(void)
+/***************************************************************************************************
+*FunctionName: activityBufferFree
+*Description: 界面内存释放
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:03:10
+***************************************************************************************************/
+static void activityBufferFree(void)
 {
 	MyFree(S_ReTestPageBuffer);
 	S_ReTestPageBuffer = NULL;
-	return My_Pass;
 }
 
 /***************************************************************************************************/

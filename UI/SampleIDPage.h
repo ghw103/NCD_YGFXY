@@ -14,7 +14,7 @@ typedef struct SampleIDPage_tag {
 	unsigned short lcdinput[100];
 }SampleIDPage;
 
-unsigned char DspSampleIDPage(void *  parm);
+MyState_TypeDef createSampleActivity(Activity * thizActivity, Intent * pram);
 
 #endif
 

@@ -15,12 +15,15 @@
 
 #include	"PlaySong_Task.h"
 
-//#include	"PaiDuiPage.h"
-//#include	"PreReadCardPage.h"
+#include	"PaiDuiPage.h"
+#include	"PreReadCardPage.h"
 
 #include	"CardStatues_Data.h"
 #include	"UI_Data.h"
 #include	"MyTest_Data.h"
+#include	"MyTools.h"
+
+#include	<string.h>
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -50,7 +53,6 @@ void PaiDuiHandler(void)
 	unsigned char index = 0;
 	ItemData * temp = NULL;
 	unsigned short tempvalue = 0;
-/*	PageInfo * currentpage = NULL;
 	
 	for(index=0; index<PaiDuiWeiNum; index++)
 	{
@@ -88,7 +90,8 @@ void PaiDuiHandler(void)
 				{
 					UpOneModelData(index, R_OFF_G_ON, 0);
 					temp->statues = statues7;
-					PageAdvanceTo(DspPreReadCardPage, NULL);
+					
+					startActivity(createPreReadCardActivity, NULL);
 				}
 				else if(TimeOut == timer_expired(&(temp->timer3)))
 				{
@@ -169,7 +172,8 @@ void PaiDuiHandler(void)
 					{
 						UpOneModelData(index, R_OFF_G_ON, 0);
 						temp->statues = statues7;
-						PageAdvanceTo(DspPreReadCardPage, NULL);
+
+						startActivity(createPreReadCardActivity, NULL);
 					}
 					//插入卡槽，结束排队
 					else if(temp->statues == statues2)
@@ -198,13 +202,10 @@ void PaiDuiHandler(void)
 					//如果正在倒计时，则切换界面到排队界面
 					if((temp->statues == statues5) && (GetCurrentTestItem() == NULL))
 					{
-						if(My_Pass == GetCurrentPage(&currentpage))
+						if(false == CheckStrIsSame(paiduiActivityName, getCurrentActivityName(), strlen(paiduiActivityName)))
 						{
-							if(currentpage->CurrentPage != DspPaiDuiPage)
-							{
-								PageResetToOrigin(NoDisplayPage);
-								PageAdvanceTo(DspPaiDuiPage, NULL);
-							}
+							backToActivity(lunchActivityName);
+							startActivity(createPaiDuiActivity, NULL);
 						}
 					}
 				}
@@ -237,7 +238,7 @@ void PaiDuiHandler(void)
 			}
 		}
 		
-	}*/
+	}
 }
 
 /****************************************end of file************************************************/

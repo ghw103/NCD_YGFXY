@@ -19,7 +19,8 @@ typedef struct TempCalData_tag{
 	double tempvalue2;
 	double average;														//平均值
 	double stdev;														//标准差
-	float CV;															//变异系数
+	float CV1;															//变异系数1
+	float CV2;															//变异系数2
 	unsigned short tempvalue3;
 	unsigned short temptestline[MaxPointLen + FilterNum];
 	double lastdata;														//记录上次滤波数据

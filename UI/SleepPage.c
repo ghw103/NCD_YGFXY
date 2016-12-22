@@ -49,7 +49,7 @@ static void DspPageText(void);
 *Author: xsx
 *Date: 2016年12月20日16:21:51
 ***************************************************************************************************/
-MyState_TypeDef createSleepActivity(Activity * thizActivity, void * pram)
+MyState_TypeDef createSleepActivity(Activity * thizActivity, Intent * pram)
 {
 	if(NULL == thizActivity)
 		return My_Fail;
@@ -81,7 +81,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*设置*/
 		if(S_SleepPageBuffer->lcdinput[0] == 0x1D70)
 		{
-			backToActivity("LunchActivity");
+			backToActivity(lunchActivityName);
 		}
 	}
 }

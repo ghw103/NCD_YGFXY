@@ -2,6 +2,7 @@
 #define __SETDEVICEID_P_H__
 
 #include	"SystemSet_Data.h"
+#include	"UI_Data.h"
 
 typedef struct SetDeviceIDPage_tag {
 	SystemSetData systemSetData;
@@ -10,7 +11,7 @@ typedef struct SetDeviceIDPage_tag {
 	unsigned short lcdinput[100];
 }SetDeviceIDPage;
 
-unsigned char DspSetDeviceIDPage(void *  parm);
+MyState_TypeDef createSetDeviceIDActivity(Activity * thizActivity, Intent * pram);
 
 #endif
 

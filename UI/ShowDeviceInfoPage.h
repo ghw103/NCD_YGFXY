@@ -2,6 +2,7 @@
 #define __SDEVICEINFO_P_H__
 
 #include	"SystemSet_Data.h"
+#include	"UI_Data.h"
 
 typedef struct ShowDeviceInfoPageBuffer_Tag
 {
@@ -10,8 +11,7 @@ typedef struct ShowDeviceInfoPageBuffer_Tag
 	unsigned short lcdinput[100];
 }ShowDeviceInfoPageBuffer;
 
-unsigned char DspShowDeviceInfoPage(void *  parm);
-DeviceInfo * GetDeviceInfo(void);
+MyState_TypeDef createDeviceInfoActivity(Activity * thizActivity, Intent * pram);
 
 #endif
 

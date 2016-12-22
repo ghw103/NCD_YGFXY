@@ -4,7 +4,6 @@
 #include	"NetPreSetPage.h"
 #include	"Define.h"
 #include	"LCD_Driver.h"
-#include	"UI_Data.h"
 #include	"MyMem.h"
 
 #include	"SystemSetPage.h"
@@ -21,125 +20,199 @@
 
 /******************************************************************************************/
 /*****************************************局部变量声明*************************************/
-
+static NetPrePageBuffer * S_NetPrePageBuffer = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
-
-static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpDate(void);
-static MyState_TypeDef PageInit(void *  parm);
-static MyState_TypeDef PageBufferMalloc(void);
-static MyState_TypeDef PageBufferFree(void);
+static void activityStart(void);
+static void activityInput(unsigned char *pbuf , unsigned short len);
+static void activityFresh(void);
+static void activityHide(void);
+static void activityResume(void);
+static void activityDestroy(void);
+static MyState_TypeDef activityBufferMalloc(void);
+static void activityBufferFree(void);
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
-
-unsigned char DspNetPreSetPage(void *  parm)
+/***************************************************************************************************
+*FunctionName: createSelectUserActivity
+*Description: 创建选择操作人界面
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:00:09
+***************************************************************************************************/
+MyState_TypeDef createNetPreActivity(Activity * thizActivity, Intent * pram)
 {
-	PageInfo * currentpage = NULL;
+	if(NULL == thizActivity)
+		return My_Fail;
 	
-	if(My_Pass == GetCurrentPage(&currentpage))
+	if(My_Pass == activityBufferMalloc())
 	{
-		currentpage->PageInit = PageInit;
-		currentpage->PageUpDate = PageUpDate;
-		currentpage->LCDInput = Input;
-		currentpage->PageBufferMalloc = PageBufferMalloc;
-		currentpage->PageBufferFree = PageBufferFree;
+		InitActivity(thizActivity, "NetPreActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
-		currentpage->PageInit(currentpage->pram);
+		return My_Pass;
 	}
 	
-	return 0;
-}
-
-
-static void Input(unsigned char *pbuf , unsigned short len)
-{
-	unsigned short *pdata = NULL;
-	
-	pdata = MyMalloc((len/2)*sizeof(unsigned short));
-	if(pdata == NULL)
-		return;
-	
-	/*命令*/
-	pdata[0] = pbuf[4];
-	pdata[0] = (pdata[0]<<8) + pbuf[5];
-	
-	/*有线网设置*/
-	if(pdata[0] == 0x1E01)
-	{
-		PageBufferFree();
-		PageAdvanceTo(DspNetSetPage, NULL);
-	}
-	/*wifi设置*/
-	else if(pdata[0] == 0x1E02)
-	{
-		PageBufferFree();
-		PageAdvanceTo(DspWifiSetPage, NULL);
-	}
-	//查看网络信息
-	else if(pdata[0] == 0x1E03)
-	{
-		PageBufferFree();
-		PageAdvanceTo(DspNetInfoPage, NULL);
-	}
-	/*返回*/
-	else if(pdata[0] == 0x1E00)
-	{
-		PageBufferFree();
-		PageBackTo(ParentPage);
-	}
-
-	MyFree(pdata);
-}
-
-static void PageUpDate(void)
-{
-
+	return My_Fail;
 }
 
 /***************************************************************************************************
-*FunctionName：PageInit
-*Description：当前界面初始化
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年6月27日08:55:25
+*FunctionName: activityStart
+*Description: 显示主界面
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:00:32
 ***************************************************************************************************/
-static MyState_TypeDef PageInit(void *  parm)
+static void activityStart(void)
 {
 	SelectPage(108);
+}
+
+/***************************************************************************************************
+*FunctionName: activityInput
+*Description: 界面输入
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:00:59
+***************************************************************************************************/
+static void activityInput(unsigned char *pbuf , unsigned short len)
+{
+	if(S_NetPrePageBuffer)
+	{
+		/*命令*/
+		S_NetPrePageBuffer->lcdinput[0] = pbuf[4];
+		S_NetPrePageBuffer->lcdinput[0] = (S_NetPrePageBuffer->lcdinput[0]<<8) + pbuf[5];
+
+		/*返回*/
+		if(S_NetPrePageBuffer->lcdinput[0] == 0x1E00)
+		{
+			backToFatherActivity();
+		}
+		
+		/*有线网设置*/
+		else if(S_NetPrePageBuffer->lcdinput[0] == 0x1E01)
+		{
+			startActivity(createNetSetActivity, NULL);
+		}
+		/*wifi设置*/
+		else if(S_NetPrePageBuffer->lcdinput[0] == 0x1E02)
+		{
+			startActivity(createWifiSetActivity, NULL);
+		}
+		//查看网络信息
+		else if(S_NetPrePageBuffer->lcdinput[0] == 0x1E03)
+		{
+			startActivity(createNetInfoActivity, NULL);
+		}
+	}
+}
+
+/***************************************************************************************************
+*FunctionName: activityFresh
+*Description: 界面刷新
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:01:16
+***************************************************************************************************/
+static void activityFresh(void)
+{
+
+}
+
+/***************************************************************************************************
+*FunctionName: activityHide
+*Description: 隐藏界面时要做的事
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:01:40
+***************************************************************************************************/
+static void activityHide(void)
+{
+
+}
+
+/***************************************************************************************************
+*FunctionName: activityResume
+*Description: 界面恢复显示时要做的事
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:01:58
+***************************************************************************************************/
+static void activityResume(void)
+{
+	SelectPage(108);
+}
+
+/***************************************************************************************************
+*FunctionName: activityDestroy
+*Description: 界面销毁
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:02:15
+***************************************************************************************************/
+static void activityDestroy(void)
+{
+	activityBufferFree();
+}
+
+/***************************************************************************************************
+*FunctionName: activityBufferMalloc
+*Description: 界面数据内存申请
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 
+***************************************************************************************************/
+static MyState_TypeDef activityBufferMalloc(void)
+{
+	if(NULL == S_NetPrePageBuffer)
+	{
+		S_NetPrePageBuffer = MyMalloc(sizeof(NetPrePageBuffer));
+		
+		if(S_NetPrePageBuffer)
+		{
+			memset(S_NetPrePageBuffer, 0, sizeof(NetPrePageBuffer));
 	
-	return My_Pass;
+			return My_Pass;
+		}
+		else
+			return My_Fail;
+	}
+	else
+		return My_Pass;
 }
 
 /***************************************************************************************************
-*FunctionName：PageBufferMalloc
-*Description：当前界面临时缓存申请
-*Input：None
-*Output：MyState_TypeDef -- 返回成功与否
-*Author：xsx
-*Data：2016年6月27日08:56:02
+*FunctionName: activityBufferFree
+*Description: 界面内存释放
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:03:10
 ***************************************************************************************************/
-static MyState_TypeDef PageBufferMalloc(void)
+static void activityBufferFree(void)
 {
-	return My_Pass;
-}
-
-/***************************************************************************************************
-*FunctionName：PageBufferFree
-*Description：当前界面临时缓存释放
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年6月27日08:56:21
-***************************************************************************************************/
-static MyState_TypeDef PageBufferFree(void)
-{
-	return My_Pass;
+	MyFree(S_NetPrePageBuffer);
+	S_NetPrePageBuffer = NULL;
 }
 
 

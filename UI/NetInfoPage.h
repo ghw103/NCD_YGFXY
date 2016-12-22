@@ -3,6 +3,7 @@
 
 #include	"Define.h"
 #include	"NetInfo_Data.h"
+#include	"UI_Data.h"
 
 typedef struct NetInfoPageBuffer_tag {
 	unsigned short lcdinput[20];
@@ -14,7 +15,7 @@ typedef struct NetInfoPageBuffer_tag {
 }NetInfoPageBuffer;
 
 
-unsigned char DspNetInfoPage(void *  parm);
+MyState_TypeDef createNetInfoActivity(Activity * thizActivity, Intent * pram);
 
 #endif
 

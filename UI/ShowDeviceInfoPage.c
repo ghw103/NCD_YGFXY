@@ -2,14 +2,11 @@
 /*****************************************头文件*******************************************/
 
 #include	"ShowDeviceInfoPage.h"
-
 #include	"SetDeviceInfoPage.h"
 #include	"SetDeviceIDPage.h"
 #include	"SystemSetPage.h"
 
 #include	"LCD_Driver.h"
-
-#include	"UI_Data.h"
 #include	"SystemSet_Dao.h"
 #include	"MyMem.h"
 #include	"MyTools.h"
@@ -24,11 +21,14 @@ static ShowDeviceInfoPageBuffer * S_ShowDeviceInfoPageBuffer = NULL;
 /*****************************************局部函数声明*************************************/
 static void showDeviceInfo(void);
 
-static MyState_TypeDef PageInit(void *  parm);
-static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpDate(void);
-static MyState_TypeDef PageBufferMalloc(void);
-static MyState_TypeDef PageBufferFree(void);
+static void activityStart(void);
+static void activityInput(unsigned char *pbuf , unsigned short len);
+static void activityFresh(void);
+static void activityHide(void);
+static void activityResume(void);
+static void activityDestroy(void);
+static MyState_TypeDef activityBufferMalloc(void);
+static void activityBufferFree(void);
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -36,26 +36,61 @@ static MyState_TypeDef PageBufferFree(void);
 /******************************************************************************************/
 /******************************************************************************************/
 
-unsigned char DspShowDeviceInfoPage(void *  parm)
+/***************************************************************************************************
+*FunctionName: createSelectUserActivity
+*Description: 创建选择操作人界面
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:00:09
+***************************************************************************************************/
+MyState_TypeDef createDeviceInfoActivity(Activity * thizActivity, Intent * pram)
 {
-	PageInfo * currentpage = NULL;
+	if(NULL == thizActivity)
+		return My_Fail;
 	
-	if(My_Pass == GetCurrentPage(&currentpage))
+	if(My_Pass == activityBufferMalloc())
 	{
-		currentpage->PageInit = PageInit;
-		currentpage->PageUpDate = PageUpDate;
-		currentpage->LCDInput = Input;
-		currentpage->PageBufferMalloc = PageBufferMalloc;
-		currentpage->PageBufferFree = PageBufferFree;
+		InitActivity(thizActivity, "DeviceInfoActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
-		currentpage->PageInit(currentpage->pram);
+		return My_Pass;
 	}
 	
-	return 0;
+	return My_Fail;
 }
 
+/***************************************************************************************************
+*FunctionName: activityStart
+*Description: 显示主界面
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:00:32
+***************************************************************************************************/
+static void activityStart(void)
+{
+	if(S_ShowDeviceInfoPageBuffer)
+	{
+		getSystemSetData(&(S_ShowDeviceInfoPageBuffer->systemSetData));
+		
+		showDeviceInfo();
+	}
+	
+	SelectPage(100);
+}
 
-static void Input(unsigned char *pbuf , unsigned short len)
+/***************************************************************************************************
+*FunctionName: activityInput
+*Description: 界面输入
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:00:59
+***************************************************************************************************/
+static void activityInput(unsigned char *pbuf , unsigned short len)
 {
 	if(S_ShowDeviceInfoPageBuffer)
 	{
@@ -80,7 +115,7 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		{
 			if(pdPASS == CheckStrIsSame(&pbuf[7] , AdminPassWord ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
 			{
-				PageAdvanceTo(DspSetDeviceIDPage, NULL);
+				startActivity(createSetDeviceIDActivity, NULL);
 			}
 			else
 				SendKeyCode(1);
@@ -88,24 +123,56 @@ static void Input(unsigned char *pbuf , unsigned short len)
 		/*返回*/
 		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1a00)
 		{
-			PageBackTo(ParentPage);
+			backToFatherActivity();
 		}
 		/*修改*/
 		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1a01)
 		{
-			PageAdvanceTo(DspSetDeviceInfoPage, NULL);
+			startActivity(createSetDeviceInfoActivity, NULL);
 		}
 	}
 }
 
-static void PageUpDate(void)
+/***************************************************************************************************
+*FunctionName: activityFresh
+*Description: 界面刷新
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:01:16
+***************************************************************************************************/
+static void activityFresh(void)
 {
 
 }
 
-static MyState_TypeDef PageInit(void *  parm)
+/***************************************************************************************************
+*FunctionName: activityHide
+*Description: 隐藏界面时要做的事
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:01:40
+***************************************************************************************************/
+static void activityHide(void)
 {
-	if(My_Pass == PageBufferMalloc())
+
+}
+
+/***************************************************************************************************
+*FunctionName: activityResume
+*Description: 界面恢复显示时要做的事
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:01:58
+***************************************************************************************************/
+static void activityResume(void)
+{
+	if(S_ShowDeviceInfoPageBuffer)
 	{
 		getSystemSetData(&(S_ShowDeviceInfoPageBuffer->systemSetData));
 		
@@ -113,34 +180,65 @@ static MyState_TypeDef PageInit(void *  parm)
 	}
 	
 	SelectPage(100);
-
-	return My_Pass;
 }
 
-static MyState_TypeDef PageBufferMalloc(void)
+/***************************************************************************************************
+*FunctionName: activityDestroy
+*Description: 界面销毁
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:02:15
+***************************************************************************************************/
+static void activityDestroy(void)
 {
-	if(S_ShowDeviceInfoPageBuffer == NULL)
+	activityBufferFree();
+}
+
+/***************************************************************************************************
+*FunctionName: activityBufferMalloc
+*Description: 界面数据内存申请
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 
+***************************************************************************************************/
+static MyState_TypeDef activityBufferMalloc(void)
+{
+	if(NULL == S_ShowDeviceInfoPageBuffer)
 	{
 		S_ShowDeviceInfoPageBuffer = MyMalloc(sizeof(ShowDeviceInfoPageBuffer));
+		
 		if(S_ShowDeviceInfoPageBuffer)
 		{
 			memset(S_ShowDeviceInfoPageBuffer, 0, sizeof(ShowDeviceInfoPageBuffer));
-		
+	
 			return My_Pass;
 		}
-		return My_Fail; 
+		else
+			return My_Fail;
 	}
-
-	return My_Pass;
+	else
+		return My_Pass;
 }
 
-static MyState_TypeDef PageBufferFree(void)
+/***************************************************************************************************
+*FunctionName: activityBufferFree
+*Description: 界面内存释放
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016年12月21日09:03:10
+***************************************************************************************************/
+static void activityBufferFree(void)
 {
 	MyFree(S_ShowDeviceInfoPageBuffer);
 	S_ShowDeviceInfoPageBuffer = NULL;
-	
-	return My_Pass;
 }
+
 
 static void showDeviceInfo(void)
 {

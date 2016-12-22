@@ -4,7 +4,7 @@
 #include	"TestPage.h"
 #include	"Define.h"
 #include	"LCD_Driver.h"
-#include	"UI_Data.h"
+
 #include	"MyMem.h"
 #include	"WaittingCardPage.h"
 #include	"MyTest_Data.h"
@@ -32,14 +32,17 @@ const unsigned int TestLineHigh = 77010;	//´ËÊý¾ÝÓëÇúÏßÏÔÊ¾ÇøÓò¸ß¶ÈÓÐ¹Ø£¬Èç¹û½çÃ
 /******************************************************************************************/
 /*****************************************¾Ö²¿º¯ÊýÉùÃ÷*************************************/
 static void RefreshCurve(void);
-static void Input(unsigned char *pbuf , unsigned short len);
-static void PageUpDate(void);
 static void AddDataToLine(unsigned short data);
 static void RefreshPageText(void);
 
-static MyState_TypeDef PageInit(void *  parm);
-static MyState_TypeDef PageBufferMalloc(void);
-static MyState_TypeDef PageBufferFree(void);
+static void activityStart(void);
+static void activityInput(unsigned char *pbuf , unsigned short len);
+static void activityFresh(void);
+static void activityHide(void);
+static void activityResume(void);
+static void activityDestroy(void);
+static MyState_TypeDef activityBufferMalloc(void);
+static void activityBufferFree(void);
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -47,26 +50,78 @@ static MyState_TypeDef PageBufferFree(void);
 /******************************************************************************************/
 /******************************************************************************************/
 
-unsigned char DspTestPage(void *  parm)
+/***************************************************************************************************
+*FunctionName: createSelectUserActivity
+*Description: ´´½¨Ñ¡Ôñ²Ù×÷ÈË½çÃæ
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016Äê12ÔÂ21ÈÕ09:00:09
+***************************************************************************************************/
+MyState_TypeDef createTestActivity(Activity * thizActivity, Intent * pram)
 {
-	PageInfo * currentpage = NULL;
+	if(NULL == thizActivity)
+		return My_Fail;
 	
-	if(My_Pass == GetCurrentPage(&currentpage))
+	if(My_Pass == activityBufferMalloc())
 	{
-		currentpage->PageInit = PageInit;
-		currentpage->PageUpDate = PageUpDate;
-		currentpage->LCDInput = Input;
-		currentpage->PageBufferMalloc = PageBufferMalloc;
-		currentpage->PageBufferFree = PageBufferFree;
+		InitActivity(thizActivity, "TestActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
-		currentpage->PageInit(currentpage->pram);
+		return My_Pass;
 	}
 	
-	return 0;
+	return My_Fail;
 }
 
+/***************************************************************************************************
+*FunctionName: activityStart
+*Description: ÏÔÊ¾Ö÷½çÃæ
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016Äê12ÔÂ21ÈÕ09:00:32
+***************************************************************************************************/
+static void activityStart(void)
+{
+	if(S_TestPageBuffer)
+	{
+		/*Çå¿ÕÇúÏß*/
+		ClearLine(0x56);
+		
+		//³õÊ¼»¯²âÊÔÇúÏß
+		S_TestPageBuffer->line.MaxData = 0;
+		S_TestPageBuffer->line.MUL_Y = 1;
+		S_TestPageBuffer->line.Y_Scale = 100;
+		
+		SetChartSize(0x1870 , S_TestPageBuffer->line.MUL_Y);
+		
+		DspNum(0x180B , S_TestPageBuffer->line.Y_Scale, 2);
+		DspNum(0x180A , S_TestPageBuffer->line.Y_Scale*2, 2);
+		
+		/*»ñÈ¡µ±Ç°²âÊÔÊý¾ÝµÄµØÖ·*/
+		S_TestPageBuffer->currenttestdata = GetCurrentTestItem();
+		
+		RefreshPageText();
 
-static void Input(unsigned char *pbuf , unsigned short len)
+		StartTest(&(S_TestPageBuffer->currenttestdata->testdata));
+	}
+	
+	SelectPage(96);
+
+}
+
+/***************************************************************************************************
+*FunctionName: activityInput
+*Description: ½çÃæÊäÈë
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016Äê12ÔÂ21ÈÕ09:00:59
+***************************************************************************************************/
+static void activityInput(unsigned char *pbuf , unsigned short len)
 {
 	if(S_TestPageBuffer)
 	{
@@ -88,14 +143,11 @@ static void Input(unsigned char *pbuf , unsigned short len)
 				//É¾³ýµ±Ç°²âÊÔ
 				DeleteCurrentTest();
 				
+				backToActivity(lunchActivityName);
+				
 				//Èç¹û»¹ÓÐ¿¨ÔÚÅÅ¶Ó£¬ÔòÖ±½ÓÌøµ½ÅÅ¶Ó½çÃæ
 				if(IsPaiDuiTestting())
-				{
-					PageResetToOrigin(NoDisplayPage);
-					PageAdvanceTo(DspPaiDuiPage, NULL);
-				}
-				else
-					PageResetToOrigin(DisplayPage);
+					startActivity(createPaiDuiActivity, NULL);
 			}
 			//ÕýÔÚ²âÊÔ²»ÔÊÐíÍË³ö
 			else
@@ -119,63 +171,107 @@ static void Input(unsigned char *pbuf , unsigned short len)
 	}
 }
 
-static void PageUpDate(void)
+/***************************************************************************************************
+*FunctionName: activityFresh
+*Description: ½çÃæË¢ÐÂ
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016Äê12ÔÂ21ÈÕ09:01:16
+***************************************************************************************************/
+static void activityFresh(void)
 {
 	if(S_TestPageBuffer)
 		RefreshCurve();
 }
 
-static MyState_TypeDef PageInit(void *  parm)
+/***************************************************************************************************
+*FunctionName: activityHide
+*Description: Òþ²Ø½çÃæÊ±Òª×öµÄÊÂ
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016Äê12ÔÂ21ÈÕ09:01:40
+***************************************************************************************************/
+static void activityHide(void)
 {
-	if(My_Fail == PageBufferMalloc())
-		return My_Fail;
-	
-	SelectPage(96);
-	
-	/*Çå¿ÕÇúÏß*/
-	ClearLine(0x56);
-	
-	//³õÊ¼»¯²âÊÔÇúÏß
-	S_TestPageBuffer->line.MaxData = 0;
-	S_TestPageBuffer->line.MUL_Y = 1;
-	S_TestPageBuffer->line.Y_Scale = 100;
-	
-	SetChartSize(0x1870 , S_TestPageBuffer->line.MUL_Y);
-	
-	DspNum(0x180B , S_TestPageBuffer->line.Y_Scale, 2);
-	DspNum(0x180A , S_TestPageBuffer->line.Y_Scale*2, 2);
-	
-	/*»ñÈ¡µ±Ç°²âÊÔÊý¾ÝµÄµØÖ·*/
-	S_TestPageBuffer->currenttestdata = GetCurrentTestItem();
-	
-	RefreshPageText();
 
-	StartTest(&(S_TestPageBuffer->currenttestdata->testdata));
-	
-	return My_Pass;
 }
 
-static MyState_TypeDef PageBufferMalloc(void)
-{	
-	S_TestPageBuffer = (TestPageBuffer *)MyMalloc(sizeof(TestPageBuffer));
-			
-	if(S_TestPageBuffer)
+/***************************************************************************************************
+*FunctionName: activityResume
+*Description: ½çÃæ»Ö¸´ÏÔÊ¾Ê±Òª×öµÄÊÂ
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016Äê12ÔÂ21ÈÕ09:01:58
+***************************************************************************************************/
+static void activityResume(void)
+{
+
+}
+
+/***************************************************************************************************
+*FunctionName: activityDestroy
+*Description: ½çÃæÏú»Ù
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016Äê12ÔÂ21ÈÕ09:02:15
+***************************************************************************************************/
+static void activityDestroy(void)
+{
+	activityBufferFree();
+}
+
+/***************************************************************************************************
+*FunctionName: activityBufferMalloc
+*Description: ½çÃæÊý¾ÝÄÚ´æÉêÇë
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 
+***************************************************************************************************/
+static MyState_TypeDef activityBufferMalloc(void)
+{
+	if(NULL == S_TestPageBuffer)
 	{
-		memset(S_TestPageBuffer, 0, sizeof(TestPageBuffer));
+		S_TestPageBuffer = MyMalloc(sizeof(TestPageBuffer));
 		
-		return My_Pass;
+		if(S_TestPageBuffer)
+		{
+			memset(S_TestPageBuffer, 0, sizeof(TestPageBuffer));
+	
+			return My_Pass;
+		}
+		else
+			return My_Fail;
 	}
 	else
-		return My_Fail;
+		return My_Pass;
 }
 
-static MyState_TypeDef PageBufferFree(void)
+/***************************************************************************************************
+*FunctionName: activityBufferFree
+*Description: ½çÃæÄÚ´æÊÍ·Å
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2016Äê12ÔÂ21ÈÕ09:03:10
+***************************************************************************************************/
+static void activityBufferFree(void)
 {
 	MyFree(S_TestPageBuffer);
 	S_TestPageBuffer = NULL;
-	
-	return My_Pass;
 }
+
+
 
 /*¸üÐÂÊý¾Ý*/
 static void RefreshCurve(void)

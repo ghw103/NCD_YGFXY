@@ -184,17 +184,10 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	else
 		goto END;
 		
-	/*读取检测卡上的检测指标计算方式*/
-	S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
-	if(S_ReadCodeBuffer->pbuf1)
-		cardQR->TestType = strtol(S_ReadCodeBuffer->pbuf1 , NULL , 10);
-	else
-		goto END;
-		
 	/*读取检测卡上的检测指标正常范围*/
 	S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
 	if(S_ReadCodeBuffer->pbuf1)
-		cardQR->NormalResult = strtod(S_ReadCodeBuffer->pbuf1 , NULL );
+		memcpy(cardQR->NormalResult, S_ReadCodeBuffer->pbuf1 ,strlen(S_ReadCodeBuffer->pbuf1));
 	else
 		goto END;
 		
@@ -218,7 +211,14 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 		memcpy(cardQR->ItemMeasure, S_ReadCodeBuffer->pbuf1 ,strlen(S_ReadCodeBuffer->pbuf1));
 	else
 		goto END;
-		
+	
+	//读取小数点个数
+	S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
+	if(S_ReadCodeBuffer->pbuf1)
+		cardQR->ItemPoint = strtol(S_ReadCodeBuffer->pbuf1 , NULL, 10);
+	else
+		goto END;
+	
 	/*读取检测卡T线位置*/
 	S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
 	if(S_ReadCodeBuffer->pbuf1)
@@ -226,32 +226,31 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	else
 		goto END;
 		
-	/*读取检测卡标准曲线数目*/
+	/*读取检测卡标准曲线临界浓度*/
 	S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
 	if(S_ReadCodeBuffer->pbuf1)
-		cardQR->ItemBiaoQuNum = strtol(S_ReadCodeBuffer->pbuf1 , NULL, 10);
+		cardQR->ItemFenDuan = strtod(S_ReadCodeBuffer->pbuf1 , NULL);
 	else
 		goto END;
-	
-	if(cardQR->ItemBiaoQuNum > 1)
+
+	/*标准曲线1*/
+	for(i=0; i<4; i++)
 	{
-		/*读取检测卡标准曲线临界浓度*/
 		S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
 		if(S_ReadCodeBuffer->pbuf1)
-			cardQR->ItemFenDuan = strtod(S_ReadCodeBuffer->pbuf1 , NULL);
+			cardQR->ItemBiaoQu[0][i] = strtod(S_ReadCodeBuffer->pbuf1 , NULL);
 		else
 			goto END;
 	}
 	
-		
-	/*标准曲线*/
-	for(j=0; j<cardQR->ItemBiaoQuNum; j++)
-	{		
-		for(i=0; i<3; i++)
+	/*标准曲线1*/
+	if(cardQR->ItemFenDuan > 0)
+	{
+		for(i=0; i<4; i++)
 		{
 			S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
 			if(S_ReadCodeBuffer->pbuf1)
-				cardQR->ItemBiaoQu[j][i] = strtod(S_ReadCodeBuffer->pbuf1 , NULL);
+				cardQR->ItemBiaoQu[1][i] = strtod(S_ReadCodeBuffer->pbuf1 , NULL);
 			else
 				goto END;
 		}
@@ -284,8 +283,8 @@ static void AnalysisCode(void *pbuf , unsigned short len)
 	if(S_ReadCodeBuffer->pbuf1)
 	{
 		static char year[10] ,month[10],day[10];
-		memcpy(year, S_ReadCodeBuffer->pbuf1, 4);
-		cardQR->CardBaoZhiQi.year = strtol(year , NULL , 10) - 2000;
+		memcpy(year, S_ReadCodeBuffer->pbuf1, 2);
+		cardQR->CardBaoZhiQi.year = strtol(year , NULL , 10);
 
 		memcpy(month, &S_ReadCodeBuffer->pbuf1[4], 2);
 		cardQR->CardBaoZhiQi.month = (unsigned char)strtod(month , NULL );

@@ -3,13 +3,14 @@
 #define	MYSTACK_H_H
 
 #include	"Define.h"
+#include	"Intent.h"
 
 //保存一个页面信息
 #pragma pack(1)
 typedef struct Activity_Tag
 {
 	char * pageName;												//activity名字，指向一个唯一地址
-	MyState_TypeDef (* pageCreate)(void * thizactivity, void * pram);					//配置每个页面具体的函数，申请页面内存
+	MyState_TypeDef (* pageCreate)(void * thizactivity, Intent * pram);					//配置每个页面具体的函数，申请页面内存
 	void (* pageStart)(void);										//显示页面，初始化页面数据
 	void (* pageInput)(unsigned char *pbuf , unsigned short len);		//获取页面输入
 	void (* pageFresh)(void);											//页面刷新
@@ -17,7 +18,7 @@ typedef struct Activity_Tag
 	void (* pageResume)(void);											//从隐藏状态返回，重新显示
 	void (* pageDestroy)(void);										//页面销毁，显示上一个页面
 	
-	void * pram;													//上一个页面传进来的参数地址，读取完需要释放
+	Intent * pram;													//上一个页面传进来的参数地址，读取完需要释放
 }Activity;
 #pragma pack()
 
@@ -38,7 +39,7 @@ typedef struct
 
 void InitLinkStack(LinkStack * linkStack);
 MyState_TypeDef StackPush(LinkStack * linkStack, Activity * nodeData);
-MyState_TypeDef StackPop(LinkStack * linkStack, Activity ** activity, bool isResume);
+MyState_TypeDef StackPop(LinkStack * linkStack, bool isResume);
 MyState_TypeDef StackTop(LinkStack * linkStack, Activity ** activity);
 
 #endif

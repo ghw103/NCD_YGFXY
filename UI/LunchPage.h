@@ -13,7 +13,7 @@ typedef struct LunchPageBuffer_tag {
 	CreateTestErrorType error;
 }LunchPageBuffer;
 
-MyState_TypeDef createLunchActivity(Activity * thizActivity, void * pram);
+MyState_TypeDef createLunchActivity(Activity * thizActivity, Intent * pram);
 
 #endif
 

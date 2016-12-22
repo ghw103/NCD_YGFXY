@@ -112,7 +112,7 @@ MyState_TypeDef StartScanQRCode(void * parm)
 
 MyState_TypeDef TakeScanQRCodeResult(ScanCodeResult *scanresult)
 {
-	if(pdPASS == xQueueReceive( xScanResultQueue, scanresult,  10/portTICK_RATE_MS))
+	if(pdPASS == xQueueReceive( xScanResultQueue, scanresult,  0/portTICK_RATE_MS))
 		return My_Pass;
 	else
 		return My_Fail;

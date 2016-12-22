@@ -13,6 +13,7 @@
 #include	"Test_Fun.h"
 #include	"Test_Task.h"
 #include	"SystemSet_Dao.h"
+#include	"Motor_Fun.h"
 
 #include	"System_Data.h"
 #include	"CRC16.h"
@@ -125,6 +126,9 @@ static void ProcessCMD(unsigned char *buf, unsigned short len, struct netconn *p
 			}
 			sprintf(pxbuf2, "],\"status\":%d}", GetTestStatusFlorLab());
 			strcat(pxbuf1, pxbuf2);
+			
+			if(0 == GetTestStatusFlorLab())
+				MotorMoveTo(MaxLocation, 1);
 		}
 
 		netconn_write( pxNetCon, pxbuf1, strlen(pxbuf1), NETCONN_COPY );

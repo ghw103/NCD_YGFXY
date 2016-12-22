@@ -3,7 +3,7 @@
 
 #include	"MyTest_Data.h"
 #include	"TestDataDao.h"
-
+#include	"UI_Data.h"
 
 typedef struct Record_tag {
 
@@ -20,7 +20,7 @@ typedef struct Record_tag {
 	unsigned short lcdinput[100];
 }RecordPageBuffer;
 
-unsigned char DspRecordPage(void *  parm);
+MyState_TypeDef createRecordActivity(Activity * thizActivity, Intent * pram);
 
 #endif
 

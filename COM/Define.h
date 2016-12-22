@@ -152,17 +152,16 @@ typedef enum
 typedef struct CardInfo_Tag
 {
 	char	ItemName[ItemNameLen];						//测试项目
-	unsigned char	TestType;							//峰高计算方式
-	float	NormalResult;								//正常值
+	char	NormalResult[20];								//正常值
 	float	LowstResult;								//最低检测线
 	float	HighestResult;								//最高检测线
 	char	ItemMeasure[ItemMeasureLen];				//测试单位
+	unsigned char ItemPoint;							//小数点数目
 	unsigned short ItemLocation;						//T线位置
-	unsigned char ItemBiaoQuNum;						//标准曲线数目
 	float	ItemFenDuan;								//分段峰高比
-	float	ItemBiaoQu[2][3];							//标准曲线
+	float	ItemBiaoQu[2][4];							//标准曲线
 			//2 --- ?2???
-			//3 --- a , b, c  (????)
+			//4 --- a , b, c d (????)
 	unsigned char CardWaitTime;							//检测卡反应时间
 	unsigned short CLineLocation;						//c线位置
 	char	CardPiCi[CardPiCiHaoLen];					//批次号

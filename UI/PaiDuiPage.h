@@ -3,6 +3,7 @@
 
 #include	"Define.h"
 #include	"MyTest_Data.h"
+#include	"UI_Data.h"
 
 typedef struct PaiDuiPageBuffer_tag {
 	TestData tempd;
@@ -22,8 +23,8 @@ typedef struct PaiDuiPageBuffer_tag {
 }PaiDuiPageBuffer;
 
 
-unsigned char DspPaiDuiPage(void *  parm);
-void CheckTime(void);
+MyState_TypeDef createPaiDuiActivity(Activity * thizActivity, Intent * pram);
+
 
 #endif
 

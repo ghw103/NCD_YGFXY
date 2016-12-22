@@ -12,7 +12,7 @@ typedef struct WelcomePageBuffer_tag {
 	unsigned short lcdinput[100];									//lcd ‰»ÎΩ‚Œˆ
 }WelcomePageBuffer;
 
-MyState_TypeDef createWelcomeActivity(Activity * thizActivity, void * pram);
+MyState_TypeDef createWelcomeActivity(Activity * thizActivity, Intent * pram);
 
 #endif
 
