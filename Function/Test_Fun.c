@@ -302,7 +302,7 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 		
 		//ÕÒcÏß
 		S_TempCalData->testdata->testline.C_Point[0] = 0;
-		for(i=S_TempCalData->testdata->temperweima.CLineLocation-20; i<S_TempCalData->testdata->temperweima.CLineLocation+20; i++)
+		for(i=S_TempCalData->testdata->temperweima.CLineLocation-30; i<S_TempCalData->testdata->temperweima.CLineLocation+30; i++)
 		{
 			if(S_TempCalData->testdata->testline.C_Point[0] < S_TempCalData->testdata->testline.TestPoint[i])
 			{
@@ -346,7 +346,7 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 		
 		//ÕÒTÏß
 		S_TempCalData->testdata->testline.T_Point[0] = 0;
-		for(i=S_TempCalData->testdata->temperweima.ItemLocation-20; i<S_TempCalData->testdata->temperweima.ItemLocation+20; i++)
+		for(i=S_TempCalData->testdata->temperweima.ItemLocation-30; i<S_TempCalData->testdata->temperweima.ItemLocation+30; i++)
 		{
 			if(S_TempCalData->testdata->testline.T_Point[0] < S_TempCalData->testdata->testline.TestPoint[i])
 			{

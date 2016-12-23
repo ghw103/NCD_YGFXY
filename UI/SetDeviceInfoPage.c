@@ -8,6 +8,7 @@
 #include	"ShowDeviceInfoPage.h"
 #include	"System_Data.h"
 #include	"SystemSet_Dao.h"
+#include	"SleepPage.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -51,7 +52,7 @@ MyState_TypeDef createSetDeviceInfoActivity(Activity * thizActivity, Intent * pr
 	
 	if(My_Pass == activityBufferMalloc())
 	{
-		InitActivity(thizActivity, "SetDeviceInfoActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
+		InitActivity(thizActivity, "SetDeviceInfoActivity\0", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
 		return My_Pass;
 	}
@@ -73,6 +74,8 @@ static void activityStart(void)
 	if(S_SetDeviceInfoPageBuffer)
 	{
 		getSystemSetData(&(S_SetDeviceInfoPageBuffer->systemSetData));
+		
+		timer_set(&(S_SetDeviceInfoPageBuffer->timer), S_SetDeviceInfoPageBuffer->systemSetData.ledSleepTime);
 	}
 	
 	SelectPage(102);
@@ -94,6 +97,9 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*ÃüÁî*/
 		S_SetDeviceInfoPageBuffer->lcdinput[0] = pbuf[4];
 		S_SetDeviceInfoPageBuffer->lcdinput[0] = (S_SetDeviceInfoPageBuffer->lcdinput[0]<<8) + pbuf[5];
+		
+		//ÖØÖÃÐÝÃßÊ±¼ä
+		timer_restart(&(S_SetDeviceInfoPageBuffer->timer));
 		
 		/*·µ»Ø*/
 		if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1B00)
@@ -180,7 +186,12 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void activityFresh(void)
 {
-
+	if(S_SetDeviceInfoPageBuffer)
+	{
+		//ÐÝÃß
+		if(TimeOut == timer_expired(&(S_SetDeviceInfoPageBuffer->timer)))
+			startActivity(createSleepActivity, NULL);
+	}
 }
 
 /***************************************************************************************************
@@ -208,7 +219,12 @@ static void activityHide(void)
 ***************************************************************************************************/
 static void activityResume(void)
 {
-
+	if(S_SetDeviceInfoPageBuffer)
+	{
+		timer_restart(&(S_SetDeviceInfoPageBuffer->timer));
+	}
+	
+	SelectPage(102);
 }
 
 /***************************************************************************************************

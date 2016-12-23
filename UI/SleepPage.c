@@ -56,7 +56,7 @@ MyState_TypeDef createSleepActivity(Activity * thizActivity, Intent * pram)
 	
 	if(My_Pass == activityBufferMalloc())
 	{
-		InitActivity(thizActivity, "SleepActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
+		InitActivity(thizActivity, "SleepActivity\0", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
 		return My_Pass;
 	}
@@ -66,6 +66,11 @@ MyState_TypeDef createSleepActivity(Activity * thizActivity, Intent * pram)
 
 static void activityStart(void)
 {
+	if(S_SleepPageBuffer)
+	{
+		getSystemSetData(&(S_SleepPageBuffer->systemSetData));
+	}	
+	
 	SetLEDLight(10);
 	
 	SelectPage(142);
@@ -81,7 +86,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*ÉèÖÃ*/
 		if(S_SleepPageBuffer->lcdinput[0] == 0x1D70)
 		{
-			backToActivity(lunchActivityName);
+			backToFatherActivity();
 		}
 	}
 }
@@ -105,7 +110,7 @@ static void activityResume(void)
 }
 static void activityDestroy(void)
 {
-	SetLEDLight(100);
+	SetLEDLight(S_SleepPageBuffer->systemSetData.ledLightIntensity);
 	
 	activityBufferFree();
 }

@@ -7,6 +7,7 @@
 #include	"NetPreSetPage.h"
 #include	"MyMem.h"
 #include	"CRC16.h"
+#include	"SleepPage.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -54,7 +55,7 @@ MyState_TypeDef createNetSetActivity(Activity * thizActivity, Intent * pram)
 	
 	if(My_Pass == activityBufferMalloc())
 	{
-		InitActivity(thizActivity, "NetSetActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
+		InitActivity(thizActivity, "NetSetActivity\0", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
 		return My_Pass;
 	}
@@ -75,8 +76,10 @@ static void activityStart(void)
 {
 	if(S_NetSetPageBuffer)
 	{
-		getSystemSetData(&(S_NetSetPageBuffer->mySystemSetData));
-
+		getSystemSetData(&(S_NetSetPageBuffer->systemSetData));
+		
+		timer_set(&(S_NetSetPageBuffer->timer), S_NetSetPageBuffer->systemSetData.ledSleepTime);
+		
 		UpPageValue();
 	}
 	
@@ -100,6 +103,8 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		S_NetSetPageBuffer->lcdinput[0] = pbuf[4];
 		S_NetSetPageBuffer->lcdinput[0] = (S_NetSetPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
+		timer_restart(&(S_NetSetPageBuffer->timer));
+		
 		/*有线网的ip获取模式*/
 		if(S_NetSetPageBuffer->lcdinput[0] == 0x1E09)
 		{
@@ -109,10 +114,10 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			
 			/*自动获取ip*/
 			if(S_NetSetPageBuffer->lcdinput[1] == 0x8000)
-				S_NetSetPageBuffer->mySystemSetData.netSet.ipmode = DHCP_Mode;
+				S_NetSetPageBuffer->systemSetData.netSet.ipmode = DHCP_Mode;
 			/*使用设置的ip*/
 			else if(S_NetSetPageBuffer->lcdinput[1] == 0x0000)
-				S_NetSetPageBuffer->mySystemSetData.netSet.ipmode = User_Mode;
+				S_NetSetPageBuffer->systemSetData.netSet.ipmode = User_Mode;
 				
 			S_NetSetPageBuffer->ischanged = 1;
 		}
@@ -132,11 +137,11 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			{
 				if(1 == S_NetSetPageBuffer->ischanged)
 				{
-					if(My_Pass == SaveSystemSetData(&(S_NetSetPageBuffer->mySystemSetData)))
+					if(My_Pass == SaveSystemSetData(&(S_NetSetPageBuffer->systemSetData)))
 					{
 						SendKeyCode(1);
 						//保存成功，更新内存中的数据
-						setSystemSetData(&(S_NetSetPageBuffer->mySystemSetData));
+						setSystemSetData(&(S_NetSetPageBuffer->systemSetData));
 						S_NetSetPageBuffer->ischanged = 0;
 					}
 					else
@@ -163,7 +168,11 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void activityFresh(void)
 {
-
+	if(S_NetSetPageBuffer)
+	{
+		if(TimeOut == timer_expired(&(S_NetSetPageBuffer->timer)))
+			startActivity(createSleepActivity, NULL);
+	}
 }
 
 /***************************************************************************************************
@@ -191,7 +200,12 @@ static void activityHide(void)
 ***************************************************************************************************/
 static void activityResume(void)
 {
-
+	if(S_NetSetPageBuffer)
+	{
+		timer_restart(&(S_NetSetPageBuffer->timer));
+	}
+	
+	SelectPage(110);
 }
 
 /***************************************************************************************************
@@ -263,7 +277,7 @@ static void UpPageValue(void)
 		memset(S_NetSetPageBuffer->buf, 0, 100);
 		
 		/*更新ip获取方式*/
-		if(S_NetSetPageBuffer->mySystemSetData.netSet.ipmode != User_Mode)
+		if(S_NetSetPageBuffer->systemSetData.netSet.ipmode != User_Mode)
 			S_NetSetPageBuffer->buf[0] = 0x80;	
 		else
 			S_NetSetPageBuffer->buf[0] = 0x00;
@@ -271,10 +285,10 @@ static void UpPageValue(void)
 		WriteRadioData(0x1E09, S_NetSetPageBuffer->buf, 2);
 			
 		/*更新ip*/
-		if(S_NetSetPageBuffer->mySystemSetData.netSet.ipmode == User_Mode)
+		if(S_NetSetPageBuffer->systemSetData.netSet.ipmode == User_Mode)
 		{
-			sprintf((S_NetSetPageBuffer->buf), "%03d.%03d.%03d.%03d", S_NetSetPageBuffer->mySystemSetData.netSet.myip.ip_1, S_NetSetPageBuffer->mySystemSetData.netSet.myip.ip_2, 
-				S_NetSetPageBuffer->mySystemSetData.netSet.myip.ip_3, S_NetSetPageBuffer->mySystemSetData.netSet.myip.ip_4);
+			sprintf((S_NetSetPageBuffer->buf), "%03d.%03d.%03d.%03d", S_NetSetPageBuffer->systemSetData.netSet.myip.ip_1, S_NetSetPageBuffer->systemSetData.netSet.myip.ip_2, 
+				S_NetSetPageBuffer->systemSetData.netSet.myip.ip_3, S_NetSetPageBuffer->systemSetData.netSet.myip.ip_4);
 			DisText(0x1E10, S_NetSetPageBuffer->buf, strlen((S_NetSetPageBuffer->buf)));
 		}
 		else
@@ -298,7 +312,7 @@ static void SetTempIP(unsigned char *buf, unsigned char len)
 				SendKeyCode(3);
 				return;
 			}
-			S_NetSetPageBuffer->mySystemSetData.netSet.myip.ip_1 = temp;
+			S_NetSetPageBuffer->systemSetData.netSet.myip.ip_1 = temp;
 			
 			memset(S_NetSetPageBuffer->buf, 0, 100);
 			memcpy(S_NetSetPageBuffer->buf, buf+4, 3);
@@ -308,7 +322,7 @@ static void SetTempIP(unsigned char *buf, unsigned char len)
 				SendKeyCode(3);
 				return;
 			}
-			S_NetSetPageBuffer->mySystemSetData.netSet.myip.ip_2 = temp;
+			S_NetSetPageBuffer->systemSetData.netSet.myip.ip_2 = temp;
 			
 			memset(S_NetSetPageBuffer->buf, 0, 100);
 			memcpy(S_NetSetPageBuffer->buf, buf+8, 3);
@@ -318,7 +332,7 @@ static void SetTempIP(unsigned char *buf, unsigned char len)
 				SendKeyCode(3);
 				return;
 			}
-			S_NetSetPageBuffer->mySystemSetData.netSet.myip.ip_3 = temp;
+			S_NetSetPageBuffer->systemSetData.netSet.myip.ip_3 = temp;
 			
 			memset(S_NetSetPageBuffer->buf, 0, 100);
 			memcpy(S_NetSetPageBuffer->buf, buf+12, 3);
@@ -328,7 +342,7 @@ static void SetTempIP(unsigned char *buf, unsigned char len)
 				SendKeyCode(3);
 				return;
 			}
-			S_NetSetPageBuffer->mySystemSetData.netSet.myip.ip_4 = temp;
+			S_NetSetPageBuffer->systemSetData.netSet.myip.ip_4 = temp;
 		}
 		else
 			SendKeyCode(3);

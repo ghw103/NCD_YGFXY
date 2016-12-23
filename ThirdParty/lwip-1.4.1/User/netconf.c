@@ -74,10 +74,10 @@ static void LwIP_Init(NetSet * netset)
 	{
 		IP4_ADDR(&ipaddr, netset->myip.ip_1, netset->myip.ip_2, netset->myip.ip_3, netset->myip.ip_4);
 		IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1 , NETMASK_ADDR2, NETMASK_ADDR3);
-		IP4_ADDR(&gw, netset->myip.ip_1, netset->myip.ip_2, netset->myip.ip_3, 1);
-		
-		SetGB_LineNetIP(ipaddr.addr);
+		IP4_ADDR(&gw, netset->myip.ip_1, netset->myip.ip_2, netset->myip.ip_3, 1);	
 	}
+	
+	SetGB_LineNetIP(ipaddr.addr);
 
 	netif_add(&xnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);
 
@@ -155,6 +155,8 @@ void ETH_link_callback(struct netif *netif)
 			ipaddr.addr = 0;
 			netmask.addr = 0;
 			gw.addr = 0;
+			
+			SetGB_DHCPState(DHCP_START);
 		}
 		else
 		{
@@ -163,6 +165,8 @@ void ETH_link_callback(struct netif *netif)
 			IP4_ADDR(&gw, myNetData.myip.ip_1, myNetData.myip.ip_2, myNetData.myip.ip_3, 1);
 		}
 
+		SetGB_LineNetIP(ipaddr.addr);
+		
 		netif_set_addr(&xnetif, &ipaddr , &netmask, &gw);
     
 		/* When the netif is fully configured this function must be called.*/
@@ -177,10 +181,12 @@ void ETH_link_callback(struct netif *netif)
 			SetGB_DHCPState(DHCP_LINK_DOWN);
 			dhcp_stop(netif);
 		}
+		
+		ipaddr.addr = 0;
+		SetGB_LineNetIP(ipaddr.addr);
 
 		/*  When the netif link is down this function must be called.*/
 		netif_set_down(&xnetif);
-
 	}
 }
 

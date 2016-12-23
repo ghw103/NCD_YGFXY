@@ -129,7 +129,7 @@ typedef struct
 /******************************************二维码相关定义**************************************************/
 /**********************************************************************************************************/
 
-#define	ScanOutTime						10			//????s
+#define	ScanOutTime						3			//????s
 #define	CodeMaxLen						300			//???????
 #define	ItemNameLen						20			//????????
 #define	ItemMeasureLen					10			//????????
@@ -266,36 +266,7 @@ typedef struct UserTag
 /******************************************自检功能相关定义****************************************************/
 /**********************************************************************************************************/
 
-typedef enum
-{ 
-	ReadServerData = 0,												//加载服务器数据
-	ReadServerError = 1,												//服务器数据失败
-	ReadServerSuccess = 2,												//服务器数据成功
-	
-	ErWeiMaChecking = 3,												//正在检查二维码
-	ErWeiMaError = 4,													//二维码错误
-	ErWeiMaSuccess = 5,													//二维码正常
-	
-	DataBasesChecking = 6,												//正在检查存储模块
-	DataBasesError = 7,													//存储模块错误
-	DataBasesSuccess = 8,												//存储模块正常
-	
-	WIFIChecking = 9,													//正在检查WIFI
-	WIFIError = 10,														//WIFI错误
-	WIFISuccess = 11,													//WIFI正常
-	
-	ADDAChecking = 12,													//正在检查采集模块
-	ADDAError = 13,														//采集模块错误
-	ADDASuccess = 14,													//采集模块正常
-	
-	MotorChecking = 15,													//正在检查采集模块
-	MotorError = 16,														//采集模块错误
-	MotorSuccess = 17,													//采集模块正常
-	
-	
-	
-	SelfCheckOver = 18													//自检完成
-}SelfCheck_TypeDef;
+
 
 typedef enum
 {

@@ -4,8 +4,10 @@
 #include	"Timer_Data.h"
 #include	"MyTest_Data.h"
 #include	"UI_Data.h"
+#include	"SystemSet_Data.h"
 
 typedef struct LunchPageBuffer_tag {
+	SystemSetData systemSetData;
 	Timer timer;
 	unsigned char presscount;
 	char buf[100];

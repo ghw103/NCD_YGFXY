@@ -7,6 +7,7 @@
 #include	"System_Data.h"
 #include	"MyMem.h"
 #include	"ShowDeviceInfoPage.h"
+#include	"SleepPage.h"
 #include	"ReadBarCode_Fun.h"
 #include	"SystemSet_Dao.h"
 
@@ -53,7 +54,7 @@ MyState_TypeDef createSetDeviceIDActivity(Activity * thizActivity, Intent * pram
 	
 	if(My_Pass == activityBufferMalloc())
 	{
-		InitActivity(thizActivity, "SetDeviceIDActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
+		InitActivity(thizActivity, "SetDeviceIDActivity\0", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
 		return My_Pass;
 	}
@@ -76,6 +77,8 @@ static void activityStart(void)
 	{
 		getSystemSetData(&(S_SetDeviceIDPage->systemSetData));
 	
+		timer_set(&(S_SetDeviceIDPage->timer), S_SetDeviceIDPage->systemSetData.ledSleepTime);
+		
 		DisText(0x1C10, S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid, strlen(S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid));
 	}
 	
@@ -99,7 +102,9 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		S_SetDeviceIDPage->lcdinput[0] = pbuf[4];
 		S_SetDeviceIDPage->lcdinput[0] = (S_SetDeviceIDPage->lcdinput[0]<<8) + pbuf[5];
 		
-		/*修改设备id*/
+		//重置休眠时间
+		timer_restart(&(S_SetDeviceIDPage->timer));
+		
 		/*返回*/
 		if(S_SetDeviceIDPage->lcdinput[0] == 0x1c00)
 		{
@@ -150,6 +155,7 @@ static void activityFresh(void)
 {
 	if(S_SetDeviceIDPage)
 	{
+		//读取设备id条码
 		if(ReadBarCodeFunction((char *)(S_SetDeviceIDPage->tempbuf), 100) > 0)
 		{
 			memcpy(S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid, S_SetDeviceIDPage->tempbuf, MaxDeviceIDLen);
@@ -157,7 +163,11 @@ static void activityFresh(void)
 			DisText(0x1C10, S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid, MaxDeviceIDLen);
 		
 			S_SetDeviceIDPage->ismodify = 1;
-		}		
+		}
+
+		//休眠
+		if(TimeOut == timer_expired(&(S_SetDeviceIDPage->timer)))
+			startActivity(createSleepActivity, NULL);
 	}
 }
 
@@ -186,6 +196,12 @@ static void activityHide(void)
 ***************************************************************************************************/
 static void activityResume(void)
 {
+	if(S_SetDeviceIDPage)
+	{
+		timer_restart(&(S_SetDeviceIDPage->timer));
+	}
+	
+	SelectPage(104);
 }
 
 /***************************************************************************************************

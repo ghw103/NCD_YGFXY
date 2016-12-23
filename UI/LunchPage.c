@@ -81,7 +81,10 @@ static void activityStart(void)
 {
 	if(S_LunchPageBuffer)
 	{
-		timer_set(&(S_LunchPageBuffer->timer), 10);
+		//读取系统设置
+		getSystemSetData(&(S_LunchPageBuffer->systemSetData));
+		
+		timer_set(&(S_LunchPageBuffer->timer), S_LunchPageBuffer->systemSetData.ledSleepTime);
 	
 		DspPageText();
 	}
@@ -106,6 +109,9 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*命令*/
 		S_LunchPageBuffer->lcdinput[0] = pbuf[4];
 		S_LunchPageBuffer->lcdinput[0] = (S_LunchPageBuffer->lcdinput[0]<<8) + pbuf[5];
+		
+		//重置休眠时间
+		timer_restart(&(S_LunchPageBuffer->timer));
 		
 		//设置
 		if(S_LunchPageBuffer->lcdinput[0] == 0x1103)
@@ -211,7 +217,7 @@ static void activityResume(void)
 {
 	if(S_LunchPageBuffer)
 	{
-		timer_set(&(S_LunchPageBuffer->timer), 10);
+		timer_restart(&(S_LunchPageBuffer->timer));
 	}
 	
 	SelectPage(82);

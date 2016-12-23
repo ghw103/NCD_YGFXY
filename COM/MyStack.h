@@ -6,7 +6,7 @@
 #include	"Intent.h"
 
 //保存一个页面信息
-#pragma pack(1)
+
 typedef struct Activity_Tag
 {
 	char * pageName;												//activity名字，指向一个唯一地址
@@ -20,22 +20,20 @@ typedef struct Activity_Tag
 	
 	Intent * pram;													//上一个页面传进来的参数地址，读取完需要释放
 }Activity;
-#pragma pack()
 
-#pragma pack(1)
+
 typedef struct _stacknode_
 {
     Activity * activity;									//当前节点的页面信息
     struct _stacknode_ * lastStackNode;						//上一节点地址
 }StackNode;
-#pragma pack()
 
-#pragma pack(1)
+
 typedef struct
 {
 	StackNode * top;										//栈顶节点
 }LinkStack;
-#pragma pack()
+
 
 void InitLinkStack(LinkStack * linkStack);
 MyState_TypeDef StackPush(LinkStack * linkStack, Activity * nodeData);

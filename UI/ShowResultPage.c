@@ -14,6 +14,7 @@
 #include	"SDFunction.h"
 #include	"Printf_Fun.h"
 #include	"RecordPage.h"
+#include	"SleepPage.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -90,6 +91,11 @@ static void activityStart(void)
 {
 	if(S_ShowPageBuffer)
 	{
+		//读取系统设置
+		getSystemSetData(&(S_ShowPageBuffer->systemSetData));
+		
+		timer_set(&(S_ShowPageBuffer->timer), S_ShowPageBuffer->systemSetData.ledSleepTime);
+		
 		RefreshText();
 			
 		DspLine();
@@ -117,6 +123,8 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		S_ShowPageBuffer->lcdinput[0] = pbuf[4];
 		S_ShowPageBuffer->lcdinput[0] = (S_ShowPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
+		timer_restart(&(S_ShowPageBuffer->timer));
+		
 		/*退出*/
 		if(0x2301 == S_ShowPageBuffer->lcdinput[0])
 		{
@@ -143,7 +151,11 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void activityFresh(void)
 {
-
+	if(S_ShowPageBuffer)
+	{
+		if(TimeOut == timer_expired(&(S_ShowPageBuffer->timer)))
+			startActivity(createSleepActivity, NULL);
+	}
 }
 
 /***************************************************************************************************
@@ -171,7 +183,12 @@ static void activityHide(void)
 ***************************************************************************************************/
 static void activityResume(void)
 {
-
+	if(S_ShowPageBuffer)
+	{
+		timer_restart(&(S_ShowPageBuffer->timer));
+	}
+	
+	SelectPage(147);
 }
 
 /***************************************************************************************************
@@ -268,10 +285,10 @@ static void DspLine(void)
 	
 	for(i=0; i<MaxPointLen;i++)
 	{
-		if(i%10 == 0)
+		if(i%20 == 0)
 		{
 			p = &(S_ShowPageBuffer->testdata.testline.TestPoint[i]);
-			DisPlayLine(1 , p , 10);
+			DisPlayLine(1 , p , 20);
 		}
 		
 		if(S_ShowPageBuffer->lineinfo.MaxData <= S_ShowPageBuffer->testdata.testline.TestPoint[i])

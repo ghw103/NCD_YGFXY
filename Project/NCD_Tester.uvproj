@@ -863,11 +863,6 @@
               <FilePath>..\Datas\MyTest_Data.c</FilePath>
             </File>
             <File>
-              <FileName>SelfCheck_Data.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Datas\SelfCheck_Data.c</FilePath>
-            </File>
-            <File>
               <FileName>UI_Data.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Datas\UI_Data.c</FilePath>

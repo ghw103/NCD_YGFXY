@@ -7,6 +7,7 @@
 #include	"UI_Data.h"
 #include	"MyMem.h"
 
+#include	"SleepPage.h"
 #include	"WaittingCardPage.h"
 #include	"PreReadCardPage.h"
 #include	"PlaySong_Task.h"

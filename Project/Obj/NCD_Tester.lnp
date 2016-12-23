@@ -85,7 +85,6 @@
 ".\obj\motor_data.o"
 ".\obj\timer_data.o"
 ".\obj\mytest_data.o"
-".\obj\selfcheck_data.o"
 ".\obj\ui_data.o"
 ".\obj\system_data.o"
 ".\obj\netinfo_data.o"

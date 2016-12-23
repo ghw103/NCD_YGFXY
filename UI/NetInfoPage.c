@@ -9,6 +9,7 @@
 #include	"NetPreSetPage.h"
 #include	"MyMem.h"
 #include	"WifiFunction.h"
+#include	"SleepPage.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -57,7 +58,7 @@ MyState_TypeDef createNetInfoActivity(Activity * thizActivity, Intent * pram)
 	
 	if(My_Pass == activityBufferMalloc())
 	{
-		InitActivity(thizActivity, "NetInfoActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
+		InitActivity(thizActivity, "NetInfoActivity\0", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
 		return My_Pass;
 	}
@@ -78,7 +79,12 @@ static void activityStart(void)
 {
 	if(S_NetInfoPageBuffer)
 	{
-		timer_set(&(S_NetInfoPageBuffer->timer), 10);
+		//读取系统设置
+		getSystemSetData(&(S_NetInfoPageBuffer->systemSetData));
+		
+		timer_set(&(S_NetInfoPageBuffer->timer2), S_NetInfoPageBuffer->systemSetData.ledSleepTime);
+		
+		timer_set(&(S_NetInfoPageBuffer->timer), 2);
 	
 		ReadNetInfo();
 		
@@ -105,6 +111,8 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		S_NetInfoPageBuffer->lcdinput[0] = pbuf[4];
 		S_NetInfoPageBuffer->lcdinput[0] = (S_NetInfoPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
+		timer_restart(&(S_NetInfoPageBuffer->timer2));
+		
 		//返回
 		if(S_NetInfoPageBuffer->lcdinput[0] == 0x1ca0)
 		{
@@ -124,11 +132,19 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void activityFresh(void)
 {
-	if(TimeOut == timer_expired(&(S_NetInfoPageBuffer->timer)))
+	if(S_NetInfoPageBuffer)
 	{
-		ReadNetInfo();
-		ShowNetInfo();
-		timer_reset(&(S_NetInfoPageBuffer->timer));
+		if(TimeOut == timer_expired(&(S_NetInfoPageBuffer->timer)))
+		{
+			ReadNetInfo();
+			ShowNetInfo();
+			timer_reset(&(S_NetInfoPageBuffer->timer));
+		}
+		
+		if(TimeOut == timer_expired(&(S_NetInfoPageBuffer->timer2)))
+		{
+			startActivity(createSleepActivity, NULL);
+		}
 	}
 }
 
@@ -157,7 +173,12 @@ static void activityHide(void)
 ***************************************************************************************************/
 static void activityResume(void)
 {
-
+	if(S_NetInfoPageBuffer)
+	{
+		timer_restart(&(S_NetInfoPageBuffer->timer2));
+	}
+	
+	SelectPage(145);
 }
 
 /***************************************************************************************************

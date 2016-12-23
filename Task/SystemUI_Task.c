@@ -73,5 +73,7 @@ static void vSystemUITask( void *pvParameters )
 			DspTimeAndTempData();
 		
 		count++;
+		
+//		vTaskDelay(10 / portTICK_RATE_MS);
 	}
 }

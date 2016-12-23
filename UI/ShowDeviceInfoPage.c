@@ -5,6 +5,7 @@
 #include	"SetDeviceInfoPage.h"
 #include	"SetDeviceIDPage.h"
 #include	"SystemSetPage.h"
+#include	"SleepPage.h"
 
 #include	"LCD_Driver.h"
 #include	"SystemSet_Dao.h"
@@ -52,7 +53,7 @@ MyState_TypeDef createDeviceInfoActivity(Activity * thizActivity, Intent * pram)
 	
 	if(My_Pass == activityBufferMalloc())
 	{
-		InitActivity(thizActivity, "DeviceInfoActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
+		InitActivity(thizActivity, "DeviceInfoActivity\0", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
 		return My_Pass;
 	}
@@ -74,6 +75,8 @@ static void activityStart(void)
 	if(S_ShowDeviceInfoPageBuffer)
 	{
 		getSystemSetData(&(S_ShowDeviceInfoPageBuffer->systemSetData));
+		
+		timer_set(&(S_ShowDeviceInfoPageBuffer->timer), S_ShowDeviceInfoPageBuffer->systemSetData.ledSleepTime);
 		
 		showDeviceInfo();
 	}
@@ -98,6 +101,9 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		S_ShowDeviceInfoPageBuffer->lcdinput[0] = pbuf[4];
 		S_ShowDeviceInfoPageBuffer->lcdinput[0] = (S_ShowDeviceInfoPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
+		//重置休眠时间
+		timer_restart(&(S_ShowDeviceInfoPageBuffer->timer));
+		
 		/*基本信息*/
 		if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1a03)
 			S_ShowDeviceInfoPageBuffer->presscount = 0;
@@ -107,7 +113,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		
 		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1a05)
 		{
-			if(S_ShowDeviceInfoPageBuffer->presscount > 15)
+			if(S_ShowDeviceInfoPageBuffer->presscount > 10)
 				SendKeyCode(2);
 		}
 		/*获取密码*/
@@ -144,7 +150,11 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void activityFresh(void)
 {
-
+	if(S_ShowDeviceInfoPageBuffer)
+	{
+		if(TimeOut == timer_expired(&(S_ShowDeviceInfoPageBuffer->timer)))
+			startActivity(createSleepActivity, NULL);
+	}
 }
 
 /***************************************************************************************************
@@ -174,9 +184,7 @@ static void activityResume(void)
 {
 	if(S_ShowDeviceInfoPageBuffer)
 	{
-		getSystemSetData(&(S_ShowDeviceInfoPageBuffer->systemSetData));
-		
-		showDeviceInfo();
+		timer_restart(&(S_ShowDeviceInfoPageBuffer->timer));
 	}
 	
 	SelectPage(100);

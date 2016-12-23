@@ -4,6 +4,7 @@
 #include	"Define.h"
 #include	"NetInfo_Data.h"
 #include	"UI_Data.h"
+#include	"SystemSet_Data.h"
 
 typedef struct NetInfoPageBuffer_tag {
 	unsigned short lcdinput[20];
@@ -12,6 +13,8 @@ typedef struct NetInfoPageBuffer_tag {
 	char tempbuffer1[100];
 	Basic_ICO lineico;
 	Basic_ICO wifiico;
+	SystemSetData systemSetData;
+	Timer timer2;
 }NetInfoPageBuffer;
 
 

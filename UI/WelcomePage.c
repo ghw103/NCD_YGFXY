@@ -6,7 +6,6 @@
 #include	"LCD_Driver.h"
 #include	"UI_Data.h"
 #include	"MyMem.h"
-#include	"SelfCheck_Data.h"
 #include	"PlaySong_Task.h"
 
 #include	"LunchPage.h"
@@ -56,7 +55,7 @@ MyState_TypeDef createWelcomeActivity(Activity * thizActivity, Intent * pram)
 	
 	if(My_Pass == activityBufferMalloc())
 	{
-		InitActivity(thizActivity, "WelcomeActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
+		InitActivity(thizActivity, "WelcomeActivity\0", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
 		return My_Pass;
 	}
@@ -78,10 +77,10 @@ static void activityStart(void)
 	if(S_WelcomePageBuffer)
 	{
 		timer_set(&(S_WelcomePageBuffer->timer), 1);
+		
 	}
 	
 	SetLEDLight(100);
-	
 	SelectPage(0);
 	
 	AddNumOfSongToList(52, 0);
@@ -100,40 +99,25 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 {
 	if(S_WelcomePageBuffer)
 	{
+		/*命令*/
+		S_WelcomePageBuffer->lcdinput[0] = pbuf[4];
+		S_WelcomePageBuffer->lcdinput[0] = (S_WelcomePageBuffer->lcdinput[0]<<8) + pbuf[5];
+		
+		S_WelcomePageBuffer->lcdinput[1] = pbuf[6];
+		S_WelcomePageBuffer->lcdinput[1] = (S_WelcomePageBuffer->lcdinput[1]<<8) + pbuf[7];
+		
 		if(0x81 == pbuf[3])
 		{
 			//页面id
 			if(0x03 == pbuf[4])
 			{
-				S_WelcomePageBuffer->lcdinput[0] = pbuf[6];
-				S_WelcomePageBuffer->lcdinput[0] = (S_WelcomePageBuffer->lcdinput[0]<<8) + pbuf[7];
-				
-				//动画播放到末尾81号页面,且自检完成
-				if((81 == S_WelcomePageBuffer->lcdinput[0]) && (SelfCheck_None != GetGB_SelfCheckStatus()))
-				{					
-					/*开启测试任务*/
-					StartvTestTask();
-					
-					/*开启网络任务*/
-					StartEthernet();
-
-					/*上传任务*/
-					StartvNormalUpLoadTask();
-					
-					/*开启读二维码任务*/
-					StartCodeScanTask();
-					
-					//开始排队任务
-					StartPaiduiTask();
-					
-					destroyTopActivity();
-					startActivity(createLunchActivity, NULL);
-				}
+				S_WelcomePageBuffer->currentPageId = S_WelcomePageBuffer->lcdinput[1];	
 			}
 		}
 		else if(0x83 == pbuf[3])
 		{
-			
+			if((S_WelcomePageBuffer->lcdinput[0] >= 0x1010) && (S_WelcomePageBuffer->lcdinput[0] <= 0x1014))
+				while(1);
 		}
 	}
 }
@@ -151,7 +135,71 @@ static void activityFresh(void)
 {
 	if(S_WelcomePageBuffer)
 	{
-		if(TimeOut == timer_expired(&(S_WelcomePageBuffer->timer)))
+		if(My_Pass == readSelfTestStatus(&(S_WelcomePageBuffer->selfTestStatus)))
+		{
+			if(SystemData_OK == S_WelcomePageBuffer->selfTestStatus)
+			{
+				getSystemSetData(&(S_WelcomePageBuffer->systemSetData));
+				SetLEDLight(S_WelcomePageBuffer->systemSetData.ledLightIntensity);
+			}
+		}
+		
+		if(80 == S_WelcomePageBuffer->currentPageId)
+		{
+			//自检完成
+			if(SelfTest_OK == S_WelcomePageBuffer->selfTestStatus)
+			{
+				/*开启测试任务*/
+				StartvTestTask();
+					
+				/*开启网络任务*/
+				StartEthernet();
+
+				/*上传任务*/
+				StartvNormalUpLoadTask();
+					
+				/*开启读二维码任务*/
+				StartCodeScanTask();
+					
+				//开始排队任务
+				StartPaiduiTask();
+					
+				destroyTopActivity();
+				startActivity(createLunchActivity, NULL);
+				
+				return;
+			}
+			//加载数据错误，说明sd异常
+			else if(SystemData_ERROR == S_WelcomePageBuffer->selfTestStatus)
+			{
+				SelectPage(81);
+				
+				SendKeyCode(5);
+			}
+			//led异常，告警发光模块错误
+			else if(Light_Error == S_WelcomePageBuffer->selfTestStatus)
+			{
+				SelectPage(81);
+				
+				SendKeyCode(4);
+			}
+			//采集异常，告警采集模块错误
+			else if(AD_ERROR == S_WelcomePageBuffer->selfTestStatus)
+			{
+				SelectPage(81);
+				
+				SendKeyCode(3);
+			}
+			//传动异常，告警传动模块错误
+			else if(Motol_ERROR == S_WelcomePageBuffer->selfTestStatus)
+			{
+				SelectPage(81);
+				
+				SendKeyCode(1);
+			}
+		}
+		
+		if((81 != S_WelcomePageBuffer->currentPageId) && (TimeOut == timer_expired(&(S_WelcomePageBuffer->timer))))
 		{
 			ReadCurrentPageId();
 

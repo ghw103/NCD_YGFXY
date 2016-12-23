@@ -52,7 +52,7 @@ Intent * createIntent(void * data, unsigned short datalen)
 	{
 		memset(intent, 0, sizeof(Intent));
 		
-		intent->data = MyMalloc(sizeof(datalen));
+		intent->data = MyMalloc(datalen);
 		intent->datalen = datalen;
 		
 		if(intent->data)

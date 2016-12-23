@@ -2,8 +2,11 @@
 #define __SYSSET_P_H__
 
 #include	"UI_Data.h"
+#include	"SystemSet_Data.h"
 
 typedef struct SysSetPageBuffer_tag {
+	SystemSetData systemSetData;
+	Timer timer;
 	unsigned short lcdinput[100];
 }SysSetPageBuffer;
 

@@ -3,6 +3,7 @@
 
 #include	"Define.h"
 #include	"UI_Data.h"
+#include	"SystemSet_Data.h"
 
 typedef struct WifiPageBuffer_tag {
 	unsigned char pageindex;							//Ò³ÃæË÷Òý
@@ -12,6 +13,8 @@ typedef struct WifiPageBuffer_tag {
 	unsigned short wifinum;
 	Basic_ICO myico[PageWifiNum];
 	unsigned short lcdinput[100];
+	SystemSetData systemSetData;
+	Timer timer;
 }WifiPageBuffer;
 
 MyState_TypeDef createWifiSetActivity(Activity * thizActivity, Intent * pram);

@@ -14,6 +14,7 @@
 #include	"RecordPage.h"
 #include	"OtherSetPage.h"
 #include	"MyTools.h"
+#include	"SleepPage.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -58,7 +59,7 @@ MyState_TypeDef createSystemSetActivity(Activity * thizActivity, Intent * pram)
 	
 	if(My_Pass == activityBufferMalloc())
 	{
-		InitActivity(thizActivity, "SystemSetActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
+		InitActivity(thizActivity, "SystemSetActivity\0", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
 		return My_Pass;
 	}
@@ -77,6 +78,14 @@ MyState_TypeDef createSystemSetActivity(Activity * thizActivity, Intent * pram)
 ***************************************************************************************************/
 static void activityStart(void)
 {
+	if(S_SysSetPageBuffer)
+	{
+		//读取系统设置
+		getSystemSetData(&(S_SysSetPageBuffer->systemSetData));
+		
+		timer_set(&(S_SysSetPageBuffer->timer), S_SysSetPageBuffer->systemSetData.ledSleepTime);
+	}
+		
 	SelectPage(98);
 }
 
@@ -96,6 +105,9 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*命令*/
 		S_SysSetPageBuffer->lcdinput[0] = pbuf[4];
 		S_SysSetPageBuffer->lcdinput[0] = (S_SysSetPageBuffer->lcdinput[0]<<8) + pbuf[5];
+		
+		//重置休眠时间
+		timer_restart(&(S_SysSetPageBuffer->timer));
 		
 		//基本信息
 		if(S_SysSetPageBuffer->lcdinput[0] == 0x1900)
@@ -160,7 +172,11 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void activityFresh(void)
 {
-
+	if(S_SysSetPageBuffer)
+	{
+		if(TimeOut == timer_expired(&(S_SysSetPageBuffer->timer)))
+			startActivity(createSleepActivity, NULL);
+	}
 }
 
 /***************************************************************************************************
@@ -188,6 +204,11 @@ static void activityHide(void)
 ***************************************************************************************************/
 static void activityResume(void)
 {
+	if(S_SysSetPageBuffer)
+	{
+		timer_restart(&(S_SysSetPageBuffer->timer));
+	}
+	
 	SelectPage(98);
 }
 

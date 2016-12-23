@@ -10,6 +10,7 @@
 #include	"NetSetPage.h"
 #include	"WifiSetPage.h"
 #include	"NetInfoPage.h"
+#include	"SleepPage.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -53,7 +54,7 @@ MyState_TypeDef createNetPreActivity(Activity * thizActivity, Intent * pram)
 	
 	if(My_Pass == activityBufferMalloc())
 	{
-		InitActivity(thizActivity, "NetPreActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
+		InitActivity(thizActivity, "NetPreActivity\0", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
 		return My_Pass;
 	}
@@ -72,6 +73,14 @@ MyState_TypeDef createNetPreActivity(Activity * thizActivity, Intent * pram)
 ***************************************************************************************************/
 static void activityStart(void)
 {
+	if(S_NetPrePageBuffer)
+	{
+		//读取系统设置
+		getSystemSetData(&(S_NetPrePageBuffer->systemSetData));
+		
+		timer_set(&(S_NetPrePageBuffer->timer), S_NetPrePageBuffer->systemSetData.ledSleepTime);
+	}
+	
 	SelectPage(108);
 }
 
@@ -92,6 +101,8 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		S_NetPrePageBuffer->lcdinput[0] = pbuf[4];
 		S_NetPrePageBuffer->lcdinput[0] = (S_NetPrePageBuffer->lcdinput[0]<<8) + pbuf[5];
 
+		timer_restart(&(S_NetPrePageBuffer->timer));
+		
 		/*返回*/
 		if(S_NetPrePageBuffer->lcdinput[0] == 0x1E00)
 		{
@@ -127,7 +138,11 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void activityFresh(void)
 {
-
+	if(S_NetPrePageBuffer)
+	{
+		if(TimeOut == timer_expired(&(S_NetPrePageBuffer->timer)))
+			startActivity(createSleepActivity, NULL);
+	}
 }
 
 /***************************************************************************************************
@@ -155,6 +170,11 @@ static void activityHide(void)
 ***************************************************************************************************/
 static void activityResume(void)
 {
+	if(S_NetPrePageBuffer)
+	{
+		timer_restart(&(S_NetPrePageBuffer->timer));
+	}
+	
 	SelectPage(108);
 }
 

@@ -8,6 +8,7 @@
 #include	"SystemSetPage.h"
 #include	"SDFunction.h"
 #include	"MyTools.h"
+#include	"SleepPage.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -58,7 +59,7 @@ MyState_TypeDef createUserManagerActivity(Activity * thizActivity, Intent * pram
 	
 	if(My_Pass == activityBufferMalloc())
 	{
-		InitActivity(thizActivity, "UserManagerActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
+		InitActivity(thizActivity, "UserManagerActivity\0", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
 		return My_Pass;
 	}
@@ -79,6 +80,11 @@ static void activityStart(void)
 {
 	if(S_UserMPageBuffer)
 	{
+		//读取系统设置
+		getSystemSetData(&(S_UserMPageBuffer->systemSetData));
+		
+		timer_set(&(S_UserMPageBuffer->timer), S_UserMPageBuffer->systemSetData.ledSleepTime);
+		
 		/*读取所有操作人*/
 		ReadUserData(S_UserMPageBuffer->user);
 		
@@ -107,6 +113,9 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*命令*/
 		S_UserMPageBuffer->lcdinput[0] = pbuf[4];
 		S_UserMPageBuffer->lcdinput[0] = (S_UserMPageBuffer->lcdinput[0]<<8) + pbuf[5];
+		
+		//重置休眠时间
+		timer_restart(&(S_UserMPageBuffer->timer));
 		
 		/*返回*/
 		if(S_UserMPageBuffer->lcdinput[0] == 0x1d00)
@@ -222,7 +231,11 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void activityFresh(void)
 {
-
+	if(S_UserMPageBuffer)
+	{
+		if(TimeOut == timer_expired(&(S_UserMPageBuffer->timer)))
+			startActivity(createSleepActivity, NULL);
+	}
 }
 
 /***************************************************************************************************
@@ -250,7 +263,12 @@ static void activityHide(void)
 ***************************************************************************************************/
 static void activityResume(void)
 {
-
+	if(S_UserMPageBuffer)
+	{
+		timer_restart(&(S_UserMPageBuffer->timer));
+	}
+	
+	SelectPage(106);
 }
 
 /***************************************************************************************************

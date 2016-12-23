@@ -4,6 +4,7 @@
 #include	"UI_Data.h"
 #include	"Define.h"
 #include	"Timer_Data.h"
+#include	"SystemSet_Data.h"
 
 typedef struct SleepPageBuffer_tag {
 	Basic_ICO myBasicICO;
@@ -15,6 +16,7 @@ typedef struct SleepPageBuffer_tag {
 	MyTime_Def time;
 	char buf[50];
 	unsigned short lcdinput[20];
+	SystemSetData systemSetData;
 }SleepPageBuffer;
 
 

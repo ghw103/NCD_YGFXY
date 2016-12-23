@@ -116,8 +116,8 @@ static void vLwipDHCPTask( void *pvParameters )
 				{
 					/* Read the new IP address */
 					IPaddress = tempnetif->ip_addr.addr;
-//					printf("正在获取IP.....\r\n");
-					if (IPaddress!=0) 
+
+					if (IPaddress!=0)
 					{
 						SetGB_DHCPState(DHCP_ADDRESS_ASSIGNED);					
 						
@@ -131,20 +131,11 @@ static void vLwipDHCPTask( void *pvParameters )
 						if (tempnetif->dhcp->tries > MAX_DHCP_TRIES)
 						{
 							SetGB_DHCPState(DHCP_TIMEOUT);
-//							printf("IP获取失败.....\r\n");
+
 							/* Stop DHCP */
 							dhcp_stop(tempnetif);
 
-							/* Static address used */
-							IP4_ADDR(&ipaddr, IP_ADDR0 ,IP_ADDR1 , IP_ADDR2 , IP_ADDR3 );
-							IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1, NETMASK_ADDR2, NETMASK_ADDR3);
-							IP4_ADDR(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
-							
-							SetGB_LineNetIP(ipaddr.addr);
-							
-							netif_set_addr(tempnetif, &ipaddr , &netmask, &gw);
-					  
-//							printf("使用静态IP %d.%d.%d.%d\r\n", IP_ADDR0 ,IP_ADDR1 , IP_ADDR2 , IP_ADDR3);
+							netif_set_down(tempnetif);
 						}
 					}
 				}

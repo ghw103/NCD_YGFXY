@@ -13,6 +13,7 @@
 #include	"CRC16.h"
 #include	"Printf_Fun.h"
 #include	"System_Data.h"
+#include	"SleepPage.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -60,7 +61,7 @@ MyState_TypeDef createRecordActivity(Activity * thizActivity, Intent * pram)
 	
 	if(My_Pass == activityBufferMalloc())
 	{
-		InitActivity(thizActivity, "RecordActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
+		InitActivity(thizActivity, "RecordActivity\0", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
 		return My_Pass;
 	}
@@ -81,6 +82,11 @@ static void activityStart(void)
 {
 	if(S_RecordPageBuffer)
 	{
+		//读取系统设置
+		getSystemSetData(&(S_RecordPageBuffer->systemSetData));
+		
+		timer_set(&(S_RecordPageBuffer->timer), S_RecordPageBuffer->systemSetData.ledSleepTime);
+		
 		S_RecordPageBuffer->selectindex = 0;
 		S_RecordPageBuffer->pageindex = 1;
 		ShowRecord(S_RecordPageBuffer->pageindex);
@@ -105,6 +111,8 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*命令*/
 		S_RecordPageBuffer->lcdinput[0] = pbuf[4];
 		S_RecordPageBuffer->lcdinput[0] = (S_RecordPageBuffer->lcdinput[0]<<8) + pbuf[5];
+		
+		timer_restart(&(S_RecordPageBuffer->timer));
 		
 		/*返回*/
 		if(S_RecordPageBuffer->lcdinput[0] == 0x2000)
@@ -175,7 +183,11 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void activityFresh(void)
 {
-
+	if(S_RecordPageBuffer)
+	{
+		if(TimeOut == timer_expired(&(S_RecordPageBuffer->timer)))
+			startActivity(createSleepActivity, NULL);
+	}
 }
 
 /***************************************************************************************************
@@ -203,6 +215,11 @@ static void activityHide(void)
 ***************************************************************************************************/
 static void activityResume(void)
 {
+	if(S_RecordPageBuffer)
+	{
+		timer_restart(&(S_RecordPageBuffer->timer));
+	}
+	
 	SelectPage(114);
 }
 

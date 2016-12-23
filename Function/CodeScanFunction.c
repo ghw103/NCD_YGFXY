@@ -81,22 +81,22 @@ ScanCodeResult ScanCodeFun(void * parm)
 		else
 		{
 			if(dir%2 == 0)
-				MotorMoveTo(GetGB_MotorLocation()+10, 0);
+				MotorMoveTo(GetGB_MotorLocation()+2, 0);
 			else
-				MotorMoveTo(GetGB_MotorLocation()-10, 0);
+				MotorMoveTo(GetGB_MotorLocation()-2, 0);
 
 			count++;
 			
 			ReadBasicCodeData();
 			
-			if((GetGB_MotorLocation() >= 3500)||(GetGB_MotorLocation() <= 200))
+			if((GetGB_MotorLocation() >= 1000)||(GetGB_MotorLocation() <= 200))
 			{
 				dir++;
 				
 			}
 			
 			vTaskDelay(2 / portTICK_RATE_MS);
-			if(count >= (ScanOutTime*1000/2))
+			if(count >= (ScanOutTime*1000/3))
 				scanresult = CardCodeScanTimeOut;				
 			
 		}

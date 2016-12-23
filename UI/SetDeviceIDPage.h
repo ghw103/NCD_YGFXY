@@ -6,6 +6,7 @@
 
 typedef struct SetDeviceIDPage_tag {
 	SystemSetData systemSetData;
+	Timer timer;
 	unsigned char tempbuf[150];								//¡Ÿ ±÷∏’Î
 	unsigned char ismodify;
 	unsigned short lcdinput[100];

@@ -143,19 +143,23 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void activityFresh(void)
 {
-	if((S_AdjustPageBuffer) && (S_AdjustPageBuffer->step == 0) && (GetCardState() == CardIN))
+	if(S_AdjustPageBuffer)
 	{
-		S_AdjustPageBuffer->step = 1;
-		SelectPage(90);
-		DspPage2Text();
-		StartScanQRCode(&(S_AdjustPageBuffer->testdata.testdata.temperweima));
+		if((S_AdjustPageBuffer->step == 0) && (GetCardState() == CardIN))
+		{
+			S_AdjustPageBuffer->step = 1;
+			SelectPage(90);
+			DspPage2Text();
+			StartScanQRCode(&(S_AdjustPageBuffer->testdata.testdata.temperweima));
+		}
+		
+		if (S_AdjustPageBuffer->step == 1)
+			CheckQRCode();
+		
+		if(S_AdjustPageBuffer->step == 2)
+			CheckPreTestCard();
 	}
 	
-	if((S_AdjustPageBuffer) && (S_AdjustPageBuffer->step == 1))
-		CheckQRCode();
-	
-	if((S_AdjustPageBuffer) && (S_AdjustPageBuffer->step == 2))
-		CheckPreTestCard();
 }
 
 /***************************************************************************************************

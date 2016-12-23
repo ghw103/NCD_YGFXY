@@ -82,6 +82,23 @@ void setSystemSetData(SystemSetData * systemSetData)
 {
 	if(systemSetData)
 	{
+		//对读取的数据进行校验
+		if(systemSetData->ledLightIntensity > 100)
+			systemSetData->ledLightIntensity = 100;
+		else if(systemSetData->ledLightIntensity < 10)
+			systemSetData->ledLightIntensity = 10;
+		
+		//0xffff表示不休眠
+		if(systemSetData->ledSleepTime != 0xffff)
+		{
+			if(systemSetData->ledSleepTime > 600)
+				systemSetData->ledSleepTime = 100;
+			else if(systemSetData->ledSleepTime < 10)
+				systemSetData->ledSleepTime = 10;
+		}
+		
+		systemSetData->crc = CalModbusCRC16Fun1(systemSetData, sizeof(SystemSetData) - 2);
+		
 		memcpy(&GB_SystemSetData, systemSetData, sizeof(SystemSetData));
 	}
 }

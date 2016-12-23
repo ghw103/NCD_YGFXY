@@ -8,6 +8,7 @@
 #include	"PlaySong_Task.h"
 #include	"PlaySong_Function.h"
 #include	"QueueUnits.h"
+#include	"SystemSet_Data.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -161,6 +162,9 @@ static void vPlaySongTask( void *pvParameters )
 unsigned char AddNumOfSongToList(unsigned char num, unsigned char mode)
 {
 	unsigned char songnum = num;
+	
+	if(isMute())
+		return pdPASS;
 	
 	if(SongListQueue == NULL)
 		return pdFAIL;

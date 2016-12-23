@@ -3,6 +3,7 @@
 
 #include	"Define.h"
 #include	"UI_Data.h"
+#include	"SystemSet_Data.h"
 
 typedef struct UserMPageBuffer_tag {
 	unsigned char selectindex;										//选中的索引
@@ -13,6 +14,8 @@ typedef struct UserMPageBuffer_tag {
 	User_Type * tempuser;
 	User_Type tempnewuser;
 	unsigned short lcdinput[100];
+	SystemSetData systemSetData;
+	Timer timer;
 }UserMPageBuffer;
 
 MyState_TypeDef createUserManagerActivity(Activity * thizActivity, Intent * pram);

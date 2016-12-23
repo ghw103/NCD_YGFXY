@@ -3,6 +3,7 @@
 
 #include	"MyTest_Data.h"
 #include	"UI_Data.h"
+#include	"SystemSet_Data.h"
 
 typedef struct ShowPageBuffer_tag {
 	char tempbuf[100];
@@ -10,6 +11,8 @@ typedef struct ShowPageBuffer_tag {
 	TestData testdata;
 	LineInfo lineinfo;
 	unsigned short lcdinput[100];
+	SystemSetData systemSetData;
+	Timer timer;
 }ShowPageBuffer;
 
 MyState_TypeDef createShowResultActivity(Activity * thizActivity, Intent * pram);

@@ -3,6 +3,7 @@
 
 #include	"OtherSetPage.h"
 #include	"SystemSetPage.h"
+#include	"SleepPage.h"
 
 #include	"SystemSet_Dao.h"
 #include	"LCD_Driver.h"
@@ -56,7 +57,7 @@ MyState_TypeDef createOtherSetActivity(Activity * thizActivity, Intent * pram)
 	
 	if(My_Pass == activityBufferMalloc())
 	{
-		InitActivity(thizActivity, "OtherSetActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
+		InitActivity(thizActivity, "OtherSetActivity\0", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
 		return My_Pass;
 	}
@@ -77,7 +78,9 @@ static void activityStart(void)
 {
 	if(S_OtherSetPageBuffer)
 	{
-		getSystemSetData(&(S_OtherSetPageBuffer->mySystemSetData));
+		getSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
+		
+		timer_set(&(S_OtherSetPageBuffer->timer), S_OtherSetPageBuffer->systemSetData.ledSleepTime);
 	}
 
 	SelectPage(122);
@@ -99,6 +102,9 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*命令*/
 		S_OtherSetPageBuffer->lcdinput[0] = pbuf[4];
 		S_OtherSetPageBuffer->lcdinput[0] = (S_OtherSetPageBuffer->lcdinput[0]<<8) + pbuf[5];
+		
+		//重置休眠时间
+		timer_restart(&(S_OtherSetPageBuffer->timer));
 		
 		/*重启*/
 		if(S_OtherSetPageBuffer->lcdinput[0] == 0x2400)
@@ -124,21 +130,21 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			
 			//自动打印
 			if(S_OtherSetPageBuffer->lcdinput[1] & 0x8000)
-				S_OtherSetPageBuffer->mySystemSetData.isAutoPrint = true;
+				S_OtherSetPageBuffer->systemSetData.isAutoPrint = true;
 			else
-				S_OtherSetPageBuffer->mySystemSetData.isAutoPrint = false;
+				S_OtherSetPageBuffer->systemSetData.isAutoPrint = false;
 			
 			//静音
 			if(S_OtherSetPageBuffer->lcdinput[1] & 0x4000)
-				S_OtherSetPageBuffer->mySystemSetData.isMute = true;
+				S_OtherSetPageBuffer->systemSetData.isMute = true;
 			else
-				S_OtherSetPageBuffer->mySystemSetData.isMute = false;
+				S_OtherSetPageBuffer->systemSetData.isMute = false;
 			
-			if(My_Pass == SaveSystemSetData(&(S_OtherSetPageBuffer->mySystemSetData)))
+			if(My_Pass == SaveSystemSetData(&(S_OtherSetPageBuffer->systemSetData)))
 			{
 				SendKeyCode(1);
 				//保存成功，更新内存中的数据
-				setSystemSetData(&(S_OtherSetPageBuffer->mySystemSetData));
+				setSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
 			}
 			else
 				SendKeyCode(2);
@@ -151,20 +157,33 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			
 			S_OtherSetPageBuffer->tempvalue = strtol(S_OtherSetPageBuffer->buf, NULL, 10);
 			
-			if(S_OtherSetPageBuffer->tempvalue > 600)
-				S_OtherSetPageBuffer->tempvalue = 600;
+			S_OtherSetPageBuffer->systemSetData.ledSleepTime = S_OtherSetPageBuffer->tempvalue;
 			
-			S_OtherSetPageBuffer->mySystemSetData.ledSleepTime = S_OtherSetPageBuffer->tempvalue;
+			if(S_OtherSetPageBuffer->systemSetData.ledSleepTime == 0)
+				S_OtherSetPageBuffer->systemSetData.ledSleepTime = 0xffff;
+			else if(S_OtherSetPageBuffer->systemSetData.ledSleepTime > 600)
+			{
+				S_OtherSetPageBuffer->systemSetData.ledSleepTime = 600;
+				S_OtherSetPageBuffer->tempvalue = 600;
+			}
+			else if(S_OtherSetPageBuffer->tempvalue < 10)
+			{
+				S_OtherSetPageBuffer->systemSetData.ledSleepTime = 10;
+				S_OtherSetPageBuffer->tempvalue = 10;
+			}
 			
 			memset(S_OtherSetPageBuffer->buf, 0, 50);
 			sprintf(S_OtherSetPageBuffer->buf, "%d", S_OtherSetPageBuffer->tempvalue);
 			DisText(0x2420, S_OtherSetPageBuffer->buf, strlen(S_OtherSetPageBuffer->buf));
 			
-			if(My_Pass == SaveSystemSetData(&(S_OtherSetPageBuffer->mySystemSetData)))
+			if(My_Pass == SaveSystemSetData(&(S_OtherSetPageBuffer->systemSetData)))
 			{
 				SendKeyCode(1);
 				//保存成功，更新内存中的数据
-				setSystemSetData(&(S_OtherSetPageBuffer->mySystemSetData));
+				setSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
+				
+				//重新设置当前页面的休眠时间
+				timer_set(&(S_OtherSetPageBuffer->timer), S_OtherSetPageBuffer->systemSetData.ledSleepTime);
 			}
 			else
 				SendKeyCode(2);
@@ -182,18 +201,18 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			if(S_OtherSetPageBuffer->tempvalue < 10)
 				S_OtherSetPageBuffer->tempvalue = 10;
 			
-			S_OtherSetPageBuffer->mySystemSetData.ledSleepTime = S_OtherSetPageBuffer->tempvalue;
+			S_OtherSetPageBuffer->systemSetData.ledLightIntensity = S_OtherSetPageBuffer->tempvalue;
 			
 			memset(S_OtherSetPageBuffer->buf, 0, 50);
 			sprintf(S_OtherSetPageBuffer->buf, "%d", S_OtherSetPageBuffer->tempvalue);
 			DisText(0x2430, S_OtherSetPageBuffer->buf, strlen(S_OtherSetPageBuffer->buf));
 			
-			if(My_Pass == SaveSystemSetData(&(S_OtherSetPageBuffer->mySystemSetData)))
+			if(My_Pass == SaveSystemSetData(&(S_OtherSetPageBuffer->systemSetData)))
 			{
 				SetLEDLight(S_OtherSetPageBuffer->tempvalue);
 				SendKeyCode(1);
 				//保存成功，更新内存中的数据
-				setSystemSetData(&(S_OtherSetPageBuffer->mySystemSetData));
+				setSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
 			}
 			else
 				SendKeyCode(2);
@@ -212,7 +231,11 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void activityFresh(void)
 {
-
+	if(S_OtherSetPageBuffer)
+	{
+		if(TimeOut == timer_expired(&(S_OtherSetPageBuffer->timer)))
+			startActivity(createSleepActivity, NULL);
+	}
 }
 
 /***************************************************************************************************
@@ -226,7 +249,7 @@ static void activityFresh(void)
 ***************************************************************************************************/
 static void activityHide(void)
 {
-
+	
 }
 
 /***************************************************************************************************
@@ -240,7 +263,12 @@ static void activityHide(void)
 ***************************************************************************************************/
 static void activityResume(void)
 {
-
+	if(S_OtherSetPageBuffer)
+	{
+		timer_restart(&(S_OtherSetPageBuffer->timer));
+	}
+	
+	SelectPage(122);
 }
 
 /***************************************************************************************************

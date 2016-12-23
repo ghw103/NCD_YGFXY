@@ -2,9 +2,12 @@
 #define __NETPRESET_P_H__
 
 #include	"UI_Data.h"
+#include	"SystemSet_Data.h"
 
 typedef struct NetPrePageBuffer_tag {
 	unsigned short lcdinput[100];
+	SystemSetData systemSetData;
+	Timer timer;
 }NetPrePageBuffer;
 
 

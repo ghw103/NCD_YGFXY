@@ -72,7 +72,7 @@ MyState_TypeDef createPreReadCardActivity(Activity * thizActivity, Intent * pram
 	
 	if(My_Pass == activityBufferMalloc())
 	{
-		InitActivity(thizActivity, "SelectUserActivity", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
+		InitActivity(thizActivity, "PreReadCardActivity\0", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
 		return My_Pass;
 	}
@@ -322,8 +322,6 @@ static void CheckPreTestCard(void)
 	if((S_PreReadPageBuffer) && (My_Pass == TakeTestResult(&(S_PreReadPageBuffer->cardpretestresult))))
 	{
 		ShowCardInfo();
-		
-		vTaskDelay(1000/portTICK_RATE_MS);
 		
 		if(S_PreReadPageBuffer->cardpretestresult == TestInterrupt)
 		{
