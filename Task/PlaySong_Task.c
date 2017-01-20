@@ -79,7 +79,6 @@ const char wavfilename[56][20]=
 
 #define	SongListSize	20							//播放列表可保持100个音频
 static xQueueHandle SongListQueue = NULL;			//播放音频的队列
-static xQueueHandle AudioStatusQueue = NULL;		//播放音频的状态
 static unsigned char S_PlayStatus = 0;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
@@ -108,9 +107,6 @@ void StartvPlaySongTask(void)
 	if(SongListQueue == NULL)
 		SongListQueue = xQueueCreate( SongListSize, ( unsigned portBASE_TYPE ) sizeof( unsigned char ) );
 	
-	if(AudioStatusQueue == NULL)
-		AudioStatusQueue = xQueueCreate( 10, ( unsigned portBASE_TYPE ) sizeof( unsigned char ) );
-	
 	xTaskCreate( vPlaySongTask, ( const char * ) "vPlaySongTask ", configMINIMAL_STACK_SIZE*2, NULL, vPlaySongTask_PRIORITY, NULL );
 }
 
@@ -133,13 +129,11 @@ static void vPlaySongTask( void *pvParameters )
 		{
 			//发出开始播放信号
 			S_PlayStatus = 1;
-			SendDataToQueue(AudioStatusQueue, NULL, &S_PlayStatus , 1 , 1, 10 / portTICK_RATE_MS, NULL);
 			
 			AudioPlay(wavfilename[tempdata]);
 			
 			//发出停止播放信号
 			S_PlayStatus = 0;
-			SendDataToQueue(AudioStatusQueue, NULL, &S_PlayStatus , 1 , 1, 10 / portTICK_RATE_MS, NULL);
 		}
 	}
 }
@@ -186,10 +180,30 @@ unsigned char AddNumOfSongToList(unsigned char num, unsigned char mode)
 	return pdPASS;
 }
 
-MyState_TypeDef TakeAudioPlayStatus(unsigned char *status)
+/***************************************************************************************************
+*FunctionName: stopPlay
+*Description: 停止播放
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年1月20日14:58:57
+***************************************************************************************************/
+void stopPlay(void)
 {
-	if(pdPASS == xQueueReceive( AudioStatusQueue, status,  10/portTICK_RATE_MS))
-		return My_Pass;
-	else
-		return My_Fail;
+	StopMyPlay();
+}
+
+/***************************************************************************************************
+*FunctionName: getPlayStatus
+*Description: 读取播放状态
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年1月20日14:59:13
+***************************************************************************************************/
+unsigned char getPlayStatus(void)
+{
+	return S_PlayStatus;
 }

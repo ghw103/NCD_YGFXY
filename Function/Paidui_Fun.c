@@ -63,15 +63,12 @@ void PaiDuiHandler(void)
 			//进入排队模式
 			if(temp->statues == startpaidui)
 			{
-				if(MaxLocation == GetGB_MotorLocation())
-				{
-					temp->statues = statues1;
+				temp->statues = statues1;
 				
-					UpOneModelData(index, R_ON_G_OFF, 5);
-					//20S提示一次将卡插入排队位
-					timer_set(&(temp->timer3), 10);
-					AddNumOfSongToList(index+22, 0);
-				}
+				UpOneModelData(index, R_ON_G_OFF, 5);
+				//20S提示一次将卡插入排队位
+				timer_set(&(temp->timer3), 10);
+				AddNumOfSongToList(index+22, 0);
 			}
 			//等待拔出卡槽
 			if(temp->statues == statues1)
@@ -82,29 +79,11 @@ void PaiDuiHandler(void)
 					temp->statues = statues2;
 					SetCurrentTestItem(NULL);
 				}
-
 				else if(TimeOut == timer_expired(&(temp->timer3)))
 				{
 					timer_restart(&(temp->timer3));
 							
 					AddNumOfSongToList(index+22, 0);
-				}
-			}
-			//等待插入卡槽
-			else if(temp->statues == statues4)
-			{
-				if(GetCardState() == CardIN)
-				{
-					UpOneModelData(index, R_OFF_G_ON, 0);
-					temp->statues = statues7;
-					
-					startActivity(createWaittingCardActivity, NULL);
-				}
-				else if(TimeOut == timer_expired(&(temp->timer3)))
-				{
-					timer_restart(&(temp->timer3));
-							
-					AddNumOfSongToList(index+30, 5);
 				}
 			}
 			//等待插入排队位
@@ -113,6 +92,9 @@ void PaiDuiHandler(void)
 				//如果插入排队位，切换到计时或者超时状态
 				if(KEY_Pressed == GetKeyStatues(index))
 				{
+					//停止播放语音
+					stopPlay();
+					
 					//超时的时候插入，继续超时计时
 					if(timerIsStartted(&(temp->timer2)))
 						temp->statues = statues6;
@@ -142,6 +124,26 @@ void PaiDuiHandler(void)
 					timer_restart(&(temp->timer3));
 							
 					AddNumOfSongToList(index+30, 0);
+				}
+			}
+			//等待插入卡槽
+			else if(temp->statues == statues4)
+			{
+				if(GetCardState() == CardIN)
+				{
+					//停止播放语音
+					stopPlay();
+					
+					UpOneModelData(index, R_OFF_G_ON, 0);
+					temp->statues = statues7;
+					
+					startActivity(createWaittingCardActivity, NULL);
+				}
+				else if(TimeOut == timer_expired(&(temp->timer3)))
+				{
+					timer_restart(&(temp->timer3));
+							
+					AddNumOfSongToList(index+30, 5);
 				}
 			}
 			//倒计时过程中卡拔出

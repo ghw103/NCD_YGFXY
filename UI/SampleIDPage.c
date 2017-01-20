@@ -15,6 +15,8 @@
 #include	"WaittingCardPage.h"
 #include	"PlaySong_Task.h"
 #include	"ReadBarCode_Fun.h"
+#include	"Motor_Data.h"
+#include	"Motor_Fun.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -86,7 +88,7 @@ static void activityStart(void)
 	
 		RefreshSampleID();
 	
-		timer_set(&(S_SampleIDPage->timer), 60);
+		timer_set(&(S_SampleIDPage->timer), 30);
 
 		AddNumOfSongToList(10, 0);
 	}
@@ -115,7 +117,10 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		if(S_SampleIDPage->lcdinput[0] == 0x1300)
 		{
 			if(CheckStrIsSame(paiduiActivityName, getFatherActivityName(), strlen(paiduiActivityName)))
+			{
+				MotorMoveTo(MaxLocation, 1);
 				DeleteCurrentTest();
+			}
 			
 			backToFatherActivity();
 		}
@@ -161,6 +166,22 @@ static void activityFresh(void)
 			memcpy(S_SampleIDPage->currenttestdata->testdata.sampleid, S_SampleIDPage->tempbuf, MaxSampleIDLen);
 			RefreshSampleID();
 		}
+		
+		if(TimeOut == timer_expired(&(S_SampleIDPage->timer)))
+		{
+			AddNumOfSongToList(6, 0);
+
+			DeleteCurrentTest();
+			
+			if(CheckStrIsSame(paiduiActivityName, getFatherActivityName(), strlen(paiduiActivityName)))
+			{
+				MotorMoveTo(MaxLocation, 1);
+
+				backToFatherActivity();
+			}
+			else
+				backToActivity(lunchActivityName);
+		}
 	}
 }
 
@@ -193,6 +214,8 @@ static void activityResume(void)
 	{
 		/*重置倒计时30s，如果超时，则取消此次测试*/
 		timer_restart(&(S_SampleIDPage->timer));
+		
+		RefreshSampleID();
 	}
 	
 	SelectPage(86);

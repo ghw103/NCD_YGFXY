@@ -5,7 +5,8 @@
 
 void StartvPlaySongTask(void);
 unsigned char AddNumOfSongToList(unsigned char num, unsigned char mode);
-MyState_TypeDef TakeAudioPlayStatus(unsigned char *status);
+void stopPlay(void);
+unsigned char getPlayStatus(void);
 #endif
 
 

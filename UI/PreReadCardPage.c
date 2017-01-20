@@ -45,6 +45,7 @@ static void activityDestroy(void);
 static MyState_TypeDef activityBufferMalloc(void);
 static void activityBufferFree(void);
 
+static void clearPageText(void);
 static void CheckQRCode(void);
 static void ShowCardInfo(void);
 static void CheckPreTestCard(void);
@@ -94,6 +95,8 @@ static void activityStart(void)
 	if(S_PreReadPageBuffer)
 	{
 		S_PreReadPageBuffer->currenttestdata = GetCurrentTestItem();
+		
+		clearPageText();
 		
 		showTemperature();
 		
@@ -271,7 +274,6 @@ static void CheckQRCode(void)
 		//读取成功
 		else if(S_PreReadPageBuffer->scancode == CardCodeScanOK)
 		{
-
 			ShowCardInfo();
 			
 			//如果测试数据包中的二维码crc校验错误，则表明是第一次读取二维码
@@ -363,20 +365,34 @@ static void CheckPreTestCard(void)
 	}
 }
 
+static void clearPageText(void)
+{
+	ClearText(0x1420, 30);
+	ClearText(0x1430, 30);
+	ClearText(0x1440, 10);
+	ClearText(0x1450, 30);
+	ClearText(0x1460, 10);
+	ClearText(0x1470, 10);
+}
+
 static void ShowCardInfo(void)
 {
+	memset(S_PreReadPageBuffer->buf, 0, 50);
 	sprintf(S_PreReadPageBuffer->buf, "%s", S_PreReadPageBuffer->temperweima.ItemName);
-	DisText(0x1420, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
-			
-	sprintf(S_PreReadPageBuffer->buf, "%s", S_PreReadPageBuffer->temperweima.PiHao);
-	DisText(0x1430, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
-			
-	sprintf(S_PreReadPageBuffer->buf, "%d", S_PreReadPageBuffer->temperweima.CardWaitTime*60);
-	DisText(0x1440, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
-			
-	sprintf(S_PreReadPageBuffer->buf, "20%02d年%02d月%02d日", S_PreReadPageBuffer->temperweima.CardBaoZhiQi.year, S_PreReadPageBuffer->temperweima.CardBaoZhiQi.month,
-		S_PreReadPageBuffer->temperweima.CardBaoZhiQi.day);
-	DisText(0x1450, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
+	DisText(0x1420, S_PreReadPageBuffer->buf, 30);
+	
+	memset(S_PreReadPageBuffer->buf, 0, 50);	
+	sprintf(S_PreReadPageBuffer->buf, "%s-%s", S_PreReadPageBuffer->temperweima.PiHao, S_PreReadPageBuffer->temperweima.piNum);
+	DisText(0x1430, S_PreReadPageBuffer->buf, 30);
+	
+	memset(S_PreReadPageBuffer->buf, 0, 50);
+	sprintf(S_PreReadPageBuffer->buf, "%d S", S_PreReadPageBuffer->temperweima.CardWaitTime*60);
+	DisText(0x1440, S_PreReadPageBuffer->buf, 10);
+		
+	memset(S_PreReadPageBuffer->buf, 0, 50);
+	sprintf(S_PreReadPageBuffer->buf, "20%02d年%02d月%02d日", S_PreReadPageBuffer->temperweima.CardBaoZhiQi.year, 
+		S_PreReadPageBuffer->temperweima.CardBaoZhiQi.month, S_PreReadPageBuffer->temperweima.CardBaoZhiQi.day);
+	DisText(0x1450, S_PreReadPageBuffer->buf, 30);
 }
 
 static void showTemperature(void)
@@ -385,12 +401,12 @@ static void showTemperature(void)
 	S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.O_Temperature = GetCardTemperature();
 	S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.E_Temperature = GetGB_EnTemperature();
 	
-	memset(S_PreReadPageBuffer->buf, 0, 40);
-	sprintf(S_PreReadPageBuffer->buf, "%2.1f", S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.O_Temperature);
+	memset(S_PreReadPageBuffer->buf, 0, 50);
+	sprintf(S_PreReadPageBuffer->buf, "%2.1f ℃", S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.O_Temperature);
 	DisText(0x1460, S_PreReadPageBuffer->buf, 20);
 	
-	memset(S_PreReadPageBuffer->buf, 0, 40);
-	sprintf(S_PreReadPageBuffer->buf, "%2.1f",S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.E_Temperature);
+	memset(S_PreReadPageBuffer->buf, 0, 50);
+	sprintf(S_PreReadPageBuffer->buf, "%2.1f ℃",S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.E_Temperature);
 	DisText(0x1470, S_PreReadPageBuffer->buf, 20);
 }
 

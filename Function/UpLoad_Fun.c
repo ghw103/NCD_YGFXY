@@ -47,18 +47,19 @@ void UpLoadFunction(void)
 	{
 		if(My_Pass == ReadTime())
 		{
-			vTaskDelay(1000 / portTICK_RATE_MS);
+			vTaskDelay(100 / portTICK_RATE_MS);
 			
-			UpLoadDeviceInfo();
+//			UpLoadDeviceInfo();
 			
-			vTaskDelay(1000 / portTICK_RATE_MS);
+			
+//			vTaskDelay(1000 / portTICK_RATE_MS);
 				
-			UpLoadTestData();
+//			UpLoadTestData();
 				
-			vTaskDelay(10000 / portTICK_RATE_MS);
+//			vTaskDelay(10000 / portTICK_RATE_MS);
 		}
 		else
-			vTaskDelay(10000 / portTICK_RATE_MS);
+			vTaskDelay(100 / portTICK_RATE_MS);
 	}
 }
 
@@ -81,7 +82,7 @@ static MyState_TypeDef ReadTime(void)
 		{
 			sprintf(buf, "did=%s", systemSetData->deviceInfo.deviceid);
 		
-			if(My_Pass == UpLoadData("/NCD_Server/up_dtime", buf, strlen(buf)))
+			if(My_Pass == UpLoadData("/NCD_Server/up_dtime", buf, 2))//strlen(buf)))
 			{
 				RTC_SetTimeData2(buf+7);
 				SetGB_LineNetStatus(1);

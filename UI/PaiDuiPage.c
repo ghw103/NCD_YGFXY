@@ -191,12 +191,11 @@ static void activityFresh(void)
 		//界面忙
 		S_PaiDuiPageBuffer->pageisbusy = true;
 
-		
 		//500ms刷新一次界面
 		if(S_PaiDuiPageBuffer->count2 % 50 == 0)
 		{
 			//插卡
-			if(CardPinIn)
+/*			if(CardPinIn)
 			{
 				//如果空闲，说明插入的卡不是排队中的卡，则创建新排队
 				if(NULL == GetCurrentTestItem())
@@ -250,7 +249,7 @@ static void activityFresh(void)
 			//如果无卡，则重置定时器
 			else
 				timer_set(&(S_PaiDuiPageBuffer->timer0), 1);
-		
+*/		
 			//更新倒计时数据
 			for(index=0; index<PaiDuiWeiNum; index++)
 			{

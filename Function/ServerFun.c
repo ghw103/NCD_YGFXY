@@ -122,6 +122,11 @@ MyState_TypeDef CommunicateWithServerByWifi(void *sendnetbuf, void *recvnetbuf, 
 	mywifidata = MyMalloc(sizeof(MyWifiData));
 	if(mywifidata)
 	{
+		
+		//清空串口数据
+//		while(pdPASS == ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4RXMutex(), mywifidata->s_mybuf->data, 500, 1, 10 / portTICK_RATE_MS))
+	//		;
+		
 		//发送数据
 		if(sendnetbuf)
 		{
@@ -136,8 +141,9 @@ MyState_TypeDef CommunicateWithServerByWifi(void *sendnetbuf, void *recvnetbuf, 
 			mywifidata->rxcount = 0;
 			mywifidata->s_mybuf = recvnetbuf;
 			mywifidata->myp = mywifidata->s_mybuf->data;
-			
-			ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4RXMutex(), mywifidata->s_mybuf->data, maxrecvlen, 1, 1000 / portTICK_RATE_MS);
+			//memset(mywifidata->myp, 0, 100);
+			while(pdPASS == ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4RXMutex(), mywifidata->s_mybuf->data, 500, 1, 1000 / portTICK_RATE_MS))
+				;
 
 			//if(mywifidata->rxcount > 0)
 				status = My_Pass;
@@ -171,7 +177,7 @@ MyState_TypeDef UpLoadData(char *URL, void * buf, unsigned short buflen)
 		sprintf(mybuf.data, "POST %s HTTP/1.1\nHost: 116.62.108.201:8080\nConnection: keep-alive\nContent-Length: %d\nContent-Type:application/x-www-form-urlencoded;charset=GBK\nAccept-Language: zh-CN,zh;q=0.8\n\n%s", URL, buflen, (char *)buf);
 		mybuf.datalen = strlen(mybuf.data);
 			
-		memset(recvbuf.data, 0, 1024);
+/*		memset(recvbuf.data, 0, 1024);
 		if(My_Pass == CommunicateWithServerByLineNet(&mybuf, &recvbuf, 116, 62, 108, 201, 1000))
 		{
 			temp = strstr(recvbuf.data, "success");
@@ -185,7 +191,7 @@ MyState_TypeDef UpLoadData(char *URL, void * buf, unsigned short buflen)
 			}
 			else
 				;//USB_PutStr("\nlwip_mode error\n", 16);
-		}
+		}*/
 		
 		memset(recvbuf.data, 0, 1024);
 		if(My_Pass == CommunicateWithServerByWifi(&mybuf, &recvbuf, 1000))

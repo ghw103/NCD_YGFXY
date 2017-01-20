@@ -99,9 +99,6 @@ static void activityStart(void)
 {
 	if(S_ReTestPageBuffer)
 	{
-		//清除其他不是测试音频的队列数据
-		while(My_Pass == TakeAudioPlayStatus(&(S_ReTestPageBuffer->playstatus)))
-			;
 		
 		timer_set(&(S_ReTestPageBuffer->timer), 10);
 		
@@ -211,37 +208,35 @@ static void activityFresh(void)
 			CheckTestCard();
 
 		
-		if(My_Pass == TakeAudioPlayStatus(&(S_ReTestPageBuffer->playstatus)))
+		S_ReTestPageBuffer->playstatus = getPlayStatus();
+		if(S_ReTestPageBuffer->playstatus == 1)
 		{
-			if(S_ReTestPageBuffer->playstatus == 1)
+			//播放次数+1
+			S_ReTestPageBuffer->retestdata.playcount++;
+					
+			//初始化当前播放时长
+			timer_set(&(S_ReTestPageBuffer->retestdata.oneplaytimer), 999999);
+					
+			GetGB_Time(&(S_ReTestPageBuffer->retestdata.startplayTime));
+		}
+		else if(S_ReTestPageBuffer->playstatus == 0)
+		{
+			GetGB_Time(&(S_ReTestPageBuffer->retestdata.endplayTime));
+					
+			//保存当前播放信息
+			if(My_Pass == SaveReTestData(&(S_ReTestPageBuffer->retestdata), 1))
 			{
-				//播放次数+1
-				S_ReTestPageBuffer->retestdata.playcount++;
-					
-				//初始化当前播放时长
-				timer_set(&(S_ReTestPageBuffer->retestdata.oneplaytimer), 999999);
-					
-				GetGB_Time(&(S_ReTestPageBuffer->retestdata.startplayTime));
+				if(S_ReTestPageBuffer->retestdata.reteststatus > 0)
+					AddNumOfSongToList(55, 3);
 			}
-			else if(S_ReTestPageBuffer->playstatus == 0)
+			else
 			{
-				GetGB_Time(&(S_ReTestPageBuffer->retestdata.endplayTime));
+				//状态
+				memset(S_ReTestPageBuffer->buf, 0, 100);
+				sprintf(S_ReTestPageBuffer->buf, "Failed");
+				DisText(0x300c, S_ReTestPageBuffer->buf, strlen(S_ReTestPageBuffer->buf));
 					
-				//保存当前播放信息
-				if(My_Pass == SaveReTestData(&(S_ReTestPageBuffer->retestdata), 1))
-				{
-					if(S_ReTestPageBuffer->retestdata.reteststatus > 0)
-						AddNumOfSongToList(55, 3);
-				}
-				else
-				{
-					//状态
-					memset(S_ReTestPageBuffer->buf, 0, 100);
-					sprintf(S_ReTestPageBuffer->buf, "Failed");
-					DisText(0x300c, S_ReTestPageBuffer->buf, strlen(S_ReTestPageBuffer->buf));
-					
-					StopReTest();
-				}
+				StopReTest();
 			}
 		}
 	}

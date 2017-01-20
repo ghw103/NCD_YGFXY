@@ -80,7 +80,7 @@ static void activityStart(void)
 	if(S_UserPageBuffer)
 	{
 		/*重置倒计时30s，如果超时，则取消此次测试*/
-		timer_set(&(S_UserPageBuffer->timer), 10);
+		timer_set(&(S_UserPageBuffer->timer), 30);
 	
 		/*获取当前测试的数据指针*/
 		S_UserPageBuffer->currenttestdata = GetCurrentTestItem();
@@ -361,7 +361,7 @@ static void SelectUser(unsigned char index)
 		
 		if(S_UserPageBuffer->tempUser2->crc == CalModbusCRC16Fun1(S_UserPageBuffer->tempUser2, sizeof(User_Type)-2))
 		{
-			BasicPic(0x1240, 1, 137, 268, 225, 558, 272, 364, 142+(S_UserPageBuffer->selectindex-1)*72);	
+			BasicPic(0x1240, 1, 137, 266, 215, 558, 284, 364, 142+(S_UserPageBuffer->selectindex-1)*72);	
 		}
 		else
 		{

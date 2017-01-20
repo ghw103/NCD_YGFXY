@@ -79,11 +79,11 @@ static void activityStart(void)
 		timer_set(&(S_WelcomePageBuffer->timer), 1);
 		
 	}
-	
-	SetLEDLight(100);
-	SelectPage(0);
-	
+
 	AddNumOfSongToList(0, 0);
+	
+	SelectPage(0);
+
 }
 
 /***************************************************************************************************

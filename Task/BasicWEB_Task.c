@@ -5,12 +5,12 @@
 
 #include	"BasicWEB_Task.h"
 #include	"MyMem.h"
-
+#include	"MyTest_Data.h"
 /* Scheduler includes. */
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
-
+#include	"Define.h"
 #include	<string.h>
 
 #include "tcpip.h"
@@ -93,6 +93,8 @@ static void prvweb_ParseHTMLRequest( struct netconn *pxNetCon )
 	struct netbuf *pxRxBuffer;
 	err_t err;
 	static char buf[100];
+	ItemData * PaiduiTestDataBuffer;
+	unsigned char i=0;
 	/* We expect to immediately get data. */
 	err = netconn_recv( pxNetCon, &pxRxBuffer);
 	
@@ -112,18 +114,27 @@ static void prvweb_ParseHTMLRequest( struct netconn *pxNetCon )
 				/* Write out the HTTP OK header. */
 				netconn_write( pxNetCon, webHTTP_OK, (u16_t) strlen( webHTTP_OK ), NETCONN_COPY );
 				
-				/* Generate the dynamic page... First the page header. */
 				strcpy( cDynamicPage, webHTML_START );
+				
+/*				strcat( cDynamicPage, "<p>索引  位置  状态</p>" );
+				for(i=0; i<PaiDuiWeiNum; i++)
+				{
+					PaiduiTestDataBuffer = GetTestItemByIndex(i);
+					if(PaiduiTestDataBuffer == NULL)
+						sprintf(buf, "<p>%d  NULL  NULL</p>", i);
+					else
+						sprintf(buf, "<p>%d  %d  %d</p>", i, PaiduiTestDataBuffer->testlocation, PaiduiTestDataBuffer->statues);
+					strcat(cDynamicPage, buf);
+				}*/
 				
 				sprintf(buf, "内存余量:%d<br>", MyGetFreeHeapSize());
 				strcat(cDynamicPage, buf);
 				
 				strcat( cDynamicPage, "<p><pre>Task            State   Priority    Stack	#<br>************************************************<br>" );
 
-				/* ... Then the list of tasks and their status... */
 				vTaskList(cDynamicPage + strlen( cDynamicPage ) );
 
-				/* ... Finally the page footer. */
+				
 				strcat( cDynamicPage, webHTML_END );
 
 				/* Write out the dynamically generated page. */
