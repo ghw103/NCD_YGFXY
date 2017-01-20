@@ -26,7 +26,7 @@ typedef struct TempCalData_tag{
 	double lastdata;														//记录上次滤波数据
 	
 	unsigned short maxdata;
-	TestData * testdata;												//测试数据指针
+	ItemData * itemData;												//测试数据指针
 	ResultState resultstatues;											//测试结果状态
 }TempCalData;
 #pragma pack()

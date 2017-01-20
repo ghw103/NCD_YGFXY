@@ -34,6 +34,10 @@ static MyState_TypeDef activityBufferMalloc(void);
 static void activityBufferFree(void);
 
 static void SetGB_Time(char *buf, unsigned char len);
+static void showPrintfIco(void);
+static void showMuteIco(void);
+static void showLcdLightNum(void);
+static void showLcdSleepTime(void);
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -81,6 +85,11 @@ static void activityStart(void)
 		getSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
 		
 		timer_set(&(S_OtherSetPageBuffer->timer), S_OtherSetPageBuffer->systemSetData.ledSleepTime);
+		
+		showPrintfIco();
+		showMuteIco();
+		showLcdLightNum();
+		showLcdSleepTime();
 	}
 
 	SelectPage(122);
@@ -121,24 +130,14 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		{
 			SetGB_Time((char *)(&pbuf[7]), GetBufLen(&pbuf[7] , 2*pbuf[6]));
 		}
-		//静音和自动打印设置
+		//自动打印设置
 		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2402)
 		{
-			/*数据*/
-			S_OtherSetPageBuffer->lcdinput[1] = pbuf[7];
-			S_OtherSetPageBuffer->lcdinput[1] = (S_OtherSetPageBuffer->lcdinput[1]<<8) + pbuf[8];
-			
-			//自动打印
-			if(S_OtherSetPageBuffer->lcdinput[1] & 0x8000)
-				S_OtherSetPageBuffer->systemSetData.isAutoPrint = true;
-			else
+			//如果当前是自动打印，则禁止，否则打开
+			if(S_OtherSetPageBuffer->systemSetData.isAutoPrint)
 				S_OtherSetPageBuffer->systemSetData.isAutoPrint = false;
-			
-			//静音
-			if(S_OtherSetPageBuffer->lcdinput[1] & 0x4000)
-				S_OtherSetPageBuffer->systemSetData.isMute = true;
 			else
-				S_OtherSetPageBuffer->systemSetData.isMute = false;
+				S_OtherSetPageBuffer->systemSetData.isAutoPrint = true;
 			
 			if(My_Pass == SaveSystemSetData(&(S_OtherSetPageBuffer->systemSetData)))
 			{
@@ -147,7 +146,35 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 				setSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
 			}
 			else
+			{
 				SendKeyCode(2);
+				getSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
+			}
+			
+			showPrintfIco();
+		}
+		//静音
+		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2403)
+		{
+			//如果当前是自动打印，则禁止，否则打开
+			if(S_OtherSetPageBuffer->systemSetData.isMute)
+				S_OtherSetPageBuffer->systemSetData.isMute = false;
+			else
+				S_OtherSetPageBuffer->systemSetData.isMute = true;
+			
+			if(My_Pass == SaveSystemSetData(&(S_OtherSetPageBuffer->systemSetData)))
+			{
+				SendKeyCode(1);
+				//保存成功，更新内存中的数据
+				setSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
+			}
+			else
+			{
+				SendKeyCode(2);
+				getSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
+			}
+			
+			showMuteIco();
 		}
 		//进入休眠时间
 		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2420)
@@ -157,24 +184,14 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			
 			S_OtherSetPageBuffer->tempvalue = strtol(S_OtherSetPageBuffer->buf, NULL, 10);
 			
-			S_OtherSetPageBuffer->systemSetData.ledSleepTime = S_OtherSetPageBuffer->tempvalue;
-			
-			if(S_OtherSetPageBuffer->systemSetData.ledSleepTime == 0)
+			if(S_OtherSetPageBuffer->tempvalue == 0)
 				S_OtherSetPageBuffer->systemSetData.ledSleepTime = 0xffff;
-			else if(S_OtherSetPageBuffer->systemSetData.ledSleepTime > 600)
-			{
+			else if(S_OtherSetPageBuffer->tempvalue > 600)
 				S_OtherSetPageBuffer->systemSetData.ledSleepTime = 600;
-				S_OtherSetPageBuffer->tempvalue = 600;
-			}
 			else if(S_OtherSetPageBuffer->tempvalue < 10)
-			{
 				S_OtherSetPageBuffer->systemSetData.ledSleepTime = 10;
-				S_OtherSetPageBuffer->tempvalue = 10;
-			}
-			
-			memset(S_OtherSetPageBuffer->buf, 0, 50);
-			sprintf(S_OtherSetPageBuffer->buf, "%d", S_OtherSetPageBuffer->tempvalue);
-			DisText(0x2420, S_OtherSetPageBuffer->buf, strlen(S_OtherSetPageBuffer->buf));
+			else
+				S_OtherSetPageBuffer->systemSetData.ledSleepTime = S_OtherSetPageBuffer->tempvalue;
 			
 			if(My_Pass == SaveSystemSetData(&(S_OtherSetPageBuffer->systemSetData)))
 			{
@@ -186,7 +203,12 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 				timer_set(&(S_OtherSetPageBuffer->timer), S_OtherSetPageBuffer->systemSetData.ledSleepTime);
 			}
 			else
+			{
 				SendKeyCode(2);
+				getSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
+			}
+			
+			showLcdSleepTime();
 		}	
 		//进入屏幕亮度
 		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2430)
@@ -202,20 +224,21 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 				S_OtherSetPageBuffer->tempvalue = 10;
 			
 			S_OtherSetPageBuffer->systemSetData.ledLightIntensity = S_OtherSetPageBuffer->tempvalue;
-			
-			memset(S_OtherSetPageBuffer->buf, 0, 50);
-			sprintf(S_OtherSetPageBuffer->buf, "%d", S_OtherSetPageBuffer->tempvalue);
-			DisText(0x2430, S_OtherSetPageBuffer->buf, strlen(S_OtherSetPageBuffer->buf));
-			
+	
 			if(My_Pass == SaveSystemSetData(&(S_OtherSetPageBuffer->systemSetData)))
 			{
-				SetLEDLight(S_OtherSetPageBuffer->tempvalue);
+				SetLEDLight(S_OtherSetPageBuffer->systemSetData.ledLightIntensity);
 				SendKeyCode(1);
 				//保存成功，更新内存中的数据
 				setSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
 			}
 			else
+			{
 				SendKeyCode(2);
+				getSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
+			}
+			
+			showLcdLightNum();
 		}
 	}
 }
@@ -413,5 +436,47 @@ static void SetGB_Time(char *buf, unsigned char len)
 			/*修改失败*/
 			SendKeyCode(2);
 	}
+}
+
+static void showPrintfIco(void)
+{
+	S_OtherSetPageBuffer->ico.ICO_ID = 22;
+	S_OtherSetPageBuffer->ico.X = 170;
+	S_OtherSetPageBuffer->ico.Y = 185;
+			
+	if(S_OtherSetPageBuffer->systemSetData.isAutoPrint)
+		BasicUI(0x2440 ,0x1807 , 1, &(S_OtherSetPageBuffer->ico) , sizeof(Basic_ICO));
+	else
+		BasicUI(0x2440 ,0x1807 , 0, &(S_OtherSetPageBuffer->ico) , sizeof(Basic_ICO));
+}
+
+
+static void showMuteIco(void)
+{
+	S_OtherSetPageBuffer->ico.ICO_ID = 22;
+	S_OtherSetPageBuffer->ico.X = 170;
+	S_OtherSetPageBuffer->ico.Y = 225;
+			
+	if(S_OtherSetPageBuffer->systemSetData.isMute)
+		BasicUI(0x2450 ,0x1807 , 1, &(S_OtherSetPageBuffer->ico) , sizeof(Basic_ICO));
+	else
+		BasicUI(0x2450 ,0x1807 , 0, &(S_OtherSetPageBuffer->ico) , sizeof(Basic_ICO));
+}
+
+static void showLcdLightNum(void)
+{
+	memset(S_OtherSetPageBuffer->buf, 0, 50);
+	sprintf(S_OtherSetPageBuffer->buf, "%d", S_OtherSetPageBuffer->systemSetData.ledLightIntensity);
+	DisText(0x2430, S_OtherSetPageBuffer->buf, strlen(S_OtherSetPageBuffer->buf));
+}
+
+static void showLcdSleepTime(void)
+{
+	memset(S_OtherSetPageBuffer->buf, 0, 50);
+	if(S_OtherSetPageBuffer->systemSetData.ledSleepTime == 0xffff)
+		sprintf(S_OtherSetPageBuffer->buf, "长亮");
+	else
+		sprintf(S_OtherSetPageBuffer->buf, "%d", S_OtherSetPageBuffer->systemSetData.ledSleepTime);
+	DisText(0x2420, S_OtherSetPageBuffer->buf, strlen(S_OtherSetPageBuffer->buf));
 }
 

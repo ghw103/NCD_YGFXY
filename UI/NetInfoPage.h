@@ -15,6 +15,12 @@ typedef struct NetInfoPageBuffer_tag {
 	Basic_ICO wifiico;
 	SystemSetData systemSetData;
 	Timer timer2;
+	
+	IP_Def WifiIP;										//wifi的ip
+	char WifiSSID[30];									//所链接wifi的名字
+	char WifiMAC[13];									//wifi模块的mac
+	unsigned char WifiIndicator;						//所连接wifi的信号
+	
 }NetInfoPageBuffer;
 
 

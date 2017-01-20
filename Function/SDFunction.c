@@ -94,6 +94,7 @@ MyState_TypeDef ReadUserData(User_Type * user)
 {
 	FatfsFileInfo_Def * myfile = NULL;
 	MyState_TypeDef statues = My_Fail;
+	unsigned char i=0;
 	
 	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
 
@@ -107,10 +108,15 @@ MyState_TypeDef ReadUserData(User_Type * user)
 		{
 			f_lseek(&(myfile->file), 0);
 					
-			myfile->res = f_read(&(myfile->file), user, sizeof(User_Type)*MaxUserNum, &(myfile->br));
-
-			if((FR_OK == myfile->res)&&(myfile->br == sizeof(User_Type)*MaxUserNum))
-				statues = My_Pass;
+			for(i=0; i<MaxUserNum; i++)
+			{
+				f_read(&(myfile->file), user, sizeof(User_Type), &(myfile->br));
+				
+				if(user->crc == CalModbusCRC16Fun1(user, sizeof(User_Type)-2))
+					user++;
+			}
+			
+			statues = My_Pass;
 			
 			f_close(&(myfile->file));
 		}

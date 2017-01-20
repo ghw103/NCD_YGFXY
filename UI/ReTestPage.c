@@ -231,7 +231,7 @@ static void activityFresh(void)
 				if(My_Pass == SaveReTestData(&(S_ReTestPageBuffer->retestdata), 1))
 				{
 					if(S_ReTestPageBuffer->retestdata.reteststatus > 0)
-						AddNumOfSongToList(62, 3);
+						AddNumOfSongToList(55, 3);
 				}
 				else
 				{
@@ -392,7 +392,7 @@ static void StartReTest(void)
 			UpOneModelData(S_ReTestPageBuffer->buf[0], R_ON_G_OFF, 5);
 			
 		//开始测试音频
-		AddNumOfSongToList(62, 3);
+		AddNumOfSongToList(55, 3);
 		//初始化播放总时长
 		timer_set(&(S_ReTestPageBuffer->retestdata.playtimer), 999999);
 	}

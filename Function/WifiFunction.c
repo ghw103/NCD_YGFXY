@@ -37,7 +37,9 @@
 /***************************************************************************************************/
 static MyState_TypeDef ComWithWIFI(char * cmd, const char *strcmp, char *buf, unsigned short buflen, portTickType xBlockTime);
 static void ProgressWifiListData(WIFI_Def *wifis, char *buf);
-
+static MyState_TypeDef SetWifiServerInfo(void);
+static MyState_TypeDef SetWifiDefaultWorkMode(void);
+static MyState_TypeDef SetWifiWorkInSTAMode(void);
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************正文********************************************************/
@@ -55,19 +57,15 @@ static MyState_TypeDef ComWithWIFI(char * cmd, const char *strcmp, char *buf, un
 		if(buf)
 		{
 			memset(buf, 0, buflen);
-			while(pdPASS == ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4RXMutex(), buf+rxcount, 1, 1, xBlockTime))
-				rxcount++;
-				
-			if(rxcount > 0)
+			ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4RXMutex(), buf, buflen, 1, xBlockTime);
+
+			if(strcmp)
 			{
-				if(strcmp)
-				{
-					if(strstr(buf, strcmp))
-						statues = My_Pass;
-				}
-				else
+				if(strstr(buf, strcmp))
 					statues = My_Pass;
 			}
+			else
+				statues = My_Pass;
 		}
 		else
 			statues = My_Pass;
@@ -77,22 +75,18 @@ static MyState_TypeDef ComWithWIFI(char * cmd, const char *strcmp, char *buf, un
 }
 
 
-MyState_TypeDef WIFICheck(void)
+MyState_TypeDef WIFIInit(void)
 {
 	MyState_TypeDef statues = My_Fail;
 	
-	if(AT_Mode != GetWifiWorkMode())
-	{
-		/*进入at模式成功*/
-		if(My_Pass != SetWifiWorkInAT(AT_Mode))
-			return My_Fail;
-	}
-	
+	SetWifiWorkInAT(AT_Mode);
+
+	SetWifiServerInfo();
+
 	SetWifiDefaultWorkMode();
 	
-	if(My_Pass == CheckWifiMID())
-		statues = My_Pass;
-
+	SetWifiWorkInSTAMode();
+	
 	RestartWifi();
 
 	return statues;
@@ -110,7 +104,10 @@ MyState_TypeDef SetWifiWorkInAT(WIFI_WorkMode_DefType mode)
 	MyState_TypeDef statues = My_Fail;
 	char *txbuf = NULL; 
 	
-	txbuf = MyMalloc(50);
+	if(mode == GetWifiWorkMode())
+		return My_Pass;
+	
+	txbuf = MyMalloc(500);
 	if(txbuf)
 	{
 		if(mode == AT_Mode)
@@ -132,29 +129,12 @@ MyState_TypeDef SetWifiWorkInAT(WIFI_WorkMode_DefType mode)
 	return statues;
 }
 
-MyState_TypeDef SetWifiDefaultWorkMode(void)
-{
-	char *txbuf = NULL;
-	MyState_TypeDef statues = My_Fail;
-	
-	txbuf = MyMalloc(50);
-	if(txbuf)
-	{
-		if(My_Pass == ComWithWIFI("AT+TMODE=cmd\r", "+ok", txbuf, 50, 500 * portTICK_RATE_MS))
-			statues = My_Pass;
-	}
-	
-	MyFree(txbuf);
-	
-	return statues;
-}
-
 WIFI_WorkMode_DefType GetWifiWorkMode(void)
 {
 	char *txbuf = NULL; 
 	WIFI_WorkMode_DefType mode = None;
 	
-	txbuf = MyMalloc(50);
+	txbuf = MyMalloc(500);
 	if(txbuf)
 	{
 		if(My_Pass == ComWithWIFI("+++\r", "+++", txbuf, 50, 50 * portTICK_RATE_MS))
@@ -168,6 +148,40 @@ WIFI_WorkMode_DefType GetWifiWorkMode(void)
 	return mode;
 }
 
+static MyState_TypeDef SetWifiDefaultWorkMode(void)
+{
+	char *txbuf = NULL;
+	MyState_TypeDef statues = My_Fail;
+	
+	txbuf = MyMalloc(500);
+	if(txbuf)
+	{
+		if(My_Pass == ComWithWIFI("AT+TMODE=throughput\r", "+ok", txbuf, 50, 500 * portTICK_RATE_MS))
+			statues = My_Pass;
+	}
+	
+	MyFree(txbuf);
+	
+	return statues;
+}
+
+static MyState_TypeDef SetWifiWorkInSTAMode(void)
+{
+	char *txbuf = NULL;
+	MyState_TypeDef statues = My_Fail;
+	
+	txbuf = MyMalloc(500);
+	if(txbuf)
+	{
+		if(My_Pass == ComWithWIFI("AT+WMODE=STA\r", "+ok", txbuf, 50, 500 * portTICK_RATE_MS))
+			statues = My_Pass;
+	}
+	
+	MyFree(txbuf);
+	
+	return statues;
+}
+
 MyState_TypeDef ScanApList(WIFI_Def *wifis)
 {
 	char *txbuf = NULL; 
@@ -176,7 +190,7 @@ MyState_TypeDef ScanApList(WIFI_Def *wifis)
 	txbuf = MyMalloc(1000);
 	if(txbuf)
 	{
-		if(My_Pass == ComWithWIFI("AT+WSCAN\r", NULL, txbuf, 1000, 1000 / portTICK_RATE_MS))
+		if(My_Pass == ComWithWIFI("AT+WSCAN\r", NULL, txbuf, 900, 1000 / portTICK_RATE_MS))
 			ProgressWifiListData(wifis, txbuf);
 		
 		MyFree(txbuf);
@@ -268,17 +282,17 @@ MyState_TypeDef ConnectWifi(WIFI_Def *wifis)
 	MyState_TypeDef statues = My_Fail;
 	
 	/*发送数据缓冲区*/
-	txbuf = MyMalloc(100);
+	txbuf = MyMalloc(500);
 	if(txbuf)
 	{
 		/*设置ssid*/
 		memset(txbuf, 0, 100);
 		sprintf(txbuf, (const char *)"AT+WSSSID=%s\r", wifis->ssid);
-		if(My_Pass == ComWithWIFI(txbuf, "+ok", txbuf, 100, 1000 * portTICK_RATE_MS))
+		if(My_Pass == ComWithWIFI(txbuf, "+ok", txbuf, 100, 10000 * portTICK_RATE_MS))
 		{
 			memset(txbuf, 0, 100);
 			sprintf(txbuf, (const char *)"AT+WSKEY=%s,%s,%s\r", wifis->auth, wifis->encry, wifis->key);
-			if(My_Pass == ComWithWIFI(txbuf, "+ok", txbuf, 100, 1000* portTICK_RATE_MS))
+			if(My_Pass == ComWithWIFI(txbuf, "+ok", txbuf, 100, 10000* portTICK_RATE_MS))
 				statues = My_Pass;
 		}
 	}
@@ -291,37 +305,107 @@ MyState_TypeDef ConnectWifi(WIFI_Def *wifis)
 
 MyState_TypeDef GetWifiStaIP(IP_Def * ip)
 {
-	static char txbuf[200] ; 
-	MyState_TypeDef statues = My_Fail;
-	
-	/*发送数据缓冲区*/
-//	txbuf = MyMalloc(500);
-//	if(txbuf)
-	{
-		if(My_Pass == ComWithWIFI("AT+WANN\r", "+ok", txbuf, 200, 50 / portTICK_RATE_MS))
-		{
-			if(!((strstr(txbuf, "DisConnected")) || (strstr(txbuf, "RF Off"))))
-				statues = My_Pass;
-		}
-	}
-//	MyFree(txbuf);
-	
-	return statues;
-}
-
-MyState_TypeDef WifiIsConnectted(void)
-{
-	char *txbuf = NULL; 
+	char *txbuf = NULL;
+	char * tempp1 = NULL;
 	MyState_TypeDef statues = My_Fail;
 	
 	/*发送数据缓冲区*/
 	txbuf = MyMalloc(500);
 	if(txbuf)
 	{
-		if(My_Pass == ComWithWIFI("AT+WSLK\r", "+ok", txbuf, 500, 50 / portTICK_RATE_MS))
+		if(My_Pass == ComWithWIFI("AT+WANN\r", "+ok", txbuf, 100, 100 / portTICK_RATE_MS))
+		{
+			tempp1 = strtok(txbuf, ",");
+			if(tempp1)
+			{
+				tempp1 = strtok(NULL, ",");
+				
+				if(tempp1)
+				{
+					ip->ip_1 = strtol(tempp1, &tempp1, 10);
+					ip->ip_2 = strtol(tempp1+1, &tempp1, 10);
+					ip->ip_3 = strtol(tempp1+1, &tempp1, 10);
+					ip->ip_4 = strtol(tempp1+1, &tempp1, 10);
+				}
+			}
+			
+			statues = My_Pass;
+		}
+	}
+	MyFree(txbuf);
+	
+	return statues;
+}
+
+MyState_TypeDef GetWifiStaMac(char *mac)
+{
+	char *txbuf = NULL;
+	char * tempp1 = NULL;
+	
+	MyState_TypeDef statues = My_Fail;
+	
+	/*发送数据缓冲区*/
+	txbuf = MyMalloc(500);
+	if(txbuf)
+	{
+		if(My_Pass == ComWithWIFI("AT+WSMAC\r", "+ok", txbuf, 100, 100 / portTICK_RATE_MS))
+		{
+			tempp1 = strtok(txbuf, "=");
+			if(tempp1)
+			{
+				tempp1 = strtok(NULL, "=");
+				
+				if(tempp1)
+					memcpy(mac, tempp1, 12);
+			}
+			
+			statues = My_Pass;
+		}
+	}
+	MyFree(txbuf);
+	
+	return statues;
+}
+
+MyState_TypeDef WifiIsConnectted(char * ssid)
+{
+	char *txbuf = NULL; 
+	char * tempp1 = NULL;
+	char * tempp2 = NULL;
+	unsigned char len = 0;
+	MyState_TypeDef statues = My_Fail;
+	
+	/*发送数据缓冲区*/
+	txbuf = MyMalloc(500);
+	if(txbuf)
+	{
+		if(My_Pass == ComWithWIFI("AT+WSLK\r", "+ok", txbuf, 100, 50 / portTICK_RATE_MS))
 		{
 			if(!((strstr(txbuf, "DisConnected")) || (strstr(txbuf, "RF Off"))))
+			{
+				//总长度
+				len = strlen(txbuf);
+				tempp1 = strtok(txbuf, "=");
+				if(tempp1)
+				{
+					//减去头长度
+					len -= strlen(tempp1);
+					//减去尾和mac长度
+					len -= 22;
+					
+					tempp1 = strtok(NULL, "=");
+				
+					if(tempp1)
+					{
+						tempp2 = strtok(tempp1, "(");
+						
+						if(tempp2)
+							memcpy(ssid, tempp2, strlen(tempp2));
+						
+					}
+				}
 				statues = My_Pass;
+			}
 		}
 	}
 	MyFree(txbuf);
@@ -335,7 +419,7 @@ MyState_TypeDef RestartWifi(void)
 	MyState_TypeDef statues = My_Fail;
 	
 	/*发送数据缓冲区*/
-	txbuf = MyMalloc(50);
+	txbuf = MyMalloc(500);
 	if(txbuf)
 	{
 		if(My_Pass == ComWithWIFI("AT+Z\r", "+ok", txbuf, 50, 50 * portTICK_RATE_MS))
@@ -354,7 +438,7 @@ MyState_TypeDef CheckWifiMID(void)
 	MyState_TypeDef statues = My_Fail;
 	
 	/*发送数据缓冲区*/
-	txbuf = MyMalloc(50);
+	txbuf = MyMalloc(500);
 	if(txbuf)
 	{
 		if(My_Pass == ComWithWIFI("AT+MID\r", "+ok", txbuf, 50, 50 * portTICK_RATE_MS))
@@ -375,7 +459,7 @@ unsigned char GetWifiIndicator(void)
 	char *s = NULL;
 	
 	/*发送数据缓冲区*/
-	txbuf = MyMalloc(50);
+	txbuf = MyMalloc(500);
 	if(txbuf)
 	{
 		s = txbuf;
@@ -412,4 +496,19 @@ unsigned char GetWifiIndicator(void)
 	return ind;
 }
 
-
+static MyState_TypeDef SetWifiServerInfo(void)
+{
+	char *txbuf = NULL; 
+	MyState_TypeDef statues = My_Fail;
+	
+	/*发送数据缓冲区*/
+	txbuf = MyMalloc(500);
+	if(txbuf)
+	{
+		if(My_Pass == ComWithWIFI("AT+NETP=TCP,CLIENT,8080,116.62.108.201\r\n", "+ok", txbuf, 100, 1000 * portTICK_RATE_MS))
+			statues = My_Pass;
+	}
+	MyFree(txbuf);
+	
+	return statues;
+}

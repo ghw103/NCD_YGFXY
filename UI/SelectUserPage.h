@@ -9,8 +9,9 @@
 typedef struct UserPage_tag {
 	unsigned char selectindex;										//选中的索引
 	unsigned char pageindex;										//页面索引
-	User_Type user[MaxUserNum];										//选中的人
-	User_Type * tempuser;
+	User_Type user[MaxUserNum];										//所有操作人列表
+	User_Type * tempUser;											//临时指针
+	User_Type * tempUser2;											//当前选中的操作人，null表示未选择
 	ItemData * currenttestdata;										//当前测试数据
 	Timer timer;													//页面超时时间
 	unsigned short lcdinput[100];									//lcd输入解析

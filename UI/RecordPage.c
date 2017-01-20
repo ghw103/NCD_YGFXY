@@ -300,31 +300,33 @@ static MyState_TypeDef ShowRecord(unsigned char pageindex)
 		S_RecordPageBuffer->readTestDataPackage.maxReadNum = DataShowNumInPage;
 		
 		//¶ÁÈ¡Êý¾Ý
-		ReadTestData(&(S_RecordPageBuffer->readTestDataPackage));
+		ReadTestDataInverte(&(S_RecordPageBuffer->readTestDataPackage));
 		
 		S_RecordPageBuffer->maxpagenum = ((S_RecordPageBuffer->readTestDataPackage.testDataHead.datanum % DataShowNumInPage) == 0)?(S_RecordPageBuffer->readTestDataPackage.testDataHead.datanum / DataShowNumInPage):
 		((S_RecordPageBuffer->readTestDataPackage.testDataHead.datanum / DataShowNumInPage)+1);
 		
 		BasicPic(0x2020, 0, 100, 39, 522, 968, 556, 39, 140+(S_RecordPageBuffer->selectindex)*36);
 		
-		S_RecordPageBuffer->tempdata = &(S_RecordPageBuffer->readTestDataPackage.testData[0]);
-		for(i=0; i<DataShowNumInPage; i++)
+		S_RecordPageBuffer->tempdata = &(S_RecordPageBuffer->readTestDataPackage.testData[S_RecordPageBuffer->readTestDataPackage.readDataNum-1]);
+		for(i=0; i<S_RecordPageBuffer->readTestDataPackage.readDataNum; i++)
 		{
-			if(S_RecordPageBuffer->tempdata->crc == CalModbusCRC16Fun1(S_RecordPageBuffer->tempdata, sizeof(TestData)-2))
-			{
-				memset(S_RecordPageBuffer->buf, 0, 300);
-				sprintf(S_RecordPageBuffer->buf, "%5d   %10s%15s  %8.2f %s %d-%d-%d %d:%d:%d %s ", (pageindex-1)*DataShowNumInPage+i+1, S_RecordPageBuffer->tempdata->temperweima.ItemName,
-				S_RecordPageBuffer->tempdata->sampleid, S_RecordPageBuffer->tempdata->testline.AdjustResult, S_RecordPageBuffer->tempdata->temperweima.ItemMeasure,
+			memset(S_RecordPageBuffer->buf, 0, 300);
+			sprintf(S_RecordPageBuffer->buf, "%5d   %10s%15s  %8.*f %s %d-%d-%d %d:%d:%d %s ", (pageindex-1)*DataShowNumInPage+i+1, S_RecordPageBuffer->tempdata->temperweima.ItemName,
+				S_RecordPageBuffer->tempdata->sampleid, S_RecordPageBuffer->tempdata->temperweima.ItemPoint, S_RecordPageBuffer->tempdata->testline.AdjustResult, S_RecordPageBuffer->tempdata->temperweima.ItemMeasure,
 				S_RecordPageBuffer->tempdata->TestTime.year, S_RecordPageBuffer->tempdata->TestTime.month, S_RecordPageBuffer->tempdata->TestTime.day,
 				S_RecordPageBuffer->tempdata->TestTime.hour, S_RecordPageBuffer->tempdata->TestTime.min, S_RecordPageBuffer->tempdata->TestTime.sec,
 				S_RecordPageBuffer->tempdata->user.user_name);
 				
-				DisText(0x2030+(i)*0x40, S_RecordPageBuffer->buf, 120);
-			}
-			else
-				ClearText(0x2030+(i)*0x40, 120);
+			DisText(0x2030+(i)*0x40, S_RecordPageBuffer->buf, 120);
 			
-			S_RecordPageBuffer->tempdata++;
+			S_RecordPageBuffer->tempdata--;
+		}
+		
+		for(i=S_RecordPageBuffer->readTestDataPackage.readDataNum; i<DataShowNumInPage; i++)
+		{
+			ClearText(0x2030+(i)*0x40, 100);
+			
+			vTaskDelay(20);
 		}
 		
 		return My_Pass;

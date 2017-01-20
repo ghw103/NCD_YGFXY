@@ -12,6 +12,8 @@ typedef struct TestPageBuffer_tag {
 	LineInfo line;
 	unsigned short lcdinput[100];
 	unsigned char testisover;
+	char buf[100];
+	unsigned char isPrintfData;							//是否正在打印
 }TestPageBuffer;
 
 

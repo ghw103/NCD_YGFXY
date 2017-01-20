@@ -24,6 +24,8 @@ typedef struct ItemData_tag {
 	MyPaiDuiStatues statues;															//测试阶段
 	unsigned char jieduan;																//测试阶段
 	unsigned char testlocation;
+	unsigned char varIcoIndex;															//排队界面显示卡的图标界面的索引
+	unsigned char lastChannelIndex;														//记录最新的调节通道
 }ItemData;
 
 typedef struct TestBuffer_tag{

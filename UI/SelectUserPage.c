@@ -94,7 +94,7 @@ static void activityStart(void)
 		ShowList();
 		SelectUser(S_UserPageBuffer->selectindex);
 	
-		AddNumOfSongToList(45, 0);
+		AddNumOfSongToList(9, 0);
 	}
 	
 	SelectPage(84);
@@ -149,9 +149,9 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			
 			if(S_UserPageBuffer->pageindex < (MaxUserNum / MaxPageShowNum))
 			{
-				S_UserPageBuffer->tempuser = &S_UserPageBuffer->user[(S_UserPageBuffer->pageindex)*MaxPageShowNum];
+				S_UserPageBuffer->tempUser = &S_UserPageBuffer->user[(S_UserPageBuffer->pageindex)*MaxPageShowNum];
 			
-				if(S_UserPageBuffer->tempuser->crc == CalModbusCRC16Fun1(S_UserPageBuffer->tempuser, sizeof(User_Type)-2))
+				if(S_UserPageBuffer->tempUser->crc == CalModbusCRC16Fun1(S_UserPageBuffer->tempUser, sizeof(User_Type)-2))
 				{
 					S_UserPageBuffer->pageindex++;
 						
@@ -165,20 +165,20 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*确定*/
 		else if(S_UserPageBuffer->lcdinput[0] == 0x1201)
 		{
-			if(S_UserPageBuffer->tempuser != NULL)
+			if(S_UserPageBuffer->tempUser2 != NULL)
 			{
 				//如果是排队测试，则保存操作人到排队测试共用操作人
 				if(S_UserPageBuffer->currenttestdata->testlocation > 0)
-					SetPaiduiUser(S_UserPageBuffer->tempuser);
+					SetPaiduiUser(S_UserPageBuffer->tempUser2);
 				
 				/*以当前选择的操作人作为本次测试数据的操作人*/
-				memcpy(&(S_UserPageBuffer->currenttestdata->testdata.user), S_UserPageBuffer->tempuser, sizeof(User_Type));
+				memcpy(&(S_UserPageBuffer->currenttestdata->testdata.user), S_UserPageBuffer->tempUser2, sizeof(User_Type));
 			
 				startActivity(createSampleActivity, NULL);
 			}
 			else
 			{
-				AddNumOfSongToList(45, 0);
+				AddNumOfSongToList(9, 0);
 				SendKeyCode(1);
 			}
 		}
@@ -207,7 +207,7 @@ static void activityFresh(void)
 {
 	if(TimeOut == timer_expired(&(S_UserPageBuffer->timer)))
 	{
-		AddNumOfSongToList(8, 0);
+		AddNumOfSongToList(6, 0);
 		
 		DeleteCurrentTest();
 			
@@ -328,14 +328,14 @@ static void ShowList(void)
 	
 	i = (S_UserPageBuffer->pageindex-1)*MaxPageShowNum;
 	
-	S_UserPageBuffer->tempuser = &(S_UserPageBuffer->user[i]);
+	S_UserPageBuffer->tempUser = &(S_UserPageBuffer->user[i]);
 	
 	/*显示列表数据*/
 	for(i=0; i<MaxPageShowNum; i++)
 	{
-		DisText(0x1210+i*8, S_UserPageBuffer->tempuser->user_name, MaxNameLen);
+		DisText(0x1210+i*8, S_UserPageBuffer->tempUser->user_name, MaxNameLen);
 		
-		S_UserPageBuffer->tempuser++;
+		S_UserPageBuffer->tempUser++;
 	}
 }
 
@@ -357,15 +357,15 @@ static void SelectUser(unsigned char index)
 	{
 		i = (S_UserPageBuffer->pageindex-1)*MaxPageShowNum + S_UserPageBuffer->selectindex-1;
 		
-		S_UserPageBuffer->tempuser = &(S_UserPageBuffer->user[i]);
+		S_UserPageBuffer->tempUser2 = &(S_UserPageBuffer->user[i]);
 		
-		if(S_UserPageBuffer->tempuser->crc == CalModbusCRC16Fun1(S_UserPageBuffer->tempuser, sizeof(User_Type)-2))
+		if(S_UserPageBuffer->tempUser2->crc == CalModbusCRC16Fun1(S_UserPageBuffer->tempUser2, sizeof(User_Type)-2))
 		{
 			BasicPic(0x1240, 1, 137, 268, 225, 558, 272, 364, 142+(S_UserPageBuffer->selectindex-1)*72);	
 		}
 		else
 		{
-			S_UserPageBuffer->tempuser = NULL;
+			S_UserPageBuffer->tempUser2 = NULL;
 			S_UserPageBuffer->selectindex = 0;
 		}
 	}

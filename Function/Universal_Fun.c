@@ -15,6 +15,7 @@
 #include	"CardStatues_Data.h"
 #include	"CardLimit_Driver.h"
 #include	"System_Data.h"
+#include	"DS18b20_Driver.h"
 
 #include	"Define.h"
 
@@ -64,4 +65,14 @@ void UpDateGB_Time(void)
 	RTC_GetTimeData(&time);
 
 	SetGB_Time(&time);	
+}
+
+void ReadEnvironmentTemperature(void)
+{
+	float tempv = 0;
+	
+	tempv = DS18B20_Get_Temp();
+	
+	if(tempv > -200)
+		SetGB_EnTemperature(tempv);
 }

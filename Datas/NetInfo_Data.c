@@ -78,39 +78,4 @@ void SetGB_LineNetStatus(unsigned char status)
 	xTaskResumeAll();
 }
 
-void SetGB_WifiSSID(char * ssid)
-{
-	vTaskSuspendAll();
-	
-	memcpy(GB_NetInfo.WifiSSID, ssid, strlen(ssid));
-	
-	xTaskResumeAll();
-}
-
-void SetGB_WifiIP(IP_Def * ip)
-{
-	vTaskSuspendAll();
-	
-	memcpy(&(GB_NetInfo.WifiIP), ip, sizeof(IP_Def));
-	
-	xTaskResumeAll();
-}
-
-void SetGB_WifiMAC(unsigned char * mac)
-{
-	vTaskSuspendAll();
-	
-	memcpy(GB_NetInfo.WifiMAC, mac, 6);
-	
-	xTaskResumeAll();
-}
-
-void SetGB_WifiIndicator(unsigned char indicator)
-{	
-	vTaskSuspendAll();
-	
-	GB_NetInfo.WifiIndicator = indicator;
-	
-	xTaskResumeAll();
-}
 /****************************************end of file************************************************/

@@ -29,7 +29,7 @@ struct netbuf *pxRxBuffer;
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
-static void ProcessCMD(unsigned char *buf, unsigned short len,struct netconn *pxNetCon);
+static err_t ProcessCMD(unsigned char *buf, unsigned short len, struct netconn *pxNetCon);
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -51,36 +51,31 @@ void ProcessQuest(void * parm)
 	
 	unsigned char *pcRxString;
 	unsigned short usLength;
-	unsigned short crc;
+	
+	if(NULL == parm)
+		return;
 	
 	pxNetCon = parm;
 	/* We expect to immediately get data. */
-	err = netconn_recv( pxNetCon , &pxRxBuffer);
-
-	if( err == ERR_OK )
+	if((err = netconn_recv( pxNetCon , &pxRxBuffer)) == ERR_OK)
 	{
-		/* Where is the data? */
-		netbuf_data( pxRxBuffer, ( void * ) &pcRxString, &usLength );
+		netbuf_data(pxRxBuffer, ( void * )&pcRxString, &usLength);
+
+		netbuf_delete(pxRxBuffer);
 		
-		crc = pcRxString[usLength-2];
-		crc = (crc<<8) + pcRxString[usLength-1];
-		
-		if(crc != CalModbusCRC16Fun1(pcRxString, usLength -2))
-			ProcessCMD(pcRxString ,usLength-2, pxNetCon);
-		
-		netbuf_delete( pxRxBuffer );
+		if(ERR_OK != ProcessCMD(pcRxString ,usLength, pxNetCon))
+			;        
 	}
-	
-	netconn_close( pxNetCon );
-	netconn_delete( pxNetCon );
+
 }
 
-static void ProcessCMD(unsigned char *buf, unsigned short len, struct netconn *pxNetCon)
+static err_t ProcessCMD(unsigned char *buf, unsigned short len, struct netconn *pxNetCon)
 {
 	char *pxbuf1;
 	char *pxbuf2;
 	unsigned short temp = 0xffff;
 	unsigned short i=0;
+	err_t err;
 	
 	pxbuf1 = MyMalloc(4096);
 	pxbuf2 = MyMalloc(10);
@@ -131,11 +126,13 @@ static void ProcessCMD(unsigned char *buf, unsigned short len, struct netconn *p
 				MotorMoveTo(MaxLocation, 1);
 		}
 
-		netconn_write( pxNetCon, pxbuf1, strlen(pxbuf1), NETCONN_COPY );
+		err = netconn_write( pxNetCon, pxbuf1, strlen(pxbuf1), NETCONN_COPY );
 	}
 	
 	MyFree(pxbuf1);
 	MyFree(pxbuf2);
+	
+	return err;
 }
 
 /****************************************end of file************************************************/

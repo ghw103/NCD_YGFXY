@@ -45,6 +45,7 @@ MyState_TypeDef CommunicateWithServerByLineNet(void *sendnetbuf, void *recvnetbu
 	err_t err;
 	
 	MyState_TypeDef status = My_Fail;
+
 	
 	MyLwipData * myclientdata = NULL;
 	
@@ -53,13 +54,19 @@ MyState_TypeDef CommunicateWithServerByLineNet(void *sendnetbuf, void *recvnetbu
 	if(myclientdata)
 	{
 		IP4_ADDR(&myclientdata->server_ipaddr,ip1,ip2,ip3,ip4);
-		
+
 		//创建连接
 		myclientdata->clientconn = netconn_new(NETCONN_TCP);
 		//创建失败
 		if(myclientdata->clientconn == NULL)
 			goto END;
-		
+
+		//绑定本地ip
+		err = netconn_bind(myclientdata->clientconn, IP_ADDR_ANY, 0);
+		//连接失败
+		if(err != ERR_OK)
+			goto END2;
+
 		//尝试连接远程服务器
 		err = netconn_connect(myclientdata->clientconn, &myclientdata->server_ipaddr, 8080);
 		//连接失败
@@ -67,7 +74,7 @@ MyState_TypeDef CommunicateWithServerByLineNet(void *sendnetbuf, void *recvnetbu
 			goto END2;
 		
 		//设置接收数据超时时间100MS
-		myclientdata->clientconn->recv_timeout = 1000;
+		myclientdata->clientconn->recv_timeout = 500;
 		
 		//发送数据
 		if(sendnetbuf)
@@ -83,13 +90,14 @@ MyState_TypeDef CommunicateWithServerByLineNet(void *sendnetbuf, void *recvnetbu
 		if(recvnetbuf)
 		{
 			myclientdata->s_mybuf = recvnetbuf;
-			err = netconn_recv(myclientdata->clientconn, &myclientdata->recvbuf);
-			if(err == ERR_OK)
+			myclientdata->s_mybuf->datalen = 0;
+			myclientdata->myp = myclientdata->s_mybuf->data;
+			
+			while(ERR_OK == netconn_recv(myclientdata->clientconn, &myclientdata->recvbuf))
 			{
-				myclientdata->s_mybuf->datalen = netbuf_copy(myclientdata->recvbuf, myclientdata->s_mybuf->data, maxrecvlen);
-				
+				myclientdata->s_mybuf->datalen += netbuf_copy(myclientdata->recvbuf, myclientdata->myp + myclientdata->s_mybuf->datalen ,
+					maxrecvlen - myclientdata->s_mybuf->datalen);
 				netbuf_delete(myclientdata->recvbuf);
-				
 				status = My_Pass;
 			}
 		}
@@ -118,16 +126,8 @@ MyState_TypeDef CommunicateWithServerByWifi(void *sendnetbuf, void *recvnetbuf, 
 		if(sendnetbuf)
 		{
 			mywifidata->s_mybuf = sendnetbuf;
-			mywifidata->myp = mywifidata->s_mybuf->data;
 			
-			while(mywifidata->s_mybuf->datalen > 100)
-			{
-				SendDataToQueue(GetUsart4TXQueue(), GetUsart4TXMutex(), mywifidata->myp, 100, 1, 100 / portTICK_RATE_MS, EnableUsart4TXInterrupt);
-				mywifidata->s_mybuf->datalen -= 100;
-				mywifidata->myp += 100;
-			}
-		
-			SendDataToQueue(GetUsart4TXQueue(), GetUsart4TXMutex(), mywifidata->myp, mywifidata->s_mybuf->datalen, 1, 100 / portTICK_RATE_MS, EnableUsart4TXInterrupt);
+			SendDataToQueue(GetUsart4TXQueue(), GetUsart4TXMutex(), mywifidata->s_mybuf->data, mywifidata->s_mybuf->datalen, 1, 1000 / portTICK_RATE_MS, EnableUsart4TXInterrupt);
 		}
 		
 		//接收数据
@@ -137,13 +137,9 @@ MyState_TypeDef CommunicateWithServerByWifi(void *sendnetbuf, void *recvnetbuf, 
 			mywifidata->s_mybuf = recvnetbuf;
 			mywifidata->myp = mywifidata->s_mybuf->data;
 			
-			while(pdPASS == ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4RXMutex(), mywifidata->myp+mywifidata->rxcount, 1, 1, 100 / portTICK_RATE_MS))
-			{
-				if(mywifidata->rxcount < maxrecvlen-1)
-					mywifidata->rxcount++;	
-			}
-			
-			if(mywifidata->rxcount > 0)
+			ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4RXMutex(), mywifidata->s_mybuf->data, maxrecvlen, 1, 1000 / portTICK_RATE_MS);
+
+			//if(mywifidata->rxcount > 0)
 				status = My_Pass;
 		}
 	}
@@ -172,13 +168,13 @@ MyState_TypeDef UpLoadData(char *URL, void * buf, unsigned short buflen)
 	if(mybuf.data && recvbuf.data)
 	{
 		memset(mybuf.data, 0, buflen+512);
-		sprintf(mybuf.data, "POST %s HTTP/1.1\nHost: 192.168.0.34:8080\nConnection: keep-alive\nContent-Length: %d\nContent-Type:application/x-www-form-urlencoded;charset=GBK\nAccept-Language: zh-CN,zh;q=0.8\n\n%s", URL, buflen, (char *)buf);
+		sprintf(mybuf.data, "POST %s HTTP/1.1\nHost: 116.62.108.201:8080\nConnection: keep-alive\nContent-Length: %d\nContent-Type:application/x-www-form-urlencoded;charset=GBK\nAccept-Language: zh-CN,zh;q=0.8\n\n%s", URL, buflen, (char *)buf);
 		mybuf.datalen = strlen(mybuf.data);
 			
 		memset(recvbuf.data, 0, 1024);
-		if(My_Pass == CommunicateWithServerByLineNet(&mybuf, &recvbuf, 192, 168, 0, 34, 2000))
+		if(My_Pass == CommunicateWithServerByLineNet(&mybuf, &recvbuf, 116, 62, 108, 201, 1000))
 		{
-			temp = strstr(recvbuf.data, "myresult->");
+			temp = strstr(recvbuf.data, "success");
 			if(temp)
 			{
 				//USB_PutStr("\nlwip_mode ok\n", 13);
@@ -192,9 +188,9 @@ MyState_TypeDef UpLoadData(char *URL, void * buf, unsigned short buflen)
 		}
 		
 		memset(recvbuf.data, 0, 1024);
-		if(My_Pass == CommunicateWithServerByWifi(&mybuf, &recvbuf, 2000))
+		if(My_Pass == CommunicateWithServerByWifi(&mybuf, &recvbuf, 1000))
 		{
-			temp = strstr(recvbuf.data, "myresult->");
+			temp = strstr(recvbuf.data, "success");
 			if(temp)
 			{
 				//USB_PutStr("wifi_mode ok\n", 13);

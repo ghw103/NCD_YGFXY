@@ -12,19 +12,18 @@ typedef enum
 	PWM_Mode = 3,
 }WIFI_WorkMode_DefType;
 
-MyState_TypeDef WIFICheck(void);
+MyState_TypeDef WIFIInit(void);
 
-MyState_TypeDef SetWifiDefaultWorkMode(void);
 WIFI_WorkMode_DefType GetWifiWorkMode(void);
 MyState_TypeDef SetWifiWorkInAT(WIFI_WorkMode_DefType mode);
 MyState_TypeDef ScanApList(WIFI_Def *wifis);
 MyState_TypeDef ConnectWifi(WIFI_Def *wifis);
 MyState_TypeDef RestartWifi(void);
-
+MyState_TypeDef GetWifiStaMac(char *mac);
 MyState_TypeDef GetWifiStaIP(IP_Def * ip);
 MyState_TypeDef CheckWifiMID(void);
 unsigned char GetWifiIndicator(void);
-MyState_TypeDef WifiIsConnectted(void);
+MyState_TypeDef WifiIsConnectted(char * ssid);
 
 #endif
 

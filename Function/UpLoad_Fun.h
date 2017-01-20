@@ -3,16 +3,16 @@
 
 #include	"Define.h"
 #include	"TestDataDao.h"
+#include	"SystemSet_Data.h"
 
 #pragma pack(1)
 typedef struct UpLoadTestDataBuffer_Tag
 {	
-	DeviceInfo deviceinfo;
-	TestDataHead myTestDataSaveHead;
-	TestData testdata;
-	
+	ReadTestDataPackage readTestDataPackage;
+	SystemSetData systemSetData;
+	TestData * testData;
 	char sendbuf[2048];
-	char tempbuf[10];
+	char tempbuf[100];
 }UpLoadTestDataBuffer;
 #pragma pack()
 

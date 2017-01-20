@@ -88,7 +88,7 @@ static void vCodeScanTask( void *pvParameters )
 			vTaskDelay(10 * portTICK_RATE_MS);
 			
 			/*·¢ËÍ²âÊÔ½á¹û*/
-			xQueueSend( xScanResultQueue, &scanresult, 10000/portTICK_RATE_MS );
+			xQueueSend( xScanResultQueue, &scanresult, 100/portTICK_RATE_MS );
 		}
 	}
 }

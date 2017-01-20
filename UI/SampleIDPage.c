@@ -88,7 +88,7 @@ static void activityStart(void)
 	
 		timer_set(&(S_SampleIDPage->timer), 60);
 
-		AddNumOfSongToList(26, 0);
+		AddNumOfSongToList(10, 0);
 	}
 	
 	SelectPage(86);
@@ -126,7 +126,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			if(strlen(S_SampleIDPage->currenttestdata->testdata.sampleid) == 0)
 			{
 				SendKeyCode(1);
-				AddNumOfSongToList(26, 0);
+				AddNumOfSongToList(10, 0);
 			}
 			else
 			{
@@ -192,10 +192,10 @@ static void activityResume(void)
 	if(S_SampleIDPage)
 	{
 		/*重置倒计时30s，如果超时，则取消此次测试*/
-		timer_set(&(S_SampleIDPage->timer), 10);
+		timer_restart(&(S_SampleIDPage->timer));
 	}
 	
-	SelectPage(84);
+	SelectPage(86);
 }
 
 /***************************************************************************************************

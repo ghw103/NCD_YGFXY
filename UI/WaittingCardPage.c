@@ -84,12 +84,14 @@ static void activityStart(void)
 		S_WaitPageData->currenttestdata = GetCurrentTestItem();
 		
 		/*等待时间，超时则取消测试*/
-		timer_set(&(S_WaitPageData->timer), 55);
+		timer_set(&(S_WaitPageData->timer), 60);
 		
 		/*间隔一段时间提示插卡*/
 		timer_set(&(S_WaitPageData->timer2), 20);
 		
-		AddNumOfSongToList(43, 0);
+		//如果无卡，提示插卡
+		if(GetCardState() == NoCard)
+			AddNumOfSongToList(11, 0);
 	}
 	
 	SelectPage(88);
@@ -115,6 +117,9 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*返回*/
 		if(S_WaitPageData->lcdinput[0] == 0x1303)
 		{
+			if(S_WaitPageData->currenttestdata->statues == statues7)
+				S_WaitPageData->currenttestdata->statues = statues4;
+			
 			backToFatherActivity();
 		}
 	}
@@ -133,14 +138,6 @@ static void activityFresh(void)
 {
 	if(S_WaitPageData)
 	{
-		
-		/*提示插卡*/
-		if(TimeOut == timer_expired(&(S_WaitPageData->timer2)))
-		{
-			AddNumOfSongToList(43, 0);
-			timer_restart(&(S_WaitPageData->timer2));
-		}
-		
 		/*是否插卡*/
 		if(GetCardState() == CardIN)
 		{
@@ -148,14 +145,23 @@ static void activityFresh(void)
 			
 		}
 		/*时间到，未插卡，返回*/
-		else if(TimeOut == timer_expired(&(S_WaitPageData->timer)))
+		else 
 		{
-			AddNumOfSongToList(8, 0);
+			/*提示插卡*/
+			if(TimeOut == timer_expired(&(S_WaitPageData->timer2)))
+			{
+				AddNumOfSongToList(11, 0);
+				timer_restart(&(S_WaitPageData->timer2));
+			}
 			
-			backToFatherActivity();
+			//超时，返回
+			if(TimeOut == timer_expired(&(S_WaitPageData->timer)))
+			{
+				AddNumOfSongToList(6, 0);
+				
+				backToFatherActivity();
+			}
 		}
-		
-		
 	}
 }
 
@@ -184,6 +190,8 @@ static void activityHide(void)
 ***************************************************************************************************/
 static void activityResume(void)
 {
+	timer_restart(&(S_WaitPageData->timer));
+	
 	SelectPage(88);
 }
 

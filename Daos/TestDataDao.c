@@ -158,21 +158,132 @@ MyState_TypeDef ReadTestData(ReadTestDataPackage * readpackage)
 			if(readpackage->maxReadNum > (readpackage->testDataHead.datanum - readpackage->startReadIndex))
 				readpackage->maxReadNum = (readpackage->testDataHead.datanum - readpackage->startReadIndex);
 			
-			myfile->res = f_lseek(&(myfile->file), (readpackage->testDataHead.datanum - (readpackage->maxReadNum + readpackage->startReadIndex))*sizeof(TestData)+sizeof(TestDataHead));
+			myfile->res = f_lseek(&(myfile->file), (readpackage->startReadIndex)*sizeof(TestData)+sizeof(TestDataHead));
 			if(FR_OK == myfile->res)
 			{
 				for(i=0; i<readpackage->maxReadNum; i++)
 				{
-					myfile->res = f_read(&(myfile->file), &(readpackage->testData[readpackage->maxReadNum - 1 - i]), sizeof(TestData), &(myfile->br));
+					myfile->res = f_read(&(myfile->file), &(readpackage->testData[i]), sizeof(TestData), &(myfile->br));
 					
 					if((FR_OK == myfile->res) && 
-						(readpackage->testData[readpackage->maxReadNum - 1 - i].crc == CalModbusCRC16Fun1(&(readpackage->testData[readpackage->maxReadNum - 1 - i]), sizeof(TestData)-2)))
+						(readpackage->testData[i].crc == CalModbusCRC16Fun1(&(readpackage->testData[i]), sizeof(TestData)-2)))
 						readpackage->readDataNum++;
 					else
 						break;
 				}
 				statues = My_Pass;
 			}
+			
+			END:
+				f_close(&(myfile->file));
+		}
+	}
+	
+	MyFree(myfile);
+	
+	return statues;
+}
+
+/***************************************************************************************************
+*FunctionName: ReadTestDataInverte
+*Description: 逆序读取，startreadindex = 0 表示从最后一个开始读
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 
+***************************************************************************************************/
+MyState_TypeDef ReadTestDataInverte(ReadTestDataPackage * readpackage)
+{
+	FatfsFileInfo_Def * myfile = NULL;
+	MyState_TypeDef statues = My_Fail;
+	unsigned char i=0;
+	
+	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
+	
+	if(myfile && readpackage)
+	{
+		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
+		
+		readpackage->readDataNum = 0;
+		
+		myfile->res = f_open(&(myfile->file), "0:/TD.NCD", FA_READ);
+		
+		if(FR_OK == myfile->res)
+		{
+			myfile->size = f_size(&(myfile->file));
+			
+			//读取数据头
+			f_lseek(&(myfile->file), 0);
+			f_read(&(myfile->file), &(readpackage->testDataHead), sizeof(TestDataHead), &(myfile->br));
+			
+			//数据头校验失败，则读取失败，返回读取数目为0
+			if(readpackage->testDataHead.crc != CalModbusCRC16Fun1(&(readpackage->testDataHead), sizeof(TestDataHead)-2))
+				goto END;
+			
+			//起始读取索引大于数据总数，则失败，返回读取数目为0
+			if((readpackage->startReadIndex + 1) > readpackage->testDataHead.datanum)
+				goto END;
+			
+			if(readpackage->maxReadNum > (readpackage->testDataHead.datanum - readpackage->startReadIndex))
+				readpackage->maxReadNum = (readpackage->testDataHead.datanum - readpackage->startReadIndex);
+			
+			myfile->res = f_lseek(&(myfile->file), (readpackage->testDataHead.datanum - (readpackage->maxReadNum + readpackage->startReadIndex))*sizeof(TestData)+sizeof(TestDataHead));
+			if(FR_OK == myfile->res)
+			{
+				for(i=0; i<readpackage->maxReadNum; i++)
+				{
+					myfile->res = f_read(&(myfile->file), &(readpackage->testData[i]), sizeof(TestData), &(myfile->br));
+					
+					if((FR_OK == myfile->res) && 
+						(readpackage->testData[i].crc == CalModbusCRC16Fun1(&(readpackage->testData[i]), sizeof(TestData)-2)))
+						readpackage->readDataNum++;
+					else
+						break;
+				}
+				statues = My_Pass;
+			}
+			
+			END:
+				f_close(&(myfile->file));
+		}
+	}
+	
+	MyFree(myfile);
+	
+	return statues;
+}
+
+MyState_TypeDef WriteTestDataHead(TestDataHead * testDataHead)
+{
+	FatfsFileInfo_Def * myfile = NULL;
+	MyState_TypeDef statues = My_Fail;
+	
+	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
+	
+	if(myfile && testDataHead)
+	{
+		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
+		
+		myfile->res = f_open(&(myfile->file), "0:/TD.NCD", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
+			
+		if(FR_OK == myfile->res)
+		{
+			f_lseek(&(myfile->file), 0);
+
+			testDataHead->crc = CalModbusCRC16Fun1(testDataHead, sizeof(TestDataHead)-2);
+
+			//更新数据头
+			myfile->res = f_write(&(myfile->file), testDataHead, sizeof(TestDataHead), &(myfile->bw));
+			if(myfile->res != FR_OK)
+				goto END;
+			
+			myfile->res = f_sync(&(myfile->file));
+			if(myfile->res != FR_OK)
+				goto END;
+			
+			if(FR_OK == myfile->res)
+				statues = My_Pass;
 			
 			END:
 				f_close(&(myfile->file));

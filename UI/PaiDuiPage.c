@@ -16,7 +16,7 @@
 #include	"PlaySong_Task.h"
 #include	"CardLimit_Driver.h"
 #include	"SampleIDPage.h"
-
+#include	"MyTools.h"
 #include	"MyTest_Data.h"
 #include	"LunchPage.h"
 
@@ -115,12 +115,13 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			if(NULL != GetCurrentTestItem())
 			{
 				SendKeyCode(4);
+				AddNumOfSongToList(21, 0);
 			}
 			//即将测试，不允许返回
 			else if(GetMinWaitTime() < 60)
 			{
 				SendKeyCode(3);
-				AddNumOfSongToList(61, 0);
+				AddNumOfSongToList(21, 0);
 			}
 			else
 			{
@@ -146,25 +147,25 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			else if(Error_PaiduiFull == S_PaiDuiPageBuffer->error)
 			{
 				SendKeyCode(2);
-				AddNumOfSongToList(61, 0);
+				AddNumOfSongToList(19, 0);
 			}
 			//创建失败
 			else if(Error_Mem == S_PaiDuiPageBuffer->error)
 			{
 				SendKeyCode(1);
-				AddNumOfSongToList(41, 0);
+				AddNumOfSongToList(7, 0);
 			}
 			//有卡即将测试
 			else if(Error_PaiDuiBusy == S_PaiDuiPageBuffer->error)
 			{
 				SendKeyCode(3);
-				AddNumOfSongToList(61, 0);
+				AddNumOfSongToList(20, 0);
 			}
 			//测试中禁止添加
 			else if(Error_PaiduiTesting == S_PaiDuiPageBuffer->error)
 			{
 				SendKeyCode(4);
-				AddNumOfSongToList(61, 0);
+				AddNumOfSongToList(21, 0);
 			}
 		}
 	}
@@ -217,25 +218,25 @@ static void activityFresh(void)
 						else if(Error_PaiduiFull == S_PaiDuiPageBuffer->error)
 						{
 							SendKeyCode(2);
-							AddNumOfSongToList(61, 0);
+							AddNumOfSongToList(19, 0);
 						}
 						//创建失败
 						else if(Error_Mem == S_PaiDuiPageBuffer->error)
 						{
 							SendKeyCode(1);
-							AddNumOfSongToList(41, 0);
+							AddNumOfSongToList(7, 0);
 						}
 						//有卡即将测试
 						else if(Error_PaiDuiBusy == S_PaiDuiPageBuffer->error)
 						{
 							SendKeyCode(3);
-							AddNumOfSongToList(61, 0);
+							AddNumOfSongToList(20, 0);
 						}
 						//测试中禁止添加
 						else if(Error_PaiduiTesting == S_PaiDuiPageBuffer->error)
 						{
 							SendKeyCode(4);
-							AddNumOfSongToList(61, 0);
+							AddNumOfSongToList(21, 0);
 						}
 						
 						//定时器设置长时间，表明不在对此卡创建，需要重新拔插才行
@@ -261,58 +262,58 @@ static void activityFresh(void)
 					if(timerIsStartted(&(S_PaiDuiPageBuffer->tempd2->timer2)))
 					{
 						S_PaiDuiPageBuffer->tempvalue1 = timer_Count(&(S_PaiDuiPageBuffer->tempd2->timer2));
-						sprintf(S_PaiDuiPageBuffer->buf, "%d:%d", S_PaiDuiPageBuffer->tempvalue1/60, S_PaiDuiPageBuffer->tempvalue1%60);
-						DisText(0x1650+index*0x08, S_PaiDuiPageBuffer->buf, 10);
-							
-						memset(S_PaiDuiPageBuffer->buf, 0, 10);
-						DisText(0x1610+index*0x08, S_PaiDuiPageBuffer->buf, 10);
-								
-						BasicPic(0x1510+index*16, 0, 100, 15, 0, 22, 570, 55 , 0);
+						if(S_PaiDuiPageBuffer->tempvalue1 > 60)
+							sprintf(S_PaiDuiPageBuffer->buf, "%02dM", S_PaiDuiPageBuffer->tempvalue1/60);
+						else
+							sprintf(S_PaiDuiPageBuffer->buf, "%02dS", S_PaiDuiPageBuffer->tempvalue1);
+		
+						WriteVarIcoNum(0x1510+index*16, 50);
 					}
 					else
 					{
 						S_PaiDuiPageBuffer->tempvalue1 = timer_surplus(&(S_PaiDuiPageBuffer->tempd2->timer));
-						sprintf(S_PaiDuiPageBuffer->buf, "%d:%d", S_PaiDuiPageBuffer->tempvalue1/60, S_PaiDuiPageBuffer->tempvalue1%60);
-						DisText(0x1610+index*0x08, S_PaiDuiPageBuffer->buf, 10);
-							
-						memset(S_PaiDuiPageBuffer->buf, 0, 10);
-						DisText(0x1650+index*0x08, S_PaiDuiPageBuffer->buf, 10);
-							
-						S_PaiDuiPageBuffer->tempvalue = S_PaiDuiPageBuffer->tempvalue1;
-						S_PaiDuiPageBuffer->tempvalue /= S_PaiDuiPageBuffer->tempd2->testdata.temperweima.CardWaitTime*60;
-						S_PaiDuiPageBuffer->tempvalue *= 254;
-						S_PaiDuiPageBuffer->tempvalue = 360-S_PaiDuiPageBuffer->tempvalue;
-						BasicPic(0x1510+index*16, 1, 137, 142, (unsigned short)(S_PaiDuiPageBuffer->tempvalue), 147, 360, 59 + index*119, (unsigned short)(S_PaiDuiPageBuffer->tempvalue)+29);
-					}
+						if(S_PaiDuiPageBuffer->tempvalue1 > 60)
+							sprintf(S_PaiDuiPageBuffer->buf, "%02dM", S_PaiDuiPageBuffer->tempvalue1/60);
+						else
+							sprintf(S_PaiDuiPageBuffer->buf, "%02dS", S_PaiDuiPageBuffer->tempvalue1);							
 						
-					if((S_PaiDuiPageBuffer->tempd2->statues == statues5) || (S_PaiDuiPageBuffer->tempd2->statues == statues6))
-						S_PaiDuiPageBuffer->myico.ICO_ID = 24;
+						S_PaiDuiPageBuffer->tempvalue = S_PaiDuiPageBuffer->tempd2->testdata.temperweima.CardWaitTime*60 - S_PaiDuiPageBuffer->tempvalue1;
+						S_PaiDuiPageBuffer->tempvalue /= S_PaiDuiPageBuffer->tempd2->testdata.temperweima.CardWaitTime*60;
+						S_PaiDuiPageBuffer->tempvalue *= 50;
 
+						WriteVarIcoNum(0x1510+index*16, (unsigned short)(S_PaiDuiPageBuffer->tempvalue));
+					}
+					
+					DisText(0x1610+index*0x08, S_PaiDuiPageBuffer->buf, 10);
+					
+					S_PaiDuiPageBuffer->tempvalue1 = CheckItemPicIndex(S_PaiDuiPageBuffer->tempd2->testdata.temperweima.ItemName);
+					
+					if((S_PaiDuiPageBuffer->tempd2->statues == statues5) || (S_PaiDuiPageBuffer->tempd2->statues == statues6)){
+						BasicPic(0x1590+index*0x10, 1, 138, 10+85*S_PaiDuiPageBuffer->tempd2->varIcoIndex, 10, 10+85*S_PaiDuiPageBuffer->tempd2->varIcoIndex+75, 10+285, 91+index*110, 190);
+					}
 					else
 					{
 						//检测卡图标闪烁
 						if((S_PaiDuiPageBuffer->count % 2) == 0)
-							S_PaiDuiPageBuffer->myico.ICO_ID = 23;
+							BasicPic(0x1590+index*0x10, 1, 138, 10+85*S_PaiDuiPageBuffer->tempd2->varIcoIndex, 10, 10+85*S_PaiDuiPageBuffer->tempd2->varIcoIndex+75, 10+285, 91+index*110, 190);
 						else
-							S_PaiDuiPageBuffer->myico.ICO_ID = 24;
+							BasicPic(0x1590+index*0x10, 0, 138, 10+85*S_PaiDuiPageBuffer->tempd2->varIcoIndex, 10, 10+85*S_PaiDuiPageBuffer->tempd2->varIcoIndex+75, 10+285, 91+index*110, 190);
 					}
-						
-					S_PaiDuiPageBuffer->myico.X = 69+(index*119);
-					S_PaiDuiPageBuffer->myico.Y = 135;
-						
-					BasicUI(0x1590+index*0x10 ,0x1907 , 1, &(S_PaiDuiPageBuffer->myico) , sizeof(Basic_ICO));
 				}
 				else
 				{
 					//清除倒计时时间
 					ClearText(0x1610+index*0x08, 10);
 					ClearText(0x1650+index*0x08, 10);
-					//显示蓝色卡
-					S_PaiDuiPageBuffer->myico.ICO_ID = 23;
+					
+					//显示卡凹槽
+					S_PaiDuiPageBuffer->myico.ICO_ID = 37;
 					S_PaiDuiPageBuffer->myico.X = 69+index*119;
 					S_PaiDuiPageBuffer->myico.Y = 135;
-					BasicUI(0x1590+index*0x10 ,0x1907 , 1, &(S_PaiDuiPageBuffer->myico) , sizeof(Basic_ICO));
-					BasicPic(0x1510+index*0x10, 0, 137, 15, 0, 22, 570, 55 , 0);
+					BasicUI(0x1590+index*0x10 ,0x1907 , 0, &(S_PaiDuiPageBuffer->myico) , sizeof(Basic_ICO));
+					
+					//时间进度条显示0
+					WriteVarIcoNum(0x1510+index*16, 0);
 				}
 			}
 			

@@ -34,6 +34,7 @@
 #include	"MAX4051_Driver.h"
 #include	"TLV5617_Driver.h"
 #include	"LEDCheck_Driver.h"
+#include	"DS18b20_Driver.h"
 
 #include	"Delay.h"
 /***************************************************************************************************/
@@ -62,75 +63,78 @@ extern void SystemInit(void);
 void MySystemBSPInit(void)
 {
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
-	
+	delay_ms(1000);
 	SystemInit();						//手动系统初始化
-	delay_ms(10);
+	delay_ms(1000);
 	
 	Led_GPIOInit();						//系统指示灯初始化
-	delay_ms(10);
+	delay_ms(1);
 	
 	Timer4_Init();						//定时器初始化
 	Timer3_Init();						//定时器初始化
-	delay_ms(10);
+	delay_ms(1);
 	
 	Usart3_Init();						//串口3初始化
-	delay_ms(5);
+	delay_ms(1);
 	
 	Usart2_Init();						//串口2初始化
-	delay_ms(5);
+	delay_ms(1);
 	
 	Usart4_Init();						//串口4初始化
-	delay_ms(5);
+	delay_ms(1);
 	
 	Usart6_Init();						//串口6初始化
-	delay_ms(5);
+	delay_ms(1);
 	
 	Usart1_Init();						//串口2初始化
-	delay_ms(5);
+	delay_ms(1);
 
 	ADS_IO_Init();						//ADC IO初始化
-	delay_ms(5);
+	delay_ms(1);
 	
 	DA_IO_Init();						//DA io初始化
-	delay_ms(5);
+	delay_ms(1);
 	
 	Limit_Init();						//限位开关初始化
-	delay_ms(5);
+	delay_ms(1);
 	
 	DRV_Init();							//电机 IO初始化
-	delay_ms(5);
+	delay_ms(1);
 	
 	CodeScanner_GPIOInit();				//二维码初始化
-	delay_ms(5);
+	delay_ms(1);
 	
 	My_USBInit();						//USB端口初始化
-	delay_ms(5);
+	delay_ms(1);
 	
 	SMBus_Init();						//温度检测初始化
-	delay_ms(5);
+	delay_ms(1);
 	
 	RTC_BSPInit();						//RTC初始化
-	delay_ms(5);
+	delay_ms(1);
 	
 	Wifi_GPIOInit();					//WIFI端口初始化
-	delay_ms(5);
+	delay_ms(1);
 	
 	MAX4051_Init();						//采集放大倍数端口初始化
-	delay_ms(5);
+	delay_ms(1);
 	
 	PT8211_GPIOInit();					//音频端口初始化
 	ConfigI2S(16000);
-	delay_ms(5);
+	delay_ms(1);
 
 	TM1623_Init();						//排队模块初始化
-	delay_ms(5);
+	delay_ms(1);
 	
 	LEDCheck_Init();					//检测发光模块的发光二极管状态初始化
+	delay_ms(1);
+	
+	DS18B20_Init();						//初始化18b20
 	delay_ms(1);
 	
 	FatfsInit();						//文件系统初始化
 	
 	IWDG_Init(3, 2000);					//看门狗初始化,超时时间2S
-	delay_ms(5);
+	delay_ms(1);
 }
 

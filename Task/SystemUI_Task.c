@@ -69,11 +69,10 @@ static void vSystemUITask( void *pvParameters )
 		activityFreshFunction();
 		
 		/*500ms更新一次时间和环境温度*/
-		if(count % 10 == 0)
+		if(count % 5 == 0)
 			DspTimeAndTempData();
 		
 		count++;
-		
-//		vTaskDelay(10 / portTICK_RATE_MS);
+
 	}
 }

@@ -11,7 +11,6 @@
 
 #include	"LCD_Driver.h"
 #include	"QueueUnits.h"
-
 #include	"System_Data.h"
 
 #include	"CRC16.h"
@@ -92,7 +91,6 @@ static void WriteLCDRegister(unsigned char reg, void *data, unsigned char len)
 static void ReadLCDRegister(unsigned char reg, unsigned char len)
 {			
 	char *q = NULL;
-	unsigned char i=0;
 	
 	txdat = MyMalloc(16);
 	if(txdat == NULL)
@@ -348,7 +346,7 @@ void DspTimeAndTempData(void)
 		/*ÏÔÊ¾Ê±¼ä*/
 		sprintf(buftime, " 20%02d-%02d-%02d %02d:%02d:%02d", time->year, time->month, time->day,
 			time->hour, time->min, time->sec);
-	
+		
 		DisText(0x1000, buftime, strlen(buftime));
 	}
 
@@ -419,5 +417,14 @@ void DspNum(unsigned short addr , unsigned int num, unsigned char len)
 
 	WriteLCDData(addr, tempbuf, len);
 }
+
+void WriteVarIcoNum(unsigned short addr, unsigned short num)
+{
+	tempbuf[0] = (unsigned char)(num >> 8);
+	tempbuf[1] = (unsigned char)num ;
+
+	WriteLCDData(addr, tempbuf, 2);
+}
+	
 
 

@@ -133,7 +133,6 @@ typedef struct
 #define	CodeMaxLen						300			//???????
 #define	ItemNameLen						20			//????????
 #define	ItemMeasureLen					10			//????????
-#define	CardPiCiHaoLen					30			//????????
 
 
 /*???????*/
@@ -159,12 +158,13 @@ typedef struct CardInfo_Tag
 	unsigned char ItemPoint;							//小数点数目
 	unsigned short ItemLocation;						//T线位置
 	float	ItemFenDuan;								//分段峰高比
-	float	ItemBiaoQu[2][4];							//标准曲线
+	float	ItemBiaoQu[2][3];							//标准曲线
 			//2 --- ?2???
 			//4 --- a , b, c d (????)
 	unsigned char CardWaitTime;							//检测卡反应时间
 	unsigned short CLineLocation;						//c线位置
-	char	CardPiCi[CardPiCiHaoLen];					//批次号
+	char	PiHao[15];									//批次号
+	char	piNum[10];
 	MyTime_Def	CardBaoZhiQi;						//保质期
 	unsigned short CRC16;								//crc
 }CardCodeInfo;
@@ -409,6 +409,11 @@ typedef struct TestData_tag {
 	char sampleid[MaxSampleIDLen];
 	CardCodeInfo temperweima;
 	AdjustData tempadjust;
+/*	float precv1[5];							//预测时的整体cv值
+	float precv2[5];							//预测时的C线cv值
+	unsigned char preChanelIndex[5];			//预测时的通道
+	float cv3;									//正式测试的cv值
+	unsigned char chanelIndex[5];				//正式测时的通道*/
 	TestLine testline;
 	MyTime_Def TestTime;					//测试时间
 	MyTemp_Def TestTemp;					//测试温度
@@ -416,6 +421,8 @@ typedef struct TestData_tag {
 	unsigned short crc;
 }TestData;
 #pragma pack()
+
+
 
 /*********************************************************************************************/
 /*********************************************************************************************/

@@ -82,12 +82,15 @@ static void activityStart(void)
 		
 		timer_set(&(S_WifiPageBuffer->timer), S_WifiPageBuffer->systemSetData.ledSleepTime);
 		
+		SelectPage(112);
+		
+		/*如果不是at模式，则进入at模式*/
+		SetWifiWorkInAT(AT_Mode);
+		
 		RefreshWifi();
 		
 		DisListText();
 	}
-	
-	SelectPage(112);
 }
 
 /***************************************************************************************************
@@ -125,8 +128,6 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 				}
 				else
 				{
-					RestartWifi();
-					vTaskDelay(2000/portTICK_RATE_MS);
 					SendKeyCode(16);
 					vTaskDelay(100/portTICK_RATE_MS);
 					SendKeyCode(1);
@@ -164,6 +165,8 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*返回*/
 		else if(S_WifiPageBuffer->lcdinput[0] == 0x1E50)
 		{
+			RestartWifi();
+			
 			backToFatherActivity();
 		}
 		/*刷新*/
@@ -312,10 +315,6 @@ static MyState_TypeDef RefreshWifi(void)
 		
 		SendKeyCode(5);
 	
-		/*如果不是at模式，则进入at模式*/
-		if(AT_Mode != GetWifiWorkMode())
-			SetWifiWorkInAT(AT_Mode);
-		
 		memset(S_WifiPageBuffer->wifilist, 0, sizeof(WIFI_Def)*MaxWifiListNum);
 		
 		ScanApList(S_WifiPageBuffer->wifilist);
@@ -357,7 +356,7 @@ static void DisListText(void)
 		}
 	}
 	
-	BasicUI(0x1F00 ,0x1907 , S_WifiPageBuffer->wifinum, S_WifiPageBuffer->myico , sizeof(Basic_ICO)*S_WifiPageBuffer->wifinum);
+	BasicUI(0x1F00 ,0x1807 , S_WifiPageBuffer->wifinum, S_WifiPageBuffer->myico , sizeof(Basic_ICO)*S_WifiPageBuffer->wifinum);
 }
 
 
@@ -387,8 +386,6 @@ static void CheckIsNeedKey(void)
 			}
 			else
 			{
-				RestartWifi();
-				vTaskDelay(2000/portTICK_RATE_MS);
 				SendKeyCode(16);
 				vTaskDelay(100 / portTICK_RATE_MS);
 				SendKeyCode(1);
@@ -408,8 +405,6 @@ static void CheckIsNeedKey(void)
 			}
 			else
 			{
-				RestartWifi();
-				vTaskDelay(2000/portTICK_RATE_MS);
 				SendKeyCode(16);
 				vTaskDelay(100 / portTICK_RATE_MS);
 				SendKeyCode(1);	

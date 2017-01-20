@@ -306,7 +306,7 @@ static void CheckQRCode(void)
 		{
 			memcpy(S_AdjustPageBuffer->tempadjust.ItemName, S_AdjustPageBuffer->testdata.testdata.temperweima.ItemName, ItemNameLen);
 			S_AdjustPageBuffer->step = 2;
-			StartTest(&(S_AdjustPageBuffer->testdata.testdata));
+			StartTest(&(S_AdjustPageBuffer->testdata));
 		}
 	}
 }

@@ -27,7 +27,8 @@ typedef struct ReadTestDataPackage_Tag
 
 MyState_TypeDef WriteTestData(TestData * testdata);
 MyState_TypeDef ReadTestData(ReadTestDataPackage * readpackage);
-
+MyState_TypeDef ReadTestDataInverte(ReadTestDataPackage * readpackage);
+MyState_TypeDef WriteTestDataHead(TestDataHead * testDataHead);
 #endif
 
 /****************************************end of file************************************************/

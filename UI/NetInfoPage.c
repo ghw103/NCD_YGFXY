@@ -86,12 +86,15 @@ static void activityStart(void)
 		
 		timer_set(&(S_NetInfoPageBuffer->timer), 2);
 	
+		SelectPage(145);
+		
+		SetWifiWorkInAT(AT_Mode);
+		
 		ReadNetInfo();
 		
 		ShowNetInfo();	
 	}
-	
-	SelectPage(145);
+
 }
 
 /***************************************************************************************************
@@ -116,6 +119,8 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		//返回
 		if(S_NetInfoPageBuffer->lcdinput[0] == 0x1ca0)
 		{
+			RestartWifi();
+			
 			backToFatherActivity();
 		}
 	}
@@ -138,7 +143,7 @@ static void activityFresh(void)
 		{
 			ReadNetInfo();
 			ShowNetInfo();
-			timer_reset(&(S_NetInfoPageBuffer->timer));
+			timer_restart(&(S_NetInfoPageBuffer->timer));
 		}
 		
 		if(TimeOut == timer_expired(&(S_NetInfoPageBuffer->timer2)))
@@ -176,6 +181,7 @@ static void activityResume(void)
 	if(S_NetInfoPageBuffer)
 	{
 		timer_restart(&(S_NetInfoPageBuffer->timer2));
+		timer_restart(&(S_NetInfoPageBuffer->timer));
 	}
 	
 	SelectPage(145);
@@ -255,7 +261,54 @@ static void activityBufferFree(void)
 ***************************************************************************************************/
 static void ReadNetInfo(void)
 {
-	GetWifiStaIP(&(S_NetInfoPageBuffer->netinfo.WifiIP));
+	S_NetInfoPageBuffer->wifiico.ICO_ID = 32;
+	S_NetInfoPageBuffer->wifiico.X = 186;
+	S_NetInfoPageBuffer->wifiico.Y = 315;
+	
+	memset(&(S_NetInfoPageBuffer->WifiIP), 0, sizeof(IP_Def));
+	memset(S_NetInfoPageBuffer->WifiSSID, 0, 30);
+		
+	memset(S_NetInfoPageBuffer->WifiMAC, 0, 13);
+	
+	if(My_Pass == WifiIsConnectted(S_NetInfoPageBuffer->WifiSSID))
+	{
+		//读取IP
+		GetWifiStaIP(&(S_NetInfoPageBuffer->WifiIP));
+		
+		//读取mac
+		GetWifiStaMac(S_NetInfoPageBuffer->WifiMAC);
+		
+		//读取信号强度
+		S_NetInfoPageBuffer->WifiIndicator = GetWifiIndicator();
+		
+		if(S_NetInfoPageBuffer->WifiIndicator <= 10)
+			S_NetInfoPageBuffer->wifiico.ICO_ID = 36;
+		else if(S_NetInfoPageBuffer->WifiIndicator < 40)
+			S_NetInfoPageBuffer->wifiico.ICO_ID = 35;
+		else if(S_NetInfoPageBuffer->WifiIndicator < 70)
+			S_NetInfoPageBuffer->wifiico.ICO_ID = 34;
+		else
+			S_NetInfoPageBuffer->wifiico.ICO_ID = 33;
+		
+		//显示wifi状态图标
+		BasicUI(0x1CB8 ,0x1807 , 1, &(S_NetInfoPageBuffer->wifiico) , sizeof(Basic_ICO));
+		//显示ssid
+		memset(S_NetInfoPageBuffer->tempbuffer1, 0, 100);
+		sprintf(S_NetInfoPageBuffer->tempbuffer1, "%s", S_NetInfoPageBuffer->WifiSSID);
+		DisText(0x1Cf0, S_NetInfoPageBuffer->tempbuffer1, strlen(S_NetInfoPageBuffer->tempbuffer1));
+		
+		//显示ip
+		memset(S_NetInfoPageBuffer->tempbuffer1, 0, 100);
+		sprintf(S_NetInfoPageBuffer->tempbuffer1, "%03d.%03d.%03d.%03d", S_NetInfoPageBuffer->WifiIP.ip_1, S_NetInfoPageBuffer->WifiIP.ip_2, 
+			S_NetInfoPageBuffer->WifiIP.ip_3, S_NetInfoPageBuffer->WifiIP.ip_4);
+		DisText(0x1CC8, S_NetInfoPageBuffer->tempbuffer1, strlen(S_NetInfoPageBuffer->tempbuffer1));
+		//显示mac
+		memset(S_NetInfoPageBuffer->tempbuffer1, 0, 100);
+		sprintf(S_NetInfoPageBuffer->tempbuffer1, "%.2s-%.2s-%.2s-%.2s-%.2s-%.2s", S_NetInfoPageBuffer->WifiMAC, &(S_NetInfoPageBuffer->WifiMAC[2]), &(S_NetInfoPageBuffer->WifiMAC[4]),
+			&(S_NetInfoPageBuffer->WifiMAC[6]), &(S_NetInfoPageBuffer->WifiMAC[8]), &(S_NetInfoPageBuffer->WifiMAC[10]));
+		DisText(0x1Ce0, S_NetInfoPageBuffer->tempbuffer1, 20);
+		
+	}
 }
 
 /***************************************************************************************************
@@ -279,7 +332,7 @@ static void ShowNetInfo(void)
 	S_NetInfoPageBuffer->lineico.X = 185;
 	S_NetInfoPageBuffer->lineico.Y = 130;
 	
-	BasicUI(0x1CB0 ,0x1907 , 1, &(S_NetInfoPageBuffer->lineico) , sizeof(Basic_ICO));
+	BasicUI(0x1CB0 ,0x1807 , 1, &(S_NetInfoPageBuffer->lineico) , sizeof(Basic_ICO));
 	
 	memset(S_NetInfoPageBuffer->tempbuffer1, 0, 100);
 	sprintf(S_NetInfoPageBuffer->tempbuffer1, "%03d.%03d.%03d.%03d", S_NetInfoPageBuffer->netinfo.LineIP.ip_1, S_NetInfoPageBuffer->netinfo.LineIP.ip_2, 

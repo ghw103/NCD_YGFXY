@@ -27,6 +27,7 @@
 ".\obj\sd_spi_driver.o"
 ".\obj\timer4_driver.o"
 ".\obj\ledcheck_driver.o"
+".\obj\ds18b20_driver.o"
 ".\obj\codescanfunction.o"
 ".\obj\getlcdinputfun.o"
 ".\obj\selftest_fun.o"

@@ -117,7 +117,7 @@ static void vLwipDHCPTask( void *pvParameters )
 					/* Read the new IP address */
 					IPaddress = tempnetif->ip_addr.addr;
 
-					if (IPaddress!=0)
+					if (IPaddress != 0)
 					{
 						SetGB_DHCPState(DHCP_ADDRESS_ASSIGNED);					
 						

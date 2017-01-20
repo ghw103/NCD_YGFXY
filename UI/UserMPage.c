@@ -148,7 +148,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 					S_UserMPageBuffer->pageindex++;
 					
 					S_UserMPageBuffer->selectindex = 0;
-						
+
 					ShowList();
 					ShowDetail();
 				}
@@ -455,7 +455,6 @@ static void DeleteAUser(void)
 	{
 		S_UserMPageBuffer->tempuser = &(S_UserMPageBuffer->user[(S_UserMPageBuffer->pageindex-1)*MaxPageShowNum + S_UserMPageBuffer->selectindex-1]);
 		memset(S_UserMPageBuffer->tempuser, 0, sizeof(User_Type));
-		
 		
 		/*±£´æÊý¾Ý*/
 		

@@ -552,6 +552,11 @@
               <FileType>1</FileType>
               <FilePath>..\HardwareDriver\LEDCheck_Driver.c</FilePath>
             </File>
+            <File>
+              <FileName>DS18b20_Driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HardwareDriver\DS18b20_Driver.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

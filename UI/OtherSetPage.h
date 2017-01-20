@@ -13,6 +13,7 @@ typedef struct OtherSetPageBuffer_tag {
 	char buf[50];
 	unsigned short lcdinput[100];
 	unsigned short tempvalue;
+	Basic_ICO ico;
 }OtherSetPageBuffer;
 
 MyState_TypeDef createOtherSetActivity(Activity * thizActivity, Intent * pram);

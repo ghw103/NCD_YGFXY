@@ -143,6 +143,8 @@ ResultState TestFunction(void * parm)
 	if(S_TempCalData)
 	{
 		memset(S_TempCalData, 0, sizeof(TempCalData));
+		//测试数据指针指向传进来的真实数据空间
+		S_TempCalData->itemData = parm;
 		
 		//初始配置
 		SetGB_LedValue(300);
@@ -151,13 +153,10 @@ ResultState TestFunction(void * parm)
 		SetGB_CLineValue(0);
 		vTaskDelay(10/portTICK_RATE_MS);
 		
-		SelectChannel(0);
+		SelectChannel(S_TempCalData->itemData->lastChannelIndex);
 		vTaskDelay(10/portTICK_RATE_MS);
 		
 		SMBUS_SCK_L();
-		
-		//测试数据指针指向传进来的真实数据空间
-		S_TempCalData->testdata = parm;
 		
 		repeat:
 				
@@ -197,16 +196,14 @@ ResultState TestFunction(void * parm)
 						
 						S_TempCalData->tempvalue2 /= FilterNum;
 						
-						S_TempCalData->testdata->testline.TestPoint[index - FilterNum] = S_TempCalData->tempvalue2;
+						S_TempCalData->itemData->testdata.testline.TestPoint[index - FilterNum] = S_TempCalData->tempvalue2;
 							
-						SendTestPointData(&(S_TempCalData->testdata->testline.TestPoint[index - FilterNum]));
+						SendTestPointData(&(S_TempCalData->itemData->testdata.testline.TestPoint[index - FilterNum]));
 					}
 						
 					S_TempCalData->tempvalue1 = 0;
 				}
 			}
-			
-			vTaskDelay(1500/portTICK_RATE_MS);
 			
 			//分析曲线
 			AnalysisTestData(S_TempCalData);
@@ -214,8 +211,8 @@ ResultState TestFunction(void * parm)
 			if(S_TempCalData->resultstatues == NoResult)
 			{
 				//发送一个特定数据，清除曲线
-				S_TempCalData->testdata->testline.TestPoint[0] = 0xffff;
-				SendTestPointData(&(S_TempCalData->testdata->testline.TestPoint[0]));
+				S_TempCalData->itemData->testdata.testline.TestPoint[0] = 0xffff;
+				SendTestPointData(&(S_TempCalData->itemData->testdata.testline.TestPoint[0]));
 				goto repeat;
 			}
 
@@ -226,6 +223,8 @@ ResultState TestFunction(void * parm)
 			SMBUS_SCK_H();
 			
 			SetGB_LedValue(0);
+			
+			vTaskDelay(1500/portTICK_RATE_MS);
 			
 			return S_ResultState;
 	}
@@ -242,40 +241,14 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 	
 	{
 		//计算最大值,平均值
-		S_TempCalData->maxdata = S_TempCalData->testdata->testline.TestPoint[0];
+		S_TempCalData->maxdata = S_TempCalData->itemData->testdata.testline.TestPoint[0];
 		S_TempCalData->tempvalue1 = 0;
 		for(i=0; i<MaxPointLen; i++)
 		{
-			if(S_TempCalData->maxdata < S_TempCalData->testdata->testline.TestPoint[i])
-				S_TempCalData->maxdata = S_TempCalData->testdata->testline.TestPoint[i];
+			if(S_TempCalData->maxdata < S_TempCalData->itemData->testdata.testline.TestPoint[i])
+				S_TempCalData->maxdata = S_TempCalData->itemData->testdata.testline.TestPoint[i];
 			
-			S_TempCalData->tempvalue1 += S_TempCalData->testdata->testline.TestPoint[i];
-		}
-		
-		//平均值
-		S_TempCalData->average = S_TempCalData->tempvalue1 / MaxPointLen;
-		
-		
-		
-		//计算标准差
-		S_TempCalData->tempvalue1 = 0;
-		for(i=0; i<MaxPointLen; i++)
-		{
-			S_TempCalData->tempvalue2 = S_TempCalData->testdata->testline.TestPoint[i];
-			S_TempCalData->tempvalue2 -= S_TempCalData->average;
-			S_TempCalData->tempvalue2 *= S_TempCalData->tempvalue2;
-			S_TempCalData->tempvalue1 += S_TempCalData->tempvalue2;
-		}
-		S_TempCalData->stdev = S_TempCalData->tempvalue1 / MaxPointLen;
-		S_TempCalData->stdev = sqrt(S_TempCalData->stdev);
-		
-		//计算变异系数
-		S_TempCalData->CV1 = S_TempCalData->stdev / S_TempCalData->average;
-		
-		//如果变异系数小于1%，说明采集的为直线，未加样
-		if(S_TempCalData->CV1 < 0.01)
-		{
-			goto END1;
+			S_TempCalData->tempvalue1 += S_TempCalData->itemData->testdata.testline.TestPoint[i];
 		}
 		
 		/*判断测试值是否饱和*/
@@ -284,6 +257,8 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 			if(GetChannel() > 0)
 			{
 				SelectChannel(GetChannel() - 1);
+				
+				S_TempCalData->itemData->lastChannelIndex = GetChannel();
 
 				vTaskDelay(10/portTICK_RATE_MS);
 				return;
@@ -294,40 +269,69 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 			if(GetChannel() < 7)
 			{
 				SelectChannel(GetChannel() + 3);
-
+				
+				S_TempCalData->itemData->lastChannelIndex = GetChannel();
+				
 				vTaskDelay(10/portTICK_RATE_MS);
 				return;
 			}
 		}
 		
-		//找c线
-		S_TempCalData->testdata->testline.C_Point[0] = 0;
-		for(i=S_TempCalData->testdata->temperweima.CLineLocation-30; i<S_TempCalData->testdata->temperweima.CLineLocation+30; i++)
+		//平均值
+		S_TempCalData->average = S_TempCalData->tempvalue1 / MaxPointLen;
+		
+		//计算标准差
+		S_TempCalData->tempvalue1 = 0;
+		for(i=0; i<MaxPointLen; i++)
 		{
-			if(S_TempCalData->testdata->testline.C_Point[0] < S_TempCalData->testdata->testline.TestPoint[i])
+			S_TempCalData->tempvalue2 = S_TempCalData->itemData->testdata.testline.TestPoint[i];
+			S_TempCalData->tempvalue2 -= S_TempCalData->average;
+			S_TempCalData->tempvalue2 *= S_TempCalData->tempvalue2;
+			S_TempCalData->tempvalue1 += S_TempCalData->tempvalue2;
+		}
+		S_TempCalData->stdev = S_TempCalData->tempvalue1 / MaxPointLen;
+		S_TempCalData->stdev = sqrt(S_TempCalData->stdev);
+		
+		//计算变异系数
+		S_TempCalData->CV1 = S_TempCalData->stdev / S_TempCalData->average;
+		
+/*		for(i=0; i<5; i++)
+		{
+			if(S_TempCalData->itemData->testdata.precv1[i] == 0)
+				S_TempCalData->itemData->testdata.precv1[i] = S_TempCalData->CV1;
+		}*/
+		//如果变异系数小于1%，说明采集的为直线，未加样
+		if(S_TempCalData->CV1 < 0.01)
+		{
+			goto END1;
+		}
+		
+		//找c线
+		S_TempCalData->itemData->testdata.testline.C_Point[0] = 0;
+		for(i=S_TempCalData->itemData->testdata.temperweima.CLineLocation-30; i<S_TempCalData->itemData->testdata.temperweima.CLineLocation+30; i++)
+		{
+			if(S_TempCalData->itemData->testdata.testline.C_Point[0] < S_TempCalData->itemData->testdata.testline.TestPoint[i])
 			{
-				S_TempCalData->testdata->testline.C_Point[0] = S_TempCalData->testdata->testline.TestPoint[i];
-				S_TempCalData->testdata->testline.C_Point[1] = i;
+				S_TempCalData->itemData->testdata.testline.C_Point[0] = S_TempCalData->itemData->testdata.testline.TestPoint[i];
+				S_TempCalData->itemData->testdata.testline.C_Point[1] = i;
 			}
 		}
 		
 		//判断C线是不是真实存在
 		S_TempCalData->tempvalue1 = 0;
-		for(i=S_TempCalData->testdata->testline.C_Point[1] - 15; i<S_TempCalData->testdata->testline.C_Point[1] + 15; i++)
+		for(i=S_TempCalData->itemData->testdata.testline.C_Point[1] - 15; i<S_TempCalData->itemData->testdata.testline.C_Point[1] + 15; i++)
 		{
-			S_TempCalData->tempvalue1 += S_TempCalData->testdata->testline.TestPoint[i];
+			S_TempCalData->tempvalue1 += S_TempCalData->itemData->testdata.testline.TestPoint[i];
 		}
 		
 		//平均值
 		S_TempCalData->average = S_TempCalData->tempvalue1 / 30;
 		
-		
-		
 		//计算标准差
 		S_TempCalData->tempvalue1 = 0;
-		for(i=S_TempCalData->testdata->testline.C_Point[1] - 15; i<S_TempCalData->testdata->testline.C_Point[1] + 15; i++)
+		for(i=S_TempCalData->itemData->testdata.testline.C_Point[1] - 15; i<S_TempCalData->itemData->testdata.testline.C_Point[1] + 15; i++)
 		{
-			S_TempCalData->tempvalue2 = S_TempCalData->testdata->testline.TestPoint[i];
+			S_TempCalData->tempvalue2 = S_TempCalData->itemData->testdata.testline.TestPoint[i];
 			S_TempCalData->tempvalue2 -= S_TempCalData->average;
 			S_TempCalData->tempvalue2 *= S_TempCalData->tempvalue2;
 			S_TempCalData->tempvalue1 += S_TempCalData->tempvalue2;
@@ -338,6 +342,12 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 		//计算变异系数
 		S_TempCalData->CV2 = S_TempCalData->stdev / S_TempCalData->average;
 		
+/*		for(i=0; i<5; i++)
+		{
+			if(S_TempCalData->itemData->testdata.precv2[i] == 0)
+				S_TempCalData->itemData->testdata.precv2[i] = S_TempCalData->CV2;
+		}*/
+		
 		//如果变异系数小于1%，说明采集的为直线，未加样
 		if(S_TempCalData->CV2 < 0.01)
 		{
@@ -345,97 +355,93 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 		}
 		
 		//找T线
-		S_TempCalData->testdata->testline.T_Point[0] = 0;
-		for(i=S_TempCalData->testdata->temperweima.ItemLocation-30; i<S_TempCalData->testdata->temperweima.ItemLocation+30; i++)
+		S_TempCalData->itemData->testdata.testline.T_Point[0] = 0;
+		for(i=S_TempCalData->itemData->testdata.temperweima.ItemLocation-30; i<S_TempCalData->itemData->testdata.temperweima.ItemLocation+30; i++)
 		{
-			if(S_TempCalData->testdata->testline.T_Point[0] < S_TempCalData->testdata->testline.TestPoint[i])
+			if(S_TempCalData->itemData->testdata.testline.T_Point[0] < S_TempCalData->itemData->testdata.testline.TestPoint[i])
 			{
-				S_TempCalData->testdata->testline.T_Point[0] = S_TempCalData->testdata->testline.TestPoint[i];
-				S_TempCalData->testdata->testline.T_Point[1] = i;
+				S_TempCalData->itemData->testdata.testline.T_Point[0] = S_TempCalData->itemData->testdata.testline.TestPoint[i];
+				S_TempCalData->itemData->testdata.testline.T_Point[1] = i;
 			}
 		}
 
 		//找基线
-		S_TempCalData->testdata->testline.B_Point[0] = 0xffff;
-		for(i=S_TempCalData->testdata->testline.T_Point[1]; i<S_TempCalData->testdata->testline.C_Point[1]; i++)
+		S_TempCalData->itemData->testdata.testline.B_Point[0] = 0xffff;
+		for(i=S_TempCalData->itemData->testdata.testline.C_Point[1]; i<MaxPointLen; i++)
 		{
-			if(S_TempCalData->testdata->testline.B_Point[0] > S_TempCalData->testdata->testline.TestPoint[i])
+			if(S_TempCalData->itemData->testdata.testline.B_Point[0] > S_TempCalData->itemData->testdata.testline.TestPoint[i])
 			{
-				S_TempCalData->testdata->testline.B_Point[0] = S_TempCalData->testdata->testline.TestPoint[i];
-				S_TempCalData->testdata->testline.B_Point[1] = i;
+				S_TempCalData->itemData->testdata.testline.B_Point[0] = S_TempCalData->itemData->testdata.testline.TestPoint[i];
+				S_TempCalData->itemData->testdata.testline.B_Point[1] = i;
 			}
 		}
 				
 		/*计算结果*/
-		S_TempCalData->tempvalue2 = (S_TempCalData->testdata->testline.T_Point[0] - S_TempCalData->testdata->testline.B_Point[0]);
-		S_TempCalData->tempvalue2 /= (S_TempCalData->testdata->testline.C_Point[0] - S_TempCalData->testdata->testline.B_Point[0]);
+		S_TempCalData->tempvalue2 = (S_TempCalData->itemData->testdata.testline.T_Point[0] - S_TempCalData->itemData->testdata.testline.B_Point[0]);
+		S_TempCalData->tempvalue2 /= (S_TempCalData->itemData->testdata.testline.C_Point[0] - S_TempCalData->itemData->testdata.testline.B_Point[0]);
 				
 		/*原始峰高比*/
-		S_TempCalData->testdata->testline.BasicBili = S_TempCalData->tempvalue2;
+		S_TempCalData->itemData->testdata.testline.BasicBili = S_TempCalData->tempvalue2;
 				
 		/*根据分段，计算原始结果*/
-		if((S_TempCalData->testdata->testline.BasicBili < S_TempCalData->testdata->temperweima.ItemFenDuan) || (S_TempCalData->testdata->temperweima.ItemFenDuan == 0))
+		if((S_TempCalData->itemData->testdata.testline.BasicBili < S_TempCalData->itemData->testdata.temperweima.ItemFenDuan) || (S_TempCalData->itemData->testdata.temperweima.ItemFenDuan == 0))
 		{
-			S_TempCalData->testdata->testline.BasicResult = S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->testline.BasicBili;
-			S_TempCalData->testdata->testline.BasicResult *= S_TempCalData->testdata->temperweima.ItemBiaoQu[0][0];
+			S_TempCalData->itemData->testdata.testline.BasicResult = S_TempCalData->itemData->testdata.testline.BasicBili * S_TempCalData->itemData->testdata.testline.BasicBili;
+			S_TempCalData->itemData->testdata.testline.BasicResult *= S_TempCalData->itemData->testdata.temperweima.ItemBiaoQu[0][0];
 					
-			S_TempCalData->testdata->testline.BasicResult += (S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->temperweima.ItemBiaoQu[0][1]);
+			S_TempCalData->itemData->testdata.testline.BasicResult += (S_TempCalData->itemData->testdata.testline.BasicBili * S_TempCalData->itemData->testdata.temperweima.ItemBiaoQu[0][1]);
 					
-			S_TempCalData->testdata->testline.BasicResult += (S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->temperweima.ItemBiaoQu[0][2]);
-			
-			S_TempCalData->testdata->testline.BasicResult += S_TempCalData->testdata->temperweima.ItemBiaoQu[0][3];
+			S_TempCalData->itemData->testdata.testline.BasicResult += S_TempCalData->itemData->testdata.temperweima.ItemBiaoQu[0][2];
 		}
 		else
 		{
-			S_TempCalData->testdata->testline.BasicResult = S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->testline.BasicBili;
-			S_TempCalData->testdata->testline.BasicResult *= S_TempCalData->testdata->temperweima.ItemBiaoQu[1][0];
+			S_TempCalData->itemData->testdata.testline.BasicResult = S_TempCalData->itemData->testdata.testline.BasicBili * S_TempCalData->itemData->testdata.testline.BasicBili;
+			S_TempCalData->itemData->testdata.testline.BasicResult *= S_TempCalData->itemData->testdata.temperweima.ItemBiaoQu[1][0];
 					
-			S_TempCalData->testdata->testline.BasicResult += (S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->testline.BasicBili * S_TempCalData->testdata->temperweima.ItemBiaoQu[1][1]);
+			S_TempCalData->itemData->testdata.testline.BasicResult += (S_TempCalData->itemData->testdata.testline.BasicBili * S_TempCalData->itemData->testdata.temperweima.ItemBiaoQu[1][1]);
 					
-			S_TempCalData->testdata->testline.BasicResult += (S_TempCalData->testdata->temperweima.ItemBiaoQu[1][2] * S_TempCalData->testdata->testline.BasicBili);
-			
-			S_TempCalData->testdata->testline.BasicResult += S_TempCalData->testdata->temperweima.ItemBiaoQu[1][3];
+			S_TempCalData->itemData->testdata.testline.BasicResult += S_TempCalData->itemData->testdata.temperweima.ItemBiaoQu[1][2];
 		}
 				
-		if(S_TempCalData->testdata->testline.BasicResult < 0)
-			S_TempCalData->testdata->testline.BasicResult = 0;
+		if(S_TempCalData->itemData->testdata.testline.BasicResult < 0)
+			S_TempCalData->itemData->testdata.testline.BasicResult = 0;
 			
-		if(S_TempCalData->testdata->tempadjust.crc == CalModbusCRC16Fun1(&(S_TempCalData->testdata->tempadjust), sizeof(AdjustData)-2) )
-			S_TempCalData->testdata->testline.AdjustResult =  S_TempCalData->testdata->testline.BasicResult * S_TempCalData->testdata->tempadjust.parm;
+		if(S_TempCalData->itemData->testdata.tempadjust.crc == CalModbusCRC16Fun1(&(S_TempCalData->itemData->testdata.tempadjust), sizeof(AdjustData)-2) )
+			S_TempCalData->itemData->testdata.testline.AdjustResult =  S_TempCalData->itemData->testdata.testline.BasicResult * S_TempCalData->itemData->testdata.tempadjust.parm;
 		else
-			S_TempCalData->testdata->testline.AdjustResult =  S_TempCalData->testdata->testline.BasicResult;
+			S_TempCalData->itemData->testdata.testline.AdjustResult =  S_TempCalData->itemData->testdata.testline.BasicResult;
 		
 		S_TempCalData->resultstatues = ResultIsOK;
-		S_TempCalData->testdata->testline.BasicBili = S_TempCalData->CV1;
-			S_TempCalData->testdata->testline.BasicResult = S_TempCalData->CV2;
+		S_TempCalData->itemData->testdata.testline.BasicBili = S_TempCalData->CV1;
+		S_TempCalData->itemData->testdata.testline.BasicResult = S_TempCalData->CV2;
 		return ;
 		
 		//未加样
 		END1:
-			S_TempCalData->testdata->testline.T_Point[0] = 0;
-			S_TempCalData->testdata->testline.T_Point[1] = 0;
-			S_TempCalData->testdata->testline.T_Point[0] = 0;
-			S_TempCalData->testdata->testline.T_Point[1] = 0;
-			S_TempCalData->testdata->testline.T_Point[0] = 0;
-			S_TempCalData->testdata->testline.T_Point[1] = 0;
-			S_TempCalData->testdata->testline.BasicBili = S_TempCalData->CV1;
-			S_TempCalData->testdata->testline.BasicResult = S_TempCalData->CV2;
-			S_TempCalData->testdata->testline.AdjustResult = 0;
+			S_TempCalData->itemData->testdata.testline.T_Point[0] = 0;
+			S_TempCalData->itemData->testdata.testline.T_Point[1] = 0;
+			S_TempCalData->itemData->testdata.testline.T_Point[0] = 0;
+			S_TempCalData->itemData->testdata.testline.T_Point[1] = 0;
+			S_TempCalData->itemData->testdata.testline.T_Point[0] = 0;
+			S_TempCalData->itemData->testdata.testline.T_Point[1] = 0;
+			S_TempCalData->itemData->testdata.testline.BasicBili = S_TempCalData->CV1;
+			S_TempCalData->itemData->testdata.testline.BasicResult = S_TempCalData->CV2;
+			S_TempCalData->itemData->testdata.testline.AdjustResult = 0;
 			
 			S_TempCalData->resultstatues = NoSample;
 			
 			return ;
 		
 		END2:
-			S_TempCalData->testdata->testline.T_Point[0] = 0;
-			S_TempCalData->testdata->testline.T_Point[1] = 0;
-			S_TempCalData->testdata->testline.T_Point[0] = 0;
-			S_TempCalData->testdata->testline.T_Point[1] = 0;
-			S_TempCalData->testdata->testline.T_Point[0] = 0;
-			S_TempCalData->testdata->testline.T_Point[1] = 0;
-			S_TempCalData->testdata->testline.BasicBili = S_TempCalData->CV1;
-			S_TempCalData->testdata->testline.BasicResult = S_TempCalData->CV2;
-			S_TempCalData->testdata->testline.AdjustResult = 0;
+			S_TempCalData->itemData->testdata.testline.T_Point[0] = 0;
+			S_TempCalData->itemData->testdata.testline.T_Point[1] = 0;
+			S_TempCalData->itemData->testdata.testline.T_Point[0] = 0;
+			S_TempCalData->itemData->testdata.testline.T_Point[1] = 0;
+			S_TempCalData->itemData->testdata.testline.T_Point[0] = 0;
+			S_TempCalData->itemData->testdata.testline.T_Point[1] = 0;
+			S_TempCalData->itemData->testdata.testline.BasicBili = S_TempCalData->CV1;
+			S_TempCalData->itemData->testdata.testline.BasicResult = S_TempCalData->CV2;
+			S_TempCalData->itemData->testdata.testline.AdjustResult = 0;
 			
 			S_TempCalData->resultstatues = PeakError;
 			

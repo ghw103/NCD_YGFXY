@@ -83,7 +83,7 @@ static void activityStart(void)
 	SetLEDLight(100);
 	SelectPage(0);
 	
-	AddNumOfSongToList(52, 0);
+	AddNumOfSongToList(0, 0);
 }
 
 /***************************************************************************************************
@@ -174,28 +174,35 @@ static void activityFresh(void)
 			{
 				SelectPage(81);
 				
+				vTaskDelay(1000 / portTICK_RATE_MS);
+				
 				SendKeyCode(5);
+				
+				AddNumOfSongToList(5, 0);
 			}
 			//led异常，告警发光模块错误
 			else if(Light_Error == S_WelcomePageBuffer->selfTestStatus)
 			{
 				SelectPage(81);
-				
+				vTaskDelay(1000 / portTICK_RATE_MS);
 				SendKeyCode(4);
+				AddNumOfSongToList(4, 0);
 			}
 			//采集异常，告警采集模块错误
 			else if(AD_ERROR == S_WelcomePageBuffer->selfTestStatus)
 			{
 				SelectPage(81);
-				
+				vTaskDelay(1000 / portTICK_RATE_MS);
 				SendKeyCode(3);
+				AddNumOfSongToList(3, 0);
 			}
 			//传动异常，告警传动模块错误
 			else if(Motol_ERROR == S_WelcomePageBuffer->selfTestStatus)
 			{
 				SelectPage(81);
-				
+				vTaskDelay(1000 / portTICK_RATE_MS);
 				SendKeyCode(1);
+				AddNumOfSongToList(1, 0);
 			}
 		}
 		

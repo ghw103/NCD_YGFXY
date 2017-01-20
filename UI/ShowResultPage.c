@@ -263,7 +263,7 @@ static void RefreshText(void)
 		sprintf(S_ShowPageBuffer->tempbuf, "%2.1f", S_ShowPageBuffer->testdata.TestTemp.O_Temperature);
 		DisText(0x2330, S_ShowPageBuffer->tempbuf, 8);
 				
-		sprintf(S_ShowPageBuffer->tempbuf, "%s", S_ShowPageBuffer->testdata.temperweima.CardPiCi);
+		sprintf(S_ShowPageBuffer->tempbuf, "%s", S_ShowPageBuffer->testdata.temperweima.PiHao);
 		DisText(0x2340, S_ShowPageBuffer->tempbuf, 30);
 				
 		sprintf(S_ShowPageBuffer->tempbuf, "%.2f", S_ShowPageBuffer->testdata.testline.AdjustResult);
@@ -353,7 +353,7 @@ static void dspIco(void)
 		tempvalue += 139;										//曲线窗口起始y
 		S_ShowPageBuffer->myico[2].Y = (unsigned short)tempvalue - 5;
 		
-		BasicUI(0x2380 ,0x1907 , 3, &(S_ShowPageBuffer->myico[0]) , sizeof(Basic_ICO)*3);
+		BasicUI(0x2380 ,0x1807 , 3, &(S_ShowPageBuffer->myico[0]) , sizeof(Basic_ICO)*3);
 	}
 }
 

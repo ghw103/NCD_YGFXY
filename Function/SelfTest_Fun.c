@@ -34,6 +34,7 @@
 
 #include	"stdlib.h"
 #include	<string.h>
+
 /***************************************************************************************************/
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
@@ -113,15 +114,6 @@ void SelfTest_Function(void)
 		return;
 	}
 	
-	//检测led
-/*	if(My_Pass == testLed())
-		sendSelfTestStatus(Light_OK);
-	else
-	{
-		sendSelfTestStatus(Light_Error);
-		return;
-	}*/
-	
 	//测试采集模块
 	if(My_Pass == testADModel())
 		sendSelfTestStatus(AD_OK);
@@ -131,14 +123,23 @@ void SelfTest_Function(void)
 		return;
 	}
 	
-	//测试二维码
+	//检测led
+	if(My_Pass == testLed())
+		sendSelfTestStatus(Light_OK);
+	else
+	{
+		sendSelfTestStatus(Light_Error);
+		return;
+	}
+	
+/*	//测试二维码
 	if(My_Pass == testErWeiMa())
 		sendSelfTestStatus(Erweima_OK);
 	else
 	{
 		sendSelfTestStatus(Erweima_ERROR);
 		return;
-	}
+	}*/
 	
 	//测试传动模块
 	if(My_Pass == testMotol())
@@ -148,6 +149,8 @@ void SelfTest_Function(void)
 		sendSelfTestStatus(Motol_ERROR);
 		return;
 	}
+	
+	WIFIInit();
 	
 	//自检完成，发送结果
 	sendSelfTestStatus(SelfTest_OK);
@@ -210,10 +213,23 @@ static MyState_TypeDef loadSystemData(void)
 ***************************************************************************************************/
 static MyState_TypeDef testLed(void)
 {
-	if(LED_OK == ReadLEDStatus())
-		return My_Pass;
-	else
+	SetGB_LedValue(0);
+	vTaskDelay(100 / portTICK_RATE_MS);
+	if(LED_Error != ReadLEDStatus())
 		return My_Fail;
+	
+	SetGB_LedValue(300);
+	vTaskDelay(100 / portTICK_RATE_MS);
+	if(LED_OK == ReadLEDStatus())
+	{
+		SetGB_LedValue(0);
+		return My_Pass;
+	}
+	else
+	{
+		SetGB_LedValue(0);
+		return My_Fail;
+	}
 }
 
 /***************************************************************************************************
@@ -228,19 +244,35 @@ static MyState_TypeDef testLed(void)
 static MyState_TypeDef testADModel(void)
 {
 	double tempvalue1 = 0.0, tempvalue2 = 0.0;
+	float bili[7] = {1.874, 2.725, 3.656, 4.835, 5.878, 6.973, 8.328};
+	unsigned char i=0;
 	
-	SelectChannel(0);
+	SetGB_LedValue(300);
 	vTaskDelay(100 / portTICK_RATE_MS);
-	tempvalue1 = ADS8325();
+	
+	for(i=1; i<8; i++)
+	{
+		SelectChannel(0);
+		vTaskDelay(100 / portTICK_RATE_MS);
+		tempvalue1 = ADS8325();
 
-	SelectChannel(7);
-	vTaskDelay(100 / portTICK_RATE_MS);
-	tempvalue2 = ADS8325();
+		SelectChannel(i);
+		vTaskDelay(100 / portTICK_RATE_MS);
+		tempvalue2 = ADS8325();
+		
+		tempvalue2 /= tempvalue1;
+		
+		tempvalue1 = bili[i-1];
+		
+		tempvalue2 /= tempvalue1;
+		
+		if(tempvalue2 > 1.1)
+			;//return My_Fail;
+		//else if(tempvalue2 < 0.9)
+		//	return My_Fail;	
+	}
 	
-	if(tempvalue2 < tempvalue1)
-		return My_Fail;
-	else
-		return My_Pass;
+	return My_Pass;
 }
 
 /***************************************************************************************************
@@ -337,7 +369,7 @@ MyState_TypeDef testErWeiMa(void)
 	*p++ = 0x01;
 	*p++ = 0xee;
 	*p++ = 0xa8;
-
+/*
 	for(i=0; i<3; i++)
 	{
 		if(pdPASS == SendDataToQueue(GetUsart2TXQueue(), GetUsart2TXMutex(),temp1, 9, 1, 500/portTICK_RATE_MS, EnableUsart2TXInterrupt))
@@ -359,7 +391,7 @@ MyState_TypeDef testErWeiMa(void)
 			}
 		}	
 	}
-	
+	*/
 	END:
 		MyFree(temp1);
 		MyFree(temp2);

@@ -15,6 +15,7 @@
 
 #include	"OutModel_Fun.h"
 #include	"Universal_Fun.h"
+
 #include	"Motor_Data.h"
 #include	"CardStatues_Data.h"
 
@@ -70,23 +71,26 @@ static void vUniversalTask( void *pvParameters )
 	while(1)
 	{		
 		/*读取时间，500ms采集一次*/
-		if(count % 50 == 0)
+		if(count % 1 == 0)
 			UpDateGB_Time();
 		
 		/*检测卡状态，500ms间隔*/
-		if(count % 50 == 0)
+		if(count % 1 == 0)
 			CheckCardStatues();
 		
 		/*系统状态灯*/
-		if(count % 10 == 0)
+		if(count % 1 == 0)
 			LedToggle();
 		
-		/*控制排队模块状态*/
+		//读取环境温度
 		if(count % 10 == 0)
-			ChangeOutModelStatues();
+			ReadEnvironmentTemperature();
+		
+		/*控制排队模块状态*/
+		ChangeOutModelStatues();
 		
 		count++;
 		
-		vTaskDelay(10 * portTICK_RATE_MS);
+		vTaskDelay(100 * portTICK_RATE_MS);
 	}
 }

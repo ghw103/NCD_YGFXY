@@ -87,15 +87,13 @@ static void vTestTask( void *pvParameters )
 				SetTestStatusFlorLab(0);
 			#endif
 		}
-		
-		vTaskDelay(500 * portTICK_RATE_MS);
 	}
 }
 
 
 MyState_TypeDef StartTest(void * parm)
 {
-	if(pdPASS == xQueueSend( xStartTestQueue, &parm, 10*portTICK_RATE_MS ))
+	if(pdPASS == xQueueSend( xStartTestQueue, &parm, 10/portTICK_RATE_MS ))
 		return My_Pass;
 	else
 		return My_Fail;	

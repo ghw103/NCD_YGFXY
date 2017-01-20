@@ -21,6 +21,7 @@
 #include	"SDFunction.h"
 #include	"MyTools.h"
 #include	"CRC16.h"
+#include	"System_Data.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -47,8 +48,7 @@ static void activityBufferFree(void);
 static void CheckQRCode(void);
 static void ShowCardInfo(void);
 static void CheckPreTestCard(void);
-static void RefreshCurve(void);
-static void AddDataToLine(unsigned short data);
+static void showTemperature(void);
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -93,15 +93,9 @@ static void activityStart(void)
 {
 	if(S_PreReadPageBuffer)
 	{
-		/*清除界面*/
-		ClearText(0x1420, 30);
-		ClearText(0x1430, 30);
-		ClearText(0x1440, 10);
-		ClearText(0x1450, 30);
-		
 		S_PreReadPageBuffer->currenttestdata = GetCurrentTestItem();
 		
-		AddNumOfSongToList(44, 0);
+		showTemperature();
 		
 		StartScanQRCode(&(S_PreReadPageBuffer->temperweima));
 	}
@@ -163,10 +157,6 @@ static void activityFresh(void)
 	if(S_PreReadPageBuffer)
 	{
 		CheckQRCode();
-	
-		
-
-		RefreshCurve();
 		
 		CheckPreTestCard();
 	}
@@ -261,27 +251,27 @@ static void activityBufferFree(void)
 
 static void CheckQRCode(void)
 {
-	if((S_PreReadPageBuffer) && (My_Pass == TakeScanQRCodeResult(&(S_PreReadPageBuffer->scancode))))
+	if(My_Pass == TakeScanQRCodeResult(&(S_PreReadPageBuffer->scancode)))
 	{	
-		ClearLine(0x56);
+		//二维码读取失败
 		if((S_PreReadPageBuffer->scancode == CardCodeScanFail) || (S_PreReadPageBuffer->scancode == CardCodeCardOut) ||
 			(S_PreReadPageBuffer->scancode == CardCodeScanTimeOut) || (S_PreReadPageBuffer->scancode == CardCodeCRCError))
 		{
 			SendKeyCode(1);
 			MotorMoveTo(MaxLocation, 1);
-			AddNumOfSongToList(23, 0);
+			AddNumOfSongToList(12, 0);
 		}
+		//过期
 		else if(S_PreReadPageBuffer->scancode == CardCodeTimeOut)
 		{
 			SendKeyCode(4);
 			MotorMoveTo(MaxLocation, 1);
-			AddNumOfSongToList(21, 0);
+			AddNumOfSongToList(15, 0);
 		}
+		//读取成功
 		else if(S_PreReadPageBuffer->scancode == CardCodeScanOK)
 		{
-			//获取检测卡温度
-			S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.O_Temperature = GetCardTemperature();
-			
+
 			ShowCardInfo();
 			
 			//如果测试数据包中的二维码crc校验错误，则表明是第一次读取二维码
@@ -293,24 +283,29 @@ static void CheckQRCode(void)
 				//设置倒计时时间
 				timer_set(&(S_PreReadPageBuffer->currenttestdata->timer), S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardWaitTime*60);
 			
+				//查找卡图标索引
+				S_PreReadPageBuffer->currenttestdata->varIcoIndex = CheckItemPicIndex(S_PreReadPageBuffer->currenttestdata->testdata.temperweima.ItemName);
 				//读取校准参数
 				memcpy(S_PreReadPageBuffer->currenttestdata->testdata.tempadjust.ItemName, S_PreReadPageBuffer->currenttestdata->testdata.temperweima.ItemName, ItemNameLen);
 				if(My_Fail == ReadAdjustData(&(S_PreReadPageBuffer->currenttestdata->testdata.tempadjust)))
 					memset(&(S_PreReadPageBuffer->currenttestdata->testdata.tempadjust), 0, sizeof(AdjustData));
 				
-				StartTest(&(S_PreReadPageBuffer->currenttestdata->testdata));
+				StartTest(S_PreReadPageBuffer->currenttestdata);
 			}
 			else
 			{
 				//校验试机卡编号
-				if(pdFAIL == CheckStrIsSame(S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardPiCi, S_PreReadPageBuffer->temperweima.CardPiCi, CardPiCiHaoLen))
+				if((pdPASS == CheckStrIsSame(S_PreReadPageBuffer->currenttestdata->testdata.temperweima.PiHao, S_PreReadPageBuffer->temperweima.PiHao, 15)) &&
+					(pdPASS == CheckStrIsSame(S_PreReadPageBuffer->currenttestdata->testdata.temperweima.piNum, S_PreReadPageBuffer->temperweima.piNum, 5)))
+				{
+					startActivity(createTimeDownActivity, NULL);
+				}
+				//试剂卡变更
+				else
 				{
 					SendKeyCode(2);
 					MotorMoveTo(MaxLocation, 1);
-				}
-				else
-				{
-					startActivity(createTimeDownActivity, NULL);
+					AddNumOfSongToList(13, 0);
 				}
 			}
 		}
@@ -319,22 +314,33 @@ static void CheckQRCode(void)
 
 static void CheckPreTestCard(void)
 {
-	if((S_PreReadPageBuffer) && (My_Pass == TakeTestResult(&(S_PreReadPageBuffer->cardpretestresult))))
+	if(My_Pass == TakeTestResult(&(S_PreReadPageBuffer->cardpretestresult)))
 	{
-		ShowCardInfo();
+		timer_restart(&(S_PreReadPageBuffer->currenttestdata->timer));
 		
-		if(S_PreReadPageBuffer->cardpretestresult == TestInterrupt)
+		//未加样
+		if(S_PreReadPageBuffer->cardpretestresult == NoSample)
 		{
-			SendKeyCode(1);
-			MotorMoveTo(MaxLocation, 1);
-			AddNumOfSongToList(22, 0);
-			memset(&(S_PreReadPageBuffer->currenttestdata->testdata.temperweima), 0, sizeof(CardCodeInfo));
+			//未加样重测3次，第三次未加样则表明真的未加样
+			S_PreReadPageBuffer->preTestErrorCount++;
+			if(S_PreReadPageBuffer->preTestErrorCount < 5)
+			{
+				
+				StartTest(S_PreReadPageBuffer->currenttestdata);
+			}
+			else 
+			{
+				SendKeyCode(5);
+				MotorMoveTo(MaxLocation, 1);
+				AddNumOfSongToList(16, 0);
+				memset(&(S_PreReadPageBuffer->currenttestdata->testdata.temperweima), 0, sizeof(CardCodeInfo));
+			}
 		}
-		else if(S_PreReadPageBuffer->cardpretestresult == NoSample)
+		else if(S_PreReadPageBuffer->cardpretestresult == ResultIsOK)
 		{
-			SendKeyCode(5);
+			SendKeyCode(3);
 			MotorMoveTo(MaxLocation, 1);
-			AddNumOfSongToList(22, 0);
+			AddNumOfSongToList(14, 0);
 			memset(&(S_PreReadPageBuffer->currenttestdata->testdata.temperweima), 0, sizeof(CardCodeInfo));
 		}
 		else if(S_PreReadPageBuffer->cardpretestresult == PeakError)
@@ -345,35 +351,24 @@ static void CheckPreTestCard(void)
 				MotorMoveTo(MaxLocation, 1);
 				
 				S_PreReadPageBuffer->currenttestdata->statues = startpaidui;
-				timer_restart(&(S_PreReadPageBuffer->currenttestdata->timer));
 
 				startActivity(createPaiDuiActivity, NULL);
 			}
 			else
 			{		
-				timer_restart(&(S_PreReadPageBuffer->currenttestdata->timer));
-				
 				startActivity(createTimeDownActivity, NULL);
 			}
 		}
-		else if(S_PreReadPageBuffer->cardpretestresult == ResultIsOK)
-		{
-			SendKeyCode(3);
-			MotorMoveTo(MaxLocation, 1);
-			AddNumOfSongToList(22, 0);
-			memset(&(S_PreReadPageBuffer->currenttestdata->testdata.temperweima), 0, sizeof(CardCodeInfo));
-		}
+		
 	}
 }
 
 static void ShowCardInfo(void)
 {
-	double tempvalue = 0.0;
-	
 	sprintf(S_PreReadPageBuffer->buf, "%s", S_PreReadPageBuffer->temperweima.ItemName);
 	DisText(0x1420, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
 			
-	sprintf(S_PreReadPageBuffer->buf, "%s", S_PreReadPageBuffer->temperweima.CardPiCi);
+	sprintf(S_PreReadPageBuffer->buf, "%s", S_PreReadPageBuffer->temperweima.PiHao);
 	DisText(0x1430, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
 			
 	sprintf(S_PreReadPageBuffer->buf, "%d", S_PreReadPageBuffer->temperweima.CardWaitTime*60);
@@ -382,113 +377,20 @@ static void ShowCardInfo(void)
 	sprintf(S_PreReadPageBuffer->buf, "20%02d年%02d月%02d日", S_PreReadPageBuffer->temperweima.CardBaoZhiQi.year, S_PreReadPageBuffer->temperweima.CardBaoZhiQi.month,
 		S_PreReadPageBuffer->temperweima.CardBaoZhiQi.day);
 	DisText(0x1450, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf));
+}
+
+static void showTemperature(void)
+{
+	//获取检测卡温度
+	S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.O_Temperature = GetCardTemperature();
+	S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.E_Temperature = GetGB_EnTemperature();
 	
 	memset(S_PreReadPageBuffer->buf, 0, 40);
-	sprintf(S_PreReadPageBuffer->buf, "cv1=%.3f", S_PreReadPageBuffer->currenttestdata->testdata.testline.BasicBili);
-//	sprintf(S_PreReadPageBuffer->buf, "%2.1f", S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.O_Temperature);
+	sprintf(S_PreReadPageBuffer->buf, "%2.1f", S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.O_Temperature);
 	DisText(0x1460, S_PreReadPageBuffer->buf, 20);
 	
 	memset(S_PreReadPageBuffer->buf, 0, 40);
-	sprintf(S_PreReadPageBuffer->buf, "cv2=%.3f",S_PreReadPageBuffer->currenttestdata->testdata.testline.BasicResult);
+	sprintf(S_PreReadPageBuffer->buf, "%2.1f",S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.E_Temperature);
 	DisText(0x1470, S_PreReadPageBuffer->buf, 20);
-	
-	if(S_PreReadPageBuffer->cardpretestresult == ResultIsOK)
-	{
-		//在曲线上标记出T,C,基线
-		S_PreReadPageBuffer->myico[0].ICO_ID = 22;
-		S_PreReadPageBuffer->myico[0].X = 505+S_PreReadPageBuffer->currenttestdata->testdata.testline.T_Point[1]-5;
-		tempvalue = S_PreReadPageBuffer->currenttestdata->testdata.testline.T_Point[0];
-		tempvalue /= S_PreReadPageBuffer->line.Y_Scale*2;
-		tempvalue = 1-tempvalue;
-		tempvalue *= 302;										//曲线窗口宽度
-		tempvalue += 139;										//曲线窗口起始y
-		S_PreReadPageBuffer->myico[0].Y = (unsigned short)tempvalue - 5;
-		
-		S_PreReadPageBuffer->myico[1].ICO_ID = 22;
-		S_PreReadPageBuffer->myico[1].X = 505+S_PreReadPageBuffer->currenttestdata->testdata.testline.C_Point[1]-5;
-		tempvalue = S_PreReadPageBuffer->currenttestdata->testdata.testline.C_Point[0];
-		tempvalue /= S_PreReadPageBuffer->line.Y_Scale*2;
-		tempvalue = 1-tempvalue;
-		tempvalue *= 302;										//曲线窗口宽度
-		tempvalue += 139;										//曲线窗口起始y
-		S_PreReadPageBuffer->myico[1].Y = (unsigned short)tempvalue - 5;
-		
-		S_PreReadPageBuffer->myico[2].ICO_ID = 22;
-		S_PreReadPageBuffer->myico[2].X = 505+S_PreReadPageBuffer->currenttestdata->testdata.testline.B_Point[1]-5;
-		tempvalue = S_PreReadPageBuffer->currenttestdata->testdata.testline.B_Point[0];
-		tempvalue /= S_PreReadPageBuffer->line.Y_Scale*2;
-		tempvalue = 1-tempvalue;
-		tempvalue *= 302;										//曲线窗口宽度
-		tempvalue += 139;										//曲线窗口起始y
-		S_PreReadPageBuffer->myico[2].Y = (unsigned short)tempvalue - 5;
-		
-		BasicUI(0x1880 ,0x1907 , 3, &(S_PreReadPageBuffer->myico[0]) , sizeof(Basic_ICO)*3);
-	}
-	else
-	{
-		memset(S_PreReadPageBuffer->myico, 0, sizeof(Basic_ICO)*3);
-		BasicUI(0x1880 ,0x1907 , 3, &S_PreReadPageBuffer->myico[0] , sizeof(Basic_ICO)*3);
-	}
 }
 
-/*更新数据*/
-static void RefreshCurve(void)
-{
-	unsigned short temp;
-	
-	if(pdTRUE == TakeTestPointData(&temp))
-	{
-		if(0xffff == temp)
-		{
-			ClearLine(0x56);
-				
-			//初始化测试曲线
-			S_PreReadPageBuffer->line.MaxData = 0;
-			S_PreReadPageBuffer->line.MUL_Y = 1;
-			S_PreReadPageBuffer->line.Y_Scale = 100;
-				
-			SetChartSize(0x1870 , S_PreReadPageBuffer->line.MUL_Y);
-		}
-		else
-			AddDataToLine(temp);
-	}
-
-}
-
-
-static void AddDataToLine(unsigned short data)
-{
-	unsigned short tempdata = data;
-	double TempMul_Y2;
-	double TempY_Scale;
-	unsigned short tempvalue;
-	
-	if(S_PreReadPageBuffer->line.MaxData <= tempdata)
-	{
-		S_PreReadPageBuffer->line.MaxData = tempdata;
-
-		////////////////////////针对当前曲线最大值计算y轴放大倍数//////////////////////////////////////
-		TempMul_Y2 = TestLineHigh1;
-		TempMul_Y2 /= S_PreReadPageBuffer->line.MaxData;
-		TempMul_Y2 *= 0.8;			//*0.8是将最大值缩放到满刻度的0.8高度处
-
-		
-		tempvalue = (unsigned short)(TempMul_Y2*10);
-		S_PreReadPageBuffer->line.MUL_Y = ((tempvalue%10) > 5)?(tempvalue/10 + 1):(tempvalue/10);
-		
-		if(S_PreReadPageBuffer->line.MUL_Y < 1)			//最小值为1
-			S_PreReadPageBuffer->line.MUL_Y = 1;
-
-		/////////////////////////针对当前放大倍数，计算y轴刻度递增基数/////////////////////////////////////
-		TempY_Scale = TestLineHigh1 ;
-		TempY_Scale /= S_PreReadPageBuffer->line.MUL_Y;
-		TempY_Scale /= 2.0;																//目前显示2个y轴刻度
-		S_PreReadPageBuffer->line.Y_Scale = (unsigned short)TempY_Scale;
-		
-		SetChartSize(0x1870 , S_PreReadPageBuffer->line.MUL_Y);
-
-
-	}
-	DisPlayLine(0 , &tempdata , 1);
-
-}

@@ -17,6 +17,7 @@
 #include	"LunchPage.h"
 #include	"Printf_Fun.h"
 #include	"Motor_Fun.h"
+#include	"CardStatues_Data.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -31,8 +32,10 @@ static TestPageBuffer * S_TestPageBuffer = NULL;
 const unsigned int TestLineHigh = 77010;	//此数据与曲线显示区域高度有关，如果界面不改，此数不改
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
+static void InitCurve(void);
 static void RefreshCurve(void);
 static void AddDataToLine(unsigned short data);
+static void InitPageText(void);
 static void RefreshPageText(void);
 
 static void activityStart(void);
@@ -43,6 +46,7 @@ static void activityResume(void);
 static void activityDestroy(void);
 static MyState_TypeDef activityBufferMalloc(void);
 static void activityBufferFree(void);
+static void printfTestData(void);
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -87,25 +91,15 @@ static void activityStart(void)
 {
 	if(S_TestPageBuffer)
 	{
-		/*清空曲线*/
-		ClearLine(0x56);
-		
-		//初始化测试曲线
-		S_TestPageBuffer->line.MaxData = 0;
-		S_TestPageBuffer->line.MUL_Y = 1;
-		S_TestPageBuffer->line.Y_Scale = 100;
-		
-		SetChartSize(0x1870 , S_TestPageBuffer->line.MUL_Y);
-		
-		DspNum(0x180B , S_TestPageBuffer->line.Y_Scale, 2);
-		DspNum(0x180A , S_TestPageBuffer->line.Y_Scale*2, 2);
-		
 		/*获取当前测试数据的地址*/
 		S_TestPageBuffer->currenttestdata = GetCurrentTestItem();
 		
-		RefreshPageText();
-
-		StartTest(&(S_TestPageBuffer->currenttestdata->testdata));
+		InitCurve();
+		
+		//必须在获取当前测试数据地址后使用
+		InitPageText();
+		
+		StartTest(S_TestPageBuffer->currenttestdata);
 	}
 	
 	SelectPage(96);
@@ -156,17 +150,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*打印数据*/
 		else if(0x1800 == S_TestPageBuffer->lcdinput[0])
 		{
-			if(S_TestPageBuffer->cardpretestresult == ResultIsOK)
-			{
-				if(My_Pass == ConnectPrintter())
-				{
-					SendKeyCode(6);
-					PrintfData(&(S_TestPageBuffer->currenttestdata->testdata));
-					SendKeyCode(16);
-				}
-				else
-					SendKeyCode(4);
-			}
+			printfTestData();
 		}
 	}
 }
@@ -183,7 +167,25 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 static void activityFresh(void)
 {
 	if(S_TestPageBuffer)
+	{
 		RefreshCurve();
+		
+		//如果打印完毕，且卡拔出，则退出
+		if(S_TestPageBuffer->cardpretestresult != NoResult) 
+		{
+			if((S_TestPageBuffer->isPrintfData == 0) && (GetCardState() == NoCard) &&(MaxLocation == GetGB_MotorLocation()))
+			{
+				//删除当前测试
+				DeleteCurrentTest();
+					
+				backToActivity(lunchActivityName);
+					
+				//如果还有卡在排队，则直接跳到排队界面
+				if(IsPaiDuiTestting())
+					startActivity(createPaiDuiActivity, NULL);
+			}
+		}
+	}
 }
 
 /***************************************************************************************************
@@ -272,6 +274,44 @@ static void activityBufferFree(void)
 }
 
 
+static void InitCurve(void)
+{
+	ClearLine(0x56);
+				
+	//初始化测试曲线
+	S_TestPageBuffer->line.MaxData = 0;
+	S_TestPageBuffer->line.MUL_Y = 1;
+	S_TestPageBuffer->line.Y_Scale = 100;
+				
+	SetChartSize(0x1870 , S_TestPageBuffer->line.MUL_Y);
+				
+	DspNum(0x180B , S_TestPageBuffer->line.Y_Scale, 2);
+	DspNum(0x180A , S_TestPageBuffer->line.Y_Scale*2, 2);
+	
+	BasicUI(0x1880 ,0x1807 , 0, &(S_TestPageBuffer->myico[0]) , sizeof(Basic_ICO)*3);
+}
+
+static void InitPageText(void)
+{
+	memset(S_TestPageBuffer->buf, 0, 100);
+	sprintf(S_TestPageBuffer->buf, "%s", S_TestPageBuffer->currenttestdata->testdata.temperweima.ItemName);
+	DisText(0x1810, S_TestPageBuffer->buf, 20);
+			
+	memset(S_TestPageBuffer->buf, 0, 100);
+	memcpy(S_TestPageBuffer->buf, S_TestPageBuffer->currenttestdata->testdata.sampleid, MaxSampleIDLen);
+	DisText(0x1820, S_TestPageBuffer->buf, 20);
+			
+	sprintf(S_TestPageBuffer->buf, "%2.1f", S_TestPageBuffer->currenttestdata->testdata.TestTemp.O_Temperature);
+	DisText(0x1830, S_TestPageBuffer->buf, 8);
+			
+	sprintf(S_TestPageBuffer->buf, "%s", S_TestPageBuffer->currenttestdata->testdata.temperweima.PiHao);
+	DisText(0x1840, S_TestPageBuffer->buf, 30);
+			
+	sprintf(S_TestPageBuffer->buf, "%s", S_TestPageBuffer->currenttestdata->testdata.temperweima.NormalResult);
+	DisText(0x1860, S_TestPageBuffer->buf, 30);
+			
+	ClearText(0x1850, 30);
+}
 
 /*更新数据*/
 static void RefreshCurve(void)
@@ -281,34 +321,22 @@ static void RefreshCurve(void)
 	if(pdTRUE == TakeTestPointData(&temp))
 	{
 		if(0xffff == temp)
-		{
-			ClearLine(0x56);
-				
-			//初始化测试曲线
-			S_TestPageBuffer->line.MaxData = 0;
-			S_TestPageBuffer->line.MUL_Y = 1;
-			S_TestPageBuffer->line.Y_Scale = 100;
-				
-			SetChartSize(0x1870 , S_TestPageBuffer->line.MUL_Y);
-				
-			DspNum(0x180B , S_TestPageBuffer->line.Y_Scale, 2);
-			DspNum(0x180A , S_TestPageBuffer->line.Y_Scale*2, 2);
-		}
+			InitCurve();
 		else
 			AddDataToLine(temp);
 	}
 	 
 	if(My_Pass == TakeTestResult(&(S_TestPageBuffer->cardpretestresult)))
 	{
-		
+		GetGB_Time(&(GetCurrentTestItem()->testdata.TestTime));
+		WriteTestData(&(GetCurrentTestItem()->testdata));
 		MotorMoveTo(MaxLocation, 1);
 		
 		if(S_TestPageBuffer->cardpretestresult == ResultIsOK)
 		{
 			RefreshPageText();
-				
-			GetGB_Time(&(GetCurrentTestItem()->testdata.TestTime));
-			WriteTestData(&(GetCurrentTestItem()->testdata));
+			
+			printfTestData();
 		}
 		else if(S_TestPageBuffer->cardpretestresult == PeakError)
 		{
@@ -324,39 +352,19 @@ static void RefreshCurve(void)
 
 static void RefreshPageText(void)
 {
-	char *buf = NULL;
 	double tempvalue = 0.0;
 	
-	buf = MyMalloc(100);
-	if(buf)
+	if(S_TestPageBuffer->currenttestdata)
 	{
-		memset(buf, 0, 100);
-		
-		if((S_TestPageBuffer)&&(S_TestPageBuffer->currenttestdata))
-		{
-			sprintf(buf, "%s", S_TestPageBuffer->currenttestdata->testdata.temperweima.ItemName);
-			DisText(0x1810, buf, 20);
-			
-			memset(buf, 0, 100);
-			memcpy(buf, S_TestPageBuffer->currenttestdata->testdata.sampleid, MaxSampleIDLen);
-			DisText(0x1820, buf, 20);
-			
-			sprintf(buf, "%2.1f", S_TestPageBuffer->currenttestdata->testdata.TestTemp.O_Temperature);
-			DisText(0x1830, buf, 8);
-			
-			sprintf(buf, "%s", S_TestPageBuffer->currenttestdata->testdata.temperweima.CardPiCi);
-			DisText(0x1840, buf, 30);
-			
-			if(S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult <= S_TestPageBuffer->currenttestdata->testdata.temperweima.LowstResult)
-				sprintf(buf, "<%.3f", S_TestPageBuffer->currenttestdata->testdata.temperweima.LowstResult);
-			else if(S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult >= S_TestPageBuffer->currenttestdata->testdata.temperweima.HighestResult)
-				sprintf(buf, ">%.3f", S_TestPageBuffer->currenttestdata->testdata.temperweima.HighestResult);
-			else
-				sprintf(buf, "%.3f", S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult);
-			DisText(0x1850, buf, 30);
-		}
+		if(S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult <= S_TestPageBuffer->currenttestdata->testdata.temperweima.LowstResult)
+			sprintf(S_TestPageBuffer->buf, "<%.*f %s", S_TestPageBuffer->currenttestdata->testdata.temperweima.ItemPoint , S_TestPageBuffer->currenttestdata->testdata.temperweima.LowstResult, S_TestPageBuffer->currenttestdata->testdata.temperweima.ItemMeasure);
+		else if(S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult >= S_TestPageBuffer->currenttestdata->testdata.temperweima.HighestResult)
+			sprintf(S_TestPageBuffer->buf, ">%.*f %s", S_TestPageBuffer->currenttestdata->testdata.temperweima.ItemPoint , S_TestPageBuffer->currenttestdata->testdata.temperweima.HighestResult, S_TestPageBuffer->currenttestdata->testdata.temperweima.ItemMeasure);
+		else
+			sprintf(S_TestPageBuffer->buf, "%.*f %s", S_TestPageBuffer->currenttestdata->testdata.temperweima.ItemPoint , S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult, S_TestPageBuffer->currenttestdata->testdata.temperweima.ItemMeasure);
+		DisText(0x1850, S_TestPageBuffer->buf, 30);
+
 	}
-	MyFree(buf);
 	
 	if(S_TestPageBuffer->cardpretestresult == ResultIsOK)
 	{
@@ -388,12 +396,12 @@ static void RefreshPageText(void)
 		tempvalue += 139;										//曲线窗口起始y
 		S_TestPageBuffer->myico[2].Y = (unsigned short)tempvalue - 5;
 		
-		BasicUI(0x1880 ,0x1907 , 3, &(S_TestPageBuffer->myico[0]) , sizeof(Basic_ICO)*3);
+		BasicUI(0x1880 ,0x1807 , 3, &(S_TestPageBuffer->myico[0]) , sizeof(Basic_ICO)*3);
 	}
 	else
 	{
 		memset(S_TestPageBuffer->myico, 0, sizeof(Basic_ICO)*3);
-		BasicUI(0x1880 ,0x1907 , 3, &S_TestPageBuffer->myico[0] , sizeof(Basic_ICO)*3);
+		BasicUI(0x1880 ,0x1807 , 0, &S_TestPageBuffer->myico[0] , sizeof(Basic_ICO)*3);
 	}
 }
 
@@ -434,6 +442,26 @@ static void AddDataToLine(unsigned short data)
 
 	}
 	DisPlayLine(0 , &tempdata , 1);
+}
 
+/***************************************************************************************************
+*FunctionName: printfTestData
+*Description: 打印测试数据
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年1月19日16:39:51
+***************************************************************************************************/
+static void printfTestData(void)
+{
+	if(S_TestPageBuffer->cardpretestresult == ResultIsOK)
+	{
+		S_TestPageBuffer->isPrintfData = 1;
+		SendKeyCode(6);
+		PrintfData(&(S_TestPageBuffer->currenttestdata->testdata));
+		SendKeyCode(16);
+		S_TestPageBuffer->isPrintfData = 0;
+	}
 }
 

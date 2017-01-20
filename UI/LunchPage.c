@@ -136,13 +136,13 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			else if(Error_StopNormalTest == S_LunchPageBuffer->error)
 			{
 				SendKeyCode(1);
-				AddNumOfSongToList(45, 0);
+				AddNumOfSongToList(8, 0);
 			}
 			//创建失败
 			else if(Error_Mem == S_LunchPageBuffer->error)
 			{
 				SendKeyCode(2);
-				AddNumOfSongToList(41, 0);
+				AddNumOfSongToList(7, 0);
 			}
 		}
 		//批量测试
@@ -166,7 +166,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 				else if(Error_Mem == S_LunchPageBuffer->error)
 				{
 					SendKeyCode(2);
-					AddNumOfSongToList(41, 0);
+					AddNumOfSongToList(7, 0);
 				}
 			}
 		}

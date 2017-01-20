@@ -16,7 +16,7 @@
 #include	"PlaySong_Task.h"
 
 #include	"PaiDuiPage.h"
-#include	"PreReadCardPage.h"
+#include	"WaittingCardPage.h"
 
 #include	"CardStatues_Data.h"
 #include	"UI_Data.h"
@@ -58,46 +58,53 @@ void PaiDuiHandler(void)
 	{
 		temp = GetTestItemByIndex(index);
 		
-		if(temp)
+		if((temp) && (temp->statues != statuesNull))
 		{
 			//进入排队模式
 			if(temp->statues == startpaidui)
 			{
-				temp->statues = statues1;
+				if(MaxLocation == GetGB_MotorLocation())
+				{
+					temp->statues = statues1;
 				
-				UpOneModelData(index, R_ON_G_OFF, 5);
-				//20S提示一次将卡插入排队位
-				timer_set(&(temp->timer3), 10);
-				AddNumOfSongToList(index+27, 0);
+					UpOneModelData(index, R_ON_G_OFF, 5);
+					//20S提示一次将卡插入排队位
+					timer_set(&(temp->timer3), 10);
+					AddNumOfSongToList(index+22, 0);
+				}
 			}
 			//等待拔出卡槽
 			if(temp->statues == statues1)
 			{
-				if(!CardPinIn)
+				//如果从卡槽拔出，则将当前操作卡置为空，可以进行其他操作
+				if(GetCardState() == NoCard)
+				{
 					temp->statues = statues2;
+					SetCurrentTestItem(NULL);
+				}
 
 				else if(TimeOut == timer_expired(&(temp->timer3)))
 				{
 					timer_restart(&(temp->timer3));
 							
-					AddNumOfSongToList(index+27, 0);
+					AddNumOfSongToList(index+22, 0);
 				}
 			}
 			//等待插入卡槽
 			else if(temp->statues == statues4)
 			{
-				if(CardPinIn)
+				if(GetCardState() == CardIN)
 				{
 					UpOneModelData(index, R_OFF_G_ON, 0);
 					temp->statues = statues7;
 					
-					startActivity(createPreReadCardActivity, NULL);
+					startActivity(createWaittingCardActivity, NULL);
 				}
 				else if(TimeOut == timer_expired(&(temp->timer3)))
 				{
 					timer_restart(&(temp->timer3));
 							
-					AddNumOfSongToList(index+35, 0);
+					AddNumOfSongToList(index+30, 5);
 				}
 			}
 			//等待插入排队位
@@ -113,16 +120,12 @@ void PaiDuiHandler(void)
 						temp->statues = statues5;
 						
 					UpOneModelData(index, R_ON_G_OFF, 0);
-					
-					//如果当前操作的不是自己，则说明自己只是被异常拔出，只需插入即可，不更改当前操作对象
-					if(temp == GetCurrentTestItem())					
-						SetCurrentTestItem(NULL);
 				}
 				else if(TimeOut == timer_expired(&(temp->timer3)))
 				{
 					timer_restart(&(temp->timer3));
 							
-					AddNumOfSongToList(index+27, 0);
+					AddNumOfSongToList(index+22, 0);
 				}
 			}
 			//等待拔出排队位
@@ -138,7 +141,7 @@ void PaiDuiHandler(void)
 				{
 					timer_restart(&(temp->timer3));
 							
-					AddNumOfSongToList(index+35, 0);
+					AddNumOfSongToList(index+30, 0);
 				}
 			}
 			//倒计时过程中卡拔出
@@ -149,7 +152,7 @@ void PaiDuiHandler(void)
 				{
 					temp->statues = statues2;
 					UpOneModelData(index, R_ON_G_OFF, 5);
-					AddNumOfSongToList(index+27, 0);
+					AddNumOfSongToList(index+22, 0);
 					timer_restart(&(temp->timer3));
 				}
 			}
@@ -163,7 +166,10 @@ void PaiDuiHandler(void)
 				{
 					UpOneModelData(index, R_ON_G_OFF, 0);
 					timer_restart(&(temp->timer2));				//启动超时计时器
-					AddNumOfSongToList(index+11, 0);
+					AddNumOfSongToList(index+38, 0);
+					
+					if(temp->statues == statues5)
+						temp->statues = statues6;
 				}
 				else if(tempvalue <= 30)
 				{
@@ -173,15 +179,18 @@ void PaiDuiHandler(void)
 						UpOneModelData(index, R_OFF_G_ON, 0);
 						temp->statues = statues7;
 
-						startActivity(createPreReadCardActivity, NULL);
+						startActivity(createWaittingCardActivity, NULL);
 					}
-					//插入卡槽，结束排队
+					//等待插入排队位，但是如果时间小于30秒，则转为状态4，提示插入测试位测试，不在插入排队位
 					else if(temp->statues == statues2)
 					{
-						UpOneModelData(index, R_OFF_G_ON, 0);
-						temp->statues = statues4;
-						timer_restart(&(temp->timer3));
-						AddNumOfSongToList(index+35, 0);
+						if(NULL == GetCurrentTestItem())
+						{
+							UpOneModelData(index, R_OFF_G_ON, 0);
+							temp->statues = statues4;
+							timer_restart(&(temp->timer3));
+							AddNumOfSongToList(index+30, 0);
+						}
 					}
 					//如果正在倒计时，则提示拔出排队位，
 					else if(temp->statues == statues5)
@@ -189,11 +198,25 @@ void PaiDuiHandler(void)
 						//如果空闲
 						if(GetCurrentTestItem() == NULL)
 						{
-							SetCurrentTestItem(temp);
-							UpOneModelData(index, R_ON_G_OFF, 5);
-							temp->statues = statues3;
-							timer_restart(&(temp->timer3));
-							AddNumOfSongToList(index+35, 0);
+							//如果卡槽有卡，提示清空
+							if(GetCardState() == CardIN)
+							{
+								if(TimeOut == timer_expired(&(temp->timer3)))
+								{
+									timer_restart(&(temp->timer3));
+											
+									AddNumOfSongToList(46, 0);					//提示清空卡槽
+								}
+							}
+							else
+							{
+								SetCurrentTestItem(temp);
+								UpOneModelData(index, R_ON_G_OFF, 5);
+								temp->statues = statues3;
+								timer_restart(&(temp->timer3));
+								AddNumOfSongToList(index+30, 0);
+							}
+							
 						}
 					}
 				}
@@ -214,8 +237,8 @@ void PaiDuiHandler(void)
 			//如果正在超时计时
 			if(timerIsStartted(&(temp->timer2)))
 			{
-				//如果有卡倒计时小于40S，则中断此超时卡的测试
-				if(GetMinWaitTime() < 40)
+				//如果有卡倒计时小于60S，则中断此超时卡的测试
+				if(GetMinWaitTime() < 60)
 				{
 					if(temp->statues == statues3)
 					{
@@ -224,17 +247,43 @@ void PaiDuiHandler(void)
 						temp->statues = statues6;
 					}
 				}
-				
-				//如果超时时，操作空闲
-				if((temp->statues == statues6) && (GetMinWaitTime() > 60) && (GetCurrentTestItem() == NULL))
+				else
 				{
-					SetCurrentTestItem(temp);
-					UpOneModelData(index, R_ON_G_OFF, 5);
-					temp->statues = statues3;
-					timer_restart(&(temp->timer3));
-					AddNumOfSongToList(index+35, 0);
+					if(temp->statues == statues2)
+					{
+						if(NULL == GetCurrentTestItem())
+						{
+							UpOneModelData(index, R_OFF_G_ON, 0);
+							temp->statues = statues4;
+							timer_restart(&(temp->timer3));
+							AddNumOfSongToList(index+30, 0);
+						}
+					}
+					if(temp->statues == statues6)
+					{
+						if(NULL == GetCurrentTestItem())
+						{
+							//如果卡槽有卡，提示清空
+							if(GetCardState() == CardIN)
+							{
+								if(TimeOut == timer_expired(&(temp->timer3)))
+								{
+									timer_restart(&(temp->timer3));
+											
+									AddNumOfSongToList(46, 0);					//提示清空卡槽
+								}
+							}
+							else
+							{
+								SetCurrentTestItem(temp);
+								UpOneModelData(index, R_ON_G_OFF, 5);
+								temp->statues = statues3;
+								timer_restart(&(temp->timer3));
+								AddNumOfSongToList(index+30, 0);
+							}
+						}
+					}
 				}
-				
 			}
 		}
 		

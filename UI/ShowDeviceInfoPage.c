@@ -184,7 +184,11 @@ static void activityResume(void)
 {
 	if(S_ShowDeviceInfoPageBuffer)
 	{
+		getSystemSetData(&(S_ShowDeviceInfoPageBuffer->systemSetData));
+		
 		timer_restart(&(S_ShowDeviceInfoPageBuffer->timer));
+		
+		showDeviceInfo();
 	}
 	
 	SelectPage(100);
