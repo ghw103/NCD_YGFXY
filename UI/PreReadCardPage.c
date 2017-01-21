@@ -280,7 +280,7 @@ static void CheckQRCode(void)
 			if(S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CRC16 == 0)
 			{
 				//将读取的二维码数据拷贝到测试数据包中
-				memcpy(&(S_PreReadPageBuffer->currenttestdata->testdata.temperweima), &(S_PreReadPageBuffer->temperweima), sizeof(CardCodeInfo));
+				memcpy(&(S_PreReadPageBuffer->currenttestdata->testdata.temperweima), &(S_PreReadPageBuffer->temperweima), sizeof(QRCode));
 				
 				//设置倒计时时间
 				timer_set(&(S_PreReadPageBuffer->currenttestdata->timer), S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardWaitTime*60);
@@ -318,7 +318,7 @@ static void CheckPreTestCard(void)
 {
 	if(My_Pass == TakeTestResult(&(S_PreReadPageBuffer->cardpretestresult)))
 	{
-		timer_restart(&(S_PreReadPageBuffer->currenttestdata->timer));
+/*		timer_restart(&(S_PreReadPageBuffer->currenttestdata->timer));
 		
 		//未加样
 		if(S_PreReadPageBuffer->cardpretestresult == NoSample)
@@ -335,7 +335,7 @@ static void CheckPreTestCard(void)
 				SendKeyCode(5);
 				MotorMoveTo(MaxLocation, 1);
 				AddNumOfSongToList(16, 0);
-				memset(&(S_PreReadPageBuffer->currenttestdata->testdata.temperweima), 0, sizeof(CardCodeInfo));
+				memset(&(S_PreReadPageBuffer->currenttestdata->testdata.temperweima), 0, sizeof(QRCode));
 			}
 		}
 		else if(S_PreReadPageBuffer->cardpretestresult == ResultIsOK)
@@ -343,10 +343,10 @@ static void CheckPreTestCard(void)
 			SendKeyCode(3);
 			MotorMoveTo(MaxLocation, 1);
 			AddNumOfSongToList(14, 0);
-			memset(&(S_PreReadPageBuffer->currenttestdata->testdata.temperweima), 0, sizeof(CardCodeInfo));
+			memset(&(S_PreReadPageBuffer->currenttestdata->testdata.temperweima), 0, sizeof(QRCode));
 		}
 		else if(S_PreReadPageBuffer->cardpretestresult == PeakError)
-		{
+		*/{
 			//如果是排队模式，则进入排队界面
 			if(S_PreReadPageBuffer->currenttestdata->testlocation > 0)
 			{

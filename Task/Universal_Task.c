@@ -91,6 +91,6 @@ static void vUniversalTask( void *pvParameters )
 		
 		count++;
 		
-		vTaskDelay(100 * portTICK_RATE_MS);
+		vTaskDelay(100 / portTICK_RATE_MS);
 	}
 }

@@ -79,6 +79,7 @@ static void activityStart(void)
 	
 		timer_set(&(S_SetDeviceIDPage->timer), S_SetDeviceIDPage->systemSetData.ledSleepTime);
 		
+		ClearText(0x1c10, 30);
 		DisText(0x1C10, S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid, strlen(S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid));
 	}
 	

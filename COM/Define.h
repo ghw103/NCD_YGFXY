@@ -26,6 +26,14 @@
 #define	GB_SoftVersion_1	1
 #define	GB_SoftVersion_2	0
 #define	GB_SoftVersion_3	3
+
+/*服务器信息*/
+#define	GB_ServerIp_1		116
+#define	GB_ServerIp_2		62
+#define	GB_ServerIp_3		108
+#define	GB_ServerIp_4		201
+
+#define	GB_ServerPort		8080
 /**********************************************************************************************************/
 /******************************************操作结果变量*************************************************/
 /**********************************************************************************************************/
@@ -128,8 +136,7 @@ typedef struct
 /******************************************二维码相关定义**************************************************/
 /**********************************************************************************************************/
 
-#define	ScanOutTime						3			//????s
-#define	CodeMaxLen						300			//???????
+			//????s
 #define	ItemNameLen						20			//????????
 #define	ItemMeasureLen					10			//????????
 
@@ -147,7 +154,7 @@ typedef enum
 }ScanCodeResult;
 
 #pragma pack(1)
-typedef struct CardInfo_Tag
+typedef struct QRCode_Tag
 {
 	char	ItemName[ItemNameLen];						//测试项目
 	char	NormalResult[20];								//正常值
@@ -156,8 +163,8 @@ typedef struct CardInfo_Tag
 	char	ItemMeasure[ItemMeasureLen];				//测试单位
 	unsigned char ItemPoint;							//小数点数目
 	unsigned short ItemLocation;						//T线位置
-	float	ItemFenDuan;								//分段峰高比
-	float	ItemBiaoQu[2][3];							//标准曲线
+	float	ItemFenDuan[2];								//分段峰高比
+	float	ItemBiaoQu[3][3];							//标准曲线
 			//2 --- ?2???
 			//4 --- a , b, c d (????)
 	unsigned char CardWaitTime;							//检测卡反应时间
@@ -166,7 +173,7 @@ typedef struct CardInfo_Tag
 	char	piNum[10];
 	MyTime_Def	CardBaoZhiQi;						//保质期
 	unsigned short CRC16;								//crc
-}CardCodeInfo;
+}QRCode;
 #pragma pack()
 
 
@@ -406,7 +413,7 @@ typedef struct TestLine_tag {
 typedef struct TestData_tag {
 	User_Type user;
 	char sampleid[MaxSampleIDLen];
-	CardCodeInfo temperweima;
+	QRCode temperweima;
 	AdjustData tempadjust;
 /*	float precv1[5];							//预测时的整体cv值
 	float precv2[5];							//预测时的C线cv值

@@ -49,7 +49,6 @@ static MyState_TypeDef SetWifiWorkInSTAMode(void);
 
 static MyState_TypeDef ComWithWIFI(char * cmd, const char *strcmp, char *buf, unsigned short buflen, portTickType xBlockTime)
 {
-	unsigned short rxcount = 0;
 	MyState_TypeDef statues = My_Fail;
 	
 	if(pdPASS == SendDataToQueue(GetUsart4TXQueue(), GetUsart4TXMutex(), cmd, strlen(cmd), 1, 50 * portTICK_RATE_MS, EnableUsart4TXInterrupt))

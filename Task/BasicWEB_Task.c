@@ -12,7 +12,7 @@
 #include "semphr.h"
 #include	"Define.h"
 #include	<string.h>
-
+#include	"CardStatues_Data.h"
 #include "tcpip.h"
 
 
@@ -104,7 +104,7 @@ static void prvweb_ParseHTMLRequest( struct netconn *pxNetCon )
 		netbuf_data( pxRxBuffer, ( void * ) &pcRxString, &usLength );
 
 		/* Is this a GET?  We don't handle anything else. */
-		if(( NULL != pcRxString               )
+		if(( NULL != pcRxString)
 		 && ( !strncmp( pcRxString, "GET", 3 ) ))
 		{
 			cDynamicPage = MyMalloc(2000);
@@ -115,6 +115,8 @@ static void prvweb_ParseHTMLRequest( struct netconn *pxNetCon )
 				netconn_write( pxNetCon, webHTTP_OK, (u16_t) strlen( webHTTP_OK ), NETCONN_COPY );
 				
 				strcpy( cDynamicPage, webHTML_START );
+				sprintf(buf, "<p>%d</p>", GetCardState());
+				strcat(cDynamicPage, buf);
 				
 /*				strcat( cDynamicPage, "<p>Ë÷Òý  Î»ÖÃ  ×´Ì¬</p>" );
 				for(i=0; i<PaiDuiWeiNum; i++)

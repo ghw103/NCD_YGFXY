@@ -5,31 +5,26 @@
 #include	"tcp.h"
 #include 	"api.h" 
 
+#define	SERVERSENDBUFLEN	1024
+#define	SERVERRECVBUFLEN	1024
 
 typedef struct
 {
+	void *myp;									//临时指针
+	char sendBuf[SERVERSENDBUFLEN];						//发送数据缓冲区
+	unsigned short sendDataLen;					//发送数据长度
+	char recvBuf[SERVERRECVBUFLEN];						//发送数据缓冲区
+	unsigned short recvDataLen;					//发送数据长度
+	
 	struct ip_addr server_ipaddr;				//服务器ip
 	struct netconn *clientconn;				//当前客户端
 	struct netbuf *recvbuf;						//接收缓冲区
 	struct pbuf *q;								//接收数据的链表
-	unsigned char *myp;							//临时指针
-	mynetbuf * s_mybuf;							//临时网络数据包
-}MyLwipData;
+}MyServerData;
 
+void CommunicateWithServerByLineNet(MyServerData * myServerData);
+void CommunicateWithServerByWifi(MyServerData * myServerData);
 
-#pragma pack(1)
-typedef struct
-{
-	unsigned char *myp;							//临时指针
-	mynetbuf * s_mybuf;							//临时网络数据包
-	unsigned short rxcount;						//接收数据长度
-}MyWifiData;
-#pragma pack()
-
-MyState_TypeDef CommunicateWithServerByLineNet(void *sendnetbuf, void *recvnetbuf, unsigned char ip1, unsigned char ip2, 
-	unsigned char ip3, unsigned char ip4, unsigned short maxrecvlen);
-MyState_TypeDef CommunicateWithServerByWifi(void *sendnetbuf, void *recvnetbuf, unsigned short maxrecvlen);
-
-MyState_TypeDef UpLoadData(char *URL, void * buf, unsigned short buflen);
+MyState_TypeDef UpLoadData(char *URL, void * sendBuf, unsigned short sendLen, void * recvBuf, unsigned short recvLen);
 
 #endif

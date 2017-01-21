@@ -30,6 +30,8 @@ static void activityResume(void);
 static void activityDestroy(void);
 static MyState_TypeDef activityBufferMalloc(void);
 static void activityBufferFree(void);
+
+static void showDeviceInfoText(void);
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -76,6 +78,8 @@ static void activityStart(void)
 		getSystemSetData(&(S_SetDeviceInfoPageBuffer->systemSetData));
 		
 		timer_set(&(S_SetDeviceInfoPageBuffer->timer), S_SetDeviceInfoPageBuffer->systemSetData.ledSleepTime);
+		
+		showDeviceInfoText();
 	}
 	
 	SelectPage(102);
@@ -284,4 +288,40 @@ static void activityBufferFree(void)
 	S_SetDeviceInfoPageBuffer = NULL;
 }
 
-
+static void showDeviceInfoText(void)
+{
+	ClearText(0x1b10, 10);
+	memset(S_SetDeviceInfoPageBuffer->tempBuf, 0, 100);
+	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_name);
+	DisText(0x1b10, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf));
+	
+	ClearText(0x1b20, 10);
+	memset(S_SetDeviceInfoPageBuffer->tempBuf, 0, 100);
+	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_age);
+	DisText(0x1b20, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf));
+	
+	ClearText(0x1b30, 10);
+	memset(S_SetDeviceInfoPageBuffer->tempBuf, 0, 100);
+	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_sex);
+	DisText(0x1b30, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf));
+	
+	ClearText(0x1b40, 16);
+	memset(S_SetDeviceInfoPageBuffer->tempBuf, 0, 100);
+	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_phone);
+	DisText(0x1b40, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf));
+	
+	ClearText(0x1b50, 16);
+	memset(S_SetDeviceInfoPageBuffer->tempBuf, 0, 100);
+	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_job);
+	DisText(0x1b50, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf));
+	
+	ClearText(0x1b60, 16);
+	memset(S_SetDeviceInfoPageBuffer->tempBuf, 0, 100);
+	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_desc);
+	DisText(0x1b60, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf));
+	
+	ClearText(0x1b70, 30);
+	memset(S_SetDeviceInfoPageBuffer->tempBuf, 0, 100);
+	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceunit);
+	DisText(0x1b70, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf));
+}

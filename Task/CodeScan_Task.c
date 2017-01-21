@@ -19,7 +19,7 @@
 const char * CodeScanTaskName = "vCodeScanTask";
 
 static xQueueHandle xStartScanQueue = NULL ;			//扫描二维码数据空间地址的队列，如果接受到空间地址则启动扫描二维码任务
-static CardCodeInfo * cardQR;							//扫描二维码数据空间地址
+static QRCode * cardQR;							//扫描二维码数据空间地址
 
 static xQueueHandle xScanResultQueue = NULL;			//发送扫描结果队列
 static ScanCodeResult scanresult;						//扫码二维码的结果

@@ -380,7 +380,7 @@ static void ShowDetail(void)
 			DisText(0x1d80, S_UserMPageBuffer->tempuser->user_phone, strlen(S_UserMPageBuffer->tempuser->user_phone));
 			DisText(0x1d90, S_UserMPageBuffer->tempuser->user_job, strlen(S_UserMPageBuffer->tempuser->user_job));
 			DisText(0x1da0, S_UserMPageBuffer->tempuser->user_desc, strlen(S_UserMPageBuffer->tempuser->user_desc));
-			BasicPic(0x1d40, 1, 137, 268, 225, 558, 272, 158, 136+(S_UserMPageBuffer->selectindex-1)*72);
+			BasicPic(0x1d40, 1, 137, 266, 215, 559, 284, 157, 135+(S_UserMPageBuffer->selectindex-1)*72);	
 		}
 	}
 	else

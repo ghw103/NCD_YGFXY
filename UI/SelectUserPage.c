@@ -361,7 +361,7 @@ static void SelectUser(unsigned char index)
 		
 		if(S_UserPageBuffer->tempUser2->crc == CalModbusCRC16Fun1(S_UserPageBuffer->tempUser2, sizeof(User_Type)-2))
 		{
-			BasicPic(0x1240, 1, 137, 266, 215, 558, 284, 364, 142+(S_UserPageBuffer->selectindex-1)*72);	
+			BasicPic(0x1240, 1, 137, 266, 215, 559, 284, 363, 141+(S_UserPageBuffer->selectindex-1)*72);	
 		}
 		else
 		{

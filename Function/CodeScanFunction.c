@@ -11,6 +11,7 @@
 #include	"Motor_Data.h"
 #include	"CardStatues_Data.h"
 #include	"System_Data.h"
+#include	"Timer_Data.h"
 
 #include	"Define.h"
 #include	"CRC16.h"
@@ -27,14 +28,12 @@
 
 /******************************************************************************************/
 /*****************************************局部变量声明*************************************/
-static CardCodeInfo * cardQR;								//扫描二维码数据空间地址
-static ReadCodeBuffer * S_ReadCodeBuffer;					//用于处理二维码的缓存
-static ScanCodeResult scanresult;							//扫码二维码结果
+
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
-static void ReadBasicCodeData(void);
-static void AnalysisCode(void *pbuf , unsigned short len);
-static MyState_TypeDef CheckCardIsTimeOut(CardCodeInfo * s_CardCodeInfo);
+static void ReadBasicCodeData(ReadQRCodeBuffer * readQRCodeBuffer);
+static void AnalysisCode(ReadQRCodeBuffer * readQRCodeBuffer);
+static MyState_TypeDef CheckCardIsTimeOut(ReadQRCodeBuffer * readQRCodeBuffer);
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -42,69 +41,71 @@ static MyState_TypeDef CheckCardIsTimeOut(CardCodeInfo * s_CardCodeInfo);
 /******************************************************************************************/
 /******************************************************************************************/
 
-ScanCodeResult ScanCodeFun(void * parm)
+ScanCodeResult ScanCodeFun(QRCode * parm)
 {
-	unsigned short count = 0;
-	unsigned char dir = 0;							//扫描次数	
+	ReadQRCodeBuffer * readQRCodeBuffer;
+	ScanCodeResult scanresult;							//扫码二维码结果
 	
 	if(parm == NULL)
 		return CardCodeScanFail;
 	
-	S_ReadCodeBuffer = MyMalloc(sizeof(ReadCodeBuffer));
-	if(NULL == S_ReadCodeBuffer)
+	readQRCodeBuffer = MyMalloc(sizeof(ReadQRCodeBuffer));
+	if(NULL == readQRCodeBuffer)
 		return CardCodeScanFail;
 	
-	memset(S_ReadCodeBuffer, 0, sizeof(ReadCodeBuffer));
+	memset(readQRCodeBuffer, 0, sizeof(ReadQRCodeBuffer));
 	
-	cardQR = parm;
-	memset(cardQR, 0, sizeof(CardCodeInfo));
+	readQRCodeBuffer->cardQR = parm;
+	memset(readQRCodeBuffer->cardQR, 0, sizeof(QRCode));
 		
 	MotorMoveTo(0, 0);
 	MotorMoveTo(500, 0);
+	readQRCodeBuffer->motorLocation = GetGB_MotorLocation();
 		
 	OpenCodeScanner();
 	
-		
-	while(pdPASS == ReceiveDataFromQueue(GetUsart2RXQueue(), GetUsart2RXMutex(), &dir , 1, 1, 50 * portTICK_RATE_MS))
+	while(pdPASS == ReceiveDataFromQueue(GetUsart2RXQueue(), GetUsart2RXMutex(), readQRCodeBuffer->originalcode , MAX_QR_CODE_LENGHT, 1, 50 * portTICK_RATE_MS))
 		;
-		
-	dir = 0;
-	scanresult = CardCodeScanning;
+
+	readQRCodeBuffer->scanresult = CardCodeScanning;
 	
-	while(scanresult == CardCodeScanning)
+	//设置定时器
+	timer_set(&(readQRCodeBuffer->timer), MAX_SCAN_QR_TIME);
+	
+	while(readQRCodeBuffer->scanresult == CardCodeScanning)
 	{
 		if(GetCardState() == NoCard)				//卡被拔出
 		{
-			scanresult = CardCodeCardOut;
+			readQRCodeBuffer->scanresult = CardCodeCardOut;
 			break;
 		}
 		else
 		{
-			if(dir%2 == 0)
-				MotorMoveTo(GetGB_MotorLocation()+2, 0);
+			if((readQRCodeBuffer->motorLocation >= 1000)||(readQRCodeBuffer->motorLocation <= 200))
+				readQRCodeBuffer->motorDir++;
+			
+			if(readQRCodeBuffer->motorDir%2 == 0)
+				readQRCodeBuffer->motorLocation += 1;
 			else
-				MotorMoveTo(GetGB_MotorLocation()-2, 0);
+				readQRCodeBuffer->motorLocation -= 1;
+			
+			MotorMoveTo(readQRCodeBuffer->motorLocation, 0);
+			
+			if(readQRCodeBuffer->motorLocation % 50 == 0)
+				ReadBasicCodeData(readQRCodeBuffer);
 
-			count++;
-			
-			ReadBasicCodeData();
-			
-			if((GetGB_MotorLocation() >= 1000)||(GetGB_MotorLocation() <= 200))
-			{
-				dir++;
-				
-			}
-			
 			vTaskDelay(2 / portTICK_RATE_MS);
-			if(count >= (ScanOutTime*1000/3))
-				scanresult = CardCodeScanTimeOut;				
 			
+			if(TimeOut == timer_expired(&(readQRCodeBuffer->timer)))
+				readQRCodeBuffer->scanresult = CardCodeScanTimeOut;				
 		}
 	}
 
 	CloseCodeScanner();
 	
-	MyFree(S_ReadCodeBuffer);
+	scanresult = readQRCodeBuffer->scanresult;
+	
+	MyFree(readQRCodeBuffer);
 	
 	return scanresult;
 }
@@ -117,15 +118,18 @@ ScanCodeResult ScanCodeFun(void * parm)
 *Author：xsx
 *Data：2016年4月25日14:07:38
 ***************************************************************************************************/
-static void ReadBasicCodeData(void)
+static void ReadBasicCodeData(ReadQRCodeBuffer * readQRCodeBuffer)
 {
-	S_ReadCodeBuffer->rxcount = 0;
+	if(readQRCodeBuffer == NULL)
+		return;
 	
-	while(pdPASS == ReceiveDataFromQueue(GetUsart2RXQueue(), GetUsart2RXMutex(), (S_ReadCodeBuffer->originalcode+S_ReadCodeBuffer->rxcount) , 1, 1, 10 / portTICK_RATE_MS))	
-		S_ReadCodeBuffer->rxcount++;
-
-	if(S_ReadCodeBuffer->rxcount > 0)
-		AnalysisCode(S_ReadCodeBuffer->originalcode, S_ReadCodeBuffer->rxcount);
+	while(pdPASS == ReceiveDataFromQueue(GetUsart2RXQueue(), GetUsart2RXMutex(), readQRCodeBuffer->originalcode , MAX_QR_CODE_LENGHT, 1, 10 / portTICK_RATE_MS))	
+		;
+	
+	readQRCodeBuffer->originalCodeLen = strlen(readQRCodeBuffer->originalcode);
+	
+	if(readQRCodeBuffer->originalCodeLen > 0)
+		AnalysisCode(readQRCodeBuffer);
 }
 
 /***************************************************************************************************
@@ -136,213 +140,231 @@ static void ReadBasicCodeData(void)
 *Author：xsx
 *Data：2016年4月25日14:08:25
 ***************************************************************************************************/
-static void AnalysisCode(void *pbuf , unsigned short len)
+static void AnalysisCode(ReadQRCodeBuffer * readQRCodeBuffer)
 {
 	unsigned short datalen = 0;
 	unsigned char i=0;
 	
+	if(readQRCodeBuffer == NULL)
+		return;
+	
 	/*清空二维码空间*/
-	memset(S_ReadCodeBuffer->decryptcode, 0, 320);
+	memset(readQRCodeBuffer->decryptcode, 0, MAX_QR_CODE_LENGHT);
 
 	/*数据解密失败*/
-	if(pdFAIL == MyDencrypt(pbuf, S_ReadCodeBuffer->decryptcode, len))
+	if(pdFAIL == MyDencrypt(readQRCodeBuffer->originalcode, readQRCodeBuffer->decryptcode, readQRCodeBuffer->originalCodeLen))
 		goto END;
 	
-	memcpy(S_ReadCodeBuffer->originalcode, S_ReadCodeBuffer->decryptcode, len);
-	S_ReadCodeBuffer->pbuf2 = S_ReadCodeBuffer->originalcode;
-
-	/*获取检测卡二维码信息存放地址*/
-	if(NULL == cardQR)
-		goto END;
+	memcpy(readQRCodeBuffer->originalcode, readQRCodeBuffer->decryptcode, readQRCodeBuffer->originalCodeLen);
+	readQRCodeBuffer->pbuf2 = readQRCodeBuffer->originalcode;
 	
 	/*获取数据头*/
-	S_ReadCodeBuffer->pbuf1 = strtok(S_ReadCodeBuffer->decryptcode, "#");
-	if(S_ReadCodeBuffer->pbuf1)
+	readQRCodeBuffer->pbuf1 = strtok(readQRCodeBuffer->decryptcode, "#");
+	if(readQRCodeBuffer->pbuf1)
 	{
-		if(0 != strcmp(S_ReadCodeBuffer->pbuf1, "AB"))
+		if(0 != strcmp(readQRCodeBuffer->pbuf1, "AB"))
 			goto END;
 		else
-			S_ReadCodeBuffer->pbuf2 += 3;
+			readQRCodeBuffer->pbuf2 += 3;
 	}
 	else
 		goto END;
 	
 	/*获取数据长度*/
-	S_ReadCodeBuffer->pbuf1 = strtok(NULL, "#");
-	if(S_ReadCodeBuffer->pbuf1)
+	readQRCodeBuffer->pbuf1 = strtok(NULL, "#");
+	if(readQRCodeBuffer->pbuf1)
 	{
-		datalen = strtol(S_ReadCodeBuffer->pbuf1 , NULL , 10);
-		S_ReadCodeBuffer->pbuf2 += (strlen(S_ReadCodeBuffer->pbuf1)+1);
+		datalen = strtol(readQRCodeBuffer->pbuf1 , NULL , 10);
+		readQRCodeBuffer->pbuf2 += (strlen(readQRCodeBuffer->pbuf1)+1);
 	}
 	else
 		goto END;
 	
 	/*获取测试项目名称*/
-	S_ReadCodeBuffer->pbuf1 = strtok(NULL, "#");
-	if(S_ReadCodeBuffer->pbuf1)
-		memcpy(cardQR->ItemName, S_ReadCodeBuffer->pbuf1 ,strlen(S_ReadCodeBuffer->pbuf1));
+	readQRCodeBuffer->pbuf1 = strtok(NULL, "#");
+	if(readQRCodeBuffer->pbuf1)
+		memcpy(readQRCodeBuffer->cardQR->ItemName, readQRCodeBuffer->pbuf1 ,strlen(readQRCodeBuffer->pbuf1));
 	else
 		goto END;
 		
 	/*读取检测卡上的检测指标正常范围*/
-	S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
-	if(S_ReadCodeBuffer->pbuf1)
-		memcpy(cardQR->NormalResult, S_ReadCodeBuffer->pbuf1 ,strlen(S_ReadCodeBuffer->pbuf1));
+	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
+	if(readQRCodeBuffer->pbuf1)
+		memcpy(readQRCodeBuffer->cardQR->NormalResult, readQRCodeBuffer->pbuf1 ,strlen(readQRCodeBuffer->pbuf1));
 	else
 		goto END;
 		
 	/*读取检测卡上的最低检测值*/
-	S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
-	if(S_ReadCodeBuffer->pbuf1)
-		cardQR->LowstResult = strtod(S_ReadCodeBuffer->pbuf1 , NULL );
+	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
+	if(readQRCodeBuffer->pbuf1)
+		readQRCodeBuffer->cardQR->LowstResult = strtod(readQRCodeBuffer->pbuf1 , NULL );
 	else
 		goto END;
 		
 	/*读取检测卡上的最高检测值*/
-	S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
-	if(S_ReadCodeBuffer->pbuf1)
-		cardQR->HighestResult = strtod(S_ReadCodeBuffer->pbuf1 , NULL );
+	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
+	if(readQRCodeBuffer->pbuf1)
+		readQRCodeBuffer->cardQR->HighestResult = strtod(readQRCodeBuffer->pbuf1 , NULL );
 	else
 		goto END;	
 		
 	/*读取测试项目的单位*/
-	S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
-	if(S_ReadCodeBuffer->pbuf1)
-		memcpy(cardQR->ItemMeasure, S_ReadCodeBuffer->pbuf1 ,strlen(S_ReadCodeBuffer->pbuf1));
+	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
+	if(readQRCodeBuffer->pbuf1)
+		memcpy(readQRCodeBuffer->cardQR->ItemMeasure, readQRCodeBuffer->pbuf1 ,strlen(readQRCodeBuffer->pbuf1));
 	else
 		goto END;
 	
 	//读取小数点个数
-	S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
-	if(S_ReadCodeBuffer->pbuf1)
-		cardQR->ItemPoint = strtol(S_ReadCodeBuffer->pbuf1 , NULL, 10);
+	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
+	if(readQRCodeBuffer->pbuf1)
+		readQRCodeBuffer->cardQR->ItemPoint = strtol(readQRCodeBuffer->pbuf1 , NULL, 10);
 	else
 		goto END;
 	
 	/*读取检测卡T线位置*/
-	S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
-	if(S_ReadCodeBuffer->pbuf1)
-		cardQR->ItemLocation = strtol(S_ReadCodeBuffer->pbuf1 , NULL, 10);
+	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
+	if(readQRCodeBuffer->pbuf1)
+		readQRCodeBuffer->cardQR->ItemLocation = strtol(readQRCodeBuffer->pbuf1 , NULL, 10);
 	else
 		goto END;
 		
-	/*读取检测卡标准曲线临界浓度*/
-	S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
-	if(S_ReadCodeBuffer->pbuf1)
-		cardQR->ItemFenDuan = strtod(S_ReadCodeBuffer->pbuf1 , NULL);
+	/*读取检测卡标准曲线临界浓度1*/
+	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
+	if(readQRCodeBuffer->pbuf1)
+		readQRCodeBuffer->cardQR->ItemFenDuan[0] = strtod(readQRCodeBuffer->pbuf1 , NULL);
+	else
+		goto END;
+	
+	/*读取检测卡标准曲线临界浓度2*/
+	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
+	if(readQRCodeBuffer->pbuf1)
+		readQRCodeBuffer->cardQR->ItemFenDuan[1] = strtod(readQRCodeBuffer->pbuf1 , NULL);
 	else
 		goto END;
 
 	/*标准曲线1*/
 	for(i=0; i<3; i++)
 	{
-		S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
-		if(S_ReadCodeBuffer->pbuf1)
-			cardQR->ItemBiaoQu[0][i] = strtod(S_ReadCodeBuffer->pbuf1 , NULL);
+		readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
+		if(readQRCodeBuffer->pbuf1)
+			readQRCodeBuffer->cardQR->ItemBiaoQu[0][i] = strtod(readQRCodeBuffer->pbuf1 , NULL);
 		else
 			goto END;
 	}
 	
-	/*标准曲线1*/
-	if(cardQR->ItemFenDuan > 0)
+	/*标准曲线2*/
+	if(readQRCodeBuffer->cardQR->ItemFenDuan[0] > 0)
 	{
 		for(i=0; i<3; i++)
 		{
-			S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
-			if(S_ReadCodeBuffer->pbuf1)
-				cardQR->ItemBiaoQu[1][i] = strtod(S_ReadCodeBuffer->pbuf1 , NULL);
+			readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
+			if(readQRCodeBuffer->pbuf1)
+				readQRCodeBuffer->cardQR->ItemBiaoQu[1][i] = strtod(readQRCodeBuffer->pbuf1 , NULL);
+			else
+				goto END;
+		}
+	}
+	
+	/*标准曲线3*/
+	if(readQRCodeBuffer->cardQR->ItemFenDuan[1] > 0)
+	{
+		for(i=0; i<3; i++)
+		{
+			readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
+			if(readQRCodeBuffer->pbuf1)
+				readQRCodeBuffer->cardQR->ItemBiaoQu[2][i] = strtod(readQRCodeBuffer->pbuf1 , NULL);
 			else
 				goto END;
 		}
 	}
 		
 	/*读取检测卡反应时间*/
-	S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
-	if(S_ReadCodeBuffer->pbuf1)
-		cardQR->CardWaitTime = strtol(S_ReadCodeBuffer->pbuf1 , NULL , 10);
+	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
+	if(readQRCodeBuffer->pbuf1)
+		readQRCodeBuffer->cardQR->CardWaitTime = strtol(readQRCodeBuffer->pbuf1 , NULL , 10);
 	else
 		goto END;
 		
 	/*读取检测卡C线位置*/
-	S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
-	if(S_ReadCodeBuffer->pbuf1)
-		cardQR->CLineLocation = strtol(S_ReadCodeBuffer->pbuf1 , NULL , 10);
+	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
+	if(readQRCodeBuffer->pbuf1)
+		readQRCodeBuffer->cardQR->CLineLocation = strtol(readQRCodeBuffer->pbuf1 , NULL , 10);
 	else
 		goto END;
 
 
 	/*读取检测卡批号*/
-	S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
-	if(S_ReadCodeBuffer->pbuf1)
-		memcpy(cardQR->PiHao, S_ReadCodeBuffer->pbuf1, strlen(S_ReadCodeBuffer->pbuf1));
+	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
+	if(readQRCodeBuffer->pbuf1)
+		memcpy(readQRCodeBuffer->cardQR->PiHao, readQRCodeBuffer->pbuf1, strlen(readQRCodeBuffer->pbuf1));
 	else
 		goto END;
 	
 	
 	/*读取检测卡批号*/
-	S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
-	if(S_ReadCodeBuffer->pbuf1)
-		memcpy(cardQR->piNum, S_ReadCodeBuffer->pbuf1, strlen(S_ReadCodeBuffer->pbuf1));
+	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
+	if(readQRCodeBuffer->pbuf1)
+		memcpy(readQRCodeBuffer->cardQR->piNum, readQRCodeBuffer->pbuf1, strlen(readQRCodeBuffer->pbuf1));
 	else
 		goto END;
 
 	/*读取检测卡保质期*/
-	S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
-	if(S_ReadCodeBuffer->pbuf1)
+	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
+	if(readQRCodeBuffer->pbuf1)
 	{
 		static char year[10] ,month[10],day[10];
-		memcpy(year, S_ReadCodeBuffer->pbuf1, 2);
-		cardQR->CardBaoZhiQi.year = strtol(year , NULL , 10);
+		memcpy(year, readQRCodeBuffer->pbuf1, 2);
+		readQRCodeBuffer->cardQR->CardBaoZhiQi.year = strtol(year , NULL , 10);
 
-		memcpy(month, &S_ReadCodeBuffer->pbuf1[2], 2);
-		cardQR->CardBaoZhiQi.month = (unsigned char)strtod(month , NULL );
+		memcpy(month, &readQRCodeBuffer->pbuf1[2], 2);
+		readQRCodeBuffer->cardQR->CardBaoZhiQi.month = (unsigned char)strtod(month , NULL );
 
-		memcpy(day, &S_ReadCodeBuffer->pbuf1[4], 2);
-		cardQR->CardBaoZhiQi.day = (unsigned char)strtod(day , NULL );
+		memcpy(day, &readQRCodeBuffer->pbuf1[4], 2);
+		readQRCodeBuffer->cardQR->CardBaoZhiQi.day = (unsigned char)strtod(day , NULL );
 	}
 	else
 		goto END;
 
 	/*读取二维码CRC*/
-	S_ReadCodeBuffer->pbuf1 = strtok(NULL , "#");
-	if(S_ReadCodeBuffer->pbuf1)
+	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
+	if(readQRCodeBuffer->pbuf1)
 	{
-		cardQR->CRC16 = strtol(S_ReadCodeBuffer->pbuf1 , NULL , 10);
+		readQRCodeBuffer->cardQR->CRC16 = strtol(readQRCodeBuffer->pbuf1 , NULL , 10);
 			
-		datalen -= strlen(S_ReadCodeBuffer->pbuf1);
+		datalen -= strlen(readQRCodeBuffer->pbuf1);
 		goto END;
 	}
 	else
 		goto END;
 	
 	END:
-		if(cardQR->CRC16 != CalModbusCRC16Fun1(S_ReadCodeBuffer->pbuf2 , datalen))
-			scanresult = CardCodeCRCError;		
-		else if(My_Fail == CheckCardIsTimeOut(cardQR))
-			scanresult = CardCodeTimeOut;
+		if(readQRCodeBuffer->cardQR->CRC16 != CalModbusCRC16Fun1(readQRCodeBuffer->pbuf2 , datalen))
+			readQRCodeBuffer->scanresult = CardCodeCRCError;		
+		else if(My_Fail == CheckCardIsTimeOut(readQRCodeBuffer))
+			readQRCodeBuffer->scanresult = CardCodeTimeOut;
 		else
-			scanresult = CardCodeScanOK;
-		
+			readQRCodeBuffer->scanresult = CardCodeScanOK;
 }
 
 
-static MyState_TypeDef CheckCardIsTimeOut(CardCodeInfo * s_CardCodeInfo)
+static MyState_TypeDef CheckCardIsTimeOut(ReadQRCodeBuffer * readQRCodeBuffer)
 {
-	if(S_ReadCodeBuffer)
+	if(readQRCodeBuffer)
 	{
-		GetGB_Time(&(S_ReadCodeBuffer->temptime));
+		GetGB_Time(&(readQRCodeBuffer->temptime));
 		
-		if(s_CardCodeInfo->CardBaoZhiQi.year == S_ReadCodeBuffer->temptime.year)
+		if(readQRCodeBuffer->cardQR->CardBaoZhiQi.year == readQRCodeBuffer->temptime.year)
 		{
-			if(s_CardCodeInfo->CardBaoZhiQi.month == S_ReadCodeBuffer->temptime.month)
+			if(readQRCodeBuffer->cardQR->CardBaoZhiQi.month == readQRCodeBuffer->temptime.month)
 			{
-				if(s_CardCodeInfo->CardBaoZhiQi.day >= S_ReadCodeBuffer->temptime.day)
+				if(readQRCodeBuffer->cardQR->CardBaoZhiQi.day >= readQRCodeBuffer->temptime.day)
 					return My_Pass;
 			}
-			else if(s_CardCodeInfo->CardBaoZhiQi.month > S_ReadCodeBuffer->temptime.month)
+			else if(readQRCodeBuffer->cardQR->CardBaoZhiQi.month > readQRCodeBuffer->temptime.month)
 				return My_Pass;
 		}
-		else if(s_CardCodeInfo->CardBaoZhiQi.year > S_ReadCodeBuffer->temptime.year)
+		else if(readQRCodeBuffer->cardQR->CardBaoZhiQi.year > readQRCodeBuffer->temptime.year)
 			return My_Pass;
 	}
 	
