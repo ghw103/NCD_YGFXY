@@ -84,8 +84,8 @@ static void activityStart(void)
 {
 	if(S_PaiDuiPageBuffer)
 	{
-		//一秒读取一次是否插卡
-		timer_set(&(S_PaiDuiPageBuffer->timer0), 1);
+		//进入界面先禁止插卡自动新建测试功能
+		timer_set(&(S_PaiDuiPageBuffer->timer0), 65535);
 	}
 	
 	SelectPage(93);
@@ -194,61 +194,59 @@ static void activityFresh(void)
 		//500ms刷新一次界面
 		if(S_PaiDuiPageBuffer->count2 % 50 == 0)
 		{
-			//插卡
-			if(CardPinIn)
+			//如果当前功能处于禁止状态，且电机位置处于最大行程，且卡槽无卡，则启用插卡自动创建功能
+			if((S_PaiDuiPageBuffer->timer0.interval == 65535) && (MaxLocation == GetGB_MotorLocation()) && (!CardPinIn))
 			{
-				//如果空闲，说明插入的卡不是排队中的卡，则创建新排队
-				if(NULL == GetCurrentTestItem())
-				{
-					if(TimeOut == timer_expired(&(S_PaiDuiPageBuffer->timer0)))
-					{
-						S_PaiDuiPageBuffer->error = CreateANewTest(PaiDuiTestType);
-						//创建成功
-						if(Error_OK == S_PaiDuiPageBuffer->error)
-						{
-							//创建成功，则使电机远离，防止用户拔卡
-							MotorMoveTo(1000, 1);
-							
-							startActivity(createSampleActivity, NULL);
-								
-							return;
-						}
-						//排队位置满，不允许
-						else if(Error_PaiduiFull == S_PaiDuiPageBuffer->error)
-						{
-							SendKeyCode(2);
-							AddNumOfSongToList(19, 0);
-						}
-						//创建失败
-						else if(Error_Mem == S_PaiDuiPageBuffer->error)
-						{
-							SendKeyCode(1);
-							AddNumOfSongToList(7, 0);
-						}
-						//有卡即将测试
-						else if(Error_PaiDuiBusy == S_PaiDuiPageBuffer->error)
-						{
-							SendKeyCode(3);
-							AddNumOfSongToList(20, 0);
-						}
-						//测试中禁止添加
-						else if(Error_PaiduiTesting == S_PaiDuiPageBuffer->error)
-						{
-							SendKeyCode(4);
-							AddNumOfSongToList(21, 0);
-						}
-						
-						//定时器设置长时间，表明不在对此卡创建，需要重新拔插才行
-						timer_set(&(S_PaiDuiPageBuffer->timer0), 10000);
-					}
-				}
-				//如果有卡，但是排队忙，则说明插入的卡是排队的卡，
-				else
-					timer_set(&(S_PaiDuiPageBuffer->timer0), 1);
-			}
-			//如果无卡，则重置定时器
-			else
 				timer_set(&(S_PaiDuiPageBuffer->timer0), 1);
+			}
+			
+			//如果当前空闲，且扫描时间到，则检测是否插卡了
+			if(TimeOut == timer_expired(&(S_PaiDuiPageBuffer->timer0)))
+			{
+				//如果当前空闲,且已经插卡
+				if((NULL == GetCurrentTestItem()) && (CardPinIn))
+				{
+					S_PaiDuiPageBuffer->error = CreateANewTest(PaiDuiTestType);
+					//创建成功
+					if(Error_OK == S_PaiDuiPageBuffer->error)
+					{
+						//创建成功，则使电机远离，防止用户拔卡
+						MotorMoveTo(1000, 1);
+							
+						startActivity(createSampleActivity, NULL);
+								
+						return;
+					}
+					//排队位置满，不允许
+					else if(Error_PaiduiFull == S_PaiDuiPageBuffer->error)
+					{
+						SendKeyCode(2);
+						AddNumOfSongToList(19, 0);
+					}
+					//创建失败
+					else if(Error_Mem == S_PaiDuiPageBuffer->error)
+					{
+						SendKeyCode(1);
+						AddNumOfSongToList(7, 0);
+					}
+					//有卡即将测试
+					else if(Error_PaiDuiBusy == S_PaiDuiPageBuffer->error)
+					{
+						SendKeyCode(3);
+						AddNumOfSongToList(20, 0);
+					}
+					//测试中禁止添加
+					else if(Error_PaiduiTesting == S_PaiDuiPageBuffer->error)
+					{
+						SendKeyCode(4);
+						AddNumOfSongToList(21, 0);
+					}
+						
+					//定时器设置长时间，表明不在对此卡创建，需要重新拔插才行
+					timer_set(&(S_PaiDuiPageBuffer->timer0), 65535);
+				}
+				timer_restart(&(S_PaiDuiPageBuffer->timer0));
+			}
 		
 			//更新倒计时数据
 			for(index=0; index<PaiDuiWeiNum; index++)
@@ -353,8 +351,8 @@ static void activityResume(void)
 {
 	if(S_PaiDuiPageBuffer)
 	{
-		//一秒读取一次是否插卡
-		timer_set(&(S_PaiDuiPageBuffer->timer0), 1);
+		//进入界面先禁止插卡自动新建测试功能，通过设置超大检测时间
+		timer_set(&(S_PaiDuiPageBuffer->timer0), 65535);
 	}
 	
 	SelectPage(93);

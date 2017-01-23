@@ -237,6 +237,7 @@ static void AnalysisCode(ReadQRCodeBuffer * readQRCodeBuffer)
 		goto END;
 	
 	/*读取检测卡标准曲线临界浓度2*/
+//	readQRCodeBuffer->cardQR->ItemFenDuan[1] = 0;//strtod(readQRCodeBuffer->pbuf1 , NULL);
 	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
 	if(readQRCodeBuffer->pbuf1)
 		readQRCodeBuffer->cardQR->ItemFenDuan[1] = strtod(readQRCodeBuffer->pbuf1 , NULL);

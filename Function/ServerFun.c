@@ -122,7 +122,7 @@ MyState_TypeDef UpLoadData(char *URL, void * sendBuf, unsigned short sendLen, vo
 		sprintf(myServerData->sendBuf, "POST %s HTTP/1.1\nHost: 116.62.108.201:8080\nConnection: keep-alive\nContent-Length: %d\nContent-Type:application/x-www-form-urlencoded;charset=GBK\nAccept-Language: zh-CN,zh;q=0.8\n\n%s", URL, sendLen, (char *)sendBuf);
 		myServerData->sendDataLen = strlen(myServerData->sendBuf);
 			
-/*		CommunicateWithServerByLineNet(myServerData);
+		CommunicateWithServerByLineNet(myServerData);
 		{
 			myServerData->myp = strstr(myServerData->recvBuf, "success");
 			if(myServerData->myp)
@@ -132,7 +132,7 @@ MyState_TypeDef UpLoadData(char *URL, void * sendBuf, unsigned short sendLen, vo
 				statues = My_Pass;
 				goto END1;
 			}
-		}*/
+		}
 		
 		memset(myServerData->recvBuf, 0, SERVERRECVBUFLEN);
 		CommunicateWithServerByWifi(myServerData);

@@ -17,7 +17,7 @@
 
 #include	"PaiDuiPage.h"
 #include	"WaittingCardPage.h"
-
+#include	"Motor_Data.h"
 #include	"CardStatues_Data.h"
 #include	"UI_Data.h"
 #include	"MyTest_Data.h"
@@ -63,12 +63,15 @@ void PaiDuiHandler(void)
 			//进入排队模式
 			if(temp->statues == startpaidui)
 			{
-				temp->statues = statues1;
+				if(MaxLocation == GetGB_MotorLocation())
+				{
+					temp->statues = statues1;
 				
-				UpOneModelData(index, R_ON_G_OFF, 5);
-				//20S提示一次将卡插入排队位
-				timer_set(&(temp->timer3), 10);
-				AddNumOfSongToList(index+22, 0);
+					UpOneModelData(index, R_ON_G_OFF, 5);
+					//20S提示一次将卡插入排队位
+					timer_set(&(temp->timer3), 10);
+					AddNumOfSongToList(index+22, 0);
+				}
 			}
 			//等待拔出卡槽
 			if(temp->statues == statues1)

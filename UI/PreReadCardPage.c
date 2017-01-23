@@ -141,6 +141,10 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 				DeleteCurrentTest();
 				
 				backToActivity(lunchActivityName);
+				
+				//如果还有卡在排队，则直接跳到排队界面
+				if(IsPaiDuiTestting())
+					startActivity(createPaiDuiActivity, NULL);
 			}
 		}
 	}
@@ -318,7 +322,7 @@ static void CheckPreTestCard(void)
 {
 	if(My_Pass == TakeTestResult(&(S_PreReadPageBuffer->cardpretestresult)))
 	{
-/*		timer_restart(&(S_PreReadPageBuffer->currenttestdata->timer));
+		timer_restart(&(S_PreReadPageBuffer->currenttestdata->timer));
 		
 		//未加样
 		if(S_PreReadPageBuffer->cardpretestresult == NoSample)
@@ -346,7 +350,7 @@ static void CheckPreTestCard(void)
 			memset(&(S_PreReadPageBuffer->currenttestdata->testdata.temperweima), 0, sizeof(QRCode));
 		}
 		else if(S_PreReadPageBuffer->cardpretestresult == PeakError)
-		*/{
+		{
 			//如果是排队模式，则进入排队界面
 			if(S_PreReadPageBuffer->currenttestdata->testlocation > 0)
 			{
