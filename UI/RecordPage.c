@@ -122,8 +122,8 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		//查看
 		else if(S_RecordPageBuffer->lcdinput[0] == 0x2001)
 		{
-			if((S_RecordPageBuffer->selectindex > 0) && (S_RecordPageBuffer->selectindex <= S_RecordPageBuffer->readTestDataPackage.readDataNum))
-				startActivity(createShowResultActivity, createIntent(&S_RecordPageBuffer->readTestDataPackage.testData[S_RecordPageBuffer->selectindex-1], sizeof(TestData)));
+			if((S_RecordPageBuffer->selectindex > 0) && (S_RecordPageBuffer->selectindex <= S_RecordPageBuffer->page.ElementsSize))
+				startActivity(createShowResultActivity, createIntent(&S_RecordPageBuffer->page.testData[S_RecordPageBuffer->selectindex-1], sizeof(TestData)));
 		}
 		/*上一页*/
 		else if(S_RecordPageBuffer->lcdinput[0] == 0x2002)
@@ -150,7 +150,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		{
 			
 			S_RecordPageBuffer->tempvalue1 = S_RecordPageBuffer->lcdinput[0] - 0x2004 + 1;
-			if(S_RecordPageBuffer->tempvalue1 <= S_RecordPageBuffer->readTestDataPackage.readDataNum)
+			if(S_RecordPageBuffer->tempvalue1 <= S_RecordPageBuffer->page.ElementsSize)
 			{
 				S_RecordPageBuffer->selectindex = (S_RecordPageBuffer->lcdinput[0] - 0x2004 + 1);
 				BasicPic(0x2020, 1, 137, 83, 417, 1012, 454, 36, 148+(S_RecordPageBuffer->selectindex - 1)*39);
@@ -292,26 +292,31 @@ static MyState_TypeDef ShowRecord(unsigned char pageindex)
 	
 	if(S_RecordPageBuffer)
 	{
-		memset(&(S_RecordPageBuffer->readTestDataPackage), 0, sizeof(ReadTestDataPackage));
+		memset(&(S_RecordPageBuffer->page), 0, sizeof(Page));
 		
+		//设置分页读取信息
 		S_RecordPageBuffer->tempvalue1 = pageindex-1;
 		S_RecordPageBuffer->tempvalue1 *= DataShowNumInPage;
-		S_RecordPageBuffer->readTestDataPackage.startReadIndex = S_RecordPageBuffer->tempvalue1;
-		S_RecordPageBuffer->readTestDataPackage.maxReadNum = DataShowNumInPage;
+		S_RecordPageBuffer->pageRequest.startElementIndex = S_RecordPageBuffer->tempvalue1;
+		S_RecordPageBuffer->pageRequest.pageSize = DataShowNumInPage;
+		S_RecordPageBuffer->pageRequest.orderType = ASC;
+		
+		//再次读取系统设置数据，主要是为了读取数据总数
+		getSystemSetData(&(S_RecordPageBuffer->systemSetData));
 		
 		//读取数据
-		ReadTestDataInverte(&(S_RecordPageBuffer->readTestDataPackage));
+		ReadTestData(&(S_RecordPageBuffer->pageRequest), &(S_RecordPageBuffer->page), &(S_RecordPageBuffer->systemSetData));
 		
-		S_RecordPageBuffer->maxpagenum = ((S_RecordPageBuffer->readTestDataPackage.testDataHead.datanum % DataShowNumInPage) == 0)?(S_RecordPageBuffer->readTestDataPackage.testDataHead.datanum / DataShowNumInPage):
-		((S_RecordPageBuffer->readTestDataPackage.testDataHead.datanum / DataShowNumInPage)+1);
+		S_RecordPageBuffer->maxpagenum = ((S_RecordPageBuffer->systemSetData.testDataNum % DataShowNumInPage) == 0)?(S_RecordPageBuffer->systemSetData.testDataNum / DataShowNumInPage):
+		((S_RecordPageBuffer->systemSetData.testDataNum / DataShowNumInPage)+1);
 		
 		BasicPic(0x2020, 0, 100, 39, 522, 968, 556, 39, 140+(S_RecordPageBuffer->selectindex)*36);
 		
-		S_RecordPageBuffer->tempdata = &(S_RecordPageBuffer->readTestDataPackage.testData[S_RecordPageBuffer->readTestDataPackage.readDataNum-1]);
-		for(i=0; i<S_RecordPageBuffer->readTestDataPackage.readDataNum; i++)
+		S_RecordPageBuffer->tempdata = &(S_RecordPageBuffer->page.testData[S_RecordPageBuffer->page.ElementsSize-1]);
+		for(i=0; i<S_RecordPageBuffer->page.ElementsSize; i++)
 		{
 			memset(S_RecordPageBuffer->buf, 0, 300);
-			sprintf(S_RecordPageBuffer->buf, "%5d   %10s%15s  %8.*f %s %d-%d-%d %d:%d:%d %s ", (pageindex-1)*DataShowNumInPage+i+1, S_RecordPageBuffer->tempdata->temperweima.ItemName,
+			sprintf(S_RecordPageBuffer->buf, "%5d   %10s%15s  %8.*f %s %02d-%02d-%02d %02d:%02d:%02d %s ", (pageindex-1)*DataShowNumInPage+i+1, S_RecordPageBuffer->tempdata->temperweima.ItemName,
 				S_RecordPageBuffer->tempdata->sampleid, S_RecordPageBuffer->tempdata->temperweima.ItemPoint, S_RecordPageBuffer->tempdata->testline.AdjustResult, S_RecordPageBuffer->tempdata->temperweima.ItemMeasure,
 				S_RecordPageBuffer->tempdata->TestTime.year, S_RecordPageBuffer->tempdata->TestTime.month, S_RecordPageBuffer->tempdata->TestTime.day,
 				S_RecordPageBuffer->tempdata->TestTime.hour, S_RecordPageBuffer->tempdata->TestTime.min, S_RecordPageBuffer->tempdata->TestTime.sec,
@@ -322,11 +327,9 @@ static MyState_TypeDef ShowRecord(unsigned char pageindex)
 			S_RecordPageBuffer->tempdata--;
 		}
 		
-		for(i=S_RecordPageBuffer->readTestDataPackage.readDataNum; i<DataShowNumInPage; i++)
+		for(i=S_RecordPageBuffer->page.ElementsSize; i<DataShowNumInPage; i++)
 		{
 			ClearText(0x2030+(i)*0x40, 100);
-			
-			vTaskDelay(20);
 		}
 		
 		return My_Pass;

@@ -24,12 +24,14 @@ typedef struct UpLoadDeviceDataBuffer_Tag
 #pragma pack(1)
 typedef struct UpLoadTestDataBuffer_Tag
 {
-	ReadTestDataPackage readTestDataPackage;
+	PageRequest pageRequest;
+	Page page;
 	SystemSetData systemSetData;
 	TestData * testData;
 	char sendBuf[UPLOADSENDBUFLEN];
 	char recvBuf[UPLOADRECVBUFLEN];
 	char tempBuf[UPLOADTEMPBUFLEN];
+	unsigned char k;
 	unsigned short i;
 	unsigned short j;
 }UpLoadTestDataBuffer;

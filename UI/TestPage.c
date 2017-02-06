@@ -13,6 +13,7 @@
 
 #include	"System_Data.h"
 #include	"TestDataDao.h"
+#include	"SystemSet_Dao.h"
 #include	"Test_Task.h"
 #include	"LunchPage.h"
 #include	"Printf_Fun.h"
@@ -329,7 +330,14 @@ static void RefreshCurve(void)
 	if(My_Pass == TakeTestResult(&(S_TestPageBuffer->cardpretestresult)))
 	{
 		GetGB_Time(&(GetCurrentTestItem()->testdata.TestTime));
-		WriteTestData(&(GetCurrentTestItem()->testdata));
+		
+		//保存数据
+		WriteTestData(&(GetCurrentTestItem()->testdata), getTestDataTotalNum());
+		//测试数目+1
+		plusTestDataTotalNum(1);
+		//保存测试数目
+		persistSystemSetData();
+		
 		MotorMoveTo(MaxLocation, 1);
 		
 		if(S_TestPageBuffer->cardpretestresult == ResultIsOK)

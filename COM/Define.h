@@ -26,7 +26,7 @@
 #define	GB_SoftVersion_1	1
 #define	GB_SoftVersion_2	0
 #define	GB_SoftVersion_3	3
-#define	GB_SoftVersion_Build	"Build17012301\0"
+#define	GB_SoftVersion_Build	"Build17020601\0"
 
 /*服务器信息*/
 #define	GB_ServerIp_1		116

@@ -53,6 +53,9 @@ void setDefaultSetData(SystemSetData * systemSetData)
 		systemSetData->netSet.ipmode = DHCP_Mode;
 		systemSetData->netSet.crc = CalModbusCRC16Fun1(&(systemSetData->netSet), sizeof(NetSet) - 2);
 		
+		systemSetData->testDataNum = 0;
+		systemSetData->upLoadIndex = 0;
+		
 		systemSetData->crc = CalModbusCRC16Fun1(systemSetData, sizeof(SystemSetData) - 2);
 	}
 }
@@ -230,4 +233,58 @@ unsigned char getLedLightIntensity(void)
 	else
 		return 100;
 }
+
+/***************************************************************************************************
+*FunctionName: plusTestTotalNum
+*Description: 增加测试数据数据
+*Input: num -- 增加的数目
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月6日15:41:01
+***************************************************************************************************/
+void plusTestDataTotalNum(unsigned char num)
+{
+	if(GB_SystemSetData.crc != CalModbusCRC16Fun1(&GB_SystemSetData, sizeof(SystemSetData) - 2))
+		setDefaultSetData(&GB_SystemSetData);
+	
+	GB_SystemSetData.testDataNum += num;
+	GB_SystemSetData.crc = CalModbusCRC16Fun1(&GB_SystemSetData, sizeof(SystemSetData) - 2);
+}
+
+/***************************************************************************************************
+*FunctionName: getTestDataTotalNum
+*Description: 读取当前测试数据总数
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月6日15:46:09
+***************************************************************************************************/
+unsigned int getTestDataTotalNum(void)
+{
+	if(GB_SystemSetData.crc != CalModbusCRC16Fun1(&GB_SystemSetData, sizeof(SystemSetData) - 2))
+		setDefaultSetData(&GB_SystemSetData);
+	
+	return GB_SystemSetData.testDataNum;
+}
+
+/***************************************************************************************************
+*FunctionName: setUpLoadIndex
+*Description: 更新上传索引
+*Input: index -- 上传数据的索引
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月6日14:52:13
+***************************************************************************************************/
+void setUpLoadIndex(unsigned int index)
+{
+	if(GB_SystemSetData.crc != CalModbusCRC16Fun1(&GB_SystemSetData, sizeof(SystemSetData) - 2))
+		setDefaultSetData(&GB_SystemSetData);
+	
+	GB_SystemSetData.upLoadIndex = index;
+	GB_SystemSetData.crc = CalModbusCRC16Fun1(&GB_SystemSetData, sizeof(SystemSetData) - 2);
+}
+
 /****************************************end of file************************************************/

@@ -32,8 +32,8 @@
 /**************************************局部函数声明*************************************************/
 /***************************************************************************************************/
 static MyState_TypeDef ReadTime(void);
-static MyState_TypeDef UpLoadDeviceInfo(void);
-static MyState_TypeDef UpLoadTestData(void);
+static void UpLoadDeviceInfo(void);
+static void UpLoadTestData(void);
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************正文********************************************************/
@@ -93,10 +93,8 @@ static MyState_TypeDef ReadTime(void)
 	return status;
 }
 
-static MyState_TypeDef UpLoadDeviceInfo(void)
+static void UpLoadDeviceInfo(void)
 {
-	MyState_TypeDef status = My_Fail;
-
 	UpLoadDeviceDataBuffer * upLoadDeviceDataBuffer = NULL;
 	
 	upLoadDeviceDataBuffer = MyMalloc(sizeof(UpLoadDeviceDataBuffer));
@@ -127,23 +125,17 @@ static MyState_TypeDef UpLoadDeviceInfo(void)
 					if(My_Pass == SaveSystemSetData(&(upLoadDeviceDataBuffer->systemSetData)))
 					{
 						setSystemSetData(&(upLoadDeviceDataBuffer->systemSetData));
-						status = My_Pass;
 					}
 				}
 			}
-			else
-				status = My_Pass;
 		}
 	}
 	
 	MyFree(upLoadDeviceDataBuffer);
-	
-	return status;
 }
 
-static MyState_TypeDef UpLoadTestData(void)
+static void UpLoadTestData(void)
 {
-	MyState_TypeDef statues = My_Fail;
 	UpLoadTestDataBuffer * upLoadTestDataBuffer = NULL;
 	
 	upLoadTestDataBuffer = MyMalloc(sizeof(UpLoadTestDataBuffer));
@@ -155,90 +147,84 @@ static MyState_TypeDef UpLoadTestData(void)
 		//读取设备信息
 		getSystemSetData(&(upLoadTestDataBuffer->systemSetData));
 		
-		//读取测试数据头,失败则退出
-		upLoadTestDataBuffer->readTestDataPackage.startReadIndex = 0;
-		upLoadTestDataBuffer->readTestDataPackage.maxReadNum = 0;
-		if(My_Pass != ReadTestData(&(upLoadTestDataBuffer->readTestDataPackage)))
-			goto END;
-		
 		//检测数据头是否校验正确，且有数据待发送
-		if((upLoadTestDataBuffer->readTestDataPackage.testDataHead.crc != CalModbusCRC16Fun1(&(upLoadTestDataBuffer->readTestDataPackage.testDataHead), sizeof(TestDataHead)-2)) ||
-				upLoadTestDataBuffer->readTestDataPackage.testDataHead.readindex >= upLoadTestDataBuffer->readTestDataPackage.testDataHead.datanum)
+		if(upLoadTestDataBuffer->systemSetData.upLoadIndex >= upLoadTestDataBuffer->systemSetData.testDataNum)
 			goto END;
 		
 		//读取测试数据,读取失败则退出
-		upLoadTestDataBuffer->readTestDataPackage.startReadIndex = upLoadTestDataBuffer->readTestDataPackage.testDataHead.readindex;
-		upLoadTestDataBuffer->readTestDataPackage.maxReadNum = 1;
-		if(My_Pass != ReadTestData(&(upLoadTestDataBuffer->readTestDataPackage)))
-			goto END;
-		
-		//校验读取的数据的正确性,如果不正确，则上传索引+1，略过此数据
-		if(upLoadTestDataBuffer->readTestDataPackage.testData[0].crc != CalModbusCRC16Fun1(&(upLoadTestDataBuffer->readTestDataPackage.testData[0]), sizeof(TestData)-2))
-		{
-			upLoadTestDataBuffer->readTestDataPackage.testDataHead.readindex += 1;
-			WriteTestDataHead(&(upLoadTestDataBuffer->readTestDataPackage.testDataHead));
-			
-			statues = My_Pass;
+		upLoadTestDataBuffer->pageRequest.startElementIndex = upLoadTestDataBuffer->systemSetData.upLoadIndex;
+		upLoadTestDataBuffer->pageRequest.orderType = DESC;
+		upLoadTestDataBuffer->pageRequest.pageSize = 1;
 
-			goto END;
-		}
-		
-		//上传测试数据
-		memset(upLoadTestDataBuffer->sendBuf, 0, UPLOADSENDBUFLEN);
-		upLoadTestDataBuffer->testData = &(upLoadTestDataBuffer->readTestDataPackage.testData[0]);
-		
-		sprintf(upLoadTestDataBuffer->sendBuf, "cnum=%s&card.cid=%s&device.did=%s&t_name=%s&sid=%s&testtime=20%d-%d-%d %d:%d:%d&e_t=%.1f&o_t=%.1f&outt=%d&c_l=%d&t_l=%d&b_l=%d&t_c_v=%.3f&a_p=%.3f&b_v=%.3f&a_v=%.3f&t_re=%s",
-			upLoadTestDataBuffer->testData->temperweima.piNum, upLoadTestDataBuffer->testData->temperweima.PiHao, upLoadTestDataBuffer->systemSetData.deviceInfo.deviceid, upLoadTestDataBuffer->testData->user.user_name, upLoadTestDataBuffer->testData->sampleid,
-			upLoadTestDataBuffer->testData->TestTime.year, upLoadTestDataBuffer->testData->TestTime.month, upLoadTestDataBuffer->testData->TestTime.day, upLoadTestDataBuffer->testData->TestTime.hour, upLoadTestDataBuffer->testData->TestTime.min, upLoadTestDataBuffer->testData->TestTime.sec,
-			upLoadTestDataBuffer->testData->TestTemp.E_Temperature, upLoadTestDataBuffer->testData->TestTemp.O_Temperature, upLoadTestDataBuffer->testData->time, upLoadTestDataBuffer->testData->testline.C_Point[1], upLoadTestDataBuffer->testData->testline.T_Point[1],
-			upLoadTestDataBuffer->testData->testline.B_Point[1], upLoadTestDataBuffer->testData->testline.BasicBili, upLoadTestDataBuffer->testData->tempadjust.parm, upLoadTestDataBuffer->testData->testline.BasicResult, upLoadTestDataBuffer->testData->testline.AdjustResult,
-			"ok");
-
-		if(My_Pass != UpLoadData("/NCD_Server/up_testdata", upLoadTestDataBuffer->sendBuf, strlen(upLoadTestDataBuffer->sendBuf), 
-			upLoadTestDataBuffer->recvBuf, UPLOADRECVBUFLEN))
+		if(My_Pass != ReadTestData(&(upLoadTestDataBuffer->pageRequest), &(upLoadTestDataBuffer->page), &(upLoadTestDataBuffer->systemSetData)))
 			goto END;
 		
-		//上传测试曲线
-		for(upLoadTestDataBuffer->i=0; upLoadTestDataBuffer->i<3; upLoadTestDataBuffer->i++)
+		upLoadTestDataBuffer->testData = upLoadTestDataBuffer->page.testData;
+		for(upLoadTestDataBuffer->k=0; upLoadTestDataBuffer->k< upLoadTestDataBuffer->page.ElementsSize; upLoadTestDataBuffer->k++)
 		{
-			memset(upLoadTestDataBuffer->sendBuf, 0, UPLOADSENDBUFLEN);
-			sprintf(upLoadTestDataBuffer->sendBuf, "cnum=%s&card.cid=%s&", upLoadTestDataBuffer->testData->temperweima.piNum, upLoadTestDataBuffer->testData->temperweima.PiHao);
-			
-			memset(upLoadTestDataBuffer->tempBuf, 0, UPLOADTEMPBUFLEN);
-			if(upLoadTestDataBuffer->i == 0)
-				sprintf(upLoadTestDataBuffer->tempBuf, "serie_a=[");
-			else if(upLoadTestDataBuffer->i == 1)
-				sprintf(upLoadTestDataBuffer->tempBuf, "serie_b=[");
-			else
-				sprintf(upLoadTestDataBuffer->tempBuf, "serie_c=[");
-			strcat(upLoadTestDataBuffer->sendBuf, upLoadTestDataBuffer->tempBuf);
-			
-			for(upLoadTestDataBuffer->j=0; upLoadTestDataBuffer->j<100; upLoadTestDataBuffer->j++)
+			//如果crc校验正确，则开始上传
+			if(upLoadTestDataBuffer->testData->crc == CalModbusCRC16Fun1(upLoadTestDataBuffer->testData, sizeof(TestData)-2))
 			{
-				memset(upLoadTestDataBuffer->tempBuf, 0, UPLOADTEMPBUFLEN);
-				if(upLoadTestDataBuffer->j == 0)
-					sprintf(upLoadTestDataBuffer->tempBuf, "%d", upLoadTestDataBuffer->testData->testline.TestPoint[upLoadTestDataBuffer->i*100 + upLoadTestDataBuffer->j]);
-				else
-					sprintf(upLoadTestDataBuffer->tempBuf, ",%d", upLoadTestDataBuffer->testData->testline.TestPoint[upLoadTestDataBuffer->i*100 + upLoadTestDataBuffer->j]);
-				strcat(upLoadTestDataBuffer->sendBuf, upLoadTestDataBuffer->tempBuf);
+				//上传测试数据
+				memset(upLoadTestDataBuffer->sendBuf, 0, UPLOADSENDBUFLEN);
+				
+				sprintf(upLoadTestDataBuffer->sendBuf, "cnum=%s&card.cid=%s&device.did=%s&t_name=%s&sid=%s&testtime=20%d-%d-%d %d:%d:%d&e_t=%.1f&o_t=%.1f&outt=%d&c_l=%d&t_l=%d&b_l=%d&t_c_v=%.3f&a_p=%.3f&b_v=%.3f&a_v=%.3f&t_re=%s",
+					upLoadTestDataBuffer->testData->temperweima.piNum, upLoadTestDataBuffer->testData->temperweima.PiHao, upLoadTestDataBuffer->systemSetData.deviceInfo.deviceid, upLoadTestDataBuffer->testData->user.user_name, upLoadTestDataBuffer->testData->sampleid,
+					upLoadTestDataBuffer->testData->TestTime.year, upLoadTestDataBuffer->testData->TestTime.month, upLoadTestDataBuffer->testData->TestTime.day, upLoadTestDataBuffer->testData->TestTime.hour, upLoadTestDataBuffer->testData->TestTime.min, upLoadTestDataBuffer->testData->TestTime.sec,
+					upLoadTestDataBuffer->testData->TestTemp.E_Temperature, upLoadTestDataBuffer->testData->TestTemp.O_Temperature, upLoadTestDataBuffer->testData->time, upLoadTestDataBuffer->testData->testline.C_Point[1], upLoadTestDataBuffer->testData->testline.T_Point[1],
+					upLoadTestDataBuffer->testData->testline.B_Point[1], upLoadTestDataBuffer->testData->testline.BasicBili, upLoadTestDataBuffer->testData->tempadjust.parm, upLoadTestDataBuffer->testData->testline.BasicResult, upLoadTestDataBuffer->testData->testline.AdjustResult,
+					"ok");
+
+				if(My_Pass != UpLoadData("/NCD_Server/up_testdata", upLoadTestDataBuffer->sendBuf, strlen(upLoadTestDataBuffer->sendBuf), 
+					upLoadTestDataBuffer->recvBuf, UPLOADRECVBUFLEN))
+					break;
+				
+				//上传测试曲线
+				for(upLoadTestDataBuffer->i=0; upLoadTestDataBuffer->i<3; upLoadTestDataBuffer->i++)
+				{
+					memset(upLoadTestDataBuffer->sendBuf, 0, UPLOADSENDBUFLEN);
+					sprintf(upLoadTestDataBuffer->sendBuf, "cnum=%s&card.cid=%s&", upLoadTestDataBuffer->testData->temperweima.piNum, upLoadTestDataBuffer->testData->temperweima.PiHao);
+					
+					memset(upLoadTestDataBuffer->tempBuf, 0, UPLOADTEMPBUFLEN);
+					if(upLoadTestDataBuffer->i == 0)
+						sprintf(upLoadTestDataBuffer->tempBuf, "serie_a=[");
+					else if(upLoadTestDataBuffer->i == 1)
+						sprintf(upLoadTestDataBuffer->tempBuf, "serie_b=[");
+					else
+						sprintf(upLoadTestDataBuffer->tempBuf, "serie_c=[");
+					strcat(upLoadTestDataBuffer->sendBuf, upLoadTestDataBuffer->tempBuf);
+					
+					for(upLoadTestDataBuffer->j=0; upLoadTestDataBuffer->j<100; upLoadTestDataBuffer->j++)
+					{
+						memset(upLoadTestDataBuffer->tempBuf, 0, UPLOADTEMPBUFLEN);
+						if(upLoadTestDataBuffer->j == 0)
+							sprintf(upLoadTestDataBuffer->tempBuf, "%d", upLoadTestDataBuffer->testData->testline.TestPoint[upLoadTestDataBuffer->i*100 + upLoadTestDataBuffer->j]);
+						else
+							sprintf(upLoadTestDataBuffer->tempBuf, ",%d", upLoadTestDataBuffer->testData->testline.TestPoint[upLoadTestDataBuffer->i*100 + upLoadTestDataBuffer->j]);
+						strcat(upLoadTestDataBuffer->sendBuf, upLoadTestDataBuffer->tempBuf);
+					}
+					
+					sprintf(upLoadTestDataBuffer->tempBuf, "]");
+					strcat(upLoadTestDataBuffer->sendBuf, upLoadTestDataBuffer->tempBuf);
+					
+
+					if(My_Pass != UpLoadData("/NCD_Server/up_series", upLoadTestDataBuffer->sendBuf, strlen(upLoadTestDataBuffer->sendBuf),
+						upLoadTestDataBuffer->recvBuf, UPLOADRECVBUFLEN))
+						break;
+				}
 			}
 			
-			sprintf(upLoadTestDataBuffer->tempBuf, "]");
-			strcat(upLoadTestDataBuffer->sendBuf, upLoadTestDataBuffer->tempBuf);
-			
-
-			if(My_Pass != UpLoadData("/NCD_Server/up_series", upLoadTestDataBuffer->sendBuf, strlen(upLoadTestDataBuffer->sendBuf),
-				upLoadTestDataBuffer->recvBuf, UPLOADRECVBUFLEN))
-				goto END;
+			upLoadTestDataBuffer->systemSetData.upLoadIndex++;
+			upLoadTestDataBuffer->testData++;
 		}
 		
-		upLoadTestDataBuffer->readTestDataPackage.testDataHead.readindex += 1;
-		WriteTestDataHead(&(upLoadTestDataBuffer->readTestDataPackage.testDataHead));
-		statues = My_Pass;
+		//更新系统设置数据中的上传索引数据
+		setUpLoadIndex(upLoadTestDataBuffer->systemSetData.upLoadIndex);
+		//持久化系统设置数据
+		persistSystemSetData();
 	}
 	
 	END:
 		MyFree(upLoadTestDataBuffer);
 
-	return statues;
 }

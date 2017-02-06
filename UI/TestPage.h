@@ -2,6 +2,7 @@
 #define __TEST_P_H__
 
 #include	"MyTest_Data.h"
+#include	"SystemSet_Data.h"
 #include	"Test_Fun.h"
 #include	"UI_Data.h"
 

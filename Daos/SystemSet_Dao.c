@@ -34,6 +34,40 @@
 /***************************************************************************************************/
 
 /***************************************************************************************************
+*FunctionName: persistSystemSetData
+*Description: 持久化系统设置数据，保持系统设置数据的唯一接口
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月6日14:56:52
+***************************************************************************************************/
+MyState_TypeDef persistSystemSetData(void)
+{
+	MyState_TypeDef status = My_Fail;
+	SystemSetData * systemSetData;
+	
+	systemSetData = MyMalloc(sizeof(SystemSetData));
+	
+	if(systemSetData)
+	{
+		//从内存中读取最新的数据
+		getSystemSetData(systemSetData);
+		
+		//将最新的数据保存到sd卡
+		if(My_Pass == SaveSystemSetData(systemSetData))
+		{
+			setSystemSetData(systemSetData);
+			status = My_Pass;
+		}
+	}
+	
+	MyFree(systemSetData);
+	
+	return status;
+}
+
+/***************************************************************************************************
 *FunctionName: SaveSystemSetData
 *Description: 保存系统设置参数
 *Input: 
@@ -45,7 +79,7 @@
 MyState_TypeDef SaveSystemSetData(SystemSetData * systemSetData)
 {
 	FatfsFileInfo_Def * myfile = NULL;
-	MyState_TypeDef statues = My_Fail;
+	MyState_TypeDef status = My_Fail;
 	
 	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
 	
@@ -65,7 +99,7 @@ MyState_TypeDef SaveSystemSetData(SystemSetData * systemSetData)
 			
 			//如果写入成功，则更新内存中的设备信息
 			if((FR_OK == myfile->res)&&(myfile->bw == sizeof(SystemSetData)))
-				statues = My_Pass;
+				status = My_Pass;
 				
 			f_close(&(myfile->file));
 		}
@@ -73,7 +107,7 @@ MyState_TypeDef SaveSystemSetData(SystemSetData * systemSetData)
 	
 	MyFree(myfile);
 	
-	return statues;
+	return status;
 }
 
 /***************************************************************************************************

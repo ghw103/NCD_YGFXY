@@ -3,32 +3,39 @@
 #define	_TESTDATA_D_H
 
 #include	"Define.h"
+#include	"SystemSet_Data.h"
 
 #define	DataShowNumInPage		8							//一页8个数据
 
-#pragma pack(1)
-typedef struct TestDataHead_tag {
-	unsigned int datanum;
-	unsigned int readindex;
-	unsigned short crc;
-}TestDataHead;
-#pragma pack()
-
-#pragma pack(1)
-typedef struct ReadTestDataPackage_Tag
+typedef enum
 {
-	TestData testData[DataShowNumInPage];									//读取数据缓冲区
-	TestDataHead testDataHead;												//测试数据保存文件的文件头
-	unsigned int startReadIndex;											//开始读取索引,0开始
-	unsigned char maxReadNum;												//最大读取数目
-	unsigned char readDataNum;												//成功读取到的数据数目
-}ReadTestDataPackage;
+	DESC = 0,												//正序
+	ASC = 1													//逆序
+}OrderByEnum;
+
+//读取请求信息
+#pragma pack(1)
+typedef struct PageRequest_tag {
+	unsigned int startElementIndex;											//起始读取索引，0为第一个
+	unsigned int pageSize;													//每页的数目
+	OrderByEnum orderType;													//排序方式
+	unsigned short crc;
+}PageRequest;
 #pragma pack()
 
-MyState_TypeDef WriteTestData(TestData * testdata);
-MyState_TypeDef ReadTestData(ReadTestDataPackage * readpackage);
-MyState_TypeDef ReadTestDataInverte(ReadTestDataPackage * readpackage);
-MyState_TypeDef WriteTestDataHead(TestDataHead * testDataHead);
+//读取到的数据
+#pragma pack(1)
+typedef struct Page_tag {
+	unsigned short ElementsSize;											//读取到的数据数目
+	TestData testData[DataShowNumInPage];									//读取到的数据
+	unsigned short crc;
+}Page;
+#pragma pack()
+
+
+MyState_TypeDef WriteTestData(TestData * testdata, unsigned int writeIndex);
+MyState_TypeDef ReadTestData(PageRequest * pageRequest, Page * page, SystemSetData * systemSetData);
+
 #endif
 
 /****************************************end of file************************************************/

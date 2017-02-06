@@ -50,5 +50,11 @@
 				timer_restart(&(S_PaiDuiPageBuffer->timer0));
             }
 
-* 无序列表项 二
-* 无序列表项 三
+>版本号：<font color=red>V1.0.3</font><br>
+>编译版本：<font color=#DC641E>Build17020601</font><br>
+>版本发布时间：<font color=#1E94DC>2017年2月6日16:23:42</font><br>
+>版本发布人：<font color=#1EDC47>张雄</font><br>
+>版本说明：<font color=#DCDA1E>优化数据保存，减少IO次数</font><br>
+> 详细说明：<br>
+
+* ##### 优化1： 以前的数据上传每次需读取SD卡，检查是否有新数据等待上传，现在将是否有新数据的内容放在系统设置数据中，保存在内存中，上传数据时只需检查内存，有数据等待上传才读取SD卡，无数据则不读取
