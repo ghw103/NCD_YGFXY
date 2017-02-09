@@ -181,7 +181,7 @@ static MyState_TypeDef loadSystemData(void)
 		if(systemSetData->crc != CalModbusCRC16Fun1(systemSetData, sizeof(SystemSetData) - 2))
 		{
 			//恢复默认设置
-			setDefaultSetData(systemSetData);
+			setDefaultSystemSetData(systemSetData);
 			
 			//保存默认设置
 			if(My_Pass == SaveSystemSetData(systemSetData))

@@ -73,7 +73,7 @@ static void WriteLCDRegister(unsigned char reg, void *data, unsigned char len)
 	
 	CalModbusCRC16Fun2(txdat+3, len + 2, q);
 	
-	SendDataToQueue(GetUsart6TXQueue(), GetUsart6TXMutex(), txdat, txdat[2]+3, 1, 50 / portTICK_RATE_MS, EnableUsart6TXInterrupt);
+	SendDataToQueue(GetUsart6TXQueue(), GetUsart6TXMutex(), txdat, txdat[2]+3, 1, 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart6TXInterrupt);
 	
 	MyFree(txdat);
 }
@@ -111,7 +111,7 @@ static void ReadLCDRegister(unsigned char reg, unsigned char len)
 	
 	CalModbusCRC16Fun2(txdat+3, 1 + 2, q);
 	
-	SendDataToQueue(GetUsart6TXQueue(), GetUsart6TXMutex(), txdat, txdat[2]+3, 1, 50 / portTICK_RATE_MS, EnableUsart6TXInterrupt);
+	SendDataToQueue(GetUsart6TXQueue(), GetUsart6TXMutex(), txdat, txdat[2]+3, 1, 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart6TXInterrupt);
 	
 	MyFree(txdat);
 }
@@ -143,7 +143,7 @@ static void WriteLCDData(unsigned short addr, void *data, unsigned char len)
 	
 	CalModbusCRC16Fun2(txdat+3, len + 3, q);
 	
-	SendDataToQueue(GetUsart6TXQueue(), GetUsart6TXMutex(), txdat, txdat[2]+3, 1, 50 / portTICK_RATE_MS, EnableUsart6TXInterrupt);
+	SendDataToQueue(GetUsart6TXQueue(), GetUsart6TXMutex(), txdat, txdat[2]+3, 1, 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart6TXInterrupt);
 
 	MyFree(txdat);
 }
@@ -394,7 +394,7 @@ void DisPlayLine(unsigned char channel , void * data , unsigned char datalen)
 	
 	CalModbusCRC16Fun2(txdat+3, datalen*2 + 2, q);
 	
-	SendDataToQueue(GetUsart6TXQueue(), GetUsart6TXMutex(), txdat, txdat[2]+3, 1, 50 * portTICK_RATE_MS, EnableUsart6TXInterrupt);
+	SendDataToQueue(GetUsart6TXQueue(), GetUsart6TXMutex(), txdat, txdat[2]+3, 1, 50 * portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart6TXInterrupt);
 
 	MyFree(txdat);
 }

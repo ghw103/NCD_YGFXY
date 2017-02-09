@@ -82,7 +82,7 @@ static void activityStart(void)
 {
 	if(S_OtherSetPageBuffer)
 	{
-		getSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
+		copyGBSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
 		
 		timer_set(&(S_OtherSetPageBuffer->timer), S_OtherSetPageBuffer->systemSetData.ledSleepTime);
 		
@@ -148,7 +148,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			else
 			{
 				SendKeyCode(2);
-				getSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
+				copyGBSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
 			}
 			
 			showPrintfIco();
@@ -171,7 +171,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			else
 			{
 				SendKeyCode(2);
-				getSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
+				copyGBSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
 			}
 			
 			showMuteIco();
@@ -205,7 +205,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			else
 			{
 				SendKeyCode(2);
-				getSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
+				copyGBSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
 			}
 			
 			showLcdSleepTime();
@@ -235,7 +235,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			else
 			{
 				SendKeyCode(2);
-				getSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
+				copyGBSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
 			}
 			
 			showLcdLightNum();

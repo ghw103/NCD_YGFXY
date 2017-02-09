@@ -9,6 +9,7 @@
 /******************************************头文件***************************************************/
 /***************************************************************************************************/
 #include	"MyTest_Data.h"
+#include	"SystemSet_Data.h"
 
 #include	"MyMem.h"
 #include	"string.h"
@@ -83,6 +84,9 @@ CreateTestErrorType CreateANewTest(TestType testtype)
 			memset(GB_TestBuffer.CurrentTestDataBuffer, 0, sizeof(ItemData));
 			GB_TestBuffer.NormalTestDataBuffer->testlocation = 0;
 			
+			//从系统设置数据中获取测试时led的亮度值
+			GB_TestBuffer.NormalTestDataBuffer->ledLight = getTestLedLightIntensity(getGBSystemSetData());
+			
 			return Error_OK;
 		}
 	}
@@ -109,6 +113,9 @@ CreateTestErrorType CreateANewTest(TestType testtype)
 					
 					//复制排队共用操作人到当前测试数据中，如果是第一次创建排队，后面选择操作人则会覆盖此次操作
 					memcpy(&(GB_TestBuffer.CurrentTestDataBuffer->testdata.user), &(GB_TestBuffer.PaiduiUser), sizeof(User_Type));
+					
+					//从系统设置数据中获取测试时led的亮度值
+					GB_TestBuffer.CurrentTestDataBuffer->ledLight = getTestLedLightIntensity(getGBSystemSetData());
 					
 					return Error_OK;
 				}

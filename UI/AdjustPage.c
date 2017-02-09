@@ -12,6 +12,8 @@
 #include	"CodeScan_Task.h"
 #include	"Test_Task.h"
 #include	"SDFunction.h"
+#include	"Motor_Fun.h"
+#include	"SystemSet_Dao.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -35,10 +37,11 @@ static void activityDestroy(void);
 static MyState_TypeDef activityBufferMalloc(void);
 static void activityBufferFree(void);
 
+static void dspAdjStatus(char * str);
+static void dspTestResult(void);
+static void dspAdjResult(void);
 static void CheckQRCode(void);
 static void CheckPreTestCard(void);
-static void DspPage2Text(void);
-static void DspPage3Text(void);
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -83,10 +86,16 @@ static void activityStart(void)
 {
 	if(S_AdjustPageBuffer)
 	{
-		timer_set(&(S_AdjustPageBuffer->timer), 30);
+		//获取最新的系统参数
+		copyGBSystemSetData(&(S_AdjustPageBuffer->systemSetData));
+		
+		//获取最新led亮度值
+		S_AdjustPageBuffer->itemData.ledLight = getTestLedLightIntensity(&(S_AdjustPageBuffer->systemSetData));
+		
+		dspAdjStatus("Waitting\0");
 	}
 
-	SelectPage(88);
+	SelectPage(118);
 }
 
 /***************************************************************************************************
@@ -107,27 +116,66 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		S_AdjustPageBuffer->lcdinput[0] = (S_AdjustPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
 		/*退出*/
-		if(S_AdjustPageBuffer->lcdinput[0] == 0x2f30)
+		if(S_AdjustPageBuffer->lcdinput[0] == 0x2701)
 		{
-			backToFatherActivity();
+			if(S_AdjustPageBuffer->isAdjjing == true)
+				SendKeyCode(3);
+			else
+				backToFatherActivity();
+		}
+		//开始测试
+		else if(S_AdjustPageBuffer->lcdinput[0] == 0x270a)
+		{
+			if(GetCardState() == CardIN)
+			{
+				if(S_AdjustPageBuffer->isAdjjing == true)
+					dspAdjStatus("Already Test\0");
+				else
+				{
+					S_AdjustPageBuffer->isAdjjing = true;
+					
+					StartScanQRCode(&(S_AdjustPageBuffer->itemData.testdata.temperweima));
+				
+					dspAdjStatus("Scanning QR\0");
+				}
+			}
+			else
+			{
+				dspAdjStatus("No Card\0");
+			}
 		}
 		/*校准*/
-		else if(S_AdjustPageBuffer->lcdinput[0] == 0x2f32)
+		else if(S_AdjustPageBuffer->lcdinput[0] == 0x2702)
 		{
-			if((S_AdjustPageBuffer->testdata.testdata.testline.BasicResult != 0) && (S_AdjustPageBuffer->targetresult != 0))
+			if((S_AdjustPageBuffer->itemData.testdata.testline.BasicResult != 0) && (S_AdjustPageBuffer->targetresult != 0))
 			{
-				S_AdjustPageBuffer->tempadjust.parm = S_AdjustPageBuffer->targetresult / S_AdjustPageBuffer->testdata.testdata.testline.BasicResult;
-				SaveAdjustData(&(S_AdjustPageBuffer->tempadjust));
-				SelectPage(92);
-				DspPage3Text();
+				S_AdjustPageBuffer->adjustData.parm = S_AdjustPageBuffer->targetresult / S_AdjustPageBuffer->itemData.testdata.testline.BasicResult;
+
+				dspAdjResult();
+				
+				dspAdjStatus("Success\0");
 			}
 		}
 		/*输入标准值*/
-		else if(S_AdjustPageBuffer->lcdinput[0] == 0x2f48)
+		else if(S_AdjustPageBuffer->lcdinput[0] == 0x2740)
 		{
 			memset(S_AdjustPageBuffer->buf, 0 , 100);
 			memcpy(S_AdjustPageBuffer->buf, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			S_AdjustPageBuffer->targetresult = strtod(S_AdjustPageBuffer->buf, NULL);
+		}
+		//保存校准结果
+		else if(S_AdjustPageBuffer->lcdinput[0] == 0x2700)
+		{
+			//获取最新的系统参数
+			copyGBSystemSetData(&(S_AdjustPageBuffer->systemSetData));
+			
+			//修改系统参数副本中对于项目的校准值
+			addAdjPram(&(S_AdjustPageBuffer->systemSetData), &(S_AdjustPageBuffer->adjustData));
+			
+			if(My_Pass == SaveSystemSetData(&(S_AdjustPageBuffer->systemSetData)))
+				SendKeyCode(1);
+			else
+				SendKeyCode(2);
 		}
 	}
 }
@@ -145,21 +193,19 @@ static void activityFresh(void)
 {
 	if(S_AdjustPageBuffer)
 	{
-		if((S_AdjustPageBuffer->step == 0) && (GetCardState() == CardIN))
+		/*是否插卡*/
+		if(GetCardState() == NoCard)
 		{
-			S_AdjustPageBuffer->step = 1;
-			SelectPage(90);
-			DspPage2Text();
-			StartScanQRCode(&(S_AdjustPageBuffer->testdata.testdata.temperweima));
+			if(S_AdjustPageBuffer->isAdjjing == false)
+			{
+				dspAdjStatus("Waitting\0");
+			}
 		}
 		
-		if (S_AdjustPageBuffer->step == 1)
-			CheckQRCode();
+		CheckQRCode();
 		
-		if(S_AdjustPageBuffer->step == 2)
-			CheckPreTestCard();
+		CheckPreTestCard();
 	}
-	
 }
 
 /***************************************************************************************************
@@ -253,77 +299,82 @@ static void activityBufferFree(void)
 /***************************************************************************************************/
 /***************************************************************************************************/
 
-static void DspPage2Text(void)
+static void dspAdjStatus(char * str)
 {
-	if(S_AdjustPageBuffer)
-	{
-		if(S_AdjustPageBuffer->testdata.testdata.testline.BasicResult == 0)
-		{
-			memset(S_AdjustPageBuffer->buf, 0, 100);
-			sprintf(S_AdjustPageBuffer->buf, "Wait...");
-			DisText(0x2f40, S_AdjustPageBuffer->buf, strlen(S_AdjustPageBuffer->buf));
-			DisText(0x2f48, S_AdjustPageBuffer->buf, strlen(S_AdjustPageBuffer->buf));
-		}
-		else
-		{
-			memset(S_AdjustPageBuffer->buf, 0, 100);
-			sprintf(S_AdjustPageBuffer->buf, "%.2f", S_AdjustPageBuffer->testdata.testdata.testline.BasicResult);
-			DisText(0x2f40, S_AdjustPageBuffer->buf, strlen(S_AdjustPageBuffer->buf));
-			ClearText(0x2f48, 10);
-		}
-	}
+	memset(S_AdjustPageBuffer->buf, 0, 20);
+	sprintf(S_AdjustPageBuffer->buf, "%-15s", str);
+	DisText(0x2710, S_AdjustPageBuffer->buf, strlen(S_AdjustPageBuffer->buf));
 }
 
-static void DspPage3Text(void)
+static void dspTestResult(void)
 {
-	if(S_AdjustPageBuffer)
-	{
-		
-		if(My_Fail == ReadAdjustData(&(S_AdjustPageBuffer->tempadjust)))
-			memset(&(S_AdjustPageBuffer->tempadjust), 0, sizeof(AdjustData));
-		
-		memset(S_AdjustPageBuffer->buf, 0, 100);
-		sprintf(S_AdjustPageBuffer->buf, "%.3f", S_AdjustPageBuffer->tempadjust.parm);
-		DisText(0x2f50, S_AdjustPageBuffer->buf, strlen(S_AdjustPageBuffer->buf));
-		
-		memset(S_AdjustPageBuffer->buf, 0, 100);
-		S_AdjustPageBuffer->testdata.testdata.testline.AdjustResult = S_AdjustPageBuffer->tempadjust.parm * S_AdjustPageBuffer->testdata.testdata.testline.BasicResult;
-		sprintf(S_AdjustPageBuffer->buf, "%.2f", S_AdjustPageBuffer->testdata.testdata.testline.AdjustResult);
-		DisText(0x2f58, S_AdjustPageBuffer->buf, strlen(S_AdjustPageBuffer->buf));
-	}
+	sprintf(S_AdjustPageBuffer->buf, "(%d,%d)", S_AdjustPageBuffer->itemData.testdata.testline.T_Point[1], S_AdjustPageBuffer->itemData.testdata.testline.T_Point[0]);
+	DisText(0x2720, S_AdjustPageBuffer->buf, strlen(S_AdjustPageBuffer->buf));
+	
+	sprintf(S_AdjustPageBuffer->buf, "(%d,%d)", S_AdjustPageBuffer->itemData.testdata.testline.C_Point[1], S_AdjustPageBuffer->itemData.testdata.testline.C_Point[0]);
+	DisText(0x2728, S_AdjustPageBuffer->buf, strlen(S_AdjustPageBuffer->buf));
+	
+	sprintf(S_AdjustPageBuffer->buf, "%.3f", S_AdjustPageBuffer->itemData.testdata.testline.BasicBili);
+	DisText(0x2730, S_AdjustPageBuffer->buf, strlen(S_AdjustPageBuffer->buf));
+	
+	sprintf(S_AdjustPageBuffer->buf, "%.*f", S_AdjustPageBuffer->itemData.testdata.temperweima.ItemPoint, S_AdjustPageBuffer->itemData.testdata.testline.BasicResult);
+	DisText(0x2738, S_AdjustPageBuffer->buf, strlen(S_AdjustPageBuffer->buf));
+}
+
+static void dspAdjResult(void)
+{
+	sprintf(S_AdjustPageBuffer->buf, "%.3f", S_AdjustPageBuffer->adjustData.parm);
+	DisText(0x2748, S_AdjustPageBuffer->buf, strlen(S_AdjustPageBuffer->buf));
+	
+	sprintf(S_AdjustPageBuffer->buf, "%.*f", S_AdjustPageBuffer->itemData.testdata.temperweima.ItemPoint, S_AdjustPageBuffer->adjResult);
+	DisText(0x2750, S_AdjustPageBuffer->buf, strlen(S_AdjustPageBuffer->buf));
 }
 
 static void CheckQRCode(void)
 {
-	if((S_AdjustPageBuffer) && (My_Pass == TakeScanQRCodeResult(&(S_AdjustPageBuffer->scancode))))
+	if(My_Pass == TakeScanQRCodeResult(&(S_AdjustPageBuffer->scancode)))
 	{
+		//二维码读取失败
 		if((S_AdjustPageBuffer->scancode == CardCodeScanFail) || (S_AdjustPageBuffer->scancode == CardCodeCardOut) ||
 			(S_AdjustPageBuffer->scancode == CardCodeScanTimeOut) || (S_AdjustPageBuffer->scancode == CardCodeCRCError))
 		{
-			backToFatherActivity();
+			MotorMoveTo(MaxLocation, 1);
+			S_AdjustPageBuffer->isAdjjing = false;
+			dspAdjStatus("Scan Fail\0");
 		}
-		else
+		//过期
+		else if(S_AdjustPageBuffer->scancode == CardCodeTimeOut)
 		{
-			memcpy(S_AdjustPageBuffer->tempadjust.ItemName, S_AdjustPageBuffer->testdata.testdata.temperweima.ItemName, ItemNameLen);
-			S_AdjustPageBuffer->step = 2;
-			StartTest(&(S_AdjustPageBuffer->testdata));
+			MotorMoveTo(MaxLocation, 1);
+			S_AdjustPageBuffer->isAdjjing = false;
+			dspAdjStatus("Out Of Date\0");
+		}
+		//读取成功
+		else if(S_AdjustPageBuffer->scancode == CardCodeScanOK)
+		{
+			memset(S_AdjustPageBuffer->buf, 0, 20);
+			sprintf(S_AdjustPageBuffer->buf, "%s", S_AdjustPageBuffer->itemData.testdata.temperweima.ItemName);
+			DisText(0x2718, S_AdjustPageBuffer->buf, strlen(S_AdjustPageBuffer->buf));
+			
+			dspAdjStatus("Read Card\0");
+			
+			//保存项目名称的前AdjItemNameLen个字符
+			memcpy(S_AdjustPageBuffer->adjustData.ItemName, S_AdjustPageBuffer->itemData.testdata.temperweima.ItemName, AdjItemNameLen);
+			
+			//测试结果
+			StartTest(&(S_AdjustPageBuffer->itemData));
 		}
 	}
 }
 
 static void CheckPreTestCard(void)
 {
-	if((S_AdjustPageBuffer) && (My_Pass == TakeTestResult(&(S_AdjustPageBuffer->cardpretestresult))))
+	if(My_Pass == TakeTestResult(&(S_AdjustPageBuffer->cardTestResult)))
 	{
-
-		if(S_AdjustPageBuffer->cardpretestresult != ResultIsOK)
-		{
-			backToFatherActivity();
-		}
-		else 
-		{
-			S_AdjustPageBuffer->step = 3;
-			DspPage2Text();
-		}
+		MotorMoveTo(MaxLocation, 1);
+		S_AdjustPageBuffer->isAdjjing = false;
+		dspTestResult();
 	}
 }
+
+

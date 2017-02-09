@@ -74,7 +74,7 @@ static void activityStart(void)
 {
 	if(S_ShowDeviceInfoPageBuffer)
 	{
-		getSystemSetData(&(S_ShowDeviceInfoPageBuffer->systemSetData));
+		copyGBSystemSetData(&(S_ShowDeviceInfoPageBuffer->systemSetData));
 		
 		timer_set(&(S_ShowDeviceInfoPageBuffer->timer), S_ShowDeviceInfoPageBuffer->systemSetData.ledSleepTime);
 		
@@ -184,7 +184,7 @@ static void activityResume(void)
 {
 	if(S_ShowDeviceInfoPageBuffer)
 	{
-		getSystemSetData(&(S_ShowDeviceInfoPageBuffer->systemSetData));
+		copyGBSystemSetData(&(S_ShowDeviceInfoPageBuffer->systemSetData));
 		
 		timer_restart(&(S_ShowDeviceInfoPageBuffer->timer));
 		

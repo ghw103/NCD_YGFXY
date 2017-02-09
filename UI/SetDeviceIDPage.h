@@ -6,8 +6,8 @@
 
 typedef struct SetDeviceIDPage_tag {
 	SystemSetData systemSetData;
-	Timer timer;
 	unsigned char tempbuf[150];								//临时指针
+	char deviceId[MaxDeviceIDLen];							//新输入的设备id
 	unsigned char ismodify;
 	unsigned short lcdinput[100];
 }SetDeviceIDPage;

@@ -93,12 +93,13 @@ void CommunicateWithServerByLineNet(MyServerData * myServerData)
 void CommunicateWithServerByWifi(MyServerData * myServerData)
 {
 	//发送数据
-	SendDataToQueue(GetUsart4TXQueue(), GetUsart4TXMutex(), myServerData->sendBuf, myServerData->sendDataLen,
-		1, 1000 / portTICK_RATE_MS, EnableUsart4TXInterrupt);
-		
-	//接收数据
-	while(pdPASS == ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4RXMutex(), myServerData->recvBuf, 500, 1, 1000 / portTICK_RATE_MS))
-		;
+	if(My_Pass == SendDataToQueue(GetUsart4TXQueue(), GetUsart4Mutex(), myServerData->sendBuf, myServerData->sendDataLen,
+		1, 1000 / portTICK_RATE_MS, 10 / portTICK_RATE_MS, EnableUsart4TXInterrupt))
+	{	
+		//接收数据
+		while(pdPASS == ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4Mutex(), myServerData->recvBuf, 500, 1, 1000 / portTICK_RATE_MS, 10 / portTICK_RATE_MS))
+			;
+	}
 }
 
 /***************************************************************************************************

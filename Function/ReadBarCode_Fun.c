@@ -49,7 +49,7 @@ unsigned char ReadBarCodeFunction(char * codebuf, unsigned char len)
 	{
 		memset(codebuf, 0, len);
 		
-		ReceiveDataFromQueue(GetUsart1RXQueue(), GetUsart1RXMutex(), codebuf, len, 1, 20 / portTICK_RATE_MS);	
+		ReceiveDataFromQueue(GetUsart1RXQueue(), GetUsart1RXMutex(), codebuf, len, 1, 20 / portTICK_RATE_MS, 10 / portTICK_RATE_MS);	
 		
 		rxlen = strlen(codebuf);
 		

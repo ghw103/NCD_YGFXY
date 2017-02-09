@@ -54,7 +54,7 @@ void GetLCDInputData(void)
 {
 	rxcount = 0;
 	
-	while(pdPASS == ReceiveDataFromQueue(GetUsart6RXQueue(), GetUsart6RXMutex(), (buf+rxcount), 1, 1, 10 / portTICK_RATE_MS))
+	while(pdPASS == ReceiveDataFromQueue(GetUsart6RXQueue(), GetUsart6RXMutex(), (buf+rxcount), 1, 1, 10 / portTICK_RATE_MS, 10 / portTICK_RATE_MS))
 		rxcount++;
 	
 	if(rxcount > 0)

@@ -68,7 +68,7 @@ static void activityStart(void)
 {
 	if(S_SleepPageBuffer)
 	{
-		getSystemSetData(&(S_SleepPageBuffer->systemSetData));
+		copyGBSystemSetData(&(S_SleepPageBuffer->systemSetData));
 	}	
 	
 	SetLEDLight(10);

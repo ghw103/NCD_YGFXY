@@ -6,7 +6,8 @@
 
 typedef struct SetDeviceInfoPageBuffer_tag {
 	SystemSetData systemSetData;
-	Timer timer;
+	User_Type user;														//临时数据
+	char deviceunit[MaxDeviceUnitLen];									//设备使用单位
 	unsigned char ismodify;
 	unsigned short lcdinput[100];
 	char tempBuf[100];

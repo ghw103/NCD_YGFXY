@@ -17,15 +17,15 @@ typedef enum
 
 typedef struct ItemData_tag {
 	TestData testdata;
-	Timer timer;																		//常规倒计时计时器
-	Timer timer2;																		//超时倒计时计时器
-	Timer timer3;																		//超时倒计时计时器
-	unsigned char errorcount;															//未操作次数
-	MyPaiDuiStatues statues;															//测试阶段
-	unsigned char jieduan;																//测试阶段
+	Timer timer;																	//常规倒计时计时器
+	Timer timer2;																	//超时倒计时计时器
+	Timer timer3;																	//超时倒计时计时器
+	unsigned char errorcount;														//未操作次数
+	MyPaiDuiStatues statues;														//测试阶段
+	unsigned char jieduan;															//测试阶段
 	unsigned char testlocation;
-	unsigned char varIcoIndex;															//排队界面显示卡的图标界面的索引
-	unsigned char lastChannelIndex;														//记录最新的调节通道
+	unsigned char varIcoIndex;														//排队界面显示卡的图标界面的索引
+	unsigned short ledLight;														//测试时led的亮度，为系统设置中保存的校准led值
 }ItemData;
 
 typedef struct TestBuffer_tag{

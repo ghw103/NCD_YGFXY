@@ -75,9 +75,11 @@ static void activityStart(void)
 {
 	if(S_SetDeviceInfoPageBuffer)
 	{
-		getSystemSetData(&(S_SetDeviceInfoPageBuffer->systemSetData));
+		copyGBSystemSetData(&(S_SetDeviceInfoPageBuffer->systemSetData));
 		
-		timer_set(&(S_SetDeviceInfoPageBuffer->timer), S_SetDeviceInfoPageBuffer->systemSetData.ledSleepTime);
+		memcpy(&(S_SetDeviceInfoPageBuffer->user), &(S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser), sizeof(User_Type));
+		
+		memcpy(S_SetDeviceInfoPageBuffer->deviceunit, S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceunit, MaxDeviceUnitLen);
 		
 		showDeviceInfoText();
 	}
@@ -102,9 +104,6 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		S_SetDeviceInfoPageBuffer->lcdinput[0] = pbuf[4];
 		S_SetDeviceInfoPageBuffer->lcdinput[0] = (S_SetDeviceInfoPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
-		//重置休眠时间
-		timer_restart(&(S_SetDeviceInfoPageBuffer->timer));
-		
 		/*返回*/
 		if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1B00)
 		{
@@ -115,12 +114,16 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		{			
 			if(S_SetDeviceInfoPageBuffer->ismodify == 1)
 			{
+				copyGBSystemSetData(&(S_SetDeviceInfoPageBuffer->systemSetData));
+		
+				memcpy(&(S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser), &(S_SetDeviceInfoPageBuffer->user), sizeof(User_Type));
+		
+				memcpy(S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceunit, S_SetDeviceInfoPageBuffer->deviceunit, MaxDeviceUnitLen);
+				
 				S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.isnew = true;
 				if(My_Pass == SaveSystemSetData(&(S_SetDeviceInfoPageBuffer->systemSetData)))
 				{
 					SendKeyCode(1);
-					//保存成功，更新内存中的数据
-					setSystemSetData(&(S_SetDeviceInfoPageBuffer->systemSetData));
 					S_SetDeviceInfoPageBuffer->ismodify = 0;
 				}
 				else
@@ -130,50 +133,50 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*姓名*/
 		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1B10)
 		{
-			memset(S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_name, 0, MaxNameLen);
-			memcpy(S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_name, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
+			memset(S_SetDeviceInfoPageBuffer->user.user_name, 0, MaxNameLen);
+			memcpy(S_SetDeviceInfoPageBuffer->user.user_name, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			S_SetDeviceInfoPageBuffer->ismodify = 1;
 		}
 		/*年龄*/
 		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1B20)
 		{
-			memset(S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_age, 0, MaxAgeLen);
-			memcpy(S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_age, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
+			memset(S_SetDeviceInfoPageBuffer->user.user_age, 0, MaxAgeLen);
+			memcpy(S_SetDeviceInfoPageBuffer->user.user_age, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			S_SetDeviceInfoPageBuffer->ismodify = 1;
 		}
 		/*性别*/
 		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1B30)
 		{
-			memset(S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_sex, 0, MaxSexLen);
-			memcpy(S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_sex, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
+			memset(S_SetDeviceInfoPageBuffer->user.user_sex, 0, MaxSexLen);
+			memcpy(S_SetDeviceInfoPageBuffer->user.user_sex, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			S_SetDeviceInfoPageBuffer->ismodify = 1;
 		}
 		/*联系方式*/
 		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1B40)
 		{
-			memset(S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_phone, 0, MaxPhoneLen);
-			memcpy(S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_phone, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
+			memset(S_SetDeviceInfoPageBuffer->user.user_phone, 0, MaxPhoneLen);
+			memcpy(S_SetDeviceInfoPageBuffer->user.user_phone, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			S_SetDeviceInfoPageBuffer->ismodify = 1;
 		}
 		/*职位*/
 		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1B50)
 		{
-			memset(S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_job, 0, MaxJobLen);
-			memcpy(S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_job, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
+			memset(S_SetDeviceInfoPageBuffer->user.user_job, 0, MaxJobLen);
+			memcpy(S_SetDeviceInfoPageBuffer->user.user_job, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			S_SetDeviceInfoPageBuffer->ismodify = 1;
 		}
 		/*备注*/
 		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1B60)
 		{
-			memset(S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_desc, 0, MaxDescLen);
-			memcpy(S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_desc, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
+			memset(S_SetDeviceInfoPageBuffer->user.user_desc, 0, MaxDescLen);
+			memcpy(S_SetDeviceInfoPageBuffer->user.user_desc, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			S_SetDeviceInfoPageBuffer->ismodify = 1;
 		}
 		/*设备使用地址*/
 		else if(S_SetDeviceInfoPageBuffer->lcdinput[0] == 0x1B70)
 		{
-			memset(S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceunit, 0, MaxDeviceUnitLen);
-			memcpy(S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceunit, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
+			memset(S_SetDeviceInfoPageBuffer->deviceunit, 0, MaxDeviceUnitLen);
+			memcpy(S_SetDeviceInfoPageBuffer->deviceunit, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			S_SetDeviceInfoPageBuffer->ismodify = 1;
 		}
 	}
@@ -192,9 +195,7 @@ static void activityFresh(void)
 {
 	if(S_SetDeviceInfoPageBuffer)
 	{
-		//休眠
-		if(TimeOut == timer_expired(&(S_SetDeviceInfoPageBuffer->timer)))
-			startActivity(createSleepActivity, NULL);
+
 	}
 }
 
@@ -223,11 +224,6 @@ static void activityHide(void)
 ***************************************************************************************************/
 static void activityResume(void)
 {
-	if(S_SetDeviceInfoPageBuffer)
-	{
-		timer_restart(&(S_SetDeviceInfoPageBuffer->timer));
-	}
-	
 	SelectPage(102);
 }
 
@@ -292,36 +288,36 @@ static void showDeviceInfoText(void)
 {
 	ClearText(0x1b10, 10);
 	memset(S_SetDeviceInfoPageBuffer->tempBuf, 0, 100);
-	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_name);
+	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->user.user_name);
 	DisText(0x1b10, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf));
 	
 	ClearText(0x1b20, 10);
 	memset(S_SetDeviceInfoPageBuffer->tempBuf, 0, 100);
-	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_age);
+	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->user.user_age);
 	DisText(0x1b20, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf));
 	
 	ClearText(0x1b30, 10);
 	memset(S_SetDeviceInfoPageBuffer->tempBuf, 0, 100);
-	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_sex);
+	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->user.user_sex);
 	DisText(0x1b30, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf));
 	
 	ClearText(0x1b40, 16);
 	memset(S_SetDeviceInfoPageBuffer->tempBuf, 0, 100);
-	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_phone);
+	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->user.user_phone);
 	DisText(0x1b40, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf));
 	
 	ClearText(0x1b50, 16);
 	memset(S_SetDeviceInfoPageBuffer->tempBuf, 0, 100);
-	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_job);
+	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->user.user_job);
 	DisText(0x1b50, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf));
 	
 	ClearText(0x1b60, 16);
 	memset(S_SetDeviceInfoPageBuffer->tempBuf, 0, 100);
-	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_desc);
+	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->user.user_desc);
 	DisText(0x1b60, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf));
 	
 	ClearText(0x1b70, 30);
 	memset(S_SetDeviceInfoPageBuffer->tempBuf, 0, 100);
-	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceunit);
+	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->deviceunit);
 	DisText(0x1b70, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf));
 }

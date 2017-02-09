@@ -10,6 +10,7 @@
 /***************************************************************************************************/
 #include	"SystemSet_Data.h"
 
+#include	"MyTools.h"
 #include	"CRC16.h"
 
 #include	<string.h>
@@ -30,15 +31,15 @@ static SystemSetData GB_SystemSetData;								//系统参数
 /***************************************************************************************************/
 
 /***************************************************************************************************
-*FunctionName: setDefaultSetData
+*FunctionName: setDefaultSystemSetData
 *Description: 初始化为默认配置
-*Input: 
+*Input: systemSetData -- 需要重置的系统设置地址
 *Output: 
 *Return: 
 *Author: xsx
 *Date: 2016年12月19日09:17:30
 ***************************************************************************************************/
-void setDefaultSetData(SystemSetData * systemSetData)
+void setDefaultSystemSetData(SystemSetData * systemSetData)
 {
 	if(systemSetData)
 	{
@@ -56,50 +57,45 @@ void setDefaultSetData(SystemSetData * systemSetData)
 		systemSetData->testDataNum = 0;
 		systemSetData->upLoadIndex = 0;
 		
+		systemSetData->testLedLightIntensity = 200;
+		
+		//清空校准参数
+		memset(systemSetData->adjustData, 0, MaxAdjDataNum*sizeof(AdjustData));
+		
 		systemSetData->crc = CalModbusCRC16Fun1(systemSetData, sizeof(SystemSetData) - 2);
 	}
 }
 
 /***************************************************************************************************
-*FunctionName: getSystemSetData, setSystemSetData
-*Description: 读写系统参数信息，写入的数据源只能是SD卡中保存的数据
-*Input: 
+*FunctionName: copyGBSystemSetData, getGBSystemSetData, setSystemSetData
+*Description: 复制一份系统参数,获取系统参数地址
+*Input: systemSetData -- 复制的目标地址
 *Output: 
 *Return: 
 *Author: xsx
 *Date: 2016年12月16日16:50:13
 ***************************************************************************************************/
-void getSystemSetData(SystemSetData * systemSetData)
+void copyGBSystemSetData(SystemSetData * systemSetData)
 {
 	if(systemSetData)
 	{
 		//如果crc错误。恢复默认值
 		if(GB_SystemSetData.crc != CalModbusCRC16Fun1(&GB_SystemSetData, sizeof(SystemSetData) - 2))
-			setDefaultSetData(&GB_SystemSetData);
+			setDefaultSystemSetData(&GB_SystemSetData);
 		
 		memcpy(systemSetData, &GB_SystemSetData, sizeof(SystemSetData));
 	}
+}
+
+SystemSetData * getGBSystemSetData(void)
+{
+	return &GB_SystemSetData;
 }
 
 void setSystemSetData(SystemSetData * systemSetData)
 {
 	if(systemSetData)
 	{
-		//对读取的数据进行校验
-		if(systemSetData->ledLightIntensity > 100)
-			systemSetData->ledLightIntensity = 100;
-		else if(systemSetData->ledLightIntensity < 10)
-			systemSetData->ledLightIntensity = 10;
-		
-		//0xffff表示不休眠
-		if(systemSetData->ledSleepTime != 0xffff)
-		{
-			if(systemSetData->ledSleepTime > 600)
-				systemSetData->ledSleepTime = 100;
-			else if(systemSetData->ledSleepTime < 10)
-				systemSetData->ledSleepTime = 10;
-		}
-		
 		systemSetData->crc = CalModbusCRC16Fun1(systemSetData, sizeof(SystemSetData) - 2);
 		
 		memcpy(&GB_SystemSetData, systemSetData, sizeof(SystemSetData));
@@ -121,7 +117,7 @@ void getDeviceInfo(DeviceInfo * deviceinfo)
 	{
 		//如果crc错误。恢复默认值
 		if(GB_SystemSetData.crc != CalModbusCRC16Fun1(&GB_SystemSetData, sizeof(SystemSetData) - 2))
-			setDefaultSetData(&GB_SystemSetData);
+			setDefaultSystemSetData(&GB_SystemSetData);
 		
 		memcpy(deviceinfo, &(GB_SystemSetData.deviceInfo), sizeof(DeviceInfo));
 
@@ -160,7 +156,7 @@ void getNetSet(NetSet * netSet)
 	{
 		//如果crc错误。恢复默认值
 		if(GB_SystemSetData.crc != CalModbusCRC16Fun1(&GB_SystemSetData, sizeof(SystemSetData) - 2))
-			setDefaultSetData(&GB_SystemSetData);
+			setDefaultSystemSetData(&GB_SystemSetData);
 		
 		memcpy(netSet, &(GB_SystemSetData.netSet), sizeof(NetSet));
 	}
@@ -246,7 +242,7 @@ unsigned char getLedLightIntensity(void)
 void plusTestDataTotalNum(unsigned char num)
 {
 	if(GB_SystemSetData.crc != CalModbusCRC16Fun1(&GB_SystemSetData, sizeof(SystemSetData) - 2))
-		setDefaultSetData(&GB_SystemSetData);
+		setDefaultSystemSetData(&GB_SystemSetData);
 	
 	GB_SystemSetData.testDataNum += num;
 	GB_SystemSetData.crc = CalModbusCRC16Fun1(&GB_SystemSetData, sizeof(SystemSetData) - 2);
@@ -264,7 +260,7 @@ void plusTestDataTotalNum(unsigned char num)
 unsigned int getTestDataTotalNum(void)
 {
 	if(GB_SystemSetData.crc != CalModbusCRC16Fun1(&GB_SystemSetData, sizeof(SystemSetData) - 2))
-		setDefaultSetData(&GB_SystemSetData);
+		setDefaultSystemSetData(&GB_SystemSetData);
 	
 	return GB_SystemSetData.testDataNum;
 }
@@ -281,10 +277,141 @@ unsigned int getTestDataTotalNum(void)
 void setUpLoadIndex(unsigned int index)
 {
 	if(GB_SystemSetData.crc != CalModbusCRC16Fun1(&GB_SystemSetData, sizeof(SystemSetData) - 2))
-		setDefaultSetData(&GB_SystemSetData);
+		setDefaultSystemSetData(&GB_SystemSetData);
 	
 	GB_SystemSetData.upLoadIndex = index;
 	GB_SystemSetData.crc = CalModbusCRC16Fun1(&GB_SystemSetData, sizeof(SystemSetData) - 2);
+}
+
+/***************************************************************************************************
+*FunctionName: setTestLedLightIntensity
+*Description: 设置测试时的LED 亮度值
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月7日17:08:33
+***************************************************************************************************/
+void setTestLedLightIntensity(SystemSetData * systemSetData, unsigned short value)
+{
+	if(systemSetData == NULL)
+		return;
+	
+	if(systemSetData->crc != CalModbusCRC16Fun1(systemSetData, sizeof(SystemSetData) - 2))
+		setDefaultSystemSetData(systemSetData);
+	
+	systemSetData->testLedLightIntensity = value;
+	systemSetData->crc = CalModbusCRC16Fun1(systemSetData, sizeof(SystemSetData) - 2);
+}
+
+/***************************************************************************************************
+*FunctionName: getTestLedLightIntensity
+*Description: 读取系统中的测试led亮度值
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月7日17:09:00
+***************************************************************************************************/
+unsigned short getTestLedLightIntensity(SystemSetData * systemSetData)
+{
+	if(systemSetData == NULL)
+		return 200;
+	
+	if(systemSetData->crc != CalModbusCRC16Fun1(systemSetData, sizeof(SystemSetData) - 2))
+		setDefaultSystemSetData(systemSetData);
+	
+	return systemSetData->testLedLightIntensity;
+}
+
+/***************************************************************************************************
+*FunctionName: addAdjPram
+*Description: 保存一个校准参数，先查找是否已存在，有则覆盖，无则添加
+*Input: adjData -- 校准参数
+*Output: 
+*Return: MyState_TypeDef -- fail表示无空闲位置保存
+*Author: xsx
+*Date: 2017年2月8日14:47:14
+***************************************************************************************************/
+MyState_TypeDef addAdjPram(SystemSetData * systemSetData, AdjustData * adjData)
+{
+	unsigned char i = 0;
+	
+	if(adjData == NULL)
+		return My_Fail;
+	
+	if(systemSetData->crc != CalModbusCRC16Fun1(systemSetData, sizeof(SystemSetData) - 2))
+		setDefaultSystemSetData(systemSetData);
+	
+	//查找是否存在
+	for(i=0; i<MaxAdjDataNum; i++)
+	{
+		//存在，替换
+		if(CheckStrIsSame(systemSetData->adjustData[i].ItemName, adjData->ItemName, AdjItemNameLen) == true)
+		{
+			systemSetData->adjustData[i].parm = adjData->parm;
+			break;
+		}
+	}
+	
+	//不存在
+	if(i >= MaxAdjDataNum)
+	{
+		//找空闲位置，添加
+		for(i=0; i<MaxAdjDataNum; i++)
+		{
+			//名字的第一个字符是\0表明空
+			if(systemSetData->adjustData[i].ItemName[0] == 0)
+			{
+				memcpy(&(systemSetData->adjustData[i]), adjData, sizeof(AdjustData));
+				break;
+			}
+		}
+	}
+	
+	//保存校准数目已满
+	if(i >= MaxAdjDataNum)
+		return My_Fail;
+	else
+		return My_Pass;
+}
+
+/***************************************************************************************************
+*FunctionName: getAdjPram
+*Description: 读取一个项目的校准参数
+*Input: systemSetData -- 读取源， adjData -- 读取参数目标地址
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月8日15:01:17
+***************************************************************************************************/
+void getAdjPram(SystemSetData * systemSetData, AdjustData * adjData)
+{
+	unsigned char i = 0;
+	
+	if(adjData == NULL)
+		return;
+	
+	if(systemSetData == NULL)
+		return;
+	
+	adjData->parm = 0;
+	
+	if(systemSetData->crc != CalModbusCRC16Fun1(systemSetData, sizeof(SystemSetData) - 2))
+		setDefaultSystemSetData(systemSetData);
+	
+	//查找是否存在
+	for(i=0; i<MaxAdjDataNum; i++)
+	{
+		if(CheckStrIsSame(systemSetData->adjustData[i].ItemName, adjData->ItemName, AdjItemNameLen) == true)
+		{
+			adjData->parm = systemSetData->adjustData[i].parm;
+			break;
+		}
+	}
+	
+	if((i >= MaxAdjDataNum) || (adjData->parm <= 0))
+		adjData->parm = 1;
 }
 
 /****************************************end of file************************************************/

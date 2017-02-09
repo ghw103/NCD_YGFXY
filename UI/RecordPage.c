@@ -83,7 +83,7 @@ static void activityStart(void)
 	if(S_RecordPageBuffer)
 	{
 		//读取系统设置
-		getSystemSetData(&(S_RecordPageBuffer->systemSetData));
+		copyGBSystemSetData(&(S_RecordPageBuffer->systemSetData));
 		
 		timer_set(&(S_RecordPageBuffer->timer), S_RecordPageBuffer->systemSetData.ledSleepTime);
 		
@@ -302,7 +302,7 @@ static MyState_TypeDef ShowRecord(unsigned char pageindex)
 		S_RecordPageBuffer->pageRequest.orderType = ASC;
 		
 		//再次读取系统设置数据，主要是为了读取数据总数
-		getSystemSetData(&(S_RecordPageBuffer->systemSetData));
+		copyGBSystemSetData(&(S_RecordPageBuffer->systemSetData));
 		
 		//读取数据
 		ReadTestData(&(S_RecordPageBuffer->pageRequest), &(S_RecordPageBuffer->page), &(S_RecordPageBuffer->systemSetData));

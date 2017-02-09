@@ -75,9 +75,7 @@ static void activityStart(void)
 {
 	if(S_SetDeviceIDPage)
 	{
-		getSystemSetData(&(S_SetDeviceIDPage->systemSetData));
-	
-		timer_set(&(S_SetDeviceIDPage->timer), S_SetDeviceIDPage->systemSetData.ledSleepTime);
+		copyGBSystemSetData(&(S_SetDeviceIDPage->systemSetData));
 		
 		ClearText(0x1c10, 30);
 		DisText(0x1C10, S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid, strlen(S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid));
@@ -103,9 +101,6 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		S_SetDeviceIDPage->lcdinput[0] = pbuf[4];
 		S_SetDeviceIDPage->lcdinput[0] = (S_SetDeviceIDPage->lcdinput[0]<<8) + pbuf[5];
 		
-		//重置休眠时间
-		timer_restart(&(S_SetDeviceIDPage->timer));
-		
 		/*返回*/
 		if(S_SetDeviceIDPage->lcdinput[0] == 0x1c00)
 		{
@@ -116,12 +111,16 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		{
 			if(S_SetDeviceIDPage->ismodify == 1)
 			{
+				//读取最新的系统参数
+				copyGBSystemSetData(&(S_SetDeviceIDPage->systemSetData));
+				
+				//更新副本中的is
+				memcpy(S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid, S_SetDeviceIDPage->deviceId, MaxDeviceIDLen);
 				S_SetDeviceIDPage->systemSetData.deviceInfo.isnew = true;
 				if(My_Pass == SaveSystemSetData(&(S_SetDeviceIDPage->systemSetData)))
 				{
 					SendKeyCode(1);
-					//保存成功，更新内存中的数据
-					setSystemSetData(&(S_SetDeviceIDPage->systemSetData));
+
 					S_SetDeviceIDPage->ismodify = 0;
 				}
 				else
@@ -131,12 +130,12 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*id输入*/
 		else if(S_SetDeviceIDPage->lcdinput[0] == 0x1C10)
 		{
-			memset(S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid, 0 , MaxDeviceIDLen);
+			memset(S_SetDeviceIDPage->deviceId, 0 , MaxDeviceIDLen);
 			
 			if(MaxDeviceIDLen >= GetBufLen(&pbuf[7] , 2*pbuf[6]))
-				memcpy(S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
+				memcpy(S_SetDeviceIDPage->deviceId, &pbuf[7], GetBufLen(&pbuf[7] , 2*pbuf[6]));
 			else
-				memcpy(S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid, &pbuf[7], MaxDeviceIDLen);
+				memcpy(S_SetDeviceIDPage->deviceId, &pbuf[7], MaxDeviceIDLen);
 				
 			S_SetDeviceIDPage->ismodify = 1;
 		}
@@ -165,10 +164,6 @@ static void activityFresh(void)
 		
 			S_SetDeviceIDPage->ismodify = 1;
 		}
-
-		//休眠
-		if(TimeOut == timer_expired(&(S_SetDeviceIDPage->timer)))
-			startActivity(createSleepActivity, NULL);
 	}
 }
 
@@ -197,11 +192,6 @@ static void activityHide(void)
 ***************************************************************************************************/
 static void activityResume(void)
 {
-	if(S_SetDeviceIDPage)
-	{
-		timer_restart(&(S_SetDeviceIDPage->timer));
-	}
-	
 	SelectPage(104);
 }
 

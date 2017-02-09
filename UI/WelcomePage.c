@@ -138,7 +138,7 @@ static void activityFresh(void)
 		{
 			if(SystemData_OK == S_WelcomePageBuffer->selfTestStatus)
 			{
-				getSystemSetData(&(S_WelcomePageBuffer->systemSetData));
+				copyGBSystemSetData(&(S_WelcomePageBuffer->systemSetData));
 				SetLEDLight(S_WelcomePageBuffer->systemSetData.ledLightIntensity);
 			}
 		}

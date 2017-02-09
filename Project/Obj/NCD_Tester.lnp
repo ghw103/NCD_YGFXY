@@ -82,6 +82,8 @@
 ".\obj\retestpage.o"
 ".\obj\othersetpage.o"
 ".\obj\operguidepage.o"
+".\obj\adjustledpage.o"
+".\obj\checkqrpage.o"
 ".\obj\cardstatues_data.o"
 ".\obj\motor_data.o"
 ".\obj\timer_data.o"

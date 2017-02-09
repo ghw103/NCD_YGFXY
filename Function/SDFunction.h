@@ -13,10 +13,6 @@ MyState_TypeDef SaveWifiData(WIFI_Def * wifi);
 MyState_TypeDef ReadWifiData(WIFI_Def * wifi);
 MyState_TypeDef ClearWifiData(WIFI_Def * wifi);
 
-/*校准数据*/
-MyState_TypeDef SaveAdjustData(AdjustData *adjustdata);
-MyState_TypeDef ReadAdjustData(AdjustData *adjustdata);
-
 /*老化数据*/
 MyState_TypeDef SaveReTestData(ReTestData *retestdata, unsigned char type);
 

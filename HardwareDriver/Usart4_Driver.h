@@ -13,8 +13,7 @@ void Usart4_Init(void);
 void EnableUsart4TXInterrupt(void);
 xQueueHandle GetUsart4RXQueue(void);
 xQueueHandle GetUsart4TXQueue(void);
-xSemaphoreHandle GetUsart4RXMutex(void);
-xSemaphoreHandle GetUsart4TXMutex(void);
+xSemaphoreHandle GetUsart4Mutex(void);
 
 #endif
 

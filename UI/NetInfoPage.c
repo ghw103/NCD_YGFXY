@@ -80,7 +80,7 @@ static void activityStart(void)
 	if(S_NetInfoPageBuffer)
 	{
 		//读取系统设置
-		getSystemSetData(&(S_NetInfoPageBuffer->systemSetData));
+		copyGBSystemSetData(&(S_NetInfoPageBuffer->systemSetData));
 		
 		timer_set(&(S_NetInfoPageBuffer->timer2), S_NetInfoPageBuffer->systemSetData.ledSleepTime);
 		

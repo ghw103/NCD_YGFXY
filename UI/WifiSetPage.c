@@ -78,7 +78,7 @@ static void activityStart(void)
 	if(S_WifiPageBuffer)
 	{
 		//读取系统设置
-		getSystemSetData(&(S_WifiPageBuffer->systemSetData));
+		copyGBSystemSetData(&(S_WifiPageBuffer->systemSetData));
 		
 		timer_set(&(S_WifiPageBuffer->timer), S_WifiPageBuffer->systemSetData.ledSleepTime);
 		

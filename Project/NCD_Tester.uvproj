@@ -842,6 +842,16 @@
               <FileType>1</FileType>
               <FilePath>..\UI\OperGuidePage.c</FilePath>
             </File>
+            <File>
+              <FileName>AdjustLedPage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\UI\AdjustLedPage.c</FilePath>
+            </File>
+            <File>
+              <FileName>CheckQRPage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\UI\CheckQRPage.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

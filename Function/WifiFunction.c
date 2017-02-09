@@ -49,26 +49,25 @@ static MyState_TypeDef SetWifiWorkInSTAMode(void);
 
 static MyState_TypeDef ComWithWIFI(char * cmd, const char *strcmp, char *buf, unsigned short buflen, portTickType xBlockTime)
 {
-	MyState_TypeDef statues = My_Fail;
+	MyState_TypeDef statues = My_Pass;
 	
-	if(pdPASS == SendDataToQueue(GetUsart4TXQueue(), GetUsart4TXMutex(), cmd, strlen(cmd), 1, 50 * portTICK_RATE_MS, EnableUsart4TXInterrupt))
+	if(pdPASS == SendDataToQueue(GetUsart4TXQueue(), GetUsart4Mutex(), cmd, strlen(cmd), 1, 50 * portTICK_RATE_MS, 5000 / portTICK_RATE_MS, EnableUsart4TXInterrupt))
 	{
 		if(buf)
 		{
 			memset(buf, 0, buflen);
-			ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4RXMutex(), buf, buflen, 1, xBlockTime);
+			
+			ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4Mutex(), buf, buflen, 1, xBlockTime, 5000 / portTICK_RATE_MS);
 
 			if(strcmp)
 			{
-				if(strstr(buf, strcmp))
-					statues = My_Pass;
+				if(strstr(buf, strcmp) == NULL)
+					statues = My_Fail;
 			}
-			else
-				statues = My_Pass;
 		}
-		else
-			statues = My_Pass;
 	}
+	else
+		statues = My_Fail;
 
 	return statues;
 }
@@ -109,6 +108,7 @@ MyState_TypeDef SetWifiWorkInAT(WIFI_WorkMode_DefType mode)
 	txbuf = MyMalloc(500);
 	if(txbuf)
 	{
+		
 		if(mode == AT_Mode)
 		{
 			if(My_Pass == ComWithWIFI("+++", "a", txbuf, 50, 500 * portTICK_RATE_MS))
@@ -262,11 +262,10 @@ static void ProgressWifiListData(WIFI_Def *wifis, char *buf)
 					else if(j == 4)
 						wifis[i].indicator = strtol(tempbuf2 , NULL , 10);
 						
-					if(j == 4)
+/*					if(j == 4)
 					{
 						sprintf(buff, "ssid:%s security:%s,%s xinhao:%d\r\n", wifis[i].ssid, wifis[i].auth, wifis[i].encry, wifis[i].indicator);
-						//SendDataToNCDServer(buff, strlen(buff));
-					}
+					}*/
 				}
 			}				
 		}

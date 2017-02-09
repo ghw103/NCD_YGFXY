@@ -85,7 +85,7 @@ static MyState_TypeDef SendTestPointData(void * data)
 	if(xTestCurveQueue == NULL)
 		return My_Fail;
 	
-	if(pdPASS == xQueueSend( xTestCurveQueue, data, 10*portTICK_RATE_MS ))
+	if(pdPASS == xQueueSend( xTestCurveQueue, data, 1/portTICK_RATE_MS ))
 		return My_Pass;
 	else
 		return My_Fail;	
@@ -147,13 +147,13 @@ ResultState TestFunction(void * parm)
 		S_TempCalData->itemData = parm;
 		
 		//初始配置
-		SetGB_LedValue(300);
+		SetGB_LedValue(S_TempCalData->itemData->ledLight);
 		vTaskDelay(10/portTICK_RATE_MS);
 		
 		SetGB_CLineValue(0);
 		vTaskDelay(10/portTICK_RATE_MS);
 		
-		SelectChannel(S_TempCalData->itemData->lastChannelIndex);
+		SelectChannel(S_TempCalData->itemData->testdata.temperweima.ChannelNum);
 		vTaskDelay(10/portTICK_RATE_MS);
 		
 		SMBUS_SCK_L();
@@ -257,8 +257,6 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 			if(GetChannel() > 0)
 			{
 				SelectChannel(GetChannel() - 1);
-				
-				S_TempCalData->itemData->lastChannelIndex = GetChannel();
 
 				vTaskDelay(10/portTICK_RATE_MS);
 				return;
@@ -269,8 +267,6 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 			if(GetChannel() < 7)
 			{
 				SelectChannel(GetChannel() + 3);
-				
-				S_TempCalData->itemData->lastChannelIndex = GetChannel();
 				
 				vTaskDelay(10/portTICK_RATE_MS);
 				return;
@@ -294,12 +290,6 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 		
 		//计算变异系数
 		S_TempCalData->CV1 = S_TempCalData->stdev / S_TempCalData->average;
-		
-		//如果变异系数小于1%，说明采集的为直线，未加样
-		if(S_TempCalData->CV1 < 0.01)
-		{
-			goto END1;
-		}
 		
 		//找c线
 		S_TempCalData->itemData->testdata.testline.C_Point[0] = 0;
@@ -336,12 +326,7 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 		
 		//计算变异系数
 		S_TempCalData->CV2 = S_TempCalData->stdev / S_TempCalData->average;		
-		
-		//如果变异系数小于1%，说明采集的为直线，未加样
-		if(S_TempCalData->CV2 < 0.01)
-		{
-			goto END2;
-		}
+	
 	
 		//找T线
 		S_TempCalData->itemData->testdata.testline.T_Point[0] = 0;
@@ -405,44 +390,18 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 		if(S_TempCalData->itemData->testdata.testline.BasicResult < 0)
 			S_TempCalData->itemData->testdata.testline.BasicResult = 0;
 			
-		if(S_TempCalData->itemData->testdata.tempadjust.crc == CalModbusCRC16Fun1(&(S_TempCalData->itemData->testdata.tempadjust), sizeof(AdjustData)-2) )
-			S_TempCalData->itemData->testdata.testline.AdjustResult =  S_TempCalData->itemData->testdata.testline.BasicResult * S_TempCalData->itemData->testdata.tempadjust.parm;
-		else
-			S_TempCalData->itemData->testdata.testline.AdjustResult =  S_TempCalData->itemData->testdata.testline.BasicResult;
+		S_TempCalData->itemData->testdata.testline.AdjustResult =  S_TempCalData->itemData->testdata.testline.BasicResult * S_TempCalData->itemData->testdata.tempadjust.parm;
 		
-		S_TempCalData->resultstatues = ResultIsOK;
-		return ;
-		
-		//未加样
-		END1:
-			S_TempCalData->itemData->testdata.testline.T_Point[0] = 0;
-			S_TempCalData->itemData->testdata.testline.T_Point[1] = 0;
-			S_TempCalData->itemData->testdata.testline.T_Point[0] = 0;
-			S_TempCalData->itemData->testdata.testline.T_Point[1] = 0;
-			S_TempCalData->itemData->testdata.testline.T_Point[0] = 0;
-			S_TempCalData->itemData->testdata.testline.T_Point[1] = 0;
-			S_TempCalData->itemData->testdata.testline.BasicBili = 0;
-			S_TempCalData->itemData->testdata.testline.BasicResult = 0;
-			S_TempCalData->itemData->testdata.testline.AdjustResult = 0;
-			
+		if(S_TempCalData->CV1 < 0.01)
+		{
 			S_TempCalData->resultstatues = NoSample;
-			
-			return ;
-		
-		END2:
-			S_TempCalData->itemData->testdata.testline.T_Point[0] = 0;
-			S_TempCalData->itemData->testdata.testline.T_Point[1] = 0;
-			S_TempCalData->itemData->testdata.testline.T_Point[0] = 0;
-			S_TempCalData->itemData->testdata.testline.T_Point[1] = 0;
-			S_TempCalData->itemData->testdata.testline.T_Point[0] = 0;
-			S_TempCalData->itemData->testdata.testline.T_Point[1] = 0;
-			S_TempCalData->itemData->testdata.testline.BasicBili = 0;
-			S_TempCalData->itemData->testdata.testline.BasicResult = 0;
-			S_TempCalData->itemData->testdata.testline.AdjustResult = 0;
-			
+		}
+		else if(S_TempCalData->CV2 < 0.01)
+		{
 			S_TempCalData->resultstatues = PeakError;
-			
-			return ;
+		}
+		else
+			S_TempCalData->resultstatues = ResultIsOK;
 	}		
 }
 

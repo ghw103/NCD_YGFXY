@@ -73,7 +73,7 @@ static MyState_TypeDef ReadTime(void)
 	{
 		memset(upLoadDeviceDataBuffer, 0, sizeof(UpLoadDeviceDataBuffer));
 		
-		getSystemSetData(&(upLoadDeviceDataBuffer->systemSetData));
+		copyGBSystemSetData(&(upLoadDeviceDataBuffer->systemSetData));
 		
 		if(upLoadDeviceDataBuffer->systemSetData.crc == CalModbusCRC16Fun1(&(upLoadDeviceDataBuffer->systemSetData), sizeof(SystemSetData) - 2))
 		{
@@ -103,7 +103,7 @@ static void UpLoadDeviceInfo(void)
 	{
 		memset(upLoadDeviceDataBuffer, 0, sizeof(UpLoadDeviceDataBuffer));
 		
-		getSystemSetData(&(upLoadDeviceDataBuffer->systemSetData));
+		copyGBSystemSetData(&(upLoadDeviceDataBuffer->systemSetData));
 		
 		if(upLoadDeviceDataBuffer->systemSetData.crc == CalModbusCRC16Fun1(&(upLoadDeviceDataBuffer->systemSetData), sizeof(SystemSetData) - 2))
 		{
@@ -120,12 +120,12 @@ static void UpLoadDeviceInfo(void)
 				if(My_Pass == UpLoadData("/NCD_Server/up_device", upLoadDeviceDataBuffer->sendBuf, strlen(upLoadDeviceDataBuffer->sendBuf), upLoadDeviceDataBuffer->recvBuf,
 					SERVERRECVBUFLEN))
 				{
+					copyGBSystemSetData(&(upLoadDeviceDataBuffer->systemSetData));
+					
 					upLoadDeviceDataBuffer->systemSetData.deviceInfo.isnew = false ;
-						
-					if(My_Pass == SaveSystemSetData(&(upLoadDeviceDataBuffer->systemSetData)))
-					{
-						setSystemSetData(&(upLoadDeviceDataBuffer->systemSetData));
-					}
+					
+					//保存并更新内存中的数据
+					SaveSystemSetData(&(upLoadDeviceDataBuffer->systemSetData));
 				}
 			}
 		}
@@ -145,7 +145,7 @@ static void UpLoadTestData(void)
 		memset(upLoadTestDataBuffer, 0, sizeof(UpLoadTestDataBuffer));
 		
 		//读取设备信息
-		getSystemSetData(&(upLoadTestDataBuffer->systemSetData));
+		copyGBSystemSetData(&(upLoadTestDataBuffer->systemSetData));
 		
 		//检测数据头是否校验正确，且有数据待发送
 		if(upLoadTestDataBuffer->systemSetData.upLoadIndex >= upLoadTestDataBuffer->systemSetData.testDataNum)
@@ -221,7 +221,7 @@ static void UpLoadTestData(void)
 		//更新系统设置数据中的上传索引数据
 		setUpLoadIndex(upLoadTestDataBuffer->systemSetData.upLoadIndex);
 		//持久化系统设置数据
-		persistSystemSetData();
+		SaveSystemSetData(getGBSystemSetData());
 	}
 	
 	END:

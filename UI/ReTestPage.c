@@ -486,9 +486,8 @@ static void CheckQRCode(void)
 		else
 		{
 			//读取校准参数
-			memcpy(S_ReTestPageBuffer->retestdata.testdata.tempadjust.ItemName, S_ReTestPageBuffer->retestdata.testdata.temperweima.ItemName, ItemNameLen);
-			if(My_Fail == ReadAdjustData(&(S_ReTestPageBuffer->retestdata.testdata.tempadjust)))
-				memset(&(S_ReTestPageBuffer->retestdata.testdata.tempadjust), 0, sizeof(AdjustData));
+			memcpy(S_ReTestPageBuffer->retestdata.testdata.tempadjust.ItemName, S_ReTestPageBuffer->retestdata.testdata.temperweima.ItemName, AdjItemNameLen);
+			getAdjPram(getGBSystemSetData(), &(S_ReTestPageBuffer->retestdata.testdata.tempadjust));
 
 			S_ReTestPageBuffer->retestdata.reteststatus = 3;
 			StartTest(&(S_ReTestPageBuffer->retestdata.testdata));

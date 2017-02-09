@@ -81,7 +81,7 @@ static void activityStart(void)
 	if(S_UserMPageBuffer)
 	{
 		//读取系统设置
-		getSystemSetData(&(S_UserMPageBuffer->systemSetData));
+		copyGBSystemSetData(&(S_UserMPageBuffer->systemSetData));
 		
 		timer_set(&(S_UserMPageBuffer->timer), S_UserMPageBuffer->systemSetData.ledSleepTime);
 		

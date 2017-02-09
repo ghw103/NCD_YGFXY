@@ -336,7 +336,7 @@ static void RefreshCurve(void)
 		//测试数目+1
 		plusTestDataTotalNum(1);
 		//保存测试数目
-		persistSystemSetData();
+		SaveSystemSetData(getGBSystemSetData());
 		
 		MotorMoveTo(MaxLocation, 1);
 		

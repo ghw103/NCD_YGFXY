@@ -10,9 +10,12 @@
 	
 #define		CodeType	LabCode									//程序分类
 
-#define		AdminPassWord	"123456"								//管理员密码，用于修改设备id
-#define		AdjustPassWord	"111111"								//校准密码
-#define		TestPassWord	"222222"								//老化测试密码
+#define		AdminPassWord		"123456"								//管理员密码，用于修改设备id
+#define		AdjustPassWord		"111111"								//校准密码
+#define		TestPassWord		"222222"								//老化测试密码
+#define		CheckQRPassWord		"333333"								//测试二维码密码
+#define		AdjLedPassWord		"444444"								//校准led密码
+#define		FactoryResetPassWord	"555555"							//恢复出厂设置密码
 
 #define		MY_SUCCESS	1
 #define		MY_FALSE	0
@@ -164,6 +167,7 @@ typedef struct QRCode_Tag
 	char	ItemMeasure[ItemMeasureLen];				//测试单位
 	unsigned char ItemPoint;							//小数点数目
 	unsigned short ItemLocation;						//T线位置
+	unsigned char ChannelNum;							//通道号(0-7)
 	float	ItemFenDuan[2];								//分段峰高比
 	float	ItemBiaoQu[3][3];							//标准曲线
 			//2 --- ?2???
@@ -379,12 +383,14 @@ typedef struct NetSet_Tag
 /**************************校准参数***********************************************************/
 /*********************************************************************************************/
 
+//校准参数只保留名字的前10位
+#define	AdjItemNameLen	10
+
 #pragma pack(1)
 typedef struct AdjustData_tag
 {
-	char ItemName[ItemNameLen];
+	char ItemName[AdjItemNameLen];
 	float parm;
-	unsigned short crc;
 }AdjustData;
 #pragma pack()
 

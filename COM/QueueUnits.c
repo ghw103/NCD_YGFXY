@@ -43,13 +43,14 @@ static void GivexMutex(xSemaphoreHandle mutex)
 *		receivedstr -- 存放接收数据的地址
 *		len -- 接收的数据长度(长度为此队列单元数据大小的个数，与数据接收数据的字节长度无关)
 *		itemsize -- 队列单元数据的大小
-*		xBlockTime -- 阻塞时间
+*		queueBlockTime -- 队列阻塞时间
+*		mutexBlockTime -- 互斥量阻塞时间
 *Output：None
 *Author：xsx
 *Data：2016年4月22日15:35:40
 ***************************************************************************************************/
 unsigned char ReceiveDataFromQueue(xQueueHandle queue, xSemaphoreHandle mutex, void *receivedstr , unsigned short len ,
-	unsigned short itemsize, portTickType xBlockTime)
+	unsigned short itemsize, portTickType queueBlockTime, portTickType mutexBlockTime)
 {
 	unsigned short i=0;
 	unsigned char *pdata = (unsigned char *)receivedstr;
@@ -60,13 +61,13 @@ unsigned char ReceiveDataFromQueue(xQueueHandle queue, xSemaphoreHandle mutex, v
 	
 	if(mutex != NULL)
 	{
-		if(pdFAIL == WaittingForMutex(mutex, xBlockTime))
+		if(pdFAIL == WaittingForMutex(mutex, mutexBlockTime))
 			return pdFAIL;
 	}
 	
 	for(i=0; i<len; i++)
 	{
-		if(pdPASS == xQueueReceive(queue, pdata , xBlockTime))
+		if(pdPASS == xQueueReceive(queue, pdata , queueBlockTime))
 			pdata += itemsize;
 			
 		else
@@ -89,13 +90,14 @@ unsigned char ReceiveDataFromQueue(xQueueHandle queue, xSemaphoreHandle mutex, v
 *		sendstr -- 发送的数据地址
 *		len -- 接收的数据长度(长度为此队列单元数据大小的个数，与数据接收数据的字节长度
 *		itemsize -- 队列单元数据的大小
-*		xBlockTime -- 阻塞时间
+*		queueBlockTime -- 队列阻塞时间
+*		mutexBlockTime -- 互斥量阻塞时间
 *Output：None
 *Author：xsx
 *Data：2016年4月22日15:33:38
 ***************************************************************************************************/
 unsigned char SendDataToQueue(xQueueHandle queue, xSemaphoreHandle mutex, void *sendstr , unsigned short len ,  
-	unsigned short itemsize, portTickType xBlockTime, void (*fun)(void))
+	unsigned short itemsize, portTickType queueBlockTime, portTickType mutexBlockTime, void (*fun)(void))
 {
 	unsigned short i=0;
 	unsigned char *pdata = (unsigned char *)sendstr;
@@ -106,13 +108,13 @@ unsigned char SendDataToQueue(xQueueHandle queue, xSemaphoreHandle mutex, void *
 	
 	if(mutex != NULL)
 	{
-		if(pdFAIL == WaittingForMutex(mutex, xBlockTime))
+		if(pdFAIL == WaittingForMutex(mutex, mutexBlockTime))
 			return pdFAIL;
 	}
 
 	for(i=0; i<len; i++)
 	{
-		if(pdPASS == xQueueSend(queue, pdata , xBlockTime))
+		if(pdPASS == xQueueSend(queue, pdata , queueBlockTime))
 		{
 			pdata += itemsize;
 			statues = pdPASS;

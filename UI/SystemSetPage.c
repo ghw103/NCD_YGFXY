@@ -15,6 +15,8 @@
 #include	"OtherSetPage.h"
 #include	"MyTools.h"
 #include	"SleepPage.h"
+#include	"CheckQRPage.h"
+#include	"AdjustLedPage.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -81,7 +83,7 @@ static void activityStart(void)
 	if(S_SysSetPageBuffer)
 	{
 		//读取系统设置
-		getSystemSetData(&(S_SysSetPageBuffer->systemSetData));
+		copyGBSystemSetData(&(S_SysSetPageBuffer->systemSetData));
 		
 		timer_set(&(S_SysSetPageBuffer->timer), S_SysSetPageBuffer->systemSetData.ledSleepTime);
 	}
@@ -129,7 +131,27 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		{
 			startActivity(createRecordActivity, NULL);
 		}
-		//校准功能
+		//关于按键第一次按下
+		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1909)
+		{
+			S_SysSetPageBuffer->pressCnt = 0;
+		}
+		//关于按键持续按下
+		else if(S_SysSetPageBuffer->lcdinput[0] == 0x190A)
+		{
+			S_SysSetPageBuffer->pressCnt++;
+		}
+		//关于按键松开
+		else if(S_SysSetPageBuffer->lcdinput[0] == 0x190B)
+		{
+			//如果是长按就输入密码进入隐藏功能
+			if(S_SysSetPageBuffer->pressCnt > 10)
+				SendKeyCode(4);
+			//短按则进入关于界面
+			else
+				startActivity(createRecordActivity, NULL);
+		}
+		//隐藏密码的厂家功能
 		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1910)
 		{
 			if(GetBufLen(&pbuf[7] , 2*pbuf[6]) == 6)
@@ -141,6 +163,18 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 				else if(pdPASS == CheckStrIsSame(&pbuf[7] , TestPassWord ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
 				{
 					startActivity(createReTestActivity, NULL);
+				}
+				else if(pdPASS == CheckStrIsSame(&pbuf[7] , CheckQRPassWord ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
+				{
+					startActivity(createCheckQRActivity, NULL);
+				}
+				else if(pdPASS == CheckStrIsSame(&pbuf[7] , AdjLedPassWord ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
+				{
+					startActivity(createAdjustLedActivity, NULL);
+				}
+				else if(pdPASS == CheckStrIsSame(&pbuf[7] , FactoryResetPassWord ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
+				{
+					startActivity(createAdjustLedActivity, NULL);
 				}
 				else
 					SendKeyCode(1);
