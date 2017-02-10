@@ -11,6 +11,7 @@
 /***************************************************************************************************/
 #include	"SDFunction.h"
 #include	"System_Data.h"
+#include	"Timer_Data.h"
 
 #include	"CRC16.h"
 #include	"MyMem.h"
@@ -287,7 +288,7 @@ MyState_TypeDef ClearWifiData(WIFI_Def * wifi)
 /*********************************************************************************************/
 /*********************************************************************************************/
 
-MyState_TypeDef SaveReTestData(ReTestData *retestdata, unsigned char type)
+MyState_TypeDef SavereTestData(ReTestData *reTestData, unsigned char type)
 {
 	FatfsFileInfo_Def * myfile = NULL;
 	char *buf;
@@ -296,7 +297,7 @@ MyState_TypeDef SaveReTestData(ReTestData *retestdata, unsigned char type)
 	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
 	buf = MyMalloc(1024);
 	
-	if(myfile && retestdata && buf)
+	if(myfile && reTestData && buf)
 	{
 		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
 		
@@ -320,12 +321,12 @@ MyState_TypeDef SaveReTestData(ReTestData *retestdata, unsigned char type)
 			if(type == 0)
 			{
 				memset(buf, 0, 1024);
-				sprintf(buf, "%d/%d,%d-%d-%d %d:%d:%d,%d,%s,[100-%.3f],[200-%.3f],[300-%.3f],%d,%.1f,%.1f,%.1f,[%d-%d],[%d-%d],[%d-%d],%.3f,%.3f,%.3f\r", retestdata->retestedcount, retestdata->retestcount, retestdata->testdata.TestTime.year
-					, retestdata->testdata.TestTime.month, retestdata->testdata.TestTime.day, retestdata->testdata.TestTime.hour, retestdata->testdata.TestTime.min, retestdata->testdata.TestTime.sec
-					, timer_Count(&(retestdata->oneretesttimer)), retestdata->result, retestdata->advalue1, retestdata->advalue2, retestdata->advalue3, retestdata->ledstatus, retestdata->testdata.TestTemp.E_Temperature, retestdata->testdata.TestTemp.I_Temperature
-					, retestdata->testdata.TestTemp.O_Temperature, retestdata->testdata.testline.T_Point[0], retestdata->testdata.testline.T_Point[1], retestdata->testdata.testline.C_Point[0]
-					, retestdata->testdata.testline.C_Point[1], retestdata->testdata.testline.B_Point[0], retestdata->testdata.testline.B_Point[1], retestdata->testdata.testline.BasicBili
-					, retestdata->testdata.testline.BasicResult, retestdata->testdata.testline.AdjustResult);
+				sprintf(buf, "%d/%d,%d-%d-%d %d:%d:%d,%d,%s,[100-%.3f],[200-%.3f],[300-%.3f],%d,%.1f,%.1f,%.1f,[%d-%d],[%d-%d],[%d-%d],%.3f,%.3f,%.3f\r", reTestData->retestedcount, reTestData->retestcount, reTestData->itemData.testdata.TestTime.year
+					, reTestData->itemData.testdata.TestTime.month, reTestData->itemData.testdata.TestTime.day, reTestData->itemData.testdata.TestTime.hour, reTestData->itemData.testdata.TestTime.min, reTestData->itemData.testdata.TestTime.sec
+					, timer_Count(&(reTestData->oneretesttimer)), reTestData->result, reTestData->advalue1, reTestData->advalue2, reTestData->advalue3, reTestData->ledstatus, reTestData->itemData.testdata.TestTemp.E_Temperature, reTestData->itemData.testdata.TestTemp.I_Temperature
+					, reTestData->itemData.testdata.TestTemp.O_Temperature, reTestData->itemData.testdata.testline.T_Point[0], reTestData->itemData.testdata.testline.T_Point[1], reTestData->itemData.testdata.testline.C_Point[0]
+					, reTestData->itemData.testdata.testline.C_Point[1], reTestData->itemData.testdata.testline.B_Point[0], reTestData->itemData.testdata.testline.B_Point[1], reTestData->itemData.testdata.testline.BasicBili
+					, reTestData->itemData.testdata.testline.BasicResult, reTestData->itemData.testdata.testline.AdjustResult);
 				myfile->res = f_write(&(myfile->file), buf, strlen(buf), &(myfile->bw));
 				
 				if(FR_OK != myfile->res)
@@ -337,10 +338,10 @@ MyState_TypeDef SaveReTestData(ReTestData *retestdata, unsigned char type)
 			else
 			{
 				memset(buf, 0, 1024);
-				sprintf(buf, ",,,,,,,,,,,,,,,,,%d-%d-%d %d:%d:%d,%d-%d-%d %d:%d:%d,%d,%d,%d\r", retestdata->startplayTime.year, retestdata->startplayTime.month, retestdata->startplayTime.day
-					,retestdata->startplayTime.hour, retestdata->startplayTime.min, retestdata->startplayTime.sec, retestdata->endplayTime.year, retestdata->endplayTime.month
-					, retestdata->endplayTime.day, retestdata->endplayTime.hour, retestdata->endplayTime.min, retestdata->endplayTime.sec, timer_Count(&(retestdata->oneplaytimer))
-					, timer_Count(&(retestdata->playtimer)), retestdata->playcount);
+				sprintf(buf, ",,,,,,,,,,,,,,,,,%d-%d-%d %d:%d:%d,%d-%d-%d %d:%d:%d,%d,%d,%d\r", reTestData->startplayTime.year, reTestData->startplayTime.month, reTestData->startplayTime.day
+					,reTestData->startplayTime.hour, reTestData->startplayTime.min, reTestData->startplayTime.sec, reTestData->endplayTime.year, reTestData->endplayTime.month
+					, reTestData->endplayTime.day, reTestData->endplayTime.hour, reTestData->endplayTime.min, reTestData->endplayTime.sec, timer_Count(&(reTestData->oneplaytimer))
+					, timer_Count(&(reTestData->playtimer)), reTestData->playcount);
 				myfile->res = f_write(&(myfile->file), buf, strlen(buf), &(myfile->bw));
 				
 				if(FR_OK != myfile->res)

@@ -79,6 +79,9 @@ static void activityStart(void)
 {
 	if(S_NetInfoPageBuffer)
 	{
+		//设置wifi处于不能上传数据模式
+		setWifiIsUseable(false);
+		
 		//读取系统设置
 		copyGBSystemSetData(&(S_NetInfoPageBuffer->systemSetData));
 		
@@ -199,6 +202,9 @@ static void activityResume(void)
 static void activityDestroy(void)
 {
 	activityBufferFree();
+	
+	//设置wifi处于能上传数据模式
+	setWifiIsUseable(true);
 }
 
 /***************************************************************************************************
@@ -270,6 +276,9 @@ static void ReadNetInfo(void)
 		
 	memset(S_NetInfoPageBuffer->WifiMAC, 0, 13);
 	
+	/*如果不是at模式，则进入at模式*/
+	SetWifiWorkInAT(AT_Mode);
+	
 	if(My_Pass == WifiIsConnectted(S_NetInfoPageBuffer->WifiSSID))
 	{
 		//读取IP
@@ -307,7 +316,6 @@ static void ReadNetInfo(void)
 		sprintf(S_NetInfoPageBuffer->tempbuffer1, "%.2s-%.2s-%.2s-%.2s-%.2s-%.2s", S_NetInfoPageBuffer->WifiMAC, &(S_NetInfoPageBuffer->WifiMAC[2]), &(S_NetInfoPageBuffer->WifiMAC[4]),
 			&(S_NetInfoPageBuffer->WifiMAC[6]), &(S_NetInfoPageBuffer->WifiMAC[8]), &(S_NetInfoPageBuffer->WifiMAC[10]));
 		DisText(0x1Ce0, S_NetInfoPageBuffer->tempbuffer1, 20);
-		
 	}
 }
 

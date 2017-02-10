@@ -177,21 +177,18 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			showMuteIco();
 		}
 		//进入休眠时间
-		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2420)
+		else if((S_OtherSetPageBuffer->lcdinput[0] >= 0x2407) && (S_OtherSetPageBuffer->lcdinput[0] <= 0x240a))
 		{
-			memset(S_OtherSetPageBuffer->buf, 0, 50);
-			memcpy(S_OtherSetPageBuffer->buf, (char *)(&pbuf[7]), GetBufLen(&pbuf[7] , 2*pbuf[6]));
-			
-			S_OtherSetPageBuffer->tempvalue = strtol(S_OtherSetPageBuffer->buf, NULL, 10);
+			S_OtherSetPageBuffer->tempvalue = S_OtherSetPageBuffer->lcdinput[0] - 0x2407;
 			
 			if(S_OtherSetPageBuffer->tempvalue == 0)
-				S_OtherSetPageBuffer->systemSetData.ledSleepTime = 0xffff;
-			else if(S_OtherSetPageBuffer->tempvalue > 600)
-				S_OtherSetPageBuffer->systemSetData.ledSleepTime = 600;
-			else if(S_OtherSetPageBuffer->tempvalue < 10)
-				S_OtherSetPageBuffer->systemSetData.ledSleepTime = 10;
+				S_OtherSetPageBuffer->systemSetData.ledSleepTime = 60;
+			else if(S_OtherSetPageBuffer->tempvalue == 1)
+				S_OtherSetPageBuffer->systemSetData.ledSleepTime = 180;
+			else if(S_OtherSetPageBuffer->tempvalue == 2)
+				S_OtherSetPageBuffer->systemSetData.ledSleepTime = 300;
 			else
-				S_OtherSetPageBuffer->systemSetData.ledSleepTime = S_OtherSetPageBuffer->tempvalue;
+				S_OtherSetPageBuffer->systemSetData.ledSleepTime = 60000;
 			
 			if(My_Pass == SaveSystemSetData(&(S_OtherSetPageBuffer->systemSetData)))
 			{
@@ -211,24 +208,14 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			showLcdSleepTime();
 		}	
 		//进入屏幕亮度
-		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x2430)
-		{
-			memset(S_OtherSetPageBuffer->buf, 0, 50);
-			memcpy(S_OtherSetPageBuffer->buf, (char *)(&pbuf[7]), GetBufLen(&pbuf[7] , 2*pbuf[6]));
-			
-			S_OtherSetPageBuffer->tempvalue = strtol(S_OtherSetPageBuffer->buf, NULL, 10);
-			
-			if(S_OtherSetPageBuffer->tempvalue > 100)
-				S_OtherSetPageBuffer->tempvalue = 100;
-			if(S_OtherSetPageBuffer->tempvalue < 10)
-				S_OtherSetPageBuffer->tempvalue = 10;
-			
-			S_OtherSetPageBuffer->systemSetData.ledLightIntensity = S_OtherSetPageBuffer->tempvalue;
+		else if(S_OtherSetPageBuffer->lcdinput[0] == 0x240b)
+		{	
+			S_OtherSetPageBuffer->systemSetData.ledLightIntensity = pbuf[8];
 	
 			if(My_Pass == SaveSystemSetData(&(S_OtherSetPageBuffer->systemSetData)))
 			{
 				SetLEDLight(S_OtherSetPageBuffer->systemSetData.ledLightIntensity);
-				SendKeyCode(1);
+
 				//保存成功，更新内存中的数据
 				setSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
 			}
@@ -236,9 +223,9 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			{
 				SendKeyCode(2);
 				copyGBSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
+				
+				showLcdLightNum();
 			}
-			
-			showLcdLightNum();
 		}
 	}
 }
@@ -440,8 +427,8 @@ static void SetGB_Time(char *buf, unsigned char len)
 
 static void showPrintfIco(void)
 {
-	S_OtherSetPageBuffer->ico.ICO_ID = 22;
-	S_OtherSetPageBuffer->ico.X = 170;
+	S_OtherSetPageBuffer->ico.ICO_ID = 23;
+	S_OtherSetPageBuffer->ico.X = 176;
 	S_OtherSetPageBuffer->ico.Y = 185;
 			
 	if(S_OtherSetPageBuffer->systemSetData.isAutoPrint)
@@ -453,9 +440,9 @@ static void showPrintfIco(void)
 
 static void showMuteIco(void)
 {
-	S_OtherSetPageBuffer->ico.ICO_ID = 22;
-	S_OtherSetPageBuffer->ico.X = 170;
-	S_OtherSetPageBuffer->ico.Y = 225;
+	S_OtherSetPageBuffer->ico.ICO_ID = 23;
+	S_OtherSetPageBuffer->ico.X = 738;
+	S_OtherSetPageBuffer->ico.Y = 185;
 			
 	if(S_OtherSetPageBuffer->systemSetData.isMute)
 		BasicUI(0x2450 ,0x1807 , 1, &(S_OtherSetPageBuffer->ico) , sizeof(Basic_ICO));
@@ -465,18 +452,33 @@ static void showMuteIco(void)
 
 static void showLcdLightNum(void)
 {
-	memset(S_OtherSetPageBuffer->buf, 0, 50);
-	sprintf(S_OtherSetPageBuffer->buf, "%d", S_OtherSetPageBuffer->systemSetData.ledLightIntensity);
-	DisText(0x2430, S_OtherSetPageBuffer->buf, strlen(S_OtherSetPageBuffer->buf));
+	DspNum(0x240b, S_OtherSetPageBuffer->systemSetData.ledLightIntensity, 2);
 }
 
 static void showLcdSleepTime(void)
 {
-	memset(S_OtherSetPageBuffer->buf, 0, 50);
-	if(S_OtherSetPageBuffer->systemSetData.ledSleepTime == 0xffff)
-		sprintf(S_OtherSetPageBuffer->buf, "长亮");
+	S_OtherSetPageBuffer->ico.ICO_ID = 23;
+	S_OtherSetPageBuffer->ico.X = 385;
+	S_OtherSetPageBuffer->ico.Y = 312;
+
+	if(S_OtherSetPageBuffer->systemSetData.ledSleepTime == 60)
+		BasicUI(0x2420 ,0x1807 , 1, &(S_OtherSetPageBuffer->ico) , sizeof(Basic_ICO));
+	else if(S_OtherSetPageBuffer->systemSetData.ledSleepTime == 180)
+	{
+		S_OtherSetPageBuffer->ico.X = 490;
+		BasicUI(0x2420 ,0x1807 , 1, &(S_OtherSetPageBuffer->ico) , sizeof(Basic_ICO));
+	}
+	else if(S_OtherSetPageBuffer->systemSetData.ledSleepTime == 300)
+	{
+		S_OtherSetPageBuffer->ico.X = 595;
+		BasicUI(0x2420 ,0x1807 , 1, &(S_OtherSetPageBuffer->ico) , sizeof(Basic_ICO));
+	}
+	else if(S_OtherSetPageBuffer->systemSetData.ledSleepTime == 60000)
+	{
+		S_OtherSetPageBuffer->ico.X = 700;
+		BasicUI(0x2420 ,0x1807 , 1, &(S_OtherSetPageBuffer->ico) , sizeof(Basic_ICO));
+	}
 	else
-		sprintf(S_OtherSetPageBuffer->buf, "%d", S_OtherSetPageBuffer->systemSetData.ledSleepTime);
-	DisText(0x2420, S_OtherSetPageBuffer->buf, strlen(S_OtherSetPageBuffer->buf));
+		BasicUI(0x2420 ,0x1807 , 0, &(S_OtherSetPageBuffer->ico) , sizeof(Basic_ICO));
 }
 

@@ -73,19 +73,14 @@ static void vTestTask( void *pvParameters )
 		{
 			while(pdPASS == TakeTestResult(&resultstatues))
 				;
-			
-			#if (NormalCode != CodeType)
-			
-				SetTestStatusFlorLab(1);
-			#endif
+			SetTestStatusFlorLab(1);
+
 			resultstatues = TestFunction(testdata);
 			
 			xQueueSend( xTestResultQueue, &resultstatues, 1000/portTICK_RATE_MS );
 			
-			#if (NormalCode != CodeType)
-			
-				SetTestStatusFlorLab(0);
-			#endif
+			SetTestStatusFlorLab(0);
+
 		}
 	}
 }

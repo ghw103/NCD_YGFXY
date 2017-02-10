@@ -1,23 +1,14 @@
 /******************************************************************************************/
 /*****************************************头文件*******************************************/
 
-#include	"SystemSetPage.h"
+#include	"AboutUsPage.h"
 #include	"Define.h"
 #include	"LCD_Driver.h"
+#include	"UI_Data.h"
 #include	"MyMem.h"
-#include	"LunchPage.h"
-#include	"ShowDeviceInfoPage.h"
-#include	"AdjustPage.h"
-#include	"ReTestPage.h"
-#include	"UserMPage.h"
-#include	"NetPreSetPage.h"
-#include	"RecordPage.h"
-#include	"OtherSetPage.h"
-#include	"MyTools.h"
+
 #include	"SleepPage.h"
-#include	"CheckQRPage.h"
-#include	"AdjustLedPage.h"
-#include	"AboutUsPage.h"
+#include	"PlaySong_Task.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -28,7 +19,7 @@
 
 /******************************************************************************************/
 /*****************************************局部变量声明*************************************/
-static SysSetPageBuffer * S_SysSetPageBuffer = NULL;
+static AboutUsPageBuffer * S_AboutUsPageBuffer = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 static void activityStart(void);
@@ -39,6 +30,8 @@ static void activityResume(void);
 static void activityDestroy(void);
 static MyState_TypeDef activityBufferMalloc(void);
 static void activityBufferFree(void);
+
+static void dspPageText(void);
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -55,14 +48,14 @@ static void activityBufferFree(void);
 *Author: xsx
 *Date: 2016年12月21日09:00:09
 ***************************************************************************************************/
-MyState_TypeDef createSystemSetActivity(Activity * thizActivity, Intent * pram)
+MyState_TypeDef createAboutUsActivity(Activity * thizActivity, Intent * pram)
 {
 	if(NULL == thizActivity)
 		return My_Fail;
 	
 	if(My_Pass == activityBufferMalloc())
 	{
-		InitActivity(thizActivity, "SystemSetActivity\0", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
+		InitActivity(thizActivity, "AboutUsActivity\0", activityStart, activityInput, activityFresh, activityHide, activityResume, activityDestroy);
 		
 		return My_Pass;
 	}
@@ -81,12 +74,17 @@ MyState_TypeDef createSystemSetActivity(Activity * thizActivity, Intent * pram)
 ***************************************************************************************************/
 static void activityStart(void)
 {
-	if(S_SysSetPageBuffer)
+	if(S_AboutUsPageBuffer)
 	{
-
+		//读取系统设置
+		copyGBSystemSetData(&(S_AboutUsPageBuffer->systemSetData));
+		
+		timer_set(&(S_AboutUsPageBuffer->timer), S_AboutUsPageBuffer->systemSetData.ledSleepTime);
+		
+		dspPageText();
 	}
 		
-	SelectPage(98);
+	SelectPage(116);
 }
 
 /***************************************************************************************************
@@ -100,90 +98,17 @@ static void activityStart(void)
 ***************************************************************************************************/
 static void activityInput(unsigned char *pbuf , unsigned short len)
 {
-	if(S_SysSetPageBuffer)
+	if(S_AboutUsPageBuffer)
 	{
 		/*命令*/
-		S_SysSetPageBuffer->lcdinput[0] = pbuf[4];
-		S_SysSetPageBuffer->lcdinput[0] = (S_SysSetPageBuffer->lcdinput[0]<<8) + pbuf[5];
+		S_AboutUsPageBuffer->lcdinput[0] = pbuf[4];
+		S_AboutUsPageBuffer->lcdinput[0] = (S_AboutUsPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
-		//基本信息
-		if(S_SysSetPageBuffer->lcdinput[0] == 0x1900)
-		{
-			startActivity(createDeviceInfoActivity, NULL);
-		}
-		//操作人管理
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1901)
-		{
-			startActivity(createUserManagerActivity, NULL);
-		}
-		//网络设置
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1902)
-		{
-			startActivity(createNetPreActivity, NULL);
-		}
-		//数据管理
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1903)
-		{
-			startActivity(createRecordActivity, NULL);
-		}
-		//关于按键第一次按下
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1909)
-		{
-			S_SysSetPageBuffer->pressCnt = 0;
-		}
-		//关于按键持续按下
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x190A)
-		{
-			S_SysSetPageBuffer->pressCnt++;
-		}
-		//关于按键松开
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x190B)
-		{
-			//如果是长按就输入密码进入隐藏功能
-			if(S_SysSetPageBuffer->pressCnt > 10)
-				SendKeyCode(4);
-			//短按则进入关于界面
-			else
-				startActivity(createAboutUsActivity, NULL);
-		}
-		//隐藏密码的厂家功能
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1910)
-		{
-			if(GetBufLen(&pbuf[7] , 2*pbuf[6]) == 6)
-			{
-				if(pdPASS == CheckStrIsSame(&pbuf[7] , AdjustPassWord ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
-				{
-					startActivity(createAdjActivity, NULL);
-				}
-				else if(pdPASS == CheckStrIsSame(&pbuf[7] , TestPassWord ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
-				{
-					startActivity(createReTestActivity, NULL);
-				}
-				else if(pdPASS == CheckStrIsSame(&pbuf[7] , CheckQRPassWord ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
-				{
-					startActivity(createCheckQRActivity, NULL);
-				}
-				else if(pdPASS == CheckStrIsSame(&pbuf[7] , AdjLedPassWord ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
-				{
-					startActivity(createAdjustLedActivity, NULL);
-				}
-				else if(pdPASS == CheckStrIsSame(&pbuf[7] , FactoryResetPassWord ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
-				{
-					startActivity(createAdjustLedActivity, NULL);
-				}
-				else
-					SendKeyCode(1);
-			}
-			else
-					SendKeyCode(1);
-		}
-		//其他设置
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1904)
-		{
-			startActivity(createOtherSetActivity, NULL);
-		}
+		//重置休眠时间
+		timer_restart(&(S_AboutUsPageBuffer->timer));
+		
 		//返回
-		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1906)
+		if(S_AboutUsPageBuffer->lcdinput[0] == 0x2900)
 		{
 			backToFatherActivity();
 		}
@@ -201,7 +126,11 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void activityFresh(void)
 {
-
+	if(S_AboutUsPageBuffer)
+	{
+		if(TimeOut == timer_expired(&(S_AboutUsPageBuffer->timer)))
+			startActivity(createSleepActivity, NULL);
+	}
 }
 
 /***************************************************************************************************
@@ -229,7 +158,14 @@ static void activityHide(void)
 ***************************************************************************************************/
 static void activityResume(void)
 {
-	SelectPage(98);
+	if(S_AboutUsPageBuffer)
+	{
+		timer_restart(&(S_AboutUsPageBuffer->timer));
+		
+		dspPageText();
+	}
+	
+	SelectPage(116);
 }
 
 /***************************************************************************************************
@@ -257,13 +193,13 @@ static void activityDestroy(void)
 ***************************************************************************************************/
 static MyState_TypeDef activityBufferMalloc(void)
 {
-	if(NULL == S_SysSetPageBuffer)
+	if(NULL == S_AboutUsPageBuffer)
 	{
-		S_SysSetPageBuffer = MyMalloc(sizeof(SysSetPageBuffer));
+		S_AboutUsPageBuffer = MyMalloc(sizeof(AboutUsPageBuffer));
 		
-		if(S_SysSetPageBuffer)
+		if(S_AboutUsPageBuffer)
 		{
-			memset(S_SysSetPageBuffer, 0, sizeof(SysSetPageBuffer));
+			memset(S_AboutUsPageBuffer, 0, sizeof(AboutUsPageBuffer));
 	
 			return My_Pass;
 		}
@@ -285,8 +221,26 @@ static MyState_TypeDef activityBufferMalloc(void)
 ***************************************************************************************************/
 static void activityBufferFree(void)
 {
-	MyFree(S_SysSetPageBuffer);
-	S_SysSetPageBuffer = NULL;
+	MyFree(S_AboutUsPageBuffer);
+	S_AboutUsPageBuffer = NULL;
 }
 
+static void dspPageText(void)
+{
+	ClearText(0x2910, 30);
+	ClearText(0x2920, 30);
+	ClearText(0x2930, 30);
+	
+	memset(S_AboutUsPageBuffer->buf, 0, 30);
+	sprintf(S_AboutUsPageBuffer->buf, "V%d.%d.%02d", GB_SoftVersion_1, GB_SoftVersion_2, GB_SoftVersion_3);
+	DisText(0x2910, S_AboutUsPageBuffer->buf, strlen(S_AboutUsPageBuffer->buf));
+	
+	memset(S_AboutUsPageBuffer->buf, 0, 30);
+	sprintf(S_AboutUsPageBuffer->buf, "%s", GB_SoftVersion_Build);
+	DisText(0x2920, S_AboutUsPageBuffer->buf, strlen(S_AboutUsPageBuffer->buf));
+	
+	memset(S_AboutUsPageBuffer->buf, 0, 30);
+	sprintf(S_AboutUsPageBuffer->buf, "鄂1234567890");
+	DisText(0x2930, S_AboutUsPageBuffer->buf, strlen(S_AboutUsPageBuffer->buf));
+}
 

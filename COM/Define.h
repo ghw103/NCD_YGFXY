@@ -29,7 +29,7 @@
 #define	GB_SoftVersion_1	1
 #define	GB_SoftVersion_2	0
 #define	GB_SoftVersion_3	3
-#define	GB_SoftVersion_Build	"Build17020601\0"
+#define	GB_SoftVersion_Build	"Build17021001\0"
 
 /*服务器信息*/
 #define	GB_ServerIp_1		116
@@ -376,6 +376,25 @@ typedef struct NetSet_Tag
 
 #define	MaxTestDataSaveNum	(unsigned int)1000000
 	
+/*********************************************************************************************/
+/*********************************************************************************************/
+/*********************************************************************************************/
+/*******************************定时器********************************************************/
+/*********************************************************************************************/
+#pragma pack(1)
+typedef struct
+{
+	unsigned int start;
+	unsigned int interval;
+}Timer;
+#pragma pack()
+
+typedef enum
+{ 
+	TimeNotTo = 0,		//计时时间未到
+	TimeOut = 1,		//计时时间到
+	TimeError = 2,		//错误
+}TimerState_Def;
 
 /*********************************************************************************************/
 /*********************************************************************************************/
@@ -435,27 +454,20 @@ typedef struct TestData_tag {
 }TestData;
 #pragma pack()
 
+typedef struct ItemData_tag {
+	TestData testdata;
+	Timer timer;																	//常规倒计时计时器
+	Timer timer2;																	//超时倒计时计时器
+	Timer timer3;																	//超时倒计时计时器
+	unsigned char errorcount;														//未操作次数
+	MyPaiDuiStatues statues;														//测试阶段
+	unsigned char jieduan;															//测试阶段
+	unsigned char testlocation;
+	unsigned char varIcoIndex;														//排队界面显示卡的图标界面的索引
+	unsigned short ledLight;														//测试时led的亮度，为系统设置中保存的校准led值
+}ItemData;
 
 
-/*********************************************************************************************/
-/*********************************************************************************************/
-/*********************************************************************************************/
-/*******************************定时器********************************************************/
-/*********************************************************************************************/
-#pragma pack(1)
-typedef struct
-{
-	unsigned int start;
-	unsigned int interval;
-}Timer;
-#pragma pack()
-
-typedef enum
-{ 
-	TimeNotTo = 0,		//计时时间未到
-	TimeOut = 1,		//计时时间到
-	TimeError = 2,		//错误
-}TimerState_Def;
 
 
 /*********************************************************************************************/
@@ -463,7 +475,7 @@ typedef enum
 /*********************************************************************************************/
 /*******************************老化测试数据**************************************************/
 /*********************************************************************************************/
-#pragma pack(1)
+
 typedef struct ReTestData_tag{
 	unsigned int retestcount;								//总次数
 	unsigned short retestsurpluscount;						//剩余测试次数
@@ -471,7 +483,7 @@ typedef struct ReTestData_tag{
 	unsigned char reteststatus;								//老化测试状态，0停止，1等待插卡，2读二维码，3测试
 	Timer retesttimer;										//老化测试计时器
 	Timer oneretesttimer;									//一次老化测试计时器
-	TestData testdata;										//老化测试数据空间
+	ItemData itemData;
 	char result[30];										//当前测试的结论
 	unsigned short playcount;								//老化播放计数器，记录播放次数
 	Timer playtimer;										//老化音频总时间	
@@ -482,8 +494,9 @@ typedef struct ReTestData_tag{
 	double advalue2;										//DA值200时的AD值
 	double advalue3;										//DA值300时的AD值
 	MyLEDCheck_TypeDef ledstatus;							//发光模块状态
+	unsigned char playstatus;								//播放状态
 }ReTestData;
-#pragma pack()
+
 
 #endif
 

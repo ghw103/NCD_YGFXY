@@ -262,7 +262,7 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 				return;
 			}
 		}
-		else if(S_TempCalData->maxdata < 200)
+		else if(S_TempCalData->maxdata < 50)
 		{
 			if(GetChannel() < 7)
 			{

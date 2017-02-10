@@ -14,7 +14,7 @@ MyState_TypeDef ReadWifiData(WIFI_Def * wifi);
 MyState_TypeDef ClearWifiData(WIFI_Def * wifi);
 
 /*老化数据*/
-MyState_TypeDef SaveReTestData(ReTestData *retestdata, unsigned char type);
+MyState_TypeDef SavereTestData(ReTestData *reTestData, unsigned char type);
 
 #endif
 

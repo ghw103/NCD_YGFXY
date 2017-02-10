@@ -5,13 +5,13 @@
 #include	"UI_Data.h"
 
 typedef struct ReTestPageBuffer_tag {
-	unsigned short lcdinput[100];
+	unsigned short lcdinput[20];
 	char buf[100];
-	ReTestData retestdata;
+	ReTestData reTestData;
 	Timer timer;
 	ScanCodeResult scancode;
 	ResultState cardpretestresult;
-	unsigned char playstatus;
+	
 }ReTestPageBuffer;
 
 

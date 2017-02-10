@@ -258,12 +258,18 @@ static void showDeviceInfo(void)
 	{
 		/*显示设备id*/
 		DisText(0x1a40, S_ShowDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceid, MaxDeviceIDLen);
+		
+		/*显示设备名称*/
+		DisText(0x1a50, "荧光免疫分析仪\0", 14);
 			
 		/*显示使用单位*/
 		DisText(0x1a60, S_ShowDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceunit, MaxDeviceUnitLen);
 
 		/*显示责任人*/
 		DisText(0x1a90, S_ShowDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_name, MaxNameLen);
+		
+		/*显示责任人联系方式*/
+		DisText(0x1a80, S_ShowDeviceInfoPageBuffer->systemSetData.deviceInfo.deviceuser.user_phone, MaxPhoneLen);
 	}
 }
 

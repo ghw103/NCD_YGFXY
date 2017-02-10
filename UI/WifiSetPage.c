@@ -77,15 +77,15 @@ static void activityStart(void)
 {
 	if(S_WifiPageBuffer)
 	{
+		//设置wifi处于不能上传数据模式
+		setWifiIsUseable(false);
+		
 		//读取系统设置
 		copyGBSystemSetData(&(S_WifiPageBuffer->systemSetData));
 		
 		timer_set(&(S_WifiPageBuffer->timer), S_WifiPageBuffer->systemSetData.ledSleepTime);
 		
 		SelectPage(112);
-		
-		/*如果不是at模式，则进入at模式*/
-		SetWifiWorkInAT(AT_Mode);
 		
 		RefreshWifi();
 		
@@ -254,6 +254,9 @@ static void activityResume(void)
 static void activityDestroy(void)
 {
 	activityBufferFree();
+	
+	//设置wifi处于能上传数据模式
+	setWifiIsUseable(true);
 }
 
 /***************************************************************************************************
@@ -312,6 +315,9 @@ static MyState_TypeDef RefreshWifi(void)
 		
 		S_WifiPageBuffer->pageindex = 0;
 		S_WifiPageBuffer->selectindex = 0;
+		
+		/*如果不是at模式，则进入at模式*/
+		SetWifiWorkInAT(AT_Mode);
 		
 		SendKeyCode(5);
 	

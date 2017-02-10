@@ -287,7 +287,7 @@ static void CheckQRCode(void)
 				memcpy(&(S_PreReadPageBuffer->currenttestdata->testdata.temperweima), &(S_PreReadPageBuffer->temperweima), sizeof(QRCode));
 				
 				//设置倒计时时间
-				timer_set(&(S_PreReadPageBuffer->currenttestdata->timer), S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardWaitTime*1);
+				timer_set(&(S_PreReadPageBuffer->currenttestdata->timer), S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardWaitTime*60);
 			
 				//查找卡图标索引
 				S_PreReadPageBuffer->currenttestdata->varIcoIndex = CheckItemPicIndex(S_PreReadPageBuffer->currenttestdata->testdata.temperweima.ItemName);
@@ -329,8 +329,7 @@ static void CheckPreTestCard(void)
 			//未加样重测3次，第三次未加样则表明真的未加样
 			S_PreReadPageBuffer->preTestErrorCount++;
 			if(S_PreReadPageBuffer->preTestErrorCount < 5)
-			{
-				
+			{	
 				StartTest(S_PreReadPageBuffer->currenttestdata);
 			}
 			else 

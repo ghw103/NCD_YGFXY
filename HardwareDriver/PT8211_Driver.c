@@ -148,7 +148,6 @@ void I2S_DMA_Init(unsigned char *buf0, unsigned char *buf1, unsigned short num)
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;//子优先级0
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;//使能外部中断通道
 	NVIC_Init(&NVIC_InitStructure);//配置
-	
 }
 
 void DMA1_Stream5_IRQHandler(void)

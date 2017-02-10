@@ -10,6 +10,7 @@
 /***************************************************************************************************/
 #include	"System_Data.h"
 #include	"MyTest_Data.h"
+#include	"SystemSet_Data.h"
 
 #include	"CRC16.h"
 
@@ -50,6 +51,9 @@ static float GB_EnTemperature = 0;
 /*********************************************************************************************/
 void * GetTestDataForLab(void)
 {
+	//从系统设置数据中获取测试时led的亮度值
+	S_ItemData.ledLight = getTestLedLightIntensity(getGBSystemSetData());
+	
 	return &S_ItemData;
 }
 

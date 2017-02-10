@@ -5,9 +5,7 @@
 #include	"SystemSet_Data.h"
 
 typedef struct SysSetPageBuffer_tag {
-	SystemSetData systemSetData;
 	unsigned char pressCnt;
-	Timer timer;
 	unsigned short lcdinput[100];
 }SysSetPageBuffer;
 

@@ -79,8 +79,8 @@ static void activityStart(void)
 		dspTestStatus("Waitting\0");
 		
 		//校准设置为1通道
-		S_AdjustLedPageBuffer->itemData.testdata.temperweima.ChannelNum = 1;
-	}	
+		S_AdjustLedPageBuffer->itemData.testdata.temperweima.ChannelNum = 0;
+	}
 
 	SelectPage(140);
 }
@@ -282,6 +282,8 @@ static void analysisTestData(void)
 				DspNum(0x2604, S_AdjustLedPageBuffer->itemData.ledLight, 2);
 					
 				StartTest(&(S_AdjustLedPageBuffer->itemData));
+				
+				return;
 			}
 			else
 			{
@@ -309,6 +311,8 @@ static void analysisTestData(void)
 				DspNum(0x2604, S_AdjustLedPageBuffer->itemData.ledLight, 2);
 					
 				StartTest(&(S_AdjustLedPageBuffer->itemData));
+				
+				return;
 			}
 			else
 			{
@@ -322,5 +326,6 @@ static void analysisTestData(void)
 			S_AdjustLedPageBuffer->isTestting = false;
 		}
 	}
-
+	
+	MotorMoveTo(MaxLocation, 1);
 }
