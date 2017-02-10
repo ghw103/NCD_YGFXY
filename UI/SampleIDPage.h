@@ -7,7 +7,6 @@
 #include	"UI_Data.h"
 
 typedef struct SampleIDPage_tag {
-	Timer timer;															//一个计时器
 	unsigned char tempbuf[150];
 	unsigned int tempv1;
 	ItemData * currenttestdata;												//当前测试数据

@@ -74,7 +74,7 @@ I (..\ThirdParty\Fatfs\src\ffconf.h)(0x57BC0C42)
 I (..\ThirdParty\Fatfs\src\diskio.h)(0x570CF746)
 I (..\HardwareDriver\MLX90614_Driver.h)(0x58805825)
 I (..\HardwareDriver\RTC_Driver.h)(0x58805825)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\HardwareDriver\Usart6_Driver.h)(0x5754D7E7)
 I (..\HardwareDriver\Iwdg_Driver.h)(0x5555A640)
 I (..\HardwareDriver\CardLimit_Driver.h)(0x57347242)
@@ -526,7 +526,7 @@ I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x56266E81)
 I (..\COM\Delay.h)(0x57A322D3)
 F (..\HardwareDriver\RTC_Driver.c)(0x58805825)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\rtc_driver.o --omf_browse .\obj\rtc_driver.crf --depend .\obj\rtc_driver.d)
 I (..\HardwareDriver\RTC_Driver.h)(0x58805825)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -596,7 +596,7 @@ I (..\ThirdParty\FreeRTOS\inc\queue.h)(0x573434EB)
 I (..\ThirdParty\FreeRTOS\inc\semphr.h)(0x540632A8)
 I (..\COM\QueueUnits.h)(0x589BCB91)
 I (..\Datas\System_Data.h)(0x588174CE)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cmInstr.h)(0x5302A2D0)
@@ -675,7 +675,7 @@ I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h)(0x56266E81)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x56266E81)
 I (..\Datas\Motor_Data.h)(0x584A64F9)
 I (..\Datas\CardStatues_Data.h)(0x58805824)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\ThirdParty\FreeRTOS\inc\FreeRTOS.h)(0x58363E42)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stddef.h)(0x53463A44)
 I (..\ThirdParty\FreeRTOS\inc\FreeRTOSConfig.h)(0x576BA29B)
@@ -883,7 +883,7 @@ I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x56266E81)
 I (..\HardwareDriver\CardLimit_Driver.h)(0x57347242)
 I (..\HardwareDriver\DRV8825_Driver.h)(0x57DE5D23)
 I (..\Datas\Motor_Data.h)(0x584A64F9)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\ThirdParty\FreeRTOS\inc\FreeRTOS.h)(0x58363E42)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stddef.h)(0x53463A44)
 I (..\ThirdParty\FreeRTOS\inc\FreeRTOSConfig.h)(0x576BA29B)
@@ -923,7 +923,7 @@ I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_tim.h)(0x56266E81)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_usart.h)(0x56266E81)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h)(0x56266E81)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x56266E81)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\ThirdParty\FreeRTOS\inc\FreeRTOS.h)(0x58363E42)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stddef.h)(0x53463A44)
 I (..\ThirdParty\FreeRTOS\inc\FreeRTOSConfig.h)(0x576BA29B)
@@ -963,7 +963,7 @@ I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_usart.h)(0x56266E81)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h)(0x56266E81)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x56266E81)
 I (..\COM\Delay.h)(0x57A322D3)
-F (..\Function\CodeScanFunction.c)(0x589BC10E)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\codescanfunction.o --omf_browse .\obj\codescanfunction.crf --depend .\obj\codescanfunction.d)
+F (..\Function\CodeScanFunction.c)(0x589D5E2D)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\codescanfunction.o --omf_browse .\obj\codescanfunction.crf --depend .\obj\codescanfunction.d)
 I (..\HardwareDriver\CodeScanner_Driver.h)(0x58805825)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
@@ -988,7 +988,7 @@ I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_usart.h)(0x56266E81)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h)(0x56266E81)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x56266E81)
 I (..\Function\CodeScanFunction.h)(0x588312C1)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\ThirdParty\FreeRTOS\inc\FreeRTOS.h)(0x58363E42)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stddef.h)(0x53463A44)
 I (..\ThirdParty\FreeRTOS\inc\FreeRTOSConfig.h)(0x576BA29B)
@@ -1033,7 +1033,7 @@ I (..\ThirdParty\FreeRTOS\inc\queue.h)(0x573434EB)
 I (..\ThirdParty\FreeRTOS\inc\semphr.h)(0x540632A8)
 I (..\Datas\UI_Data.h)(0x58805825)
 I (..\COM\MyStack.h)(0x58805824)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cmInstr.h)(0x5302A2D0)
@@ -1077,7 +1077,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 F (..\Function\SelfTest_Fun.c)(0x589AD015)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\selftest_fun.o --omf_browse .\obj\selftest_fun.crf --depend .\obj\selftest_fun.d)
 I (..\Function\SelfTest_Fun.h)(0x58805825)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -1134,7 +1134,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\stdlib.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 F (..\Function\WifiFunction.c)(0x589BDB65)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\wififunction.o --omf_browse .\obj\wififunction.crf --depend .\obj\wififunction.d)
 I (..\Function\WifiFunction.h)(0x588174CF)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -1171,7 +1171,7 @@ I (..\ThirdParty\FreeRTOS\inc\semphr.h)(0x540632A8)
 I (..\ThirdParty\FreeRTOS\inc\queue.h)(0x573434EB)
 I (..\ThirdParty\FreeRTOS\inc\task.h)(0x540632A8)
 I (..\ThirdParty\FreeRTOS\inc\list.h)(0x540632A8)
-I (..\Function\ServerFun.h)(0x5882C7BC)
+I (..\Function\ServerFun.h)(0x589D769C)
 I (..\ThirdParty\lwip-1.4.1\src\include\lwip\tcp.h)(0x51F8CF7D)
 I (..\ThirdParty\lwip-1.4.1\src\include\lwip/opt.h)(0x51F8CF7D)
 I (..\ThirdParty\lwip-1.4.1\User\lwipopts.h)(0x573D195C)
@@ -1238,7 +1238,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 F (..\Function\SDFunction.c)(0x589C0F69)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\sdfunction.o --omf_browse .\obj\sdfunction.crf --depend .\obj\sdfunction.d)
 I (..\Function\SDFunction.h)(0x589C0FF0)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -1284,9 +1284,9 @@ I (..\COM\MyTools.h)(0x588174CE)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdlib.h)(0x53463A44)
-F (..\Function\ServerFun.c)(0x589BD81E)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\serverfun.o --omf_browse .\obj\serverfun.crf --depend .\obj\serverfun.d)
-I (..\Function\ServerFun.h)(0x5882C7BC)
-I (..\COM\Define.h)(0x589D0F6B)
+F (..\Function\ServerFun.c)(0x589D81F6)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\serverfun.o --omf_browse .\obj\serverfun.crf --depend .\obj\serverfun.d)
+I (..\Function\ServerFun.h)(0x589D769C)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -1358,12 +1358,13 @@ I (..\ThirdParty\USB\STM32_USB_OTG_Driver\inc\usb_core.h)(0x57E09850)
 I (..\ThirdParty\USB\STM32_USB_OTG_Driver\inc\usb_regs.h)(0x57E09850)
 I (..\ThirdParty\USB\STM32_USB_OTG_Driver\inc\usb_defines.h)(0x57E09850)
 I (..\Datas\SystemSet_Data.h)(0x589BD763)
+I (..\Daos\AppFileDao.h)(0x589D7E79)
 I (..\COM\MyMem.h)(0x579300E1)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdlib.h)(0x53463A44)
 F (..\Function\PlaySong_Function.c)(0x57C910AF)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\playsong_function.o --omf_browse .\obj\playsong_function.crf --depend .\obj\playsong_function.d)
 I (..\Function\PlaySong_Function.h)(0x57BBE17E)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -1410,7 +1411,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 F (..\Function\Universal_Fun.c)(0x588174CF)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\universal_fun.o --omf_browse .\obj\universal_fun.crf --depend .\obj\universal_fun.d)
 I (..\Function\Universal_Fun.h)(0x588174CF)
 I (..\HardwareDriver\RTC_Driver.h)(0x58805825)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -1456,7 +1457,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdlib.h)(0x53463A44)
 F (..\Function\Test_Fun.c)(0x589C1DC1)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\test_fun.o --omf_browse .\obj\test_fun.crf --depend .\obj\test_fun.d)
 I (..\Function\Test_Fun.h)(0x588174CF)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -1506,7 +1507,7 @@ I (..\COM\CRC16.h)(0x572308EC)
 I (..\HardwareDriver\MLX90614_Driver.h)(0x58805825)
 I (..\COM\MyMem.h)(0x579300E1)
 I (..\COM\QueueUnits.h)(0x589BCB91)
-I (..\Function\ServerFun.h)(0x5882C7BC)
+I (..\Function\ServerFun.h)(0x589D769C)
 I (..\ThirdParty\lwip-1.4.1\src\include\lwip\tcp.h)(0x51F8CF7D)
 I (..\ThirdParty\lwip-1.4.1\src\include\lwip/opt.h)(0x51F8CF7D)
 I (..\ThirdParty\lwip-1.4.1\User\lwipopts.h)(0x573D195C)
@@ -1530,9 +1531,9 @@ I (..\ThirdParty\lwip-1.4.1\port\STM32F4x7\arch/sys_arch.h)(0x51F8CF7A)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdlib.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\math.h)(0x53463A44)
-F (..\Function\UpLoad_Fun.c)(0x589BBEDF)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\upload_fun.o --omf_browse .\obj\upload_fun.crf --depend .\obj\upload_fun.d)
+F (..\Function\UpLoad_Fun.c)(0x589D8620)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\upload_fun.o --omf_browse .\obj\upload_fun.crf --depend .\obj\upload_fun.d)
 I (..\Function\UpLoad_Fun.h)(0x58981B1C)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -1571,7 +1572,7 @@ I (..\ThirdParty\FreeRTOS\inc\task.h)(0x540632A8)
 I (..\ThirdParty\FreeRTOS\inc\list.h)(0x540632A8)
 I (..\Daos\TestDataDao.h)(0x58982970)
 I (..\Datas\SystemSet_Data.h)(0x589BD763)
-I (..\Function\ServerFun.h)(0x5882C7BC)
+I (..\Function\ServerFun.h)(0x589D769C)
 I (..\ThirdParty\lwip-1.4.1\src\include\lwip\tcp.h)(0x51F8CF7D)
 I (..\ThirdParty\lwip-1.4.1\src\include\lwip/opt.h)(0x51F8CF7D)
 I (..\ThirdParty\lwip-1.4.1\User\lwipopts.h)(0x573D195C)
@@ -1643,7 +1644,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\stdlib.h)(0x53463A44)
 F (..\Function\LabServer_Fun.c)(0x588174CE)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\labserver_fun.o --omf_browse .\obj\labserver_fun.crf --depend .\obj\labserver_fun.d)
 I (..\Function\LabServer_Fun.h)(0x57BD415B)
 I (..\Function\Test_Fun.h)(0x588174CF)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -1730,7 +1731,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 F (..\Function\Printf_Fun.c)(0x589BC124)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\printf_fun.o --omf_browse .\obj\printf_fun.crf --depend .\obj\printf_fun.d)
 I (..\Function\Printf_Fun.h)(0x57DE5D23)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -1808,7 +1809,7 @@ I (..\ThirdParty\FreeRTOS\inc\portmacro.h)(0x5768B2E2)
 I (..\ThirdParty\FreeRTOS\inc\mpu_wrappers.h)(0x540632A8)
 I (..\HardwareDriver\CardLimit_Driver.h)(0x57347242)
 I (..\Task\PlaySong_Task.h)(0x5881B54E)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\ThirdParty\Fatfs\src\ff.h)(0x576674A6)
 I (..\ThirdParty\Fatfs\src\integer.h)(0x570CF746)
 I (..\ThirdParty\Fatfs\src\ffconf.h)(0x57BC0C42)
@@ -1821,7 +1822,7 @@ I (..\Datas\MyTest_Data.h)(0x589BE5A2)
 I (..\Datas\UI_Data.h)(0x58805825)
 I (..\COM\MyStack.h)(0x58805824)
 I (..\COM\Intent.h)(0x58805824)
-I (..\UI\WaittingCardPage.h)(0x58805826)
+I (..\UI\WaittingCardPage.h)(0x589D38CD)
 I (..\Datas\Timer_Data.h)(0x58805824)
 I (..\Datas\Motor_Data.h)(0x584A64F9)
 I (..\Datas\CardStatues_Data.h)(0x58805824)
@@ -1867,7 +1868,7 @@ I (..\ThirdParty\lwip-1.4.1\src\include\lwip/udp.h)(0x51F8CF7C)
 I (..\ThirdParty\lwip-1.4.1\src\include\ipv4\lwip/ip.h)(0x51F8CF7B)
 I (..\ThirdParty\lwip-1.4.1\User\LwIPConfig.h)(0x57A408EA)
 I (..\ThirdParty\lwip-1.4.1\User\stm32f4x7_eth_bsp.h)(0x58805825)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cmInstr.h)(0x5302A2D0)
@@ -1934,7 +1935,7 @@ I (..\ThirdParty\lwip-1.4.1\src\include\lwip/udp.h)(0x51F8CF7C)
 I (..\ThirdParty\lwip-1.4.1\src\include\ipv4\lwip/ip.h)(0x51F8CF7B)
 I (..\ThirdParty\lwip-1.4.1\User\LwIPConfig.h)(0x57A408EA)
 I (..\Datas\NetInfo_Data.h)(0x588174CE)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cmInstr.h)(0x5302A2D0)
@@ -1962,7 +1963,7 @@ I (..\ThirdParty\Fatfs\src\ffconf.h)(0x57BC0C42)
 I (..\COM\MyMem.h)(0x579300E1)
 F (..\Task\CodeScan_Task.c)(0x58830316)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\codescan_task.o --omf_browse .\obj\codescan_task.crf --depend .\obj\codescan_task.d)
 I (..\Task\CodeScan_Task.h)(0x58805825)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -2008,7 +2009,7 @@ I (..\Task\SystemUI_Task.h)(0x57242518)
 I (..\Function\GetLCDInputFun.h)(0x5721DB64)
 I (..\Datas\UI_Data.h)(0x58805825)
 I (..\COM\MyStack.h)(0x58805824)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -2099,7 +2100,7 @@ I (..\ThirdParty\FreeRTOS\inc\mpu_wrappers.h)(0x540632A8)
 I (..\Function\Universal_Fun.h)(0x588174CF)
 I (..\Datas\Motor_Data.h)(0x584A64F9)
 I (..\Datas\CardStatues_Data.h)(0x58805824)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\ThirdParty\Fatfs\src\ff.h)(0x576674A6)
 I (..\ThirdParty\Fatfs\src\integer.h)(0x570CF746)
 I (..\ThirdParty\Fatfs\src\ffconf.h)(0x57BC0C42)
@@ -2114,7 +2115,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 I (..\Task\BasicWEB_Task.h)(0x57443D64)
 I (..\COM\MyMem.h)(0x579300E1)
 I (..\Datas\MyTest_Data.h)(0x589BE5A2)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -2174,7 +2175,7 @@ I (..\ThirdParty\lwip-1.4.1\src\include\lwip/netifapi.h)(0x51F8CF7C)
 I (..\ThirdParty\lwip-1.4.1\src\include\lwip/timers.h)(0x51F8CF7B)
 F (..\Task\PlaySong_Task.c)(0x5881B542)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\playsong_task.o --omf_browse .\obj\playsong_task.crf --depend .\obj\playsong_task.d)
 I (..\Task\PlaySong_Task.h)(0x5881B54E)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -2218,7 +2219,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 F (..\Task\NormalUpLoad_Task.c)(0x5881A9E5)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\normalupload_task.o --omf_browse .\obj\normalupload_task.crf --depend .\obj\normalupload_task.d)
 I (..\Task\NormalUpLoad_Task.h)(0x57920EC6)
 I (..\Function\UpLoad_Fun.h)(0x58981B1C)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -2259,7 +2260,7 @@ I (..\Daos\TestDataDao.h)(0x58982970)
 I (..\Datas\SystemSet_Data.h)(0x589BD763)
 F (..\Task\Test_Task.c)(0x589D10B7)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\test_task.o --omf_browse .\obj\test_task.crf --depend .\obj\test_task.d)
 I (..\Task\Test_Task.h)(0x58805825)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -2344,7 +2345,7 @@ I (..\Task\SystemUI_Task.h)(0x57242518)
 I (..\Task\Iwdg_Task.h)(0x5555B11E)
 I (..\Task\Universal_Task.h)(0x572C67D6)
 I (..\Task\PlaySong_Task.h)(0x5881B54E)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -2406,7 +2407,7 @@ I (..\ThirdParty\FreeRTOS\inc\list.h)(0x540632A8)
 F (..\UI\WelcomePage.c)(0x589AD507)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\welcomepage.o --omf_browse .\obj\welcomepage.crf --depend .\obj\welcomepage.d)
 I (..\UI\WelcomePage.h)(0x58805826)
 I (..\COM\MyStack.h)(0x58805824)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -2464,7 +2465,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 F (..\UI\LunchPage.c)(0x589AD5FD)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\lunchpage.o --omf_browse .\obj\lunchpage.crf --depend .\obj\lunchpage.d)
 I (..\UI\LunchPage.h)(0x58805826)
 I (..\Datas\Timer_Data.h)(0x58805824)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -2512,7 +2513,7 @@ I (..\COM\MyMem.h)(0x579300E1)
 I (..\UI\RecordPage.h)(0x58981F94)
 I (..\Daos\TestDataDao.h)(0x58982970)
 I (..\UI\SystemSetPage.h)(0x589C21FE)
-I (..\UI\SelectUserPage.h)(0x588174CF)
+I (..\UI\SelectUserPage.h)(0x589D38E7)
 I (..\UI\PaiDuiPage.h)(0x58805826)
 I (..\UI\SleepPage.h)(0x58805826)
 I (..\Task\PlaySong_Task.h)(0x5881B54E)
@@ -2522,7 +2523,7 @@ F (..\UI\SleepPage.c)(0x589AD5FD)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 -
 I (..\UI\SleepPage.h)(0x58805826)
 I (..\Datas\UI_Data.h)(0x58805825)
 I (..\COM\MyStack.h)(0x58805824)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -2568,9 +2569,9 @@ I (..\Datas\System_Data.h)(0x588174CE)
 I (..\COM\MyMem.h)(0x579300E1)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
-F (..\UI\SelectUserPage.c)(0x5882D5C9)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\selectuserpage.o --omf_browse .\obj\selectuserpage.crf --depend .\obj\selectuserpage.d)
-I (..\UI\SelectUserPage.h)(0x588174CF)
-I (..\COM\Define.h)(0x589D0F6B)
+F (..\UI\SelectUserPage.c)(0x589D38E7)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\selectuserpage.o --omf_browse .\obj\selectuserpage.crf --depend .\obj\selectuserpage.d)
+I (..\UI\SelectUserPage.h)(0x589D38E7)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -2615,15 +2616,15 @@ I (..\COM\Intent.h)(0x58805824)
 I (..\HardwareDriver\LCD_Driver.h)(0x588174CF)
 I (..\HardwareDriver\Usart6_Driver.h)(0x5754D7E7)
 I (..\COM\MyMem.h)(0x579300E1)
-I (..\UI\SampleIDPage.h)(0x58805826)
+I (..\UI\SampleIDPage.h)(0x589D3894)
 I (..\COM\CRC16.h)(0x572308EC)
 I (..\Function\SDFunction.h)(0x589C0FF0)
 I (..\Task\PlaySong_Task.h)(0x5881B54E)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
-F (..\UI\SampleIDPage.c)(0x5881AA50)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\sampleidpage.o --omf_browse .\obj\sampleidpage.crf --depend .\obj\sampleidpage.d)
-I (..\UI\SampleIDPage.h)(0x58805826)
-I (..\COM\Define.h)(0x589D0F6B)
+F (..\UI\SampleIDPage.c)(0x589D38E7)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\sampleidpage.o --omf_browse .\obj\sampleidpage.crf --depend .\obj\sampleidpage.d)
+I (..\UI\SampleIDPage.h)(0x589D3894)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -2671,18 +2672,18 @@ I (..\Datas\System_Data.h)(0x588174CE)
 I (..\COM\MyMem.h)(0x579300E1)
 I (..\COM\MyTools.h)(0x588174CE)
 I (..\UI\PaiDuiPage.h)(0x58805826)
-I (..\UI\SelectUserPage.h)(0x588174CF)
-I (..\UI\WaittingCardPage.h)(0x58805826)
+I (..\UI\SelectUserPage.h)(0x589D38E7)
+I (..\UI\WaittingCardPage.h)(0x589D38CD)
 I (..\Task\PlaySong_Task.h)(0x5881B54E)
 I (..\Function\ReadBarCode_Fun.h)(0x58805825)
 I (..\Datas\Motor_Data.h)(0x584A64F9)
 I (..\Function\Motor_Fun.h)(0x58805825)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
-F (..\UI\WaittingCardPage.c)(0x588174CF)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\waittingcardpage.o --omf_browse .\obj\waittingcardpage.crf --depend .\obj\waittingcardpage.d)
-I (..\UI\WaittingCardPage.h)(0x58805826)
+F (..\UI\WaittingCardPage.c)(0x589D38E7)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\waittingcardpage.o --omf_browse .\obj\waittingcardpage.crf --depend .\obj\waittingcardpage.d)
+I (..\UI\WaittingCardPage.h)(0x589D38CD)
 I (..\Datas\Timer_Data.h)(0x58805824)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -2728,7 +2729,7 @@ I (..\HardwareDriver\Usart6_Driver.h)(0x5754D7E7)
 I (..\COM\MyMem.h)(0x579300E1)
 I (..\UI\LunchPage.h)(0x58805826)
 I (..\Datas\SystemSet_Data.h)(0x589BD763)
-I (..\UI\SampleIDPage.h)(0x58805826)
+I (..\UI\SampleIDPage.h)(0x589D3894)
 I (..\UI\PreReadCardPage.h)(0x58830316)
 I (..\Function\Test_Fun.h)(0x588174CF)
 I (..\Datas\CardStatues_Data.h)(0x58805824)
@@ -2739,7 +2740,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 F (..\UI\PreReadCardPage.c)(0x589C1DD1)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\prereadcardpage.o --omf_browse .\obj\prereadcardpage.crf --depend .\obj\prereadcardpage.d)
 I (..\UI\PreReadCardPage.h)(0x58830316)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -2789,7 +2790,7 @@ I (..\UI\LunchPage.h)(0x58805826)
 I (..\Datas\Timer_Data.h)(0x58805824)
 I (..\Datas\SystemSet_Data.h)(0x589BD763)
 I (..\Task\CodeScan_Task.h)(0x58805825)
-I (..\UI\WaittingCardPage.h)(0x58805826)
+I (..\UI\WaittingCardPage.h)(0x589D38CD)
 I (..\UI\TimeDownNorPage.h)(0x58805826)
 I (..\Function\CodeScanFunction.h)(0x588312C1)
 I (..\UI\PaiDuiPage.h)(0x58805826)
@@ -2806,7 +2807,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 F (..\UI\TimeDownNorPage.c)(0x58805826)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\timedownnorpage.o --omf_browse .\obj\timedownnorpage.crf --depend .\obj\timedownnorpage.d)
 I (..\UI\TimeDownNorPage.h)(0x58805826)
 I (..\Datas\Timer_Data.h)(0x58805824)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -2856,10 +2857,10 @@ I (..\UI\TestPage.h)(0x58982841)
 I (..\Function\Test_Fun.h)(0x588174CF)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
-F (..\UI\TestPage.c)(0x589AD476)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\testpage.o --omf_browse .\obj\testpage.crf --depend .\obj\testpage.d)
+F (..\UI\TestPage.c)(0x589D50C2)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\testpage.o --omf_browse .\obj\testpage.crf --depend .\obj\testpage.d)
 I (..\UI\TestPage.h)(0x58982841)
 I (..\Datas\MyTest_Data.h)(0x589BE5A2)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -2904,7 +2905,7 @@ I (..\COM\Intent.h)(0x58805824)
 I (..\HardwareDriver\LCD_Driver.h)(0x588174CF)
 I (..\HardwareDriver\Usart6_Driver.h)(0x5754D7E7)
 I (..\COM\MyMem.h)(0x579300E1)
-I (..\UI\WaittingCardPage.h)(0x58805826)
+I (..\UI\WaittingCardPage.h)(0x589D38CD)
 I (..\Datas\Timer_Data.h)(0x58805824)
 I (..\UI\PaiDuiPage.h)(0x58805826)
 I (..\HardwareDriver\CardLimit_Driver.h)(0x57347242)
@@ -2915,12 +2916,13 @@ I (..\Task\Test_Task.h)(0x58805825)
 I (..\UI\LunchPage.h)(0x58805826)
 I (..\Function\Printf_Fun.h)(0x57DE5D23)
 I (..\Function\Motor_Fun.h)(0x58805825)
+I (..\Datas\Motor_Data.h)(0x584A64F9)
 I (..\Datas\CardStatues_Data.h)(0x58805824)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
-F (..\UI\PaiDuiPage.c)(0x5885637D)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\paiduipage.o --omf_browse .\obj\paiduipage.crf --depend .\obj\paiduipage.d)
+F (..\UI\PaiDuiPage.c)(0x589D50DE)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\paiduipage.o --omf_browse .\obj\paiduipage.crf --depend .\obj\paiduipage.d)
 I (..\UI\PaiDuiPage.h)(0x58805826)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -2971,11 +2973,12 @@ I (..\Datas\Timer_Data.h)(0x58805824)
 I (..\UI\PreReadCardPage.h)(0x58830316)
 I (..\Function\Test_Fun.h)(0x588174CF)
 I (..\HardwareDriver\TM1623_Driver.h)(0x575CD749)
+I (..\Datas\Motor_Data.h)(0x584A64F9)
 I (..\Function\Motor_Fun.h)(0x58805825)
 I (..\Datas\CardStatues_Data.h)(0x58805824)
 I (..\Task\PlaySong_Task.h)(0x5881B54E)
 I (..\HardwareDriver\CardLimit_Driver.h)(0x57347242)
-I (..\UI\SampleIDPage.h)(0x58805826)
+I (..\UI\SampleIDPage.h)(0x589D3894)
 I (..\COM\MyTools.h)(0x588174CE)
 I (..\UI\LunchPage.h)(0x58805826)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
@@ -2984,7 +2987,7 @@ F (..\UI\SystemSetPage.c)(0x589C21F6)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -
 I (..\UI\SystemSetPage.h)(0x589C21FE)
 I (..\Datas\UI_Data.h)(0x58805825)
 I (..\COM\MyStack.h)(0x58805824)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -3048,7 +3051,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 F (..\UI\ShowDeviceInfoPage.c)(0x589C2FCF)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\showdeviceinfopage.o --omf_browse .\obj\showdeviceinfopage.crf --depend .\obj\showdeviceinfopage.d)
 I (..\UI\ShowDeviceInfoPage.h)(0x58805826)
 I (..\Datas\SystemSet_Data.h)(0x589BD763)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -3103,7 +3106,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 F (..\UI\SetDeviceIDPage.c)(0x589ADACE)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\setdeviceidpage.o --omf_browse .\obj\setdeviceidpage.crf --depend .\obj\setdeviceidpage.d)
 I (..\UI\SetDeviceIDPage.h)(0x589AD755)
 I (..\Datas\SystemSet_Data.h)(0x589BD763)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -3157,7 +3160,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 F (..\UI\SetDeviceInfoPage.c)(0x589ADABF)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\setdeviceinfopage.o --omf_browse .\obj\setdeviceinfopage.crf --depend .\obj\setdeviceinfopage.d)
 I (..\UI\SetDeviceInfoPage.h)(0x589AD9AA)
 I (..\Datas\SystemSet_Data.h)(0x589BD763)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -3209,7 +3212,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 F (..\UI\UserMPage.c)(0x589AD5FD)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\usermpage.o --omf_browse .\obj\usermpage.crf --depend .\obj\usermpage.d)
 I (..\UI\UserMPage.h)(0x58805826)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -3266,7 +3269,7 @@ F (..\UI\NetPreSetPage.c)(0x589AD5FD)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -
 I (..\UI\NetPreSetPage.h)(0x58805826)
 I (..\Datas\UI_Data.h)(0x58805825)
 I (..\COM\MyStack.h)(0x58805824)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -3319,7 +3322,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 F (..\UI\NetSetPage.c)(0x589ADC00)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\netsetpage.o --omf_browse .\obj\netsetpage.crf --depend .\obj\netsetpage.d)
 I (..\UI\NetSetPage.h)(0x58805826)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -3373,7 +3376,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdlib.h)(0x53463A44)
 F (..\UI\WifiSetPage.c)(0x589BD989)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\wifisetpage.o --omf_browse .\obj\wifisetpage.crf --depend .\obj\wifisetpage.d)
 I (..\UI\WifiSetPage.h)(0x58805826)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -3427,7 +3430,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 F (..\UI\NetInfoPage.c)(0x589BD9F9)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\netinfopage.o --omf_browse .\obj\netinfopage.crf --depend .\obj\netinfopage.d)
 I (..\UI\NetInfoPage.h)(0x588174CF)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -3484,7 +3487,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\stdlib.h)(0x53463A44)
 F (..\UI\RecordPage.c)(0x589AD5FD)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\recordpage.o --omf_browse .\obj\recordpage.crf --depend .\obj\recordpage.d)
 I (..\UI\RecordPage.h)(0x58981F94)
 I (..\Datas\MyTest_Data.h)(0x589BE5A2)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -3542,7 +3545,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\stdlib.h)(0x53463A44)
 F (..\UI\ShowResultPage.c)(0x589AD5FD)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\showresultpage.o --omf_browse .\obj\showresultpage.crf --depend .\obj\showresultpage.d)
 I (..\UI\ShowResultPage.h)(0x58805826)
 I (..\Datas\MyTest_Data.h)(0x589BE5A2)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -3599,7 +3602,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 F (..\UI\AdjustPage.c)(0x589AD4B9)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\adjustpage.o --omf_browse .\obj\adjustpage.crf --depend .\obj\adjustpage.d)
 I (..\UI\AdjustPage.h)(0x589ACBF3)
 I (..\Datas\Timer_Data.h)(0x58805824)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -3658,7 +3661,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdlib.h)(0x53463A44)
 F (..\UI\ReTestPage.c)(0x589C1888)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\retestpage.o --omf_browse .\obj\retestpage.crf --depend .\obj\retestpage.d)
 I (..\UI\ReTestPage.h)(0x589C183F)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -3723,7 +3726,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdlib.h)(0x53463A44)
 F (..\UI\OtherSetPage.c)(0x589D0DDF)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\othersetpage.o --omf_browse .\obj\othersetpage.crf --depend .\obj\othersetpage.d)
 I (..\UI\OtherSetPage.h)(0x588174CF)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -3777,7 +3780,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdlib.h)(0x53463A44)
 F (..\UI\OperGuidePage.c)(0x58805826)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\operguidepage.o --omf_browse .\obj\operguidepage.crf --depend .\obj\operguidepage.d)
 I (..\UI\OperGuidePage.h)(0x5746DFFC)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -3823,7 +3826,7 @@ I (..\COM\MyMem.h)(0x579300E1)
 I (..\UI\SleepPage.h)(0x58805826)
 I (..\Datas\Timer_Data.h)(0x58805824)
 I (..\Datas\SystemSet_Data.h)(0x589BD763)
-I (..\UI\WaittingCardPage.h)(0x58805826)
+I (..\UI\WaittingCardPage.h)(0x589D38CD)
 I (..\Datas\MyTest_Data.h)(0x589BE5A2)
 I (..\UI\PreReadCardPage.h)(0x58830316)
 I (..\Function\Test_Fun.h)(0x588174CF)
@@ -3834,7 +3837,7 @@ F (..\UI\AdjustLedPage.c)(0x589BCAAE)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -
 I (..\UI\AdjustLedPage.h)(0x589ACC0A)
 I (..\Datas\UI_Data.h)(0x58805825)
 I (..\COM\MyStack.h)(0x58805824)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -3889,7 +3892,7 @@ F (..\UI\CheckQRPage.c)(0x5899644A)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0
 I (..\UI\CheckQRPage.h)(0x58993957)
 I (..\Datas\UI_Data.h)(0x58805825)
 I (..\COM\MyStack.h)(0x58805824)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -3941,7 +3944,7 @@ F (..\UI\AboutUsPage.c)(0x589C21CC)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0
 I (..\UI\AboutUsPage.h)(0x589C20C9)
 I (..\Datas\UI_Data.h)(0x58805825)
 I (..\COM\MyStack.h)(0x58805824)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -3990,7 +3993,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 F (..\Datas\CardStatues_Data.c)(0x58805824)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\cardstatues_data.o --omf_browse .\obj\cardstatues_data.crf --depend .\obj\cardstatues_data.d)
 I (..\Datas\CardStatues_Data.h)(0x58805824)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -4029,7 +4032,7 @@ I (..\ThirdParty\FreeRTOS\inc\task.h)(0x540632A8)
 I (..\ThirdParty\FreeRTOS\inc\list.h)(0x540632A8)
 F (..\Datas\Motor_Data.c)(0x58805824)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\motor_data.o --omf_browse .\obj\motor_data.crf --depend .\obj\motor_data.d)
 I (..\Datas\Motor_Data.h)(0x584A64F9)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -4068,7 +4071,7 @@ I (..\ThirdParty\FreeRTOS\inc\task.h)(0x540632A8)
 I (..\ThirdParty\FreeRTOS\inc\list.h)(0x540632A8)
 F (..\Datas\Timer_Data.c)(0x58805824)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\timer_data.o --omf_browse .\obj\timer_data.crf --depend .\obj\timer_data.d)
 I (..\Datas\Timer_Data.h)(0x58805824)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -4107,7 +4110,7 @@ I (..\ThirdParty\FreeRTOS\inc\task.h)(0x540632A8)
 I (..\ThirdParty\FreeRTOS\inc\list.h)(0x540632A8)
 F (..\Datas\MyTest_Data.c)(0x589AD4D4)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\mytest_data.o --omf_browse .\obj\mytest_data.crf --depend .\obj\mytest_data.d)
 I (..\Datas\MyTest_Data.h)(0x589BE5A2)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -4150,7 +4153,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 F (..\Datas\UI_Data.c)(0x58805825)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\ui_data.o --omf_browse .\obj\ui_data.crf --depend .\obj\ui_data.d)
 I (..\Datas\UI_Data.h)(0x58805825)
 I (..\COM\MyStack.h)(0x58805824)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -4193,7 +4196,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 F (..\Datas\System_Data.c)(0x589BCE3D)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\system_data.o --omf_browse .\obj\system_data.crf --depend .\obj\system_data.d)
 I (..\Datas\System_Data.h)(0x588174CE)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -4236,7 +4239,7 @@ I (..\COM\CRC16.h)(0x572308EC)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 F (..\Datas\NetInfo_Data.c)(0x588174CE)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\netinfo_data.o --omf_browse .\obj\netinfo_data.crf --depend .\obj\netinfo_data.d)
 I (..\Datas\NetInfo_Data.h)(0x588174CE)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -4277,7 +4280,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 F (..\Datas\SystemSet_Data.c)(0x589BDD39)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\systemset_data.o --omf_browse .\obj\systemset_data.crf --depend .\obj\systemset_data.d)
 I (..\Datas\SystemSet_Data.h)(0x589BD763)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -4320,7 +4323,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
 F (..\Daos\TestDataDao.c)(0x5898301B)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\testdatadao.o --omf_browse .\obj\testdatadao.crf --depend .\obj\testdatadao.d)
 I (..\Daos\TestDataDao.h)(0x58982970)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -4366,7 +4369,51 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\stdlib.h)(0x53463A44)
 F (..\Daos\SystemSet_Dao.c)(0x589ACB5D)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\systemset_dao.o --omf_browse .\obj\systemset_dao.crf --depend .\obj\systemset_dao.d)
 I (..\Daos\SystemSet_Dao.h)(0x589ACAF6)
 I (..\Datas\SystemSet_Data.h)(0x589BD763)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
+I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
+I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
+I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
+I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cmInstr.h)(0x5302A2D0)
+I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cmFunc.h)(0x5302A2D0)
+I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4_simd.h)(0x5302A2D0)
+I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\system_stm32f4xx.h)(0x56266E9D)
+I (..\AppLunch\stm32f4xx_conf.h)(0x57A32966)
+I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dma.h)(0x56266E81)
+I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_exti.h)(0x56266E81)
+I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_gpio.h)(0x56266E81)
+I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_i2c.h)(0x56266E81)
+I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_iwdg.h)(0x56266E81)
+I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_pwr.h)(0x56266E81)
+I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_rcc.h)(0x5629066D)
+I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_rtc.h)(0x56266E81)
+I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_spi.h)(0x56266E81)
+I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_syscfg.h)(0x56266E81)
+I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_tim.h)(0x56266E81)
+I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_usart.h)(0x56266E81)
+I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h)(0x56266E81)
+I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x56266E81)
+I (..\ThirdParty\FreeRTOS\inc\FreeRTOS.h)(0x58363E42)
+I (D:\Program Files\Keil5\ARM\ARMCC\include\stddef.h)(0x53463A44)
+I (..\ThirdParty\FreeRTOS\inc\FreeRTOSConfig.h)(0x576BA29B)
+I (..\ThirdParty\FreeRTOS\inc\projdefs.h)(0x540632A8)
+I (..\ThirdParty\FreeRTOS\inc\portable.h)(0x540632A8)
+I (..\ThirdParty\FreeRTOS\inc\portmacro.h)(0x5768B2E2)
+I (..\ThirdParty\FreeRTOS\inc\mpu_wrappers.h)(0x540632A8)
+I (..\ThirdParty\Fatfs\src\ff.h)(0x576674A6)
+I (..\ThirdParty\Fatfs\src\integer.h)(0x570CF746)
+I (..\ThirdParty\Fatfs\src\ffconf.h)(0x57BC0C42)
+I (..\ThirdParty\FreeRTOS\inc\semphr.h)(0x540632A8)
+I (..\ThirdParty\FreeRTOS\inc\queue.h)(0x573434EB)
+I (..\ThirdParty\FreeRTOS\inc\task.h)(0x540632A8)
+I (..\ThirdParty\FreeRTOS\inc\list.h)(0x540632A8)
+I (..\COM\CRC16.h)(0x572308EC)
+I (..\COM\MyMem.h)(0x579300E1)
+I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
+I (D:\Program Files\Keil5\ARM\ARMCC\include\stdio.h)(0x53463A44)
+I (D:\Program Files\Keil5\ARM\ARMCC\include\stdlib.h)(0x53463A44)
+F (..\Daos\AppFileDao.c)(0x589D7E75)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\appfiledao.o --omf_browse .\obj\appfiledao.crf --depend .\obj\appfiledao.d)
+I (..\Daos\AppFileDao.h)(0x589D7E79)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -4467,7 +4514,7 @@ I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h)(0x56266E81)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x56266E81)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\string.h)(0x53463A44)
 I (..\Datas\SystemSet_Data.h)(0x589BD763)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\ThirdParty\Fatfs\src\ff.h)(0x576674A6)
 I (..\ThirdParty\Fatfs\src\integer.h)(0x570CF746)
 I (..\ThirdParty\Fatfs\src\ffconf.h)(0x57BC0C42)
@@ -4592,7 +4639,7 @@ I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_usart.h)(0x56266E81)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h)(0x56266E81)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x56266E81)
 I (..\ThirdParty\lwip-1.4.1\User\stm32f4x7_eth_bsp.h)(0x58805825)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\ThirdParty\Fatfs\src\ff.h)(0x576674A6)
 I (..\ThirdParty\Fatfs\src\integer.h)(0x570CF746)
 I (..\ThirdParty\Fatfs\src\ffconf.h)(0x57BC0C42)
@@ -4636,7 +4683,7 @@ I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_usart.h)(0x56266E81)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h)(0x56266E81)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x56266E81)
 I (..\ThirdParty\lwip-1.4.1\User\stm32f4x7_eth_bsp.h)(0x58805825)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\ThirdParty\FreeRTOS\inc\FreeRTOS.h)(0x58363E42)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stddef.h)(0x53463A44)
 I (..\ThirdParty\FreeRTOS\inc\FreeRTOSConfig.h)(0x576BA29B)
@@ -4844,12 +4891,12 @@ I (..\ThirdParty\FreeRTOS\inc\queue.h)(0x573434EB)
 I (..\ThirdParty\FreeRTOS\inc\task.h)(0x540632A8)
 I (..\ThirdParty\FreeRTOS\inc\list.h)(0x540632A8)
 I (..\ThirdParty\FreeRTOS\inc\semphr.h)(0x540632A8)
-F (..\COM\Define.h)(0x589D0F6B)()
+F (..\COM\Define.h)(0x589D5E30)()
 F (..\COM\CRC16.c)(0x572325F8)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\crc16.o --omf_browse .\obj\crc16.crf --depend .\obj\crc16.d)
 I (..\COM\CRC16.h)(0x572308EC)
 F (..\COM\MyEncryptTool.c)(0x57930144)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\myencrypttool.o --omf_browse .\obj\myencrypttool.crf --depend .\obj\myencrypttool.d)
 I (..\COM\MyEncryptTool.h)(0x576A9558)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -4894,7 +4941,7 @@ F (..\COM\CRC_CCITT.c)(0x5727F8DE)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 
 I (..\COM\CRC_CCITT.h)(0x5727FCF6)
 F (..\COM\MyTools.c)(0x588174CE)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\mytools.o --omf_browse .\obj\mytools.crf --depend .\obj\mytools.d)
 I (..\COM\MyTools.h)(0x588174CE)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -4943,7 +4990,7 @@ I (D:\Program Files\Keil5\ARM\ARMCC\include\stdlib.h)(0x53463A44)
 I (..\COM\MyMem.h)(0x579300E1)
 F (..\COM\MyStack.c)(0x58805824)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\mystack.o --omf_browse .\obj\mystack.crf --depend .\obj\mystack.d)
 I (..\COM\MyStack.h)(0x58805824)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)
@@ -4986,7 +5033,7 @@ F (..\COM\MyLink.c)(0x58805824)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --a
 I (..\COM\MyLink.h)(0x58805824)
 F (..\COM\Intent.c)(0x58805824)(--c99 -c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork -I..\AppLunch -I..\COM -I..\Datas -I..\Function -I..\HardwareDriver -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4x7_ETH_Driver\inc -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\Task -I..\ThirdParty\Fatfs\src -I..\ThirdParty\lwip-1.4.1\src\include -I..\ThirdParty\lwip-1.4.1\src\include\ipv4 -I..\ThirdParty\lwip-1.4.1\src\include\netif -I..\ThirdParty\lwip-1.4.1\src\include\lwip -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS -I..\ThirdParty\lwip-1.4.1\port\STM32F4x7 -I..\ThirdParty\lwip-1.4.1\User -I..\ThirdParty\USB\USB_User -I..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc -I..\ThirdParty\cJSON-master -I..\UI -I..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc -I..\ThirdParty\USB\STM32_USB_OTG_Driver\inc -I..\ThirdParty\FreeRTOS\inc -I..\Daos-I "D:\Program Files\Keil5\ARM\RV31\INC"-I "D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include"-I "D:\Program Files\Keil5\ARM\Inc\ST\STM32F4xx"-DSTM32F40_41xxx -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o .\obj\intent.o --omf_browse .\obj\intent.crf --depend .\obj\intent.d)
 I (..\COM\Intent.h)(0x58805824)
-I (..\COM\Define.h)(0x589D0F6B)
+I (..\COM\Define.h)(0x589D5E30)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x57E0984E)
 I (D:\Program Files\Keil5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h)(0x538426C6)
 I (D:\Program Files\Keil5\ARM\ARMCC\include\stdint.h)(0x53463A44)

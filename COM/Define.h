@@ -161,7 +161,7 @@ typedef enum
 typedef struct QRCode_Tag
 {
 	char	ItemName[ItemNameLen];						//测试项目
-	char	NormalResult[20];								//正常值
+	char	NormalResult[40];								//正常值
 	float	LowstResult;								//最低检测线
 	float	HighestResult;								//最高检测线
 	char	ItemMeasure[ItemMeasureLen];				//测试单位

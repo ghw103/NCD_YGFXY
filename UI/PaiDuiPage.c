@@ -10,7 +10,7 @@
 #include	"TimeDownNorPage.h"
 #include	"PreReadCardPage.h"
 #include	"TM1623_Driver.h"
-
+#include	"Motor_Data.h"
 #include	"Motor_Fun.h"
 #include	"CardStatues_Data.h"
 #include	"PlaySong_Task.h"

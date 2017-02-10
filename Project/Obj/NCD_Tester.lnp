@@ -95,6 +95,7 @@
 ".\obj\systemset_data.o"
 ".\obj\testdatadao.o"
 ".\obj\systemset_dao.o"
+".\obj\appfiledao.o"
 ".\obj\ethernetif.o"
 ".\obj\sys_arch.o"
 ".\obj\etharp.o"

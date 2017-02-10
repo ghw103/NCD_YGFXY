@@ -78,10 +78,7 @@ MyState_TypeDef createSelectUserActivity(Activity * thizActivity, Intent * pram)
 static void activityStart(void)
 {
 	if(S_UserPageBuffer)
-	{
-		/*重置倒计时30s，如果超时，则取消此次测试*/
-		timer_set(&(S_UserPageBuffer->timer), 30);
-	
+	{	
 		/*获取当前测试的数据指针*/
 		S_UserPageBuffer->currenttestdata = GetCurrentTestItem();
 	
@@ -127,10 +124,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		
 		/*上翻也*/
 		else if(S_UserPageBuffer->lcdinput[0] == 0x1203)
-		{
-			/*重置倒计时30s，如果超时，则取消此次测试*/
-			timer_set(&(S_UserPageBuffer->timer), 10);
-			
+		{			
 			if(S_UserPageBuffer->pageindex > 1)
 			{
 				S_UserPageBuffer->pageindex--;
@@ -143,10 +137,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		}
 		/*下翻页*/
 		else if(S_UserPageBuffer->lcdinput[0] == 0x1204)
-		{
-			/*重置倒计时30s，如果超时，则取消此次测试*/
-			timer_set(&(S_UserPageBuffer->timer), 10);
-			
+		{			
 			if(S_UserPageBuffer->pageindex < (MaxUserNum / MaxPageShowNum))
 			{
 				S_UserPageBuffer->tempUser = &S_UserPageBuffer->user[(S_UserPageBuffer->pageindex)*MaxPageShowNum];
@@ -184,10 +175,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		}
 		/*选择操作人*/
 		else if((S_UserPageBuffer->lcdinput[0] >= 0x1205)&&(S_UserPageBuffer->lcdinput[0] <= 0x1209))
-		{
-			/*重置倒计时30s，如果超时，则取消此次测试*/
-			timer_set(&(S_UserPageBuffer->timer), 10);
-			
+		{			
 			S_UserPageBuffer->selectindex = S_UserPageBuffer->lcdinput[0] - 0x1205+1;
 			SelectUser(S_UserPageBuffer->selectindex);
 		}
@@ -205,14 +193,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void activityFresh(void)
 {
-	if(TimeOut == timer_expired(&(S_UserPageBuffer->timer)))
-	{
-		AddNumOfSongToList(6, 0);
-		
-		DeleteCurrentTest();
-			
-		backToActivity(lunchActivityName);
-	}
+
 }
 
 /***************************************************************************************************
@@ -240,11 +221,6 @@ static void activityHide(void)
 ***************************************************************************************************/
 static void activityResume(void)
 {
-	if(S_UserPageBuffer)
-	{
-		/*重置倒计时30s，如果超时，则取消此次测试*/
-		timer_set(&(S_UserPageBuffer->timer), 10);
-	}
 	
 	SelectPage(84);
 }

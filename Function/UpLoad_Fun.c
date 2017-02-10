@@ -34,6 +34,7 @@
 static MyState_TypeDef ReadTime(void);
 static void UpLoadDeviceInfo(void);
 static void UpLoadTestData(void);
+static MyState_TypeDef DownLoadSoftWare(void);
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************ÕýÎÄ********************************************************/
@@ -45,6 +46,11 @@ void UpLoadFunction(void)
 {
 	while(1)
 	{
+/*		if(My_Pass == DownLoadSoftWare())
+			vTaskDelay(100000 / portTICK_RATE_MS);
+		else
+			vTaskDelay(1000 / portTICK_RATE_MS);*/
+		
 		if(My_Pass == ReadTime())
 		{
 			vTaskDelay(1000 / portTICK_RATE_MS);
@@ -227,4 +233,24 @@ static void UpLoadTestData(void)
 	END:
 		MyFree(upLoadTestDataBuffer);
 
+}
+
+static MyState_TypeDef DownLoadSoftWare(void)
+{
+	UpLoadDeviceDataBuffer * upLoadDeviceDataBuffer = NULL;
+	MyState_TypeDef status = My_Fail;
+	
+	upLoadDeviceDataBuffer = MyMalloc(sizeof(UpLoadDeviceDataBuffer));
+	
+	if(upLoadDeviceDataBuffer)
+	{
+		memset(upLoadDeviceDataBuffer, 0, sizeof(UpLoadDeviceDataBuffer));
+		
+		sprintf(upLoadDeviceDataBuffer->tempBuf, "GET /NCD_Server/fileDown HTTP/1.1\r\nHost: 116.62.108.201:8080\r\n\r\n");
+		
+		status = DownLoadApp(upLoadDeviceDataBuffer->tempBuf, strlen(upLoadDeviceDataBuffer->tempBuf));
+	}
+	MyFree(upLoadDeviceDataBuffer);
+	
+	return status;
 }

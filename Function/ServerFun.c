@@ -14,6 +14,7 @@
 #include 	"Usart4_Driver.h"
 #include 	"usbd_cdc_vcp.h"
 #include	"SystemSet_Data.h"
+#include	"AppFileDao.h"
 
 #include	"MyMem.h"
 
@@ -161,3 +162,86 @@ MyState_TypeDef UpLoadData(char *URL, void * sendBuf, unsigned short sendLen, vo
 	return statues;
 }
 
+MyState_TypeDef DownLoadApp(void * sendBuf, unsigned short sendLen)
+{
+	MyServerData * myServerData = NULL;
+	err_t err;
+	MyState_TypeDef statues = My_Fail;
+	unsigned char i=0;
+	struct pbuf *p = NULL;
+	
+	myServerData = MyMalloc(sizeof(MyServerData));
+
+	if(myServerData)
+	{
+		memset(myServerData, 0, sizeof(MyServerData));
+		sprintf(myServerData->sendBuf, "%s",(char *)sendBuf);
+		myServerData->sendDataLen = sendLen;
+			
+		IP4_ADDR(&myServerData->server_ipaddr,GB_ServerIp_1, GB_ServerIp_2, GB_ServerIp_3, GB_ServerIp_4);
+
+		//创建连接
+		myServerData->clientconn = netconn_new(NETCONN_TCP);
+		//创建失败
+		if(myServerData->clientconn == NULL)
+			goto END;
+
+		//绑定本地ip
+		err = netconn_bind(myServerData->clientconn, IP_ADDR_ANY, 0);
+		//连接失败
+		if(err != ERR_OK)
+			goto END2;
+
+		//尝试连接远程服务器
+		err = netconn_connect(myServerData->clientconn, &myServerData->server_ipaddr, GB_ServerPort);
+		//连接失败
+		if(err != ERR_OK)
+			goto END2;
+		
+		//设置接收数据超时时间100MS
+		myServerData->clientconn->recv_timeout = 1000;
+		
+		//发送数据
+		err = netconn_write(myServerData->clientconn, myServerData->sendBuf, myServerData->sendDataLen, NETCONN_COPY );
+		//发送失败
+		if(err != ERR_OK)
+			goto END1;
+		
+		//接收数据
+		while(ERR_OK == netconn_recv(myServerData->clientconn, &myServerData->recvbuf))
+		{
+			p = myServerData->recvbuf->p;
+			if(i == 0)
+			{
+				i++;
+				WriteAppFile(p->payload, p->len, true);
+			}
+			else
+				WriteAppFile(p->payload, p->len, false);
+			
+			while(p->next)
+			{
+				p = p->next;
+				WriteAppFile(p->payload, p->len, false);
+			}
+			//myServerData->recvDataLen += netbuf_copy(myServerData->recvbuf, myServerData->recvBuf + myServerData->recvDataLen ,
+			//	SERVERRECVBUFLEN - myServerData->recvDataLen);
+			//myServerData->recvbuf->
+			netbuf_delete(myServerData->recvbuf);
+			statues = My_Pass;
+		}
+		
+		END1:
+			netconn_close(myServerData->clientconn);
+			netconn_delete(myServerData->clientconn);
+			goto END;
+			
+		END2:
+			netconn_delete(myServerData->clientconn);
+			goto END;
+	}
+	
+	END:
+		MyFree(myServerData);
+		return statues;
+}

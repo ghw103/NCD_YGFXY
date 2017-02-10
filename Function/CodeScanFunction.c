@@ -187,10 +187,10 @@ static void AnalysisCode(ReadQRCodeBuffer * readQRCodeBuffer)
 	else
 		goto END;
 		
-	/*读取检测卡上的检测指标正常范围*/
+	//读取检测卡上的检测通道
 	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
 	if(readQRCodeBuffer->pbuf1)
-		memcpy(readQRCodeBuffer->cardQR->NormalResult, readQRCodeBuffer->pbuf1 ,strlen(readQRCodeBuffer->pbuf1));
+		readQRCodeBuffer->cardQR->ChannelNum = strtol(readQRCodeBuffer->pbuf1, NULL, 10);
 	else
 		goto END;
 		

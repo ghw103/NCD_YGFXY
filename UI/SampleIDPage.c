@@ -87,8 +87,6 @@ static void activityStart(void)
 		S_SampleIDPage->currenttestdata = GetCurrentTestItem();
 	
 		RefreshSampleID();
-	
-		timer_set(&(S_SampleIDPage->timer), 30);
 
 		AddNumOfSongToList(10, 0);
 	}
@@ -166,22 +164,6 @@ static void activityFresh(void)
 			memcpy(S_SampleIDPage->currenttestdata->testdata.sampleid, S_SampleIDPage->tempbuf, MaxSampleIDLen);
 			RefreshSampleID();
 		}
-		
-		if(TimeOut == timer_expired(&(S_SampleIDPage->timer)))
-		{
-			AddNumOfSongToList(6, 0);
-
-			DeleteCurrentTest();
-			
-			if(CheckStrIsSame(paiduiActivityName, getFatherActivityName(), strlen(paiduiActivityName)))
-			{
-				MotorMoveTo(MaxLocation, 1);
-
-				backToFatherActivity();
-			}
-			else
-				backToActivity(lunchActivityName);
-		}
 	}
 }
 
@@ -211,10 +193,7 @@ static void activityHide(void)
 static void activityResume(void)
 {
 	if(S_SampleIDPage)
-	{
-		/*重置倒计时30s，如果超时，则取消此次测试*/
-		timer_restart(&(S_SampleIDPage->timer));
-		
+	{		
 		RefreshSampleID();
 	}
 	

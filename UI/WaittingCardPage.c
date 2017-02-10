@@ -83,9 +83,6 @@ static void activityStart(void)
 		
 		S_WaitPageData->currenttestdata = GetCurrentTestItem();
 		
-		/*等待时间，超时则取消测试*/
-		timer_set(&(S_WaitPageData->timer), 60);
-		
 		/*间隔一段时间提示插卡*/
 		timer_set(&(S_WaitPageData->timer2), 20);
 		
@@ -153,14 +150,6 @@ static void activityFresh(void)
 				AddNumOfSongToList(11, 0);
 				timer_restart(&(S_WaitPageData->timer2));
 			}
-			
-			//超时，返回
-			if(TimeOut == timer_expired(&(S_WaitPageData->timer)))
-			{
-				AddNumOfSongToList(6, 0);
-				
-				backToFatherActivity();
-			}
 		}
 	}
 }
@@ -190,8 +179,6 @@ static void activityHide(void)
 ***************************************************************************************************/
 static void activityResume(void)
 {
-	timer_restart(&(S_WaitPageData->timer));
-	
 	SelectPage(88);
 }
 

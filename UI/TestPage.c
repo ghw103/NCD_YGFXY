@@ -18,6 +18,7 @@
 #include	"LunchPage.h"
 #include	"Printf_Fun.h"
 #include	"Motor_Fun.h"
+#include	"Motor_Data.h"
 #include	"CardStatues_Data.h"
 
 #include 	"FreeRTOS.h"

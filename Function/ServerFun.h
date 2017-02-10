@@ -26,5 +26,5 @@ void CommunicateWithServerByLineNet(MyServerData * myServerData);
 void CommunicateWithServerByWifi(MyServerData * myServerData);
 
 MyState_TypeDef UpLoadData(char *URL, void * sendBuf, unsigned short sendLen, void * recvBuf, unsigned short recvLen);
-
+MyState_TypeDef DownLoadApp(void * sendBuf, unsigned short sendLen);
 #endif
