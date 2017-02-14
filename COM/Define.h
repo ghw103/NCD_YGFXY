@@ -175,7 +175,7 @@ typedef struct ScanQRTaskData_Tag
 }ScanQRTaskData;
 #pragma pack()
 
-#define	MaxLocation			7000						//最大行程
+#define	MaxLocation			6500						//最大行程
 #define	StartTestLocation	1250							//测试起始位置
 #define	EndTestLocation		4300						//测试结束为止
 #define	WaittingCardLocation	MaxLocation					//等待插卡的位置

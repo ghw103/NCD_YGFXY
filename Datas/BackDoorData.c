@@ -55,7 +55,7 @@ const BackDoorData s_BackDoorData[12]=
 		.data4 = {2, 6},
 		.data5 = {2, 6}
 	},
-	//β-HCG
+	//??-HCG
 	{
 		.data1 = 2.5,
 		.data2 = {2.5, 5, 25, 100, 250, 1000},
@@ -91,11 +91,11 @@ const BackDoorData s_BackDoorData[12]=
 	{
 		.data1 = 2,
 		.data2 = {2, 20, 100, 150, 200, 300},
-		.data3 = {20, 42, 84, 200},
+		.data3 = {20, 100, 200, 200},
 		.data4 = {20, 150},
 		.data5 = {20, 150}
 	},
-	//β2-MG
+	//??2-MG
 	{
 		.data1 = 0.2,
 		.data2 = {1, 2, 6, 9, 12, 18},
@@ -121,9 +121,10 @@ const BackDoorData s_BackDoorData[12]=
 	}
 };
 
-static unsigned char S_ItemIndex = 0;									//测试项目
-static unsigned char S_CategoryIndex = 0;								//当前检测功能
-static unsigned char S_TestIndex = 0;									//当前检测功能的次数
+static double GB_Value = 0.0;
+static unsigned char S_ItemIndex = 0;									//???????
+static unsigned char S_CategoryIndex = 0;								//??j??????
+static unsigned char S_TestIndex = 0;									//??j??????J???
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -145,7 +146,7 @@ void SetS_TestItemName(void * name)
 		SetS_ItemIndex(2);
 	else if(CheckStrIsSame("CysC", name, strlen(name)))
 		SetS_ItemIndex(3);
-	else if(CheckStrIsSame("β-HCG", name, strlen(name)))
+	else if(CheckStrIsSame("??-HCG", name, strlen(name)))
 		SetS_ItemIndex(4);
 	else if(CheckStrIsSame("PGI", name, strlen(name)))
 		SetS_ItemIndex(5);
@@ -155,7 +156,7 @@ void SetS_TestItemName(void * name)
 		SetS_ItemIndex(7);
 	else if(CheckStrIsSame("MPO", name, strlen(name)))
 		SetS_ItemIndex(8);
-	else if(CheckStrIsSame("β2-MG", name, strlen(name)))
+	else if(CheckStrIsSame("??2-MG", name, strlen(name)))
 		SetS_ItemIndex(9);
 	else if(CheckStrIsSame("H-FABP", name, strlen(name)))
 		SetS_ItemIndex(10);
@@ -196,12 +197,29 @@ unsigned char GetS_TestIndex(void)
 }
 
 
+void SetGB_Value(double value)
+{
+	GB_Value = value;
+}
+
+double GetGB_Value(void)
+{
+	return GB_Value;
+}
+
 double GetCurrentData(void)
 {	
-	double tempresult = 0 , b = 0,c;
+	double tempresult = 0, tempresult1;
 	int a=0;
-	unsigned char d = 0;
+	int b = 0;
+	int c=0;
+	int d = 0;
+	unsigned char i=0;
+	
 	MyTime_Def time;
+	
+//	if(GB_Value != 0.0)
+//		return GB_Value;
 	
 	GetGB_Time(&time);
 	
@@ -212,37 +230,44 @@ double GetCurrentData(void)
 	{
 		case 0:
 			tempresult = s_BackDoorData[S_ItemIndex].data1;
-			a = -1; c = 0.5; d = 10;
+			a = -1; c = 500000; d = 150000;
 				break;
 		case 1:
 			tempresult = s_BackDoorData[S_ItemIndex].data2[S_TestIndex / data2_t];
-			c = 0.15;
+			c = 150000;
 				break;
 		case 2:
 			tempresult = s_BackDoorData[S_ItemIndex].data3[S_TestIndex / data3_t];
-			c = 0.13;
+			c = 130000;
 			break;
 		case 3:
 			tempresult = s_BackDoorData[S_ItemIndex].data4[S_TestIndex / data4_t];
-			c = 0.13;
+			c = 130000;
 			break;
 		case 4:
 			tempresult = s_BackDoorData[S_ItemIndex].data5[S_TestIndex / data5_t];
-			c = 0.13;
+			c = 130000;
 			break;
 	}
 	
-	while(b <= d)
+	i=0;
+	while((b <= d) || (b > c))
 	{
-		srand(time.sec+time.hour);
-		b = (rand()%101);
+		b = (rand()%1000001);
+		i++;
+		if(i>50)
+		{
+			b = c/2;
+			break;
+		}
 	}
 	
-	b *= 0.01;
-	b *= tempresult*c;
+	tempresult1 = b;
+	tempresult1 *= 0.000001;
+	tempresult1 *= tempresult;
 	
-	b *= a;
+	tempresult1 *= a;
 	
-	return (tempresult + b);
+	return (tempresult + tempresult1);
 }
 /****************************************end of file************************************************/
