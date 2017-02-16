@@ -308,8 +308,8 @@
               </OCR_RVCT3>
               <OCR_RVCT4>
                 <Type>1</Type>
-                <StartAddress>0x8000000</StartAddress>
-                <Size>0x100000</Size>
+                <StartAddress>0x8010000</StartAddress>
+                <Size>0xf0000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -642,6 +642,11 @@
               <FileType>1</FileType>
               <FilePath>..\Function\Paidui_Fun.c</FilePath>
             </File>
+            <File>
+              <FileName>SystemResetFun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Function\SystemResetFun.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -921,6 +926,16 @@
               <FileName>AppFileDao.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Daos\AppFileDao.c</FilePath>
+            </File>
+            <File>
+              <FileName>UserDao.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Daos\UserDao.c</FilePath>
+            </File>
+            <File>
+              <FileName>WifiDao.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Daos\WifiDao.c</FilePath>
             </File>
           </Files>
         </Group>

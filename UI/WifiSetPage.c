@@ -7,7 +7,7 @@
 #include	"MyMem.h"
 #include	"WifiFunction.h"
 #include	"NetPreSetPage.h"
-#include	"SDFunction.h"
+#include	"WifiDao.h"
 #include	"SleepPage.h"
 
 #include 	"FreeRTOS.h"
@@ -407,7 +407,7 @@ static void CheckIsNeedKey(void)
 				SendKeyCode(16);
 				vTaskDelay(100 / portTICK_RATE_MS);
 				SendKeyCode(3);
-				ClearWifiData(S_WifiPageBuffer->wifip);
+				deleteWifi(S_WifiPageBuffer->wifip);
 			}
 			else
 			{

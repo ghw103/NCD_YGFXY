@@ -263,8 +263,8 @@ static void DspPageText(void)
 		S_CheckQRPageBuffer->qrCode.CardBaoZhiQi.day);
 	DisText(0x2558, S_CheckQRPageBuffer->buf, strlen(S_CheckQRPageBuffer->buf));
 	
-//	sprintf(S_CheckQRPageBuffer->buf, "-20%s", S_CheckQRPageBuffer->qrCode.PiHao);
-//	DisText(0x2560, S_CheckQRPageBuffer->buf, strlen(S_CheckQRPageBuffer->buf));
+	sprintf(S_CheckQRPageBuffer->buf, "%d", S_CheckQRPageBuffer->qrCode.ChannelNum);
+	DisText(0x2560, S_CheckQRPageBuffer->buf, strlen(S_CheckQRPageBuffer->buf));
 	
 	memset(S_CheckQRPageBuffer->buf, 0, 50);
 	sprintf(S_CheckQRPageBuffer->buf, "%.4f*x^2+%.4f*x+%.4f", S_CheckQRPageBuffer->qrCode.ItemBiaoQu[0][0], S_CheckQRPageBuffer->qrCode.ItemBiaoQu[0][1], 

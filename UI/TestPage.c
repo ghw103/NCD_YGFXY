@@ -345,7 +345,8 @@ static void RefreshCurve(void)
 		{
 			RefreshPageText();
 			
-			printfTestData();
+			if(isAutoPrint() == true)
+				printfTestData();
 		}
 		else if(S_TestPageBuffer->cardpretestresult == PeakError)
 		{

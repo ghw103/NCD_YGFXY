@@ -18,6 +18,7 @@
 #include	"CheckQRPage.h"
 #include	"AdjustLedPage.h"
 #include	"AboutUsPage.h"
+#include	"SystemResetFun.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -169,7 +170,10 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 				}
 				else if(pdPASS == CheckStrIsSame(&pbuf[7] , FactoryResetPassWord ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
 				{
-					startActivity(createAdjustLedActivity, NULL);
+					if(My_Pass == SystemReset())
+						SendKeyCode(2);
+					else
+						SendKeyCode(1);
 				}
 				else
 					SendKeyCode(1);
@@ -288,5 +292,6 @@ static void activityBufferFree(void)
 	MyFree(S_SysSetPageBuffer);
 	S_SysSetPageBuffer = NULL;
 }
+
 
 

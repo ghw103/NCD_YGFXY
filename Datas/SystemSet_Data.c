@@ -52,9 +52,11 @@ void setDefaultSystemSetData(SystemSetData * systemSetData)
 		systemSetData->ledLightIntensity = 100;
 		systemSetData->ledSleepTime = 60;
 		
+		memset(&(systemSetData->deviceInfo), 0, sizeof(DeviceInfo));
 		sprintf(systemSetData->deviceInfo.deviceid, "ncd-device");
 		systemSetData->deviceInfo.crc = CalModbusCRC16Fun1(&(systemSetData->deviceInfo), sizeof(DeviceInfo) - 2);
 		
+		memset(&(systemSetData->netSet), 0, sizeof(NetSet));
 		systemSetData->netSet.ipmode = DHCP_Mode;
 		systemSetData->netSet.crc = CalModbusCRC16Fun1(&(systemSetData->netSet), sizeof(NetSet) - 2);
 		
