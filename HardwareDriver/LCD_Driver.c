@@ -11,7 +11,6 @@
 
 #include	"LCD_Driver.h"
 #include	"QueueUnits.h"
-#include	"System_Data.h"
 
 #include	"CRC16.h"
 #include	"Define.h"
@@ -204,11 +203,6 @@ void SendKeyCode(unsigned char keycode)
 	WriteLCDRegister(0x4f, &keycode, 1);
 }
 
-void ClearLine(unsigned char Command)
-{
-	WriteLCDRegister(0xEB, &Command, 1);
-}
-
 /************************************************************************
 ** 函数名:SetLEDLight
 ** 功  能:num -- 屏幕亮度，1 -- 1%， 100--100%
@@ -325,86 +319,6 @@ unsigned short GetBufLen(unsigned char *p ,unsigned short len)
 				}
 			}
 		return 0;
-}
-
-void DspTimeAndTempData(void)
-{
-	MyTime_Def * time = NULL;
-	char *buftime = NULL;
-	
-	buftime = MyMalloc(200);
-	time = MyMalloc(sizeof(MyTime_Def));
-	
-	if(buftime && time)
-	{
-		memset(buftime, 0, 200);
-		memset(time, 0, sizeof(MyTime_Def));
-		
-		/*获取当前时间*/
-		GetGB_Time(time);
-		
-		/*显示时间*/
-		sprintf(buftime, " 20%02d-%02d-%02d %02d:%02d:%02d", time->year, time->month, time->day,
-			time->hour, time->min, time->sec);
-		
-		DisText(0x1000, buftime, strlen(buftime));
-	}
-
-	MyFree(time);
-	MyFree(buftime);
-}
-
-/************************************************************************
-** 函数名:
-** 功  能:
-** 输  入:pram----倍率
-** 输  出:无
-** 返  回：无
-** 备  注：无
-** 时  间:  
-** 作  者：xsx                                                 
-************************************************************************/
-void DisPlayLine(unsigned char channel , void * data , unsigned char datalen)
-{
-	unsigned short * p = (unsigned short *)data;
-				
-	char *q = NULL;
-	unsigned char i = 0;
-	unsigned short tempdat = 0;
-		
-	txdat = MyMalloc(datalen*2 + 50);
-	if(txdat == NULL)
-		return;
-	
-	memset(txdat, 0, datalen*2 + 50);
-	q = txdat;
-
-	*q++ = LCD_Head_1;
-	*q++ = LCD_Head_2;
-	*q++ = (2+datalen*2+2);
-	*q++ = W_LINE;
-	*q++ = (0x01 << channel);
-		
-	for(i=0; i<datalen; i++)
-	{
-		tempdat = *p++;
-		*q++ = (unsigned char)(tempdat>>8);
-		*q++ = (unsigned char)tempdat;
-	}
-	
-	CalModbusCRC16Fun2(txdat+3, datalen*2 + 2, q);
-	
-	SendDataToQueue(GetUsart6TXQueue(), GetUsart6TXMutex(), txdat, txdat[2]+3, 1, 50 * portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart6TXInterrupt);
-
-	MyFree(txdat);
-}
-
-void SetChartSize(unsigned short add , unsigned short num)
-{
-	tempbuf[0] = num>>8;
-	tempbuf[1] = num;
-	
-	WriteLCDData(add+0x08, tempbuf, 2);
 }
 
 void DspNum(unsigned short addr , unsigned int num, unsigned char len)

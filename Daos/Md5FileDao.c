@@ -1,14 +1,14 @@
 /***************************************************************************************************
-*FileName: UserDao
-*Description: 操作人dao
+*FileName: Md5FileDao
+*Description: 保存新程序文件的MD5值
 *Author: xsx_kair
-*Data: 2017年2月16日11:31:22
+*Data: 2017年2月16日15:23:25
 ***************************************************************************************************/
 
 /***************************************************************************************************/
 /******************************************Header List********************************************/
 /***************************************************************************************************/
-#include	"UserDao.h"
+#include	"Md5FileDao.h"
 
 #include	"CRC16.h"
 #include	"MyMem.h"
@@ -33,29 +33,36 @@
 /****************************************File Start*************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
-
-MyState_TypeDef SaveUserData(User_Type * user)
+/***************************************************************************************************
+*FunctionName: WriteMd5File
+*Description: 更新文件的md5
+*Input: md5Str -- md5字符串
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月16日15:25:32
+***************************************************************************************************/
+MyState_TypeDef WriteMd5File(char * md5Str)
 {
 	FatfsFileInfo_Def * myfile = NULL;
 	MyState_TypeDef statues = My_Fail;
 	
 	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
 	
-	if(myfile)
+	if(myfile && md5Str)
 	{
 		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
 
-		myfile->res = f_open(&(myfile->file), "0:/Testers.ncd", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
-			
+		myfile->res = f_open(&(myfile->file), "0:/md5.txt", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
+
 		if(FR_OK == myfile->res)
-		{
+		{	
 			f_lseek(&(myfile->file), 0);
 			
-			myfile->res = f_write(&(myfile->file), user, sizeof(User_Type)*MaxUserNum, &(myfile->bw));
-				
-			if((FR_OK == myfile->res)&&(myfile->bw == sizeof(User_Type)*MaxUserNum))
+			myfile->res = f_write(&(myfile->file), md5Str, 32, &(myfile->bw));
+			if(myfile->res == FR_OK)
 				statues = My_Pass;
-				
+			
 			f_close(&(myfile->file));
 		}
 	}
@@ -65,54 +72,43 @@ MyState_TypeDef SaveUserData(User_Type * user)
 	return statues;
 }
 
-MyState_TypeDef ReadUserData(User_Type * user)
+/***************************************************************************************************
+*FunctionName: ReadMd5File
+*Description: 读取文件的md5值
+*Input: md5Str -- 读取缓存
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月16日15:25:44
+***************************************************************************************************/
+MyState_TypeDef ReadMd5File(char * md5Str)
 {
 	FatfsFileInfo_Def * myfile = NULL;
 	MyState_TypeDef statues = My_Fail;
-	unsigned char i=0;
 	
 	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
-
-	if(myfile && user)
+	
+	if(myfile && md5Str)
 	{
 		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
 
-		myfile->res = f_open(&(myfile->file), "0:/Testers.ncd", FA_READ);
-		
+		myfile->res = f_open(&(myfile->file), "0:/md5.txt", FA_OPEN_EXISTING | FA_READ);
+
 		if(FR_OK == myfile->res)
-		{
+		{	
 			f_lseek(&(myfile->file), 0);
-					
-			for(i=0; i<MaxUserNum; i++)
-			{
-				f_read(&(myfile->file), user, sizeof(User_Type), &(myfile->br));
-				
-				if(user->crc == CalModbusCRC16Fun1(user, sizeof(User_Type)-2))
-					user++;
-			}
 			
-			statues = My_Pass;
+			myfile->res = f_read(&(myfile->file), md5Str, 32, &(myfile->br));
+			if(myfile->res == FR_OK)
+				statues = My_Pass;
 			
 			f_close(&(myfile->file));
 		}
-	}	
+	}
+	
 	MyFree(myfile);
 	
 	return statues;
-}
-
-MyState_TypeDef ClearUsers(void)
-{
-	User_Type * user = NULL;
-	user = MyMalloc(sizeof(User_Type)*MaxUserNum);
-	if(user)
-	{
-		memset(user, 0, sizeof(User_Type)*MaxUserNum);
-		
-		return SaveUserData(user);
-	}
-	else
-		return My_Fail;
 }
 
 /****************************************end of file************************************************/

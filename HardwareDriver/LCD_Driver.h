@@ -15,11 +15,7 @@ void BasicPic(unsigned short addr,unsigned short datanum, unsigned short soureid
 	unsigned short txs,unsigned short tys);
 void SendKeyCode(unsigned char keycode);
 unsigned short GetBufLen(unsigned char *p ,unsigned short len);
-void DspTimeAndTempData(void);
-void DisPlayLine(unsigned char channel , void * data , unsigned char datalen);
-void SetChartSize(unsigned short add , unsigned short num);
 void DspNum(unsigned short addr , unsigned int num, unsigned char len);
-void ClearLine(unsigned char Command);
 void BasicUI(unsigned short addr , unsigned short cmd, unsigned short datapacknum, void *data , unsigned short len);
 void SetLEDLight(unsigned char num);
 void WriteVarIcoNum(unsigned short addr, unsigned short num);

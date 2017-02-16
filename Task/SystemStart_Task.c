@@ -10,14 +10,7 @@
 /***************************************************************************************************/
 #include	"SystemStart_Task.h"
 
-#include	"SystemUI_Task.h"
 #include	"Iwdg_Task.h"
-#include	"Universal_Task.h"
-#include	"PlaySong_Task.h"
-#include	"user_fatfs.h"
-#include	"WelcomePage.h"
-#include	"SelfTest_Fun.h"
-#include	"UI_Data.h"
 
 #include	"Define.h"
 
@@ -64,20 +57,6 @@ static void vSystemStartTask( void *pvParameters )
 	/*开启看门狗任务*/
 	StartvIwdgTask();
 	
-	/*通用任务*/
-	StartvUniversalTask();
-	
-	/*播放音频*/
-	StartvPlaySongTask();
-	
-	/*显示欢迎界面*/
-	startActivity(createWelcomeActivity, NULL);
-	
-	/*系统界面控制任务*/
-	StartvSystemUITask();
-	
-	/*开始自检*/
-	SelfTest_Function();
 	
 	vTaskDelete(NULL);
 }
