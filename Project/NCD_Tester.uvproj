@@ -456,15 +456,17 @@
         </Group>
         <Group>
           <GroupName>Functions</GroupName>
+          <Files>
+            <File>
+              <FileName>IAP_Fun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Function\IAP_Fun.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>Tasks</GroupName>
           <Files>
-            <File>
-              <FileName>Iwdg_Task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Task\Iwdg_Task.c</FilePath>
-            </File>
             <File>
               <FileName>SystemStart_Task.c</FileName>
               <FileType>1</FileType>
@@ -500,11 +502,6 @@
               <FileName>Delay.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\COM\Delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>QueueUnits.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\COM\QueueUnits.c</FilePath>
             </File>
             <File>
               <FileName>Define.h</FileName>
@@ -630,36 +627,6 @@
               <FileName>README.txt</FileName>
               <FileType>5</FileType>
               <FilePath>..\DOC\README.txt</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>FreertOS</GroupName>
-          <Files>
-            <File>
-              <FileName>heap_4.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\FreeRTOS\src\heap_4.c</FilePath>
-            </File>
-            <File>
-              <FileName>tasks.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\FreeRTOS\src\tasks.c</FilePath>
-            </File>
-            <File>
-              <FileName>queue.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\FreeRTOS\src\queue.c</FilePath>
-            </File>
-            <File>
-              <FileName>port.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\FreeRTOS\src\port.c</FilePath>
-            </File>
-            <File>
-              <FileName>list.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\FreeRTOS\src\list.c</FilePath>
             </File>
           </Files>
         </Group>

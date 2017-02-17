@@ -30,13 +30,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_it.h"
 
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-
-
-extern void xPortSysTickHandler(void); 
-
 /** @addtogroup STM32F4xx_StdPeriph_Examples
   * @{
   */
@@ -157,7 +150,7 @@ void DebugMon_Handler(void)
 
 void SysTick_Handler(void)
 {
-	xPortSysTickHandler(); 
+
 }
 
 

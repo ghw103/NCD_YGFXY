@@ -1,9 +1,7 @@
 #ifndef LCD_D_H_H
 #define LCD_D_H_H
 
-#include	"Usart6_Driver.h"
-
-#define	MaxSendDataLen		xTxQueue6_Len-20							//发给屏幕的数据最大长度
+#define	MaxSendDataLen		100
 
 void SelectPage(unsigned short index);
 void ReadCurrentPageId(void);

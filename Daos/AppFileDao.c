@@ -89,7 +89,7 @@ MyState_TypeDef WriteAppFile(char * file, unsigned short len, bool isNew)
 *Author: xsx
 *Date: 2017Äê2ÔÂ16ÈÕ14:55:26
 ***************************************************************************************************/
-MyState_TypeDef ReadAppFile(unsigned int startAddr, char * dataBuf, unsigned short size, unsigned short *br)
+MyState_TypeDef ReadAppFile(unsigned int startAddr, unsigned char * dataBuf, unsigned short size, unsigned short *br)
 {
 	FatfsFileInfo_Def * myfile = NULL;
 	MyState_TypeDef statues = My_Fail;

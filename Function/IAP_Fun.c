@@ -1,21 +1,32 @@
 /***************************************************************************************************
-*FileName:main
-*Description:程序入口
+*FileName:IAP_Fun
+*Description:IAP功能
 *Author:xsx
-*Data:2016年4月21日14:54:04
+*Data:2017年2月16日16:27:25
 ***************************************************************************************************/
+
 
 /***************************************************************************************************/
 /******************************************头文件***************************************************/
 /***************************************************************************************************/
-#include	"SystemInit.h"
+#include	"IAP_Fun.h"
+#include 	"stm32f4xx.h"
 
-#include	"SystemStart_Task.h"
+#include	"AppFileDao.h"
+
+#include	"MyMem.h"
+
+#include	"Define.h"
+
+#include	<string.h>
+#include	"stdio.h"
+#include 	"stdlib.h"
 
 /***************************************************************************************************/
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
-
+pFunction JumpToApplication;
+uint32_t JumpAddress;
 /***************************************************************************************************/
 /**************************************局部函数声明*************************************************/
 /***************************************************************************************************/
@@ -28,19 +39,56 @@
 /***************************************************************************************************/
 
 /***************************************************************************************************
-*FunctionName：main
-*Description：程序入口
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年4月21日14:54:56
+*FunctionName: jumpToUserApplicationProgram
+*Description: 跳转到应用程序
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月16日16:38:47
 ***************************************************************************************************/
-int main(void)
+void jumpToUserApplicationProgram(void)
 {
-	MySystemBSPInit();
-
-	StartSystemStartTask();
-
+	if (((*(__IO uint32_t*)APPLICATION_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
+    {
+      /* Jump to user application */
+      JumpAddress = *(__IO uint32_t*) (APPLICATION_ADDRESS + 4);
+      JumpToApplication = (pFunction) JumpAddress;
+      /* Initialize user application's Stack Pointer */
+      __set_MSP(*(__IO uint32_t*) APPLICATION_ADDRESS);
+      JumpToApplication();
+    }
 }
 
-/****************************************end of file************************************************/
+/***************************************************************************************************
+*FunctionName: writeApplicationToFlash
+*Description: 更新固件到flash
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月16日17:06:02
+***************************************************************************************************/
+void writeApplicationToFlash(void)
+{
+	unsigned int startAddr = 0;
+	unsigned short i = 0;
+	unsigned short readSize = 0;
+	unsigned char * dataBuf = NULL;
+	
+	dataBuf = MyMalloc(40*1024);
+	
+	if(dataBuf)
+	{
+		for(i=0; i<100; i++)
+		{
+			if(My_Pass == ReadAppFile(startAddr, dataBuf, 40*1024, &readSize))
+			{
+				
+			}
+		}
+	}
+	else
+		jumpToUserApplicationProgram();
+	
+}

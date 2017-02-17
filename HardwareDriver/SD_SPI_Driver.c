@@ -18,7 +18,6 @@
 SD_CARDINFO SD_CardInfo;
 
 static uint8_t Dummy_Send = SD_DUMMY_BYTE;
-static uint8_t Dummy_Recv = SD_DUMMY_BYTE;
 
 //SDø®µÁ‘¥≈‰÷√
 void SD_Power_Init(void)
