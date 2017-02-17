@@ -123,7 +123,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		else if(S_RecordPageBuffer->lcdinput[0] == 0x2001)
 		{
 			if((S_RecordPageBuffer->selectindex > 0) && (S_RecordPageBuffer->selectindex <= S_RecordPageBuffer->page.ElementsSize))
-				startActivity(createShowResultActivity, createIntent(&S_RecordPageBuffer->page.testData[S_RecordPageBuffer->selectindex-1], sizeof(TestData)));
+				startActivity(createShowResultActivity, createIntent(&S_RecordPageBuffer->page.testData[S_RecordPageBuffer->page.ElementsSize - S_RecordPageBuffer->selectindex], sizeof(TestData)));
 		}
 		/*ÉÏÒ»Ò³*/
 		else if(S_RecordPageBuffer->lcdinput[0] == 0x2002)

@@ -81,8 +81,7 @@ static void activityStart(void)
 		AddNumOfSongToList(0, 0);
 	}
 
-	SelectPage(0);
-	SelectPage(0);
+	SelectPage(1);
 }
 
 /***************************************************************************************************

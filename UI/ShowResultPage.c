@@ -282,13 +282,14 @@ static void DspLine(void)
 	unsigned short *p = NULL;
 
 	ClearLine(0x57);
-	
+	vTaskDelay(10 / portTICK_RATE_MS);
 	for(i=0; i<MaxPointLen;i++)
 	{
-		if(i%20 == 0)
+		if(i%50 == 0)
 		{
 			p = &(S_ShowPageBuffer->testdata.testline.TestPoint[i]);
-			DisPlayLine(1 , p , 20);
+			DisPlayLine(1 , p , 50);
+			vTaskDelay(10 / portTICK_RATE_MS);
 		}
 		
 		if(S_ShowPageBuffer->lineinfo.MaxData <= S_ShowPageBuffer->testdata.testline.TestPoint[i])

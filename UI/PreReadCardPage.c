@@ -287,7 +287,7 @@ static void CheckQRCode(void)
 				memcpy(&(S_PreReadPageBuffer->currenttestdata->testdata.temperweima), &(S_PreReadPageBuffer->temperweima), sizeof(QRCode));
 				
 				//设置倒计时时间
-				timer_set(&(S_PreReadPageBuffer->currenttestdata->timer), S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardWaitTime*10);
+				timer_set(&(S_PreReadPageBuffer->currenttestdata->timer), S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardWaitTime*60);
 			
 				//查找卡图标索引
 				S_PreReadPageBuffer->currenttestdata->varIcoIndex = CheckItemPicIndex(S_PreReadPageBuffer->currenttestdata->testdata.temperweima.ItemName);
@@ -323,7 +323,7 @@ static void CheckPreTestCard(void)
 	{
 		timer_restart(&(S_PreReadPageBuffer->currenttestdata->timer));
 		
-/*		//未加样
+		//未加样
 		if(S_PreReadPageBuffer->cardpretestresult == NoSample)
 		{
 			//未加样重测3次，第三次未加样则表明真的未加样
@@ -347,7 +347,7 @@ static void CheckPreTestCard(void)
 			AddNumOfSongToList(14, 0);
 			memset(&(S_PreReadPageBuffer->currenttestdata->testdata.temperweima), 0, sizeof(QRCode));
 		}
-		else if(S_PreReadPageBuffer->cardpretestresult == PeakError)*/
+		else if(S_PreReadPageBuffer->cardpretestresult == PeakError)
 		{
 			//如果是排队模式，则进入排队界面
 			if(S_PreReadPageBuffer->currenttestdata->testlocation > 0)

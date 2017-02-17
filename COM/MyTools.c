@@ -84,7 +84,7 @@ unsigned char CheckItemPicIndex(void * item)
 		return 1;
 	else if(strstr(item, "cTnI\0"))
 		return 2;
-	else if(strstr(item, "Myo\0"))
+	else if(strstr(item, "MYO\0"))
 		return 3;
 	else
 		return 0;
