@@ -24,7 +24,21 @@
 /***************************************************************************************************/
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
-
+const unsigned int FLASH_SECTORS[12]=
+{
+	ADDR_FLASH_SECTOR_0,
+	ADDR_FLASH_SECTOR_1,
+	ADDR_FLASH_SECTOR_2, 
+	ADDR_FLASH_SECTOR_3,  
+	ADDR_FLASH_SECTOR_4, 
+	ADDR_FLASH_SECTOR_5,
+	ADDR_FLASH_SECTOR_6,
+	ADDR_FLASH_SECTOR_7,
+	ADDR_FLASH_SECTOR_8,
+	ADDR_FLASH_SECTOR_9,
+	ADDR_FLASH_SECTOR_10,
+	ADDR_FLASH_SECTOR_11
+};
 /***************************************************************************************************/
 /**************************************局部函数声明*************************************************/
 /***************************************************************************************************/
@@ -190,4 +204,40 @@ void readFlash(unsigned int FlashAddress, void * Data , unsigned int DataLength)
 		p[i] = *(unsigned int *)FlashAddress;
 		FlashAddress += 4;
 	}
+}
+
+void testFlashWriteAndReadFunction(void)
+{
+	unsigned char * dataBuf = NULL;
+	unsigned int j = 0;
+	unsigned int flashWriteAddr = APPLICATION_ADDRESS;
+	
+	dataBuf = MyMalloc(1024);
+	
+	if(dataBuf)
+	{
+		for(j=0; j<1024; j++)
+			dataBuf[j] = j;
+		
+		//擦除用户区域
+		EraseFlashSectors(getFlashSector(APPLICATION_ADDRESS), FLASH_Sector_11);
+		
+//		for(j=4; j<12; j++)
+//		{
+			if(My_Pass == writeFlash(FLASH_SECTORS[4], dataBuf, 256))
+			{
+
+			}
+			
+			if(My_Pass == writeFlash(FLASH_SECTORS[4]+1024, dataBuf, 256))
+			{
+	
+			}
+//		}
+		
+		//擦除用户区域
+		EraseFlashSectors(getFlashSector(APPLICATION_ADDRESS), FLASH_Sector_11);
+	}
+	
+	MyFree(dataBuf);
 }

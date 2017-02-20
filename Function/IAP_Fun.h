@@ -3,7 +3,7 @@
 
 void jumpToUserApplicationProgram(void);
 void writeApplicationToFlash(void);
-void testFlashWriteAndReadFunction(void);
+
 
 #endif
 

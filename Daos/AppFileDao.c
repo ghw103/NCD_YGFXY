@@ -105,7 +105,7 @@ MyState_TypeDef ReadAppFile(unsigned int startAddr, unsigned char * dataBuf, uns
 		myfile->res = f_open(&(myfile->file), "0:/UPDATE.BIN", FA_OPEN_EXISTING | FA_READ);
 
 		if(FR_OK == myfile->res)
-		{	
+		{
 			f_lseek(&(myfile->file), startAddr);
 			
 			myfile->res = f_read(&(myfile->file), dataBuf, size, &(myfile->br));

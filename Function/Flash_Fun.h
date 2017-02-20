@@ -25,6 +25,7 @@ unsigned short getFlashSector(unsigned int startAddress);
 MyState_TypeDef EraseFlashSectors(unsigned int startSectorIndex, unsigned int endSectorIndex);
 MyState_TypeDef writeFlash(unsigned int FlashAddress, void * Data , unsigned int DataLength);
 void readFlash(unsigned int FlashAddress, void * Data , unsigned int DataLength);
+void testFlashWriteAndReadFunction(void);
 
 #endif
 

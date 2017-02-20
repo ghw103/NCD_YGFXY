@@ -88,13 +88,14 @@ void writeApplicationToFlash(void)
 		
 		for(i=0; i<100; i++)
 		{
-			if(My_Pass == ReadAppFile(startAddr, dataBuf, 40*1024, &readSize))
+			memset(dataBuf, 0xff, 40*1024);
+			if(My_Pass == ReadAppFile(flashWriteAddr - APPLICATION_ADDRESS, dataBuf, 40*1024, &readSize))
 			{
 				if(readSize != 0)
 				{
 					if(My_Pass == writeFlash(flashWriteAddr, dataBuf, readSize / 4))
 					{
-						flashWriteAddr += readSize;
+						flashWriteAddr += readSize/4*4;
 					}
 				}
 				else
@@ -102,35 +103,12 @@ void writeApplicationToFlash(void)
 			}
 		}
 		
-		
+		MyFree(dataBuf);
+		jumpToUserApplicationProgram();
 	}
+	//升级失败
 	else
 		jumpToUserApplicationProgram();
 }
 
-void testFlashWriteAndReadFunction(void)
-{
-	unsigned char * dataBuf = NULL;
-	unsigned int j = 0;
-	unsigned int flashWriteAddr = APPLICATION_ADDRESS;
-	
-	dataBuf = MyMalloc(1024);
-	
-	if(dataBuf)
-	{
-		for(j=0; j<1024; j++)
-			dataBuf[j] = j;
-		
-		//擦除用户区域
-		EraseFlashSectors(getFlashSector(APPLICATION_ADDRESS), FLASH_Sector_11);
-		
-		if(My_Pass == writeFlash(flashWriteAddr, dataBuf, 256))
-		{
-			memset(dataBuf, 0, 1024);
-			
-			readFlash(flashWriteAddr, dataBuf, 256);
-		}
-	}
-	
-	MyFree(dataBuf);
-}
+
