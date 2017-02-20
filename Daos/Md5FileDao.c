@@ -53,7 +53,7 @@ MyState_TypeDef WriteMd5File(char * md5Str)
 	{
 		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
 
-		myfile->res = f_open(&(myfile->file), "0:/md5.txt", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
+		myfile->res = f_open(&(myfile->file), "0:/MD5.NCD", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
 
 		if(FR_OK == myfile->res)
 		{	
@@ -92,7 +92,7 @@ MyState_TypeDef ReadMd5File(char * md5Str)
 	{
 		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
 
-		myfile->res = f_open(&(myfile->file), "0:/md5.txt", FA_OPEN_EXISTING | FA_READ);
+		myfile->res = f_open(&(myfile->file), "0:/MD5.NCD", FA_OPEN_EXISTING | FA_READ);
 
 		if(FR_OK == myfile->res)
 		{	

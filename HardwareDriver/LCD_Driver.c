@@ -271,7 +271,7 @@ void BasicUI(unsigned short addr , unsigned short cmd, unsigned short datapacknu
 ***************************************************************************************************/
 void BasicPic(unsigned short addr,unsigned short datanum, unsigned short soureid ,unsigned short xs,unsigned short ys ,unsigned short xe,unsigned short ye ,
 	unsigned short txs,unsigned short tys)
-{	
+{
 	//cmd 0x0006
 	tempbuf[0] = 0;		tempbuf[1] = 6;
 		

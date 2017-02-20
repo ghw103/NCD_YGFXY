@@ -467,6 +467,11 @@
               <FileType>1</FileType>
               <FilePath>..\Function\Flash_Fun.c</FilePath>
             </File>
+            <File>
+              <FileName>IAPMessage_Fun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Function\IAPMessage_Fun.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -527,6 +532,11 @@
               <FileName>MyMem.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\COM\MyMem.c</FilePath>
+            </File>
+            <File>
+              <FileName>Md5.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\COM\Md5.c</FilePath>
             </File>
           </Files>
         </Group>

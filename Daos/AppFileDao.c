@@ -89,7 +89,8 @@ MyState_TypeDef WriteAppFile(char * file, unsigned short len, bool isNew)
 *Author: xsx
 *Date: 2017Äê2ÔÂ16ÈÕ14:55:26
 ***************************************************************************************************/
-MyState_TypeDef ReadAppFile(unsigned int startAddr, unsigned char * dataBuf, unsigned short size, unsigned short *br)
+MyState_TypeDef ReadAppFile(unsigned int startAddr, unsigned char * dataBuf, unsigned short size, unsigned short *br,
+	unsigned int *fileSize)
 {
 	FatfsFileInfo_Def * myfile = NULL;
 	MyState_TypeDef statues = My_Fail;
@@ -106,6 +107,9 @@ MyState_TypeDef ReadAppFile(unsigned int startAddr, unsigned char * dataBuf, uns
 
 		if(FR_OK == myfile->res)
 		{
+			if(fileSize != NULL)
+				*fileSize = f_size(&(myfile->file));
+			
 			f_lseek(&(myfile->file), startAddr);
 			
 			myfile->res = f_read(&(myfile->file), dataBuf, size, &(myfile->br));
@@ -179,5 +183,6 @@ MyState_TypeDef deleteAppFileIfExist(void)
 	else
 		return My_Fail;
 }
+
 
 /****************************************end of file************************************************/

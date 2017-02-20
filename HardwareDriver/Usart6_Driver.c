@@ -70,8 +70,6 @@ static void ConfigUsart6(void)
   
 	/* 使能串口3 */
 	USART_Cmd(USART6, ENABLE);
-	//使能接收中断
-	USART_ClearFlag(USART1, USART_FLAG_TC);
 
 }
 
@@ -100,14 +98,14 @@ void Usart6_Init(void)
 void USART6_SentData(char * dataBuf, unsigned short len)
 {
 	unsigned short i = 0;
-	unsigned short data = 0;
+	unsigned char data = 0;
 	
 	for(i=0; i<len; i++)
 	{
 		data = *dataBuf;
 		
-		USART_SendData(USART1, data);
-		while(USART_GetFlagStatus(USART6, USART_FLAG_TC)!=SET);
+		USART_SendData(USART6, data);
+		while(USART_GetFlagStatus(USART6, USART_FLAG_TXE) == RESET);
 		
 		dataBuf++;
 	}
