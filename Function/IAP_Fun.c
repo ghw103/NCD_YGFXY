@@ -186,7 +186,7 @@ void writeApplicationToFlash(void)
 			showIapStatus(statusBuf);
 			delay_ms(500);
 			
-			//deleteAppFileIfExist();
+			deleteAppFileIfExist();
 			
 			jumpToUserApplicationProgram();
 		}
