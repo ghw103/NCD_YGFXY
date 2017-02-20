@@ -13,6 +13,9 @@
 #include 	"stm32f4xx.h"
 #include	"Flash_Fun.h"
 
+#include	"LCD_Driver.h"
+#include 	"Iwdg_Driver.h"
+
 #include	"AppFileDao.h"
 
 #include	"MyMem.h"
@@ -28,6 +31,21 @@
 /***************************************************************************************************/
 pFunction JumpToApplication;
 uint32_t JumpAddress;
+const unsigned int FLASH_SECTORS[12]=
+{
+	FLASH_Sector_0,
+	FLASH_Sector_1,
+	FLASH_Sector_2, 
+	FLASH_Sector_3,  
+	FLASH_Sector_4, 
+	FLASH_Sector_5,
+	FLASH_Sector_6,
+	FLASH_Sector_7, 
+	FLASH_Sector_8,  
+	FLASH_Sector_9, 
+	FLASH_Sector_10,
+	FLASH_Sector_11
+};
 /***************************************************************************************************/
 /**************************************局部函数声明*************************************************/
 /***************************************************************************************************/
@@ -84,31 +102,65 @@ void writeApplicationToFlash(void)
 	if(dataBuf)
 	{
 		//擦除用户区域
-		EraseFlashSectors(getFlashSector(APPLICATION_ADDRESS), FLASH_Sector_11);
-		
+		for(i=4; i<12; i++)
+		{
+			EraseFlashSectors(FLASH_SECTORS[i], FLASH_SECTORS[i]);
+			IWDG_Feed();
+		}
+
 		for(i=0; i<100; i++)
 		{
 			memset(dataBuf, 0xff, 40*1024);
+			IWDG_Feed();
+			
+			readSize = 1;							//标记有数据
 			if(My_Pass == ReadAppFile(flashWriteAddr - APPLICATION_ADDRESS, dataBuf, 40*1024, &readSize))
 			{
+				IWDG_Feed();
+				
 				if(readSize != 0)
 				{
 					if(My_Pass == writeFlash(flashWriteAddr, dataBuf, readSize / 4))
 					{
+						IWDG_Feed();
 						flashWriteAddr += readSize/4*4;
 					}
+					else
+						break;
 				}
 				else
 					break;
 			}
+			else
+				break;
 		}
 		
+		IWDG_Feed();
 		MyFree(dataBuf);
-		jumpToUserApplicationProgram();
+		
+		if(readSize == 0)
+		{
+			DisText(0x2a00, "更新成功!", 10);
+			
+			deleteAppFileIfExist();
+			
+			jumpToUserApplicationProgram();
+		}
+		else
+		{
+			DisText(0x2a00, "更新失败!", 10);
+			
+			NVIC_SystemReset();
+		}
+
 	}
 	//升级失败
 	else
-		jumpToUserApplicationProgram();
+	{
+		DisText(0x2a00, "更新失败!", 10);
+			
+		NVIC_SystemReset();
+	}
 }
 
 

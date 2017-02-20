@@ -24,21 +24,7 @@
 /***************************************************************************************************/
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
-const unsigned int FLASH_SECTORS[12]=
-{
-	ADDR_FLASH_SECTOR_0,
-	ADDR_FLASH_SECTOR_1,
-	ADDR_FLASH_SECTOR_2, 
-	ADDR_FLASH_SECTOR_3,  
-	ADDR_FLASH_SECTOR_4, 
-	ADDR_FLASH_SECTOR_5,
-	ADDR_FLASH_SECTOR_6,
-	ADDR_FLASH_SECTOR_7,
-	ADDR_FLASH_SECTOR_8,
-	ADDR_FLASH_SECTOR_9,
-	ADDR_FLASH_SECTOR_10,
-	ADDR_FLASH_SECTOR_11
-};
+
 /***************************************************************************************************/
 /**************************************局部函数声明*************************************************/
 /***************************************************************************************************/
@@ -130,8 +116,6 @@ MyState_TypeDef EraseFlashSectors(unsigned int startSectorIndex, unsigned int en
 	
 	for(index = startSectorIndex; index <= endSectorIndex; )
 	{
-		
-		
 		status = FLASH_EraseSector(index, VoltageRange_3);
 		if(FLASH_COMPLETE != status)
 			break;
@@ -224,12 +208,12 @@ void testFlashWriteAndReadFunction(void)
 		
 //		for(j=4; j<12; j++)
 //		{
-			if(My_Pass == writeFlash(FLASH_SECTORS[4], dataBuf, 256))
+			if(My_Pass == writeFlash(FLASH_Sector_4, dataBuf, 256))
 			{
 
 			}
 			
-			if(My_Pass == writeFlash(FLASH_SECTORS[4]+1024, dataBuf, 256))
+			if(My_Pass == writeFlash(FLASH_Sector_4+1024, dataBuf, 256))
 			{
 	
 			}
