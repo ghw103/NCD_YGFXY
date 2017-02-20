@@ -8,6 +8,7 @@
 ".\obj\sd_spi_driver.o"
 ".\obj\usart6_driver.o"
 ".\obj\iap_fun.o"
+".\obj\flash_fun.o"
 ".\obj\systemstart_task.o"
 ".\obj\appfiledao.o"
 ".\obj\md5filedao.o"

@@ -48,7 +48,15 @@ void StartSystemStartTask(void)
 	SelectPage(0);
 	IWDG_Feed();
 	
-	//检查是否有新程序
+	testFlashWriteAndReadFunction();
+	
+	while(1)
+		{
+			IWDG_Feed();
+			delay_ms(100);
+		}
+		
+/*	//检查是否有新程序
 	if(My_Pass == checkNewAppFileIsExist())
 	{
 		while(1)
@@ -58,7 +66,7 @@ void StartSystemStartTask(void)
 		}
 	}
 	else
-		jumpToUserApplicationProgram();
+		jumpToUserApplicationProgram();*/
 }
 
 

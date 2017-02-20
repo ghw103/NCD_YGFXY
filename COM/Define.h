@@ -51,6 +51,7 @@ typedef struct
 /**********************************************************************************************************/
 
 #define APPLICATION_ADDRESS   (uint32_t)0x08010000 
+#define APPLICATION_END_ADDRESS	(uint32_t)0x080FFFFF
 
 typedef  void (*pFunction)(void);
 

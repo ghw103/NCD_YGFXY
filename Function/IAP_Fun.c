@@ -11,6 +11,7 @@
 /***************************************************************************************************/
 #include	"IAP_Fun.h"
 #include 	"stm32f4xx.h"
+#include	"Flash_Fun.h"
 
 #include	"AppFileDao.h"
 
@@ -72,23 +73,64 @@ void jumpToUserApplicationProgram(void)
 void writeApplicationToFlash(void)
 {
 	unsigned int startAddr = 0;
+	unsigned int flashWriteAddr = APPLICATION_ADDRESS;
 	unsigned short i = 0;
 	unsigned short readSize = 0;
 	unsigned char * dataBuf = NULL;
+	unsigned int j = 0;
 	
 	dataBuf = MyMalloc(40*1024);
 	
 	if(dataBuf)
 	{
+		//擦除用户区域
+		EraseFlashSectors(getFlashSector(APPLICATION_ADDRESS), FLASH_Sector_11);
+		
 		for(i=0; i<100; i++)
 		{
 			if(My_Pass == ReadAppFile(startAddr, dataBuf, 40*1024, &readSize))
 			{
-				
+				if(readSize != 0)
+				{
+					if(My_Pass == writeFlash(flashWriteAddr, dataBuf, readSize / 4))
+					{
+						flashWriteAddr += readSize;
+					}
+				}
+				else
+					break;
 			}
 		}
+		
+		
 	}
 	else
 		jumpToUserApplicationProgram();
+}
+
+void testFlashWriteAndReadFunction(void)
+{
+	unsigned char * dataBuf = NULL;
+	unsigned int j = 0;
+	unsigned int flashWriteAddr = APPLICATION_ADDRESS;
 	
+	dataBuf = MyMalloc(1024);
+	
+	if(dataBuf)
+	{
+		for(j=0; j<1024; j++)
+			dataBuf[j] = j;
+		
+		//擦除用户区域
+		EraseFlashSectors(getFlashSector(APPLICATION_ADDRESS), FLASH_Sector_11);
+		
+		if(My_Pass == writeFlash(flashWriteAddr, dataBuf, 256))
+		{
+			memset(dataBuf, 0, 1024);
+			
+			readFlash(flashWriteAddr, dataBuf, 256);
+		}
+	}
+	
+	MyFree(dataBuf);
 }
