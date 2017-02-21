@@ -14,7 +14,7 @@ typedef struct
 	char sendBuf[SERVERSENDBUFLEN];						//发送数据缓冲区
 	unsigned short sendDataLen;					//发送数据长度
 	char recvBuf[SERVERRECVBUFLEN];						//发送数据缓冲区
-	unsigned short recvDataLen;					//发送数据长度
+	unsigned int recvDataLen;					//发送数据长度
 	
 	struct ip_addr server_ipaddr;				//服务器ip
 	struct netconn *clientconn;				//当前客户端
@@ -25,6 +25,7 @@ typedef struct
 void CommunicateWithServerByLineNet(MyServerData * myServerData);
 void CommunicateWithServerByWifi(MyServerData * myServerData);
 
-MyState_TypeDef UpLoadData(char *URL, void * sendBuf, unsigned short sendLen, void * recvBuf, unsigned short recvLen);
-MyState_TypeDef DownLoadApp(void * sendBuf, unsigned short sendLen);
+MyState_TypeDef UpLoadData(char *URL, void * sendBuf, unsigned short sendLen, void * recvBuf, unsigned short recvLen,
+	char * sendType);
+
 #endif

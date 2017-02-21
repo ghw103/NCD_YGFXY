@@ -293,7 +293,7 @@ static void DspPageText(void)
 	if(S_LunchPageBuffer)
 	{
 		memset(S_LunchPageBuffer->buf, 0, 100);
-		sprintf(S_LunchPageBuffer->buf, "V%d.%d.%02d", GB_SoftVersion_1, GB_SoftVersion_2, GB_SoftVersion_3);
+		sprintf(S_LunchPageBuffer->buf, "V%d.%d.%02d", GB_SoftVersion/1000, GB_SoftVersion%1000/100, GB_SoftVersion%100);
 		DisText(0x1110, S_LunchPageBuffer->buf, 30);
 	}
 }

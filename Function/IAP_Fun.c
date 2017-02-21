@@ -1,40 +1,37 @@
 /***************************************************************************************************
-*FileName:GetLCDInputFun
-*Description:获取lcd输入
+*FileName:IAP_Fun
+*Description:IAP功能
 *Author:xsx
-*Data:2016年4月28日17:42:51
+*Data:2017年2月16日16:27:25
 ***************************************************************************************************/
+
 
 /***************************************************************************************************/
 /******************************************头文件***************************************************/
 /***************************************************************************************************/
-#include	"GetLCDInputFun.h"
-#include	"Usart6_Driver.h"
-#include	"UI_Data.h"
+#include	"IAP_Fun.h"
 
-#include	"QueueUnits.h"
+#include	"Md5FileDao.h"
+#include	"AppFileDao.h"
+
 #include	"MyMem.h"
+#include	"Md5.h"
 #include	"Define.h"
-#include	"CRC16.h"
-
-#include 	"usbd_cdc_vcp.h"
-
-#include 	"FreeRTOS.h"
-#include 	"task.h"
-#include 	"queue.h"
+#include	"MyTools.h"
+#include	"Delay.h"
 
 #include	<string.h>
 #include	"stdio.h"
+#include 	"stdlib.h"
 
 /***************************************************************************************************/
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
-static char buf[100];
-static unsigned short rxcount = 0;
+
 /***************************************************************************************************/
 /**************************************局部函数声明*************************************************/
 /***************************************************************************************************/
-static void AnalysisCode(void * pbuf, unsigned short len);
+
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************正文********************************************************/
@@ -43,43 +40,55 @@ static void AnalysisCode(void * pbuf, unsigned short len);
 /***************************************************************************************************/
 
 /***************************************************************************************************
-*FunctionName：GetLCDInputData
-*Description：获取LCD按键输入数据
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年4月28日17:43:24
+*FunctionName: checkMd5
+*Description: 计算并对比MD5
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月20日14:02:35
 ***************************************************************************************************/
-void GetLCDInputData(void)
+MyState_TypeDef checkMd5(void)
 {
-	rxcount = 0;
+	char originMd5[40];				//原始MD5
+	char currentMd5[40];				//当前MD5
 	
-	while(pdPASS == ReceiveDataFromQueue(GetUsart6RXQueue(), GetUsart6RXMutex(), (buf+rxcount), 1, NULL, 1, 10 / portTICK_RATE_MS, 10 / portTICK_RATE_MS))
-		rxcount++;
+	//读取文件中的md5
+	memset(originMd5, 0, 40);
+	if(My_Fail == ReadMd5File(originMd5))
+		return My_Fail;
 	
-	if(rxcount > 0)
-		AnalysisCode(buf, rxcount);
+	//计算更新固件的md5值
+	memset(currentMd5, 0, 40);
+	md5sum(currentMd5);
+	
+	//对比MD5
+	if(true == CheckStrIsSame(originMd5, currentMd5, 32))
+		return My_Pass;
+	else
+		return My_Fail;
 }
 
 /***************************************************************************************************
-*FunctionName：AnalysisCode
-*Description：处理接收的数据
-*Input：None
-*Output：None
-*Author：xsx
-*Data：2016年4月29日10:08:39
+*FunctionName: checkNewFirmwareIsSuccessDownload
+*Description: 检查是否成功下载新固件
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月21日09:02:28
 ***************************************************************************************************/
-static void AnalysisCode(void * pbuf, unsigned short len)
+MyState_TypeDef checkNewFirmwareIsSuccessDownload(void)
 {
-	unsigned char * p = (unsigned char *)pbuf;
-	unsigned short * crc = (unsigned short *)(p+len-2);
-	unsigned short *tempcrc = (unsigned short *)(p+len);
-
-	*tempcrc = CalModbusCRC16Fun1(p+3, len-2-3);
-	
-	if((p[0] == LCD_Head_1)&&(p[1] == LCD_Head_2)&&(len == (p[2]+3))&&(*crc == *tempcrc))
+	//检查是否有新程序
+	if(My_Pass == checkNewAppFileIsExist())
 	{
-		activityInputFunction(pbuf, len);
+		//如果有新固件，对比MD5
+		if(My_Pass == checkMd5())
+			return My_Pass;	
 	}
-
+	
+	return My_Fail;
 }
+
+

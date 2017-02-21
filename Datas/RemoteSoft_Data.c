@@ -1,25 +1,22 @@
 /***************************************************************************************************
-*FileName: ReadBarCode_Fun.c
-*Description:
+*FileName:RemoteSoft_Data
+*Description：最新固件信息
 *Author: xsx_kair
-*Data:
+*Data:2017年2月21日09:18:33
 ***************************************************************************************************/
 
 /***************************************************************************************************/
 /******************************************Header List********************************************/
 /***************************************************************************************************/
-#include	"ReadBarCode_Fun.h"
+#include	"RemoteSoft_Data.h"
 
-#include	"Usart1_Driver.h"
-
-#include	"QueueUnits.h"
+#include	"MyTools.h"
 
 #include	<string.h>
-#include	"stdio.h"
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
-
+static RemoteSoftInfo GB_RemoteSoftInfo;
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -32,41 +29,62 @@
 /***************************************************************************************************/
 
 /***************************************************************************************************
-*FunctionName: ReadBarCodeFunction
-*Description: 读取条码枪的数据
-*Input: codebuf -- 数据保存地址
-*		len -- 要读取的数据长度
+*FunctionName: setGbRemoteFirmwareVersion, getGbRemoteFirmwareVersion
+*Description: 更新和读取远程固件版本
+*Input: 
 *Output: 
-*Return: 成功读取数据的长度
+*Return: 
 *Author: xsx
-*Date: 2016年12月16日16:00:36
+*Date: 2017年2月20日16:42:29
 ***************************************************************************************************/
-unsigned char ReadBarCodeFunction(char * codebuf, unsigned char len)
+void setGbRemoteFirmwareVersion(unsigned short version)
 {
-	unsigned char rxlen = 0;
-	
-	if(codebuf)
-	{
-		memset(codebuf, 0, len);
-		
-		ReceiveDataFromQueue(GetUsart1RXQueue(), GetUsart1RXMutex(), codebuf, len, NULL, 1, 20 / portTICK_RATE_MS, 10 / portTICK_RATE_MS);	
-		
-		rxlen = strlen(codebuf);
-		
-		if(rxlen > 1)
-		{
-			if(codebuf[rxlen-1] == 0x0d)
-			{
-				codebuf[rxlen-1] = 0;
-				rxlen -= 1;
-				
-				return rxlen;
-			}
-		}
-	}
-	
-	return 0;
+	GB_RemoteSoftInfo.RemoteFirmwareVersion = version;
 }
 
+unsigned short getGbRemoteFirmwareVersion(void)
+{
+	return GB_RemoteSoftInfo.RemoteFirmwareVersion;
+}
+
+/***************************************************************************************************
+*FunctionName: setIsSuccessDownloadFirmware， getIsSuccessDownloadFirmware
+*Description: 更新和读取固件下载状态
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月21日09:09:50
+***************************************************************************************************/
+void setIsSuccessDownloadFirmware(bool status)
+{
+	GB_RemoteSoftInfo.isSuccessDownloadFirmware = status;
+}
+
+bool getIsSuccessDownloadFirmware(void)
+{
+	return GB_RemoteSoftInfo.isSuccessDownloadFirmware;
+}
+
+/***************************************************************************************************
+*FunctionName: setGbRemoteFirmwareMd5,checkMd5IsSame
+*Description: 
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月21日09:26:20
+***************************************************************************************************/
+void setGbRemoteFirmwareMd5(char * md5)
+{
+	memcpy(GB_RemoteSoftInfo.md5, md5, 32);
+}
+bool checkMd5IsSame(char * sMd5, char * dMd5)
+{
+	if(true == CheckStrIsSame(sMd5, dMd5, 32))
+		return true;
+	else
+		return false;
+}
 
 /****************************************end of file************************************************/

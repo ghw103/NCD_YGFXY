@@ -60,7 +60,7 @@ static MyState_TypeDef ComWithWIFI(char * cmd, const char *strcmp, char *buf, un
 			{
 				memset(buf, 0, buflen);
 					
-				ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4Mutex(), buf, buflen, 1, xBlockTime, 1000 / portTICK_RATE_MS);
+				ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4Mutex(), buf, buflen, NULL, 1, xBlockTime, 1000 / portTICK_RATE_MS);
 
 				if(strcmp)
 				{

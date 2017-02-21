@@ -13,6 +13,9 @@
 #include	"RTC_Driver.h"
 #include	"SystemSet_Dao.h"
 #include	"NetInfo_Data.h"
+#include	"System_Data.h"
+#include	"Md5FileDao.h"
+#include	"RemoteSoft_Data.h"
 
 #include	"MyMem.h"
 #include	"CRC16.h"
@@ -22,8 +25,9 @@
 #include 	"queue.h"
 #include	"semphr.h"
 
+#include	<string.h>
 #include	"stdio.h"
-#include	"string.h"
+#include 	"stdlib.h"
 /***************************************************************************************************/
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
@@ -34,7 +38,8 @@
 static MyState_TypeDef ReadTime(void);
 static void UpLoadDeviceInfo(void);
 static void UpLoadTestData(void);
-static MyState_TypeDef DownLoadSoftWare(void);
+static void readRemoteFirmwareVersion(void);
+static void DownLoadFirmware(void);
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************正文********************************************************/
@@ -56,11 +61,15 @@ void UpLoadFunction(void)
 			vTaskDelay(1000 / portTICK_RATE_MS);
 			
 			UpLoadDeviceInfo();
-
+			vTaskDelay(1000 / portTICK_RATE_MS);
+			
+			readRemoteFirmwareVersion();
+			vTaskDelay(1000 / portTICK_RATE_MS);
+			
+			DownLoadFirmware();
 			vTaskDelay(1000 / portTICK_RATE_MS);
 				
-			UpLoadTestData();
-				
+			UpLoadTestData();	
 			vTaskDelay(10000 / portTICK_RATE_MS);
 		}
 		else
@@ -86,7 +95,7 @@ static MyState_TypeDef ReadTime(void)
 			sprintf(upLoadDeviceDataBuffer->sendBuf, "did=%s", upLoadDeviceDataBuffer->systemSetData.deviceInfo.deviceid);
 		
 			if(My_Pass == UpLoadData("/NCD_Server/up_dtime", upLoadDeviceDataBuffer->sendBuf, strlen(upLoadDeviceDataBuffer->sendBuf),
-				upLoadDeviceDataBuffer->recvBuf, SERVERRECVBUFLEN))
+				upLoadDeviceDataBuffer->recvBuf, SERVERRECVBUFLEN, "POST"))
 			{
 				RTC_SetTimeData2(upLoadDeviceDataBuffer->recvBuf+7);
 				SetGB_LineNetStatus(1);
@@ -124,7 +133,7 @@ static void UpLoadDeviceInfo(void)
 					upLoadDeviceDataBuffer->systemSetData.deviceInfo.deviceuser.user_job, upLoadDeviceDataBuffer->systemSetData.deviceInfo.deviceuser.user_desc);
 					
 				if(My_Pass == UpLoadData("/NCD_Server/up_device", upLoadDeviceDataBuffer->sendBuf, strlen(upLoadDeviceDataBuffer->sendBuf), upLoadDeviceDataBuffer->recvBuf,
-					SERVERRECVBUFLEN))
+					SERVERRECVBUFLEN, "POST"))
 				{
 					copyGBSystemSetData(&(upLoadDeviceDataBuffer->systemSetData));
 					
@@ -140,6 +149,15 @@ static void UpLoadDeviceInfo(void)
 	MyFree(upLoadDeviceDataBuffer);
 }
 
+/***************************************************************************************************
+*FunctionName: UpLoadTestData
+*Description: 上传测试数据（数据和曲线）
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月20日16:43:44
+***************************************************************************************************/
 static void UpLoadTestData(void)
 {
 	UpLoadTestDataBuffer * upLoadTestDataBuffer = NULL;
@@ -182,7 +200,7 @@ static void UpLoadTestData(void)
 					"ok");
 
 				if(My_Pass != UpLoadData("/NCD_Server/up_testdata", upLoadTestDataBuffer->sendBuf, strlen(upLoadTestDataBuffer->sendBuf), 
-					upLoadTestDataBuffer->recvBuf, UPLOADRECVBUFLEN))
+					upLoadTestDataBuffer->recvBuf, UPLOADRECVBUFLEN, "POST"))
 					break;
 				
 				//上传测试曲线
@@ -215,7 +233,7 @@ static void UpLoadTestData(void)
 					
 
 					if(My_Pass != UpLoadData("/NCD_Server/up_series", upLoadTestDataBuffer->sendBuf, strlen(upLoadTestDataBuffer->sendBuf),
-						upLoadTestDataBuffer->recvBuf, UPLOADRECVBUFLEN))
+						upLoadTestDataBuffer->recvBuf, UPLOADRECVBUFLEN, "POST"))
 						break;
 				}
 			}
@@ -235,7 +253,16 @@ static void UpLoadTestData(void)
 
 }
 
-static MyState_TypeDef DownLoadSoftWare(void)
+/***************************************************************************************************
+*FunctionName: 
+*Description: 
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 
+***************************************************************************************************/
+static void readRemoteFirmwareVersion(void)
 {
 	UpLoadDeviceDataBuffer * upLoadDeviceDataBuffer = NULL;
 	MyState_TypeDef status = My_Fail;
@@ -246,11 +273,54 @@ static MyState_TypeDef DownLoadSoftWare(void)
 	{
 		memset(upLoadDeviceDataBuffer, 0, sizeof(UpLoadDeviceDataBuffer));
 		
-		sprintf(upLoadDeviceDataBuffer->tempBuf, "GET /NCD_Server/fileDown HTTP/1.1\r\nHost: 116.62.108.201:8080\r\n\r\n");
+		sprintf(upLoadDeviceDataBuffer->sendBuf, "a");
 		
-		status = DownLoadApp(upLoadDeviceDataBuffer->tempBuf, strlen(upLoadDeviceDataBuffer->tempBuf));
+		if(My_Pass == UpLoadData("/NCD_Server/deviceSoftInfo", upLoadDeviceDataBuffer->sendBuf, strlen(upLoadDeviceDataBuffer->sendBuf),
+			upLoadDeviceDataBuffer->recvBuf, SERVERRECVBUFLEN, "POST"))
+		{
+			//解析最新固件版本
+			upLoadDeviceDataBuffer->tempValue = strtol(upLoadDeviceDataBuffer->recvBuf+16, NULL, 10);
+			
+			//如果读取到的版本，大于当前版本，且大于当前保存的最新远程版本，则此次读取的是最新的
+			if((upLoadDeviceDataBuffer->tempValue > GB_SoftVersion) &&(upLoadDeviceDataBuffer->tempValue > getGbRemoteFirmwareVersion()))
+			{
+				//解析最新固件MD5
+				upLoadDeviceDataBuffer->tempP = strtok(upLoadDeviceDataBuffer->recvBuf, "#");
+				if(upLoadDeviceDataBuffer->tempP)
+				{
+					upLoadDeviceDataBuffer->tempP = strtok(NULL, "#");
+					memcpy(upLoadDeviceDataBuffer->tempBuf, upLoadDeviceDataBuffer->tempP+4, 32);
+					setGbRemoteFirmwareMd5(upLoadDeviceDataBuffer->tempBuf);
+					
+					WriteMd5File(upLoadDeviceDataBuffer->tempBuf);
+					
+					//md5保存成功后，才更新最新版本号，保存最新固件版本
+					setGbRemoteFirmwareVersion(upLoadDeviceDataBuffer->tempValue);
+					
+					setIsSuccessDownloadFirmware(false);
+				}
+			}	
+		}
 	}
 	MyFree(upLoadDeviceDataBuffer);
+}
+
+static void DownLoadFirmware(void)
+{
+	UpLoadDeviceDataBuffer * upLoadDeviceDataBuffer = NULL;
+	MyState_TypeDef status = My_Fail;
 	
-	return status;
+	//检查是否有更新，且未成功下载，则需要下载
+	if((getGbRemoteFirmwareVersion() > GB_SoftVersion) && (false == getIsSuccessDownloadFirmware()))
+	{
+		upLoadDeviceDataBuffer = MyMalloc(sizeof(UpLoadDeviceDataBuffer));
+	
+		if(upLoadDeviceDataBuffer)
+		{
+			memset(upLoadDeviceDataBuffer, 0, sizeof(UpLoadDeviceDataBuffer));
+			
+			UpLoadData("/NCD_Server/deviceCodeDownload", NULL, 0, NULL, 0, "GET");
+		}
+		MyFree(upLoadDeviceDataBuffer);
+	}
 }

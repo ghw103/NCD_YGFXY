@@ -4,6 +4,7 @@
 
 #include	"Define.h"
 
+
 void * GetTestDataForLab(void);
 void SetTestStatusFlorLab(unsigned char status);
 unsigned char GetTestStatusFlorLab(void);
@@ -15,6 +16,7 @@ void SetGB_Time(void * time);
 //»·¾³ÎÂ¶È
 float GetGB_EnTemperature(void);
 void SetGB_EnTemperature(float temp);
+
 	
 #endif
 

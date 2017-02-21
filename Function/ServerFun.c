@@ -15,6 +15,8 @@
 #include 	"usbd_cdc_vcp.h"
 #include	"SystemSet_Data.h"
 #include	"AppFileDao.h"
+#include	"IAP_Fun.h"
+#include	"RemoteSoft_Data.h"
 
 #include	"MyMem.h"
 
@@ -44,6 +46,8 @@
 void CommunicateWithServerByLineNet(MyServerData * myServerData)
 {
 	err_t err;
+	struct pbuf *p = NULL;
+	unsigned char i=0;
 	
 	IP4_ADDR(&myServerData->server_ipaddr,GB_ServerIp_1, GB_ServerIp_2, GB_ServerIp_3, GB_ServerIp_4);
 
@@ -77,8 +81,30 @@ void CommunicateWithServerByLineNet(MyServerData * myServerData)
 	//接收数据
 	while(ERR_OK == netconn_recv(myServerData->clientconn, &myServerData->recvbuf))
 	{
-		myServerData->recvDataLen += netbuf_copy(myServerData->recvbuf, myServerData->recvBuf + myServerData->recvDataLen ,
-			SERVERRECVBUFLEN - myServerData->recvDataLen);
+		//如果发生的是GET请求，则说明是下载固件，需要保存
+		if(strstr(myServerData->sendBuf, "GET"))
+		{
+			p = myServerData->recvbuf->p;
+			if(i == 0)
+			{
+				i++;
+				WriteAppFile((unsigned char *)(p->payload)+229, p->len-229, true);
+			}
+			else
+				WriteAppFile(p->payload, p->len, false);
+			
+			while(p->next)
+			{
+				p = p->next;
+				WriteAppFile(p->payload, p->len, false);
+			}
+		}
+		else
+		{
+			myServerData->recvDataLen += netbuf_copy(myServerData->recvbuf, myServerData->recvBuf + myServerData->recvDataLen ,
+				SERVERRECVBUFLEN - myServerData->recvDataLen);
+		}
+		
 		netbuf_delete(myServerData->recvbuf);
 	}
 		
@@ -94,6 +120,8 @@ void CommunicateWithServerByLineNet(MyServerData * myServerData)
 
 void CommunicateWithServerByWifi(MyServerData * myServerData)
 {
+	unsigned short i = 0;
+	unsigned short readSize = 0;
 	
 	if(isWifiUseable() == true)
 	{
@@ -102,8 +130,23 @@ void CommunicateWithServerByWifi(MyServerData * myServerData)
 			1, 1000 / portTICK_RATE_MS, 10 / portTICK_RATE_MS, EnableUsart4TXInterrupt))
 		{
 			//接收数据
-			while(pdPASS == ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4Mutex(), myServerData->recvBuf, 500, 1, 1000 / portTICK_RATE_MS, 10 / portTICK_RATE_MS))
-				;
+			while(pdPASS == ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4Mutex(), myServerData->recvBuf, 1000, 
+				&readSize, 1, 1000 / portTICK_RATE_MS, 10 / portTICK_RATE_MS))
+			{
+				//如果发生的是GET请求，则说明是下载固件，需要保存
+				if(strstr(myServerData->sendBuf, "GET"))
+				{
+					if(i == 0)
+					{
+						WriteAppFile(myServerData->recvBuf + 229, readSize-229, true);
+						i++;
+					}
+					else
+						WriteAppFile(myServerData->recvBuf, readSize, false);
+					
+					myServerData->recvDataLen += readSize;
+				}
+			}
 		}
 	}
 }
@@ -116,7 +159,8 @@ void CommunicateWithServerByWifi(MyServerData * myServerData)
 *Author：xsx
 *Data：
 ***************************************************************************************************/
-MyState_TypeDef UpLoadData(char *URL, void * sendBuf, unsigned short sendLen, void * recvBuf, unsigned short recvLen)
+MyState_TypeDef UpLoadData(char *URL, void * sendBuf, unsigned short sendLen, void * recvBuf, unsigned short recvLen,
+	char * sendType)
 {
 	MyState_TypeDef statues = My_Fail;
 	MyServerData * myServerData = NULL;
@@ -126,30 +170,57 @@ MyState_TypeDef UpLoadData(char *URL, void * sendBuf, unsigned short sendLen, vo
 	if(myServerData)
 	{
 		memset(myServerData, 0, sizeof(MyServerData));
-		sprintf(myServerData->sendBuf, "POST %s HTTP/1.1\nHost: 116.62.108.201:8080\nConnection: keep-alive\nContent-Length: %d\nContent-Type:application/x-www-form-urlencoded;charset=GBK\nAccept-Language: zh-CN,zh;q=0.8\n\n%s", URL, sendLen, (char *)sendBuf);
+		if(strstr(sendType, "POST"))
+			sprintf(myServerData->sendBuf, "POST %s HTTP/1.1\nHost: 116.62.108.201:8080\nConnection: keep-alive\nContent-Length: %d\nContent-Type:application/x-www-form-urlencoded;charset=GBK\nAccept-Language: zh-CN,zh;q=0.8\n\n%s", URL, sendLen, (char *)sendBuf);
+		else
+			sprintf(myServerData->sendBuf, "GET %s HTTP/1.1\nHost: 116.62.108.201:8080\nConnection: keep-alive\n\n", URL);
+		
 		myServerData->sendDataLen = strlen(myServerData->sendBuf);
 			
 		CommunicateWithServerByLineNet(myServerData);
 		{
-			myServerData->myp = strstr(myServerData->recvBuf, "success");
-			if(myServerData->myp)
+			if(strstr(sendType, "POST"))
 			{
-				memset(recvBuf, 0, recvLen);
-				memcpy(recvBuf, myServerData->myp, recvLen);
-				statues = My_Pass;
-				goto END1;
+				myServerData->myp = strstr(myServerData->recvBuf, "success");
+				if(myServerData->myp)
+				{
+					memset(recvBuf, 0, recvLen);
+					memcpy(recvBuf, myServerData->myp, recvLen);
+					statues = My_Pass;
+					goto END1;
+				}
+			}
+			else
+			{
+				if(My_Pass == checkNewFirmwareIsSuccessDownload())
+				{
+					statues = My_Pass;
+					setIsSuccessDownloadFirmware(true);
+					goto END1;
+				}
 			}
 		}
 		
 		memset(myServerData->recvBuf, 0, SERVERRECVBUFLEN);
 		CommunicateWithServerByWifi(myServerData);
 		{
-			myServerData->myp = strstr(myServerData->recvBuf, "success");
-			if(myServerData->myp)
+			if(strstr(sendType, "POST"))
 			{
-				memset(recvBuf, 0, recvLen);
-				memcpy(recvBuf, myServerData->myp, recvLen);
-				statues = My_Pass;
+				myServerData->myp = strstr(myServerData->recvBuf, "success");
+				if(myServerData->myp)
+				{
+					memset(recvBuf, 0, recvLen);
+					memcpy(recvBuf, myServerData->myp, recvLen);
+					statues = My_Pass;
+				}
+			}
+			else
+			{
+				if(My_Pass == checkNewFirmwareIsSuccessDownload())
+				{
+					setIsSuccessDownloadFirmware(true);
+					statues = My_Pass;
+				}
 			}
 		}
 		
@@ -162,86 +233,3 @@ MyState_TypeDef UpLoadData(char *URL, void * sendBuf, unsigned short sendLen, vo
 	return statues;
 }
 
-MyState_TypeDef DownLoadApp(void * sendBuf, unsigned short sendLen)
-{
-	MyServerData * myServerData = NULL;
-	err_t err;
-	MyState_TypeDef statues = My_Fail;
-	unsigned char i=0;
-	struct pbuf *p = NULL;
-	
-	myServerData = MyMalloc(sizeof(MyServerData));
-
-	if(myServerData)
-	{
-		memset(myServerData, 0, sizeof(MyServerData));
-		sprintf(myServerData->sendBuf, "%s",(char *)sendBuf);
-		myServerData->sendDataLen = sendLen;
-			
-		IP4_ADDR(&myServerData->server_ipaddr,GB_ServerIp_1, GB_ServerIp_2, GB_ServerIp_3, GB_ServerIp_4);
-
-		//创建连接
-		myServerData->clientconn = netconn_new(NETCONN_TCP);
-		//创建失败
-		if(myServerData->clientconn == NULL)
-			goto END;
-
-		//绑定本地ip
-		err = netconn_bind(myServerData->clientconn, IP_ADDR_ANY, 0);
-		//连接失败
-		if(err != ERR_OK)
-			goto END2;
-
-		//尝试连接远程服务器
-		err = netconn_connect(myServerData->clientconn, &myServerData->server_ipaddr, GB_ServerPort);
-		//连接失败
-		if(err != ERR_OK)
-			goto END2;
-		
-		//设置接收数据超时时间100MS
-		myServerData->clientconn->recv_timeout = 1000;
-		
-		//发送数据
-		err = netconn_write(myServerData->clientconn, myServerData->sendBuf, myServerData->sendDataLen, NETCONN_COPY );
-		//发送失败
-		if(err != ERR_OK)
-			goto END1;
-		
-		//接收数据
-		while(ERR_OK == netconn_recv(myServerData->clientconn, &myServerData->recvbuf))
-		{
-			p = myServerData->recvbuf->p;
-			if(i == 0)
-			{
-				i++;
-				WriteAppFile(p->payload, p->len, true);
-			}
-			else
-				WriteAppFile(p->payload, p->len, false);
-			
-			while(p->next)
-			{
-				p = p->next;
-				WriteAppFile(p->payload, p->len, false);
-			}
-			//myServerData->recvDataLen += netbuf_copy(myServerData->recvbuf, myServerData->recvBuf + myServerData->recvDataLen ,
-			//	SERVERRECVBUFLEN - myServerData->recvDataLen);
-			//myServerData->recvbuf->
-			netbuf_delete(myServerData->recvbuf);
-			statues = My_Pass;
-		}
-		
-		END1:
-			netconn_close(myServerData->clientconn);
-			netconn_delete(myServerData->clientconn);
-			goto END;
-			
-		END2:
-			netconn_delete(myServerData->clientconn);
-			goto END;
-	}
-	
-	END:
-		MyFree(myServerData);
-		return statues;
-}

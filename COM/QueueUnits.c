@@ -41,6 +41,7 @@ void GivexMutex(xSemaphoreHandle mutex)
 *		mutex -- 此队列的互斥量，可为null
 *		receivedstr -- 存放接收数据的地址
 *		len -- 接收的数据长度(长度为此队列单元数据大小的个数，与数据接收数据的字节长度无关)
+*		readSize -- 实际读取到的数据长度
 *		itemsize -- 队列单元数据的大小
 *		queueBlockTime -- 队列阻塞时间
 *		mutexBlockTime -- 互斥量阻塞时间
@@ -49,7 +50,7 @@ void GivexMutex(xSemaphoreHandle mutex)
 *Data：2016年4月22日15:35:40
 ***************************************************************************************************/
 unsigned char ReceiveDataFromQueue(xQueueHandle queue, xSemaphoreHandle mutex, void *receivedstr , unsigned short len ,
-	unsigned short itemsize, portTickType queueBlockTime, portTickType mutexBlockTime)
+	unsigned short * readSize, unsigned short itemsize, portTickType queueBlockTime, portTickType mutexBlockTime)
 {
 	unsigned short i=0;
 	unsigned char *pdata = (unsigned char *)receivedstr;
@@ -75,6 +76,9 @@ unsigned char ReceiveDataFromQueue(xQueueHandle queue, xSemaphoreHandle mutex, v
 	
 	if(i > 0)
 		statues = pdPASS;
+	
+	if(readSize)
+		*readSize = i;
 	
 	if(mutex != NULL)
 		GivexMutex(mutex);

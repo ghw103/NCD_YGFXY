@@ -6,6 +6,7 @@
 #include	"LCD_Driver.h"
 #include	"UI_Data.h"
 #include	"MyMem.h"
+#include	"RemoteSoft_Data.h"
 
 #include	"SleepPage.h"
 #include	"PlaySong_Task.h"
@@ -231,8 +232,16 @@ static void dspPageText(void)
 	ClearText(0x2920, 30);
 	ClearText(0x2930, 30);
 	
-	memset(S_AboutUsPageBuffer->buf, 0, 30);
-	sprintf(S_AboutUsPageBuffer->buf, "V%d.%d.%02d", GB_SoftVersion_1, GB_SoftVersion_2, GB_SoftVersion_3);
+	memset(S_AboutUsPageBuffer->buf, 0, 100);
+	
+	if((getIsSuccessDownloadFirmware() == true) && (getGbRemoteFirmwareVersion() > GB_SoftVersion))
+	{
+		S_AboutUsPageBuffer->tempV = getGbRemoteFirmwareVersion();
+		sprintf(S_AboutUsPageBuffer->buf, "V%d.%d.%02d (�°汾V%d.%d.%02d)", GB_SoftVersion/1000, GB_SoftVersion%1000/100, GB_SoftVersion%100,
+			S_AboutUsPageBuffer->tempV/1000, S_AboutUsPageBuffer->tempV%1000/100, S_AboutUsPageBuffer->tempV%100);
+	}
+	else
+		sprintf(S_AboutUsPageBuffer->buf, "V%d.%d.%02d", GB_SoftVersion/1000, GB_SoftVersion%1000/100, GB_SoftVersion%100);
 	DisText(0x2910, S_AboutUsPageBuffer->buf, strlen(S_AboutUsPageBuffer->buf));
 	
 	memset(S_AboutUsPageBuffer->buf, 0, 30);

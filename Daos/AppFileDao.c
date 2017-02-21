@@ -80,6 +80,109 @@ MyState_TypeDef WriteAppFile(char * file, unsigned short len, bool isNew)
 	return statues;
 }
 
+/***************************************************************************************************
+*FunctionName: ReadAppFile
+*Description: 读取应用程序数据
+*Input: startAddr -- 偏移地址， dataBuf -- 缓存, size -- 读取长度, *br -- 实际读取长度
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月16日14:55:26
+***************************************************************************************************/
+MyState_TypeDef ReadAppFile(unsigned int startAddr, unsigned char * dataBuf, unsigned short size, unsigned short *br,
+	unsigned int *fileSize)
+{
+	FatfsFileInfo_Def * myfile = NULL;
+	MyState_TypeDef statues = My_Fail;
+	
+	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
+	
+	*br = 0;
+	
+	if(myfile && dataBuf)
+	{
+		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
+
+		myfile->res = f_open(&(myfile->file), "0:/UPDATE.BIN", FA_OPEN_EXISTING | FA_READ);
+
+		if(FR_OK == myfile->res)
+		{
+			if(fileSize != NULL)
+				*fileSize = f_size(&(myfile->file));
+			
+			f_lseek(&(myfile->file), startAddr);
+			
+			myfile->res = f_read(&(myfile->file), dataBuf, size, &(myfile->br));
+			if(myfile->res == FR_OK)
+			{
+				statues = My_Pass;
+				*br = myfile->br;
+			}
+			
+			f_close(&(myfile->file));
+		}
+	}
+	
+	MyFree(myfile);
+	
+	return statues;
+}
+
+/***************************************************************************************************
+*FunctionName: checkNewAppFileIsExist
+*Description: 检查是否存在新程序
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月16日15:12:19
+***************************************************************************************************/
+MyState_TypeDef checkNewAppFileIsExist(void)
+{
+	FatfsFileInfo_Def * myfile = NULL;
+	MyState_TypeDef statues = My_Fail;
+	
+	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
+	
+	if(myfile)
+	{
+		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
+		
+		myfile->res = f_open(&(myfile->file), "0:/UPDATE.BIN", FA_OPEN_EXISTING | FA_READ);
+
+		if(FR_OK == myfile->res)
+		{	
+			statues = My_Pass;
+			
+			f_close(&(myfile->file));
+		}
+	}
+	
+	MyFree(myfile);
+	
+	return statues;
+}
+
+/***************************************************************************************************
+*FunctionName: deleteAppFileIfExist
+*Description: 如果存在，则删除新程序文件
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月16日15:13:20
+***************************************************************************************************/
+MyState_TypeDef deleteAppFileIfExist(void)
+{
+	FRESULT res;
+	
+	res = f_unlink("0:/UPDATE.BIN");
+	
+	if(FR_OK == res)
+		return My_Pass;
+	else
+		return My_Fail;
+}
 
 
 /****************************************end of file************************************************/

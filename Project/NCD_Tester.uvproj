@@ -308,8 +308,8 @@
               </OCR_RVCT3>
               <OCR_RVCT4>
                 <Type>1</Type>
-                <StartAddress>0x8010000</StartAddress>
-                <Size>0xf0000</Size>
+                <StartAddress>0x8000000</StartAddress>
+                <Size>0x100000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -647,6 +647,11 @@
               <FileType>1</FileType>
               <FilePath>..\Function\SystemResetFun.c</FilePath>
             </File>
+            <File>
+              <FileName>IAP_Fun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Function\IAP_Fun.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -907,6 +912,11 @@
               <FileType>1</FileType>
               <FilePath>..\Datas\SystemSet_Data.c</FilePath>
             </File>
+            <File>
+              <FileName>RemoteSoft_Data.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Datas\RemoteSoft_Data.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -936,6 +946,11 @@
               <FileName>WifiDao.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Daos\WifiDao.c</FilePath>
+            </File>
+            <File>
+              <FileName>Md5FileDao.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Daos\Md5FileDao.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1061,6 +1076,11 @@
               <FileName>Intent.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\COM\Intent.c</FilePath>
+            </File>
+            <File>
+              <FileName>Md5.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\COM\Md5.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -9,6 +9,7 @@ typedef struct AboutUsPageBuffer_tag {
 	Timer timer;
 	unsigned short lcdinput[20];
 	char buf[100];
+	unsigned short tempV;
 }AboutUsPageBuffer;
 
 MyState_TypeDef createAboutUsActivity(Activity * thizActivity, Intent * pram);

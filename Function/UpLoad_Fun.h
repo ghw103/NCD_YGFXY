@@ -16,6 +16,8 @@ typedef struct UpLoadDeviceDataBuffer_Tag
 	char sendBuf[UPLOADSENDBUFLEN];
 	char recvBuf[UPLOADRECVBUFLEN];
 	char tempBuf[UPLOADTEMPBUFLEN];
+	unsigned short tempValue;
+	unsigned char * tempP;
 	unsigned short i;
 	unsigned short j;
 }UpLoadDeviceDataBuffer;

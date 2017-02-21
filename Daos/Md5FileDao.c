@@ -1,24 +1,27 @@
 /***************************************************************************************************
-*FileName: ReadBarCode_Fun.c
-*Description:
+*FileName: Md5FileDao
+*Description: 保存新程序文件的MD5值
 *Author: xsx_kair
-*Data:
+*Data: 2017年2月16日15:23:25
 ***************************************************************************************************/
 
 /***************************************************************************************************/
 /******************************************Header List********************************************/
 /***************************************************************************************************/
-#include	"ReadBarCode_Fun.h"
+#include	"Md5FileDao.h"
 
-#include	"Usart1_Driver.h"
+#include	"CRC16.h"
+#include	"MyMem.h"
 
-#include	"QueueUnits.h"
+#include	"ff.h"
 
 #include	<string.h>
 #include	"stdio.h"
+#include 	"stdlib.h"
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
+
 
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -30,43 +33,82 @@
 /****************************************File Start*************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
-
 /***************************************************************************************************
-*FunctionName: ReadBarCodeFunction
-*Description: 读取条码枪的数据
-*Input: codebuf -- 数据保存地址
-*		len -- 要读取的数据长度
+*FunctionName: WriteMd5File
+*Description: 更新文件的md5
+*Input: md5Str -- md5字符串
 *Output: 
-*Return: 成功读取数据的长度
+*Return: 
 *Author: xsx
-*Date: 2016年12月16日16:00:36
+*Date: 2017年2月16日15:25:32
 ***************************************************************************************************/
-unsigned char ReadBarCodeFunction(char * codebuf, unsigned char len)
+MyState_TypeDef WriteMd5File(char * md5Str)
 {
-	unsigned char rxlen = 0;
+	FatfsFileInfo_Def * myfile = NULL;
+	MyState_TypeDef statues = My_Fail;
 	
-	if(codebuf)
+	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
+	
+	if(myfile && md5Str)
 	{
-		memset(codebuf, 0, len);
-		
-		ReceiveDataFromQueue(GetUsart1RXQueue(), GetUsart1RXMutex(), codebuf, len, NULL, 1, 20 / portTICK_RATE_MS, 10 / portTICK_RATE_MS);	
-		
-		rxlen = strlen(codebuf);
-		
-		if(rxlen > 1)
-		{
-			if(codebuf[rxlen-1] == 0x0d)
-			{
-				codebuf[rxlen-1] = 0;
-				rxlen -= 1;
-				
-				return rxlen;
-			}
+		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
+
+		myfile->res = f_open(&(myfile->file), "0:/MD5.NCD", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
+
+		if(FR_OK == myfile->res)
+		{	
+			f_lseek(&(myfile->file), 0);
+			
+			myfile->res = f_write(&(myfile->file), md5Str, 32, &(myfile->bw));
+			if(myfile->res == FR_OK)
+				statues = My_Pass;
+			
+			f_close(&(myfile->file));
 		}
 	}
 	
-	return 0;
+	MyFree(myfile);
+	
+	return statues;
 }
 
+/***************************************************************************************************
+*FunctionName: ReadMd5File
+*Description: 读取文件的md5值
+*Input: md5Str -- 读取缓存
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月16日15:25:44
+***************************************************************************************************/
+MyState_TypeDef ReadMd5File(char * md5Str)
+{
+	FatfsFileInfo_Def * myfile = NULL;
+	MyState_TypeDef statues = My_Fail;
+	
+	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
+	
+	if(myfile && md5Str)
+	{
+		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
+
+		myfile->res = f_open(&(myfile->file), "0:/MD5.NCD", FA_OPEN_EXISTING | FA_READ);
+
+		if(FR_OK == myfile->res)
+		{
+			f_lseek(&(myfile->file), 0);
+			
+			myfile->res = f_read(&(myfile->file), md5Str, 32, &(myfile->br));
+			if((myfile->res == FR_OK) && (32 == myfile->br))
+				statues = My_Pass;
+			
+			f_close(&(myfile->file));
+		}
+	}
+	
+	MyFree(myfile);
+	
+	return statues;
+}
 
 /****************************************end of file************************************************/
