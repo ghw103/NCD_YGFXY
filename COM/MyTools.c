@@ -67,25 +67,3 @@ bool CheckStrIsSame(void *str1 , void * str2 , unsigned short len)
 	return true;
 }
 
-/***************************************************************************************************
-*FunctionName: 
-*Description: 
-*Input: 
-*Output: 
-*Return: 
-*Author: xsx
-*Date: 
-***************************************************************************************************/
-unsigned char CheckItemPicIndex(void * item)
-{
-	if(strstr(item, "BNP\0"))
-		return 0;
-	else if(strstr(item, "CK-MB\0"))
-		return 1;
-	else if(strstr(item, "cTnI\0"))
-		return 2;
-	else if(strstr(item, "MYO\0"))
-		return 3;
-	else
-		return 0;
-}

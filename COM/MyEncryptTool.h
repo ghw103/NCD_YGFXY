@@ -13,11 +13,14 @@ typedef struct PointBuffer_Tag
 	unsigned char *k;
 	unsigned char *t;
 	unsigned char *s;
-	unsigned char i;
-	unsigned char j;
+	unsigned short i;
+	unsigned short j;
+	unsigned short tempIndex;
+	unsigned short tempV1;
+	unsigned short tempV2;
 }PointBuffer;
 
-unsigned char MyDencrypt(void *source, void *target, unsigned short len);
+unsigned char MyDencrypt(char *source, char *target, unsigned short len);
 
 #endif
 

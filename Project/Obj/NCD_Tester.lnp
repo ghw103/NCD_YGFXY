@@ -96,6 +96,7 @@
 ".\obj\netinfo_data.o"
 ".\obj\systemset_data.o"
 ".\obj\remotesoft_data.o"
+".\obj\itemconst_data.o"
 ".\obj\testdatadao.o"
 ".\obj\systemset_dao.o"
 ".\obj\appfiledao.o"

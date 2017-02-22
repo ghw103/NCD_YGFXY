@@ -317,7 +317,7 @@ static void dspTestResult(void)
 	sprintf(S_AdjustPageBuffer->buf, "%.3f", S_AdjustPageBuffer->itemData.testdata.testline.BasicBili);
 	DisText(0x2730, S_AdjustPageBuffer->buf, strlen(S_AdjustPageBuffer->buf));
 	
-	sprintf(S_AdjustPageBuffer->buf, "%.*f", S_AdjustPageBuffer->itemData.testdata.temperweima.ItemPoint, S_AdjustPageBuffer->itemData.testdata.testline.BasicResult);
+	sprintf(S_AdjustPageBuffer->buf, "%.*f", S_AdjustPageBuffer->itemData.testdata.temperweima.itemConstData.pointNum, S_AdjustPageBuffer->itemData.testdata.testline.BasicResult);
 	DisText(0x2738, S_AdjustPageBuffer->buf, strlen(S_AdjustPageBuffer->buf));
 }
 
@@ -326,7 +326,7 @@ static void dspAdjResult(void)
 	sprintf(S_AdjustPageBuffer->buf, "%.3f", S_AdjustPageBuffer->adjustData.parm);
 	DisText(0x2748, S_AdjustPageBuffer->buf, strlen(S_AdjustPageBuffer->buf));
 	
-	sprintf(S_AdjustPageBuffer->buf, "%.*f", S_AdjustPageBuffer->itemData.testdata.temperweima.ItemPoint, S_AdjustPageBuffer->adjResult);
+	sprintf(S_AdjustPageBuffer->buf, "%.*f", S_AdjustPageBuffer->itemData.testdata.temperweima.itemConstData.pointNum, S_AdjustPageBuffer->adjResult);
 	DisText(0x2750, S_AdjustPageBuffer->buf, strlen(S_AdjustPageBuffer->buf));
 }
 

@@ -7,8 +7,8 @@
 #include	"SampleIDPage.h"
 #include	"MyTest_Data.h"
 #include	"CRC16.h"
-#include	"SDFunction.h"
 #include	"PlaySong_Task.h"
+#include	"UserDao.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"

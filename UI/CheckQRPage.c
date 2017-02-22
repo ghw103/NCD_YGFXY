@@ -10,6 +10,7 @@
 #include	"CardStatues_Data.h"
 #include	"Timer_Data.h"
 #include	"CodeScan_Task.h"
+#include	"ItemConst_Data.h"
 #include	"MyMem.h"
 
 #include 	"FreeRTOS.h"
@@ -138,6 +139,9 @@ static void activityFresh(void)
 			{
 				dspScanStatus("Scan Fail\0");
 			}
+			//读取当前品种固定内容
+			else if(S_CheckQRPageBuffer->scancode == CardUnsupported)
+				dspScanStatus("Unsupported Item\0");
 			//过期
 			else if(S_CheckQRPageBuffer->scancode == CardCodeTimeOut)
 			{
@@ -235,19 +239,19 @@ static void DspPageText(void)
 	sprintf(S_CheckQRPageBuffer->buf, "%-20s", S_CheckQRPageBuffer->qrCode.ItemName);
 	DisText(0x2510, S_CheckQRPageBuffer->buf, strlen(S_CheckQRPageBuffer->buf));
 	
-	sprintf(S_CheckQRPageBuffer->buf, "%-20s", S_CheckQRPageBuffer->qrCode.NormalResult);
+	sprintf(S_CheckQRPageBuffer->buf, "%-20s", S_CheckQRPageBuffer->qrCode.itemConstData.normalResult);
 	DisText(0x2518, S_CheckQRPageBuffer->buf, strlen(S_CheckQRPageBuffer->buf));
 	
-	sprintf(S_CheckQRPageBuffer->buf, "%-20f", S_CheckQRPageBuffer->qrCode.LowstResult);
+	sprintf(S_CheckQRPageBuffer->buf, "%-20f", S_CheckQRPageBuffer->qrCode.itemConstData.lowstResult);
 	DisText(0x2520, S_CheckQRPageBuffer->buf, strlen(S_CheckQRPageBuffer->buf));
 	
-	sprintf(S_CheckQRPageBuffer->buf, "%-20f", S_CheckQRPageBuffer->qrCode.HighestResult);
+	sprintf(S_CheckQRPageBuffer->buf, "%-20f", S_CheckQRPageBuffer->qrCode.itemConstData.highestResult);
 	DisText(0x2528, S_CheckQRPageBuffer->buf, strlen(S_CheckQRPageBuffer->buf));
 	
-	sprintf(S_CheckQRPageBuffer->buf, "%-20s", S_CheckQRPageBuffer->qrCode.ItemMeasure);
+	sprintf(S_CheckQRPageBuffer->buf, "%-20s", S_CheckQRPageBuffer->qrCode.itemConstData.itemMeasure);
 	DisText(0x2530, S_CheckQRPageBuffer->buf, strlen(S_CheckQRPageBuffer->buf));
 	
-	sprintf(S_CheckQRPageBuffer->buf, "%-20d", S_CheckQRPageBuffer->qrCode.ItemPoint);
+	sprintf(S_CheckQRPageBuffer->buf, "%-20d", S_CheckQRPageBuffer->qrCode.itemConstData.pointNum);
 	DisText(0x2538, S_CheckQRPageBuffer->buf, strlen(S_CheckQRPageBuffer->buf));
 	
 	sprintf(S_CheckQRPageBuffer->buf, "%-20d", S_CheckQRPageBuffer->qrCode.ItemLocation);
@@ -322,6 +326,6 @@ static void calculateResult(void)
 	}
 			
 	memset(S_CheckQRPageBuffer->buf, 0, 20);
-	sprintf(S_CheckQRPageBuffer->buf, "%.*f", S_CheckQRPageBuffer->qrCode.ItemPoint, S_CheckQRPageBuffer->basicResult);
+	sprintf(S_CheckQRPageBuffer->buf, "%.*f", S_CheckQRPageBuffer->qrCode.itemConstData.pointNum, S_CheckQRPageBuffer->basicResult);
 	DisText(0x25c0, S_CheckQRPageBuffer->buf, strlen(S_CheckQRPageBuffer->buf));
 }

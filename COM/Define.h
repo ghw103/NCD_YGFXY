@@ -138,12 +138,24 @@ typedef struct
 /******************************************二维码相关定义**************************************************/
 /**********************************************************************************************************/
 
-			//????s
+
+#define	ITEM_NUM	4
 #define	ItemNameLen						20			//????????
 #define	ItemMeasureLen					10			//????????
 
+#pragma pack(1)
+typedef struct ItemConstData_Tag
+{
+	char itemName[ItemNameLen];									//项目名称
+	unsigned short icoIndex;								//排队界面显示图标的索引
+	unsigned char pointNum;								//小数点个数
+	float lowstResult;									//最低检测线
+	float highestResult;								//最高检测线
+	char normalResult[50];								//参考值
+	char itemMeasure[10];								//单位
+}ItemConstData;
+#pragma pack()
 
-/*???????*/
 typedef enum
 {
 	CardCodeScanning = 0,											//正在扫描
@@ -152,18 +164,14 @@ typedef enum
 	CardCodeTimeOut = 3,											//过期
 	CardCodeCardOut = 4,											//卡被拔出
 	CardCodeScanTimeOut = 5,										//扫描超时
-	CardCodeCRCError = 6											//crc错误
+	CardCodeCRCError = 6,											//crc错误
+	CardUnsupported = 7												//当前程序不支持
 }ScanCodeResult;
 
 #pragma pack(1)
 typedef struct QRCode_Tag
 {
 	char	ItemName[ItemNameLen];						//测试项目
-	char	NormalResult[40];								//正常值
-	float	LowstResult;								//最低检测线
-	float	HighestResult;								//最高检测线
-	char	ItemMeasure[ItemMeasureLen];				//测试单位
-	unsigned char ItemPoint;							//小数点数目
 	unsigned short ItemLocation;						//T线位置
 	unsigned char ChannelNum;							//通道号(0-7)
 	float	ItemFenDuan[2];								//分段峰高比
@@ -175,9 +183,11 @@ typedef struct QRCode_Tag
 	char	PiHao[15];									//批次号
 	char	piNum[10];
 	MyTime_Def	CardBaoZhiQi;						//保质期
+	ItemConstData itemConstData;						//此项目的固定数据
 	unsigned short CRC16;								//crc
 }QRCode;
 #pragma pack()
+
 
 
 #define	MaxLocation			6500						//最大行程
@@ -461,7 +471,6 @@ typedef struct ItemData_tag {
 	MyPaiDuiStatues statues;														//测试阶段
 	unsigned char jieduan;															//测试阶段
 	unsigned char testlocation;
-	unsigned char varIcoIndex;														//排队界面显示卡的图标界面的索引
 	unsigned short ledLight;														//测试时led的亮度，为系统设置中保存的校准led值
 }ItemData;
 

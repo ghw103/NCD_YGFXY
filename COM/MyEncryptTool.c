@@ -34,22 +34,17 @@
 *Author£ºxsx
 *Data£º2016Äê4ÔÂ25ÈÕ15:32:39
 ***************************************************************************************************/
-unsigned char MyDencrypt(void *source, void *target, unsigned short len)
+unsigned char MyDencrypt(char *source, char *target, unsigned short len)
 {
 	PointBuffer * TempPointBuffer = NULL;
 	MyState_TypeDef statues = My_Fail;
-	unsigned char *s, *t, *k;
-	unsigned char *temp = NULL;
-	unsigned char i=0, j=0;
+
+	unsigned short i=0, j=0;
 	
 	TempPointBuffer = MyMalloc(sizeof(PointBuffer));
 	if(TempPointBuffer)
 	{
 		memset(TempPointBuffer, 0, sizeof(PointBuffer));
-
-		s = (unsigned char *)source;
-		t = (unsigned char *)target;
-		k = &(TempPointBuffer->key[0]);
 		
 		TempPointBuffer->myfile.res = f_open(&(TempPointBuffer->myfile.file), "0:/MyWord.ncd", FA_READ);
 		if(FR_OK == TempPointBuffer->myfile.res)
@@ -101,21 +96,18 @@ unsigned char MyDencrypt(void *source, void *target, unsigned short len)
 		
 		for(i=0; i<len ;i++)
 		{
-			if(*k == 0)
-				k = &(TempPointBuffer->key[0]);
-				
-			temp = &(TempPointBuffer->word[*k - 33][0]);
+			TempPointBuffer->tempIndex = (i + len) % 54;
+			TempPointBuffer->tempV1 = TempPointBuffer->key[TempPointBuffer->tempIndex] - 33;
+			TempPointBuffer->tempV2 = source[i];
+			
 			for(j=0; j<94; j++)
 			{
-				if(*temp == *s)
+				if(TempPointBuffer->word[TempPointBuffer->tempV1][j] == TempPointBuffer->tempV2)
 				{
-					*t++ = j+33;
+					*target++ = j+33;
 					break;	
-				}	
-				temp++;
+				}
 			}
-			k++;
-			s++;
 		}
 		
 		statues = My_Pass;

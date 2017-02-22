@@ -283,18 +283,16 @@ static void activityFresh(void)
 					
 					DisText(0x1610+index*0x08, S_PaiDuiPageBuffer->buf, 10);
 					
-					S_PaiDuiPageBuffer->tempvalue1 = CheckItemPicIndex(S_PaiDuiPageBuffer->tempd2->testdata.temperweima.ItemName);
-					
 					if((S_PaiDuiPageBuffer->tempd2->statues == statues5) || (S_PaiDuiPageBuffer->tempd2->statues == statues6)){
-						BasicPic(0x1590+index*0x10, 1, 138, 10+85*S_PaiDuiPageBuffer->tempd2->varIcoIndex, 10, 10+85*S_PaiDuiPageBuffer->tempd2->varIcoIndex+75, 10+285, 91+index*110, 190);
+						BasicPic(0x1590+index*0x10, 1, 138, 10+85*S_PaiDuiPageBuffer->tempd2->testdata.temperweima.itemConstData.icoIndex, 10, 10+85*S_PaiDuiPageBuffer->tempd2->testdata.temperweima.itemConstData.icoIndex+75, 10+285, 91+index*110, 190);
 					}
 					else
 					{
 						//¼ì²â¿¨Í¼±êÉÁË¸
 						if((S_PaiDuiPageBuffer->count % 2) == 0)
-							BasicPic(0x1590+index*0x10, 1, 138, 10+85*S_PaiDuiPageBuffer->tempd2->varIcoIndex, 10, 10+85*S_PaiDuiPageBuffer->tempd2->varIcoIndex+75, 10+285, 91+index*110, 190);
+							BasicPic(0x1590+index*0x10, 1, 138, 10+85*S_PaiDuiPageBuffer->tempd2->testdata.temperweima.itemConstData.icoIndex, 10, 10+85*S_PaiDuiPageBuffer->tempd2->testdata.temperweima.itemConstData.icoIndex+75, 10+285, 91+index*110, 190);
 						else
-							BasicPic(0x1590+index*0x10, 0, 138, 10+85*S_PaiDuiPageBuffer->tempd2->varIcoIndex, 10, 10+85*S_PaiDuiPageBuffer->tempd2->varIcoIndex+75, 10+285, 91+index*110, 190);
+							BasicPic(0x1590+index*0x10, 0, 138, 10+85*S_PaiDuiPageBuffer->tempd2->testdata.temperweima.itemConstData.icoIndex, 10, 10+85*S_PaiDuiPageBuffer->tempd2->testdata.temperweima.itemConstData.icoIndex+75, 10+285, 91+index*110, 190);
 					}
 				}
 				else

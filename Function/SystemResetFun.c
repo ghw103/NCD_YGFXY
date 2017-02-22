@@ -45,7 +45,6 @@ MyState_TypeDef SystemReset(void)
 {
 	SystemSetData * systemSetData = NULL;
 	
-	
 	systemSetData = MyMalloc(sizeof(SystemSetData));
 	if(systemSetData)
 	{
@@ -56,7 +55,6 @@ MyState_TypeDef SystemReset(void)
 	else
 		return My_Fail;
 	
-			
 	//删除操作人
 	if(My_Fail == ClearUsers())
 		return My_Fail;
@@ -64,6 +62,8 @@ MyState_TypeDef SystemReset(void)
 	//删除wifi数据
 	if(My_Fail == ClearWifi())
 		return My_Fail;
+	
+	return My_Pass;
 }
 
 

@@ -289,8 +289,6 @@ static void CheckQRCode(void)
 				//设置倒计时时间
 				timer_set(&(S_PreReadPageBuffer->currenttestdata->timer), S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CardWaitTime*60);
 			
-				//查找卡图标索引
-				S_PreReadPageBuffer->currenttestdata->varIcoIndex = CheckItemPicIndex(S_PreReadPageBuffer->currenttestdata->testdata.temperweima.ItemName);
 				//读取校准参数
 				memcpy(S_PreReadPageBuffer->currenttestdata->testdata.tempadjust.ItemName, S_PreReadPageBuffer->currenttestdata->testdata.temperweima.ItemName, AdjItemNameLen);
 				getAdjPram(getGBSystemSetData(), &(S_PreReadPageBuffer->currenttestdata->testdata.tempadjust));

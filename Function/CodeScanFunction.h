@@ -19,6 +19,7 @@ typedef struct ReadQRCodeBuffer_tag {
 	Timer timer;												//计时器
 	unsigned short motorLocation;								//电机位置
 	unsigned char motorDir;										//电机方向
+	unsigned char tempV1;
 	ScanCodeResult scanresult;
 }ReadQRCodeBuffer;
 #pragma pack()

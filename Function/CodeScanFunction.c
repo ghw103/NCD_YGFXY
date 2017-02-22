@@ -12,6 +12,7 @@
 #include	"CardStatues_Data.h"
 #include	"System_Data.h"
 #include	"Timer_Data.h"
+#include	"ItemConst_Data.h"
 
 #include	"Define.h"
 #include	"CRC16.h"
@@ -129,7 +130,10 @@ static void ReadBasicCodeData(ReadQRCodeBuffer * readQRCodeBuffer)
 	readQRCodeBuffer->originalCodeLen = strlen(readQRCodeBuffer->originalcode);
 	
 	if(readQRCodeBuffer->originalCodeLen > 0)
+	{
+		readQRCodeBuffer->originalCodeLen -= 1;
 		AnalysisCode(readQRCodeBuffer);
+	}
 }
 
 /***************************************************************************************************
@@ -142,7 +146,6 @@ static void ReadBasicCodeData(ReadQRCodeBuffer * readQRCodeBuffer)
 ***************************************************************************************************/
 static void AnalysisCode(ReadQRCodeBuffer * readQRCodeBuffer)
 {
-	unsigned short datalen = 0;
 	unsigned char i=0;
 	
 	if(readQRCodeBuffer == NULL)
@@ -158,32 +161,17 @@ static void AnalysisCode(ReadQRCodeBuffer * readQRCodeBuffer)
 	memcpy(readQRCodeBuffer->originalcode, readQRCodeBuffer->decryptcode, readQRCodeBuffer->originalCodeLen);
 	readQRCodeBuffer->pbuf2 = readQRCodeBuffer->originalcode;
 	
-	/*获取数据头*/
+	/*获取测试项目名称*/
 	readQRCodeBuffer->pbuf1 = strtok(readQRCodeBuffer->decryptcode, "#");
 	if(readQRCodeBuffer->pbuf1)
 	{
-		if(0 != strcmp(readQRCodeBuffer->pbuf1, "AB"))
-			goto END;
-		else
-			readQRCodeBuffer->pbuf2 += 3;
-	}
-	else
-		goto END;
-	
-	/*获取数据长度*/
-	readQRCodeBuffer->pbuf1 = strtok(NULL, "#");
-	if(readQRCodeBuffer->pbuf1)
-	{
-		datalen = strtol(readQRCodeBuffer->pbuf1 , NULL , 10);
-		readQRCodeBuffer->pbuf2 += (strlen(readQRCodeBuffer->pbuf1)+1);
-	}
-	else
-		goto END;
-	
-	/*获取测试项目名称*/
-	readQRCodeBuffer->pbuf1 = strtok(NULL, "#");
-	if(readQRCodeBuffer->pbuf1)
 		memcpy(readQRCodeBuffer->cardQR->ItemName, readQRCodeBuffer->pbuf1 ,strlen(readQRCodeBuffer->pbuf1));
+		if(getItemConstData(&(readQRCodeBuffer->cardQR->itemConstData), readQRCodeBuffer->cardQR->ItemName) == My_Fail)
+		{
+			readQRCodeBuffer->scanresult = CardUnsupported;
+			goto END;
+		}
+	}
 	else
 		goto END;
 		
@@ -191,34 +179,6 @@ static void AnalysisCode(ReadQRCodeBuffer * readQRCodeBuffer)
 	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
 	if(readQRCodeBuffer->pbuf1)
 		readQRCodeBuffer->cardQR->ChannelNum = strtol(readQRCodeBuffer->pbuf1, NULL, 10);
-	else
-		goto END;
-		
-	/*读取检测卡上的最低检测值*/
-	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
-	if(readQRCodeBuffer->pbuf1)
-		readQRCodeBuffer->cardQR->LowstResult = strtod(readQRCodeBuffer->pbuf1 , NULL );
-	else
-		goto END;
-		
-	/*读取检测卡上的最高检测值*/
-	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
-	if(readQRCodeBuffer->pbuf1)
-		readQRCodeBuffer->cardQR->HighestResult = strtod(readQRCodeBuffer->pbuf1 , NULL );
-	else
-		goto END;	
-		
-	/*读取测试项目的单位*/
-	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
-	if(readQRCodeBuffer->pbuf1)
-		memcpy(readQRCodeBuffer->cardQR->ItemMeasure, readQRCodeBuffer->pbuf1 ,strlen(readQRCodeBuffer->pbuf1));
-	else
-		goto END;
-	
-	//读取小数点个数
-	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
-	if(readQRCodeBuffer->pbuf1)
-		readQRCodeBuffer->cardQR->ItemPoint = strtol(readQRCodeBuffer->pbuf1 , NULL, 10);
 	else
 		goto END;
 	
@@ -237,7 +197,6 @@ static void AnalysisCode(ReadQRCodeBuffer * readQRCodeBuffer)
 		goto END;
 	
 	/*读取检测卡标准曲线临界浓度2*/
-//	readQRCodeBuffer->cardQR->ItemFenDuan[1] = 0;//strtod(readQRCodeBuffer->pbuf1 , NULL);
 	readQRCodeBuffer->pbuf1 = strtok(NULL , "#");
 	if(readQRCodeBuffer->pbuf1)
 		readQRCodeBuffer->cardQR->ItemFenDuan[1] = strtod(readQRCodeBuffer->pbuf1 , NULL);
@@ -333,14 +292,17 @@ static void AnalysisCode(ReadQRCodeBuffer * readQRCodeBuffer)
 	{
 		readQRCodeBuffer->cardQR->CRC16 = strtol(readQRCodeBuffer->pbuf1 , NULL , 10);
 			
-		datalen -= strlen(readQRCodeBuffer->pbuf1);
+		readQRCodeBuffer->tempV1 = strlen(readQRCodeBuffer->pbuf1);
 		goto END;
 	}
 	else
 		goto END;
 	
 	END:
-		if(readQRCodeBuffer->cardQR->CRC16 != CalModbusCRC16Fun1(readQRCodeBuffer->pbuf2 , datalen))
+		if(readQRCodeBuffer->scanresult != CardCodeScanning)
+			return;
+		else if(readQRCodeBuffer->cardQR->CRC16 != CalModbusCRC16Fun1(readQRCodeBuffer->pbuf2 , readQRCodeBuffer->originalCodeLen - 
+			readQRCodeBuffer->tempV1))
 			readQRCodeBuffer->scanresult = CardCodeCRCError;		
 		else if(My_Fail == CheckCardIsTimeOut(readQRCodeBuffer))
 			readQRCodeBuffer->scanresult = CardCodeTimeOut;

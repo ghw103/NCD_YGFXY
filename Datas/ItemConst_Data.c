@@ -1,28 +1,61 @@
 /***************************************************************************************************
-*FileName: UserDao
-*Description: 操作人dao
-*Author: xsx_kair
-*Data: 2017年2月16日11:31:22
+*FileName: ItemConst_Data
+*Description: 各个测试品种的固定数据，不用写在二维码
+*Author:xsx
+*Data: 2017年2月21日11:19:58
 ***************************************************************************************************/
 
 /***************************************************************************************************/
 /******************************************Header List********************************************/
 /***************************************************************************************************/
-#include	"UserDao.h"
+#include	"ItemConst_Data.h"
 
-#include	"CRC16.h"
-#include	"MyMem.h"
-
-#include	"ff.h"
+#include	"MyTools.h"
 
 #include	<string.h>
 #include	"stdio.h"
-#include 	"stdlib.h"
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
-
-
+const ItemConstData GB_ItemConstData[4]=
+{
+	{
+		.itemName = "NT-proBNP\0",
+		.icoIndex = 0,
+		.pointNum = 0,
+		.lowstResult = 20,
+		.highestResult = 30000,
+		.normalResult = "<75岁,<125pg/mL\r\n>=75岁,<450pg/mL\0",
+		.itemMeasure = "pg/mL\0"
+	},
+	{
+		.itemName = "CK-MB\0",
+		.icoIndex = 1,
+		.pointNum = 2,
+		.lowstResult = 0.5,
+		.highestResult = 1000,
+		.normalResult = {"xsx\0"},
+		.itemMeasure = {"xsx\0"}
+	},
+	{
+		.itemName = "cTnI\0",
+		.icoIndex = 2,
+		.pointNum = 2,
+		.lowstResult = 0,
+		.highestResult = 1000,
+		.normalResult = {"xsx\0"},
+		.itemMeasure = {"xsx\0"}
+	},
+	{
+		.itemName = "Myo\0",
+		.icoIndex = 3,
+		.pointNum = 2,
+		.lowstResult = 0,
+		.highestResult = 1000,
+		.normalResult = {"xsx\0"},
+		.itemMeasure = {"xsx\0"}
+	},
+};
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -34,83 +67,23 @@
 /***************************************************************************************************/
 /***************************************************************************************************/
 
-MyState_TypeDef SaveUserData(User_Type * user)
+MyState_TypeDef getItemConstData(ItemConstData * itemConstData, char * itemName)
 {
-	FatfsFileInfo_Def * myfile = NULL;
-	MyState_TypeDef statues = My_Fail;
+	unsigned char i=0;
 	
-	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
+	if(itemConstData == NULL)
+		return My_Fail;
 	
-	if(myfile)
+	for(i=0; i<ITEM_NUM; i++)
 	{
-		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
-
-		myfile->res = f_open(&(myfile->file), "0:/Testers.ncd", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
-			
-		if(FR_OK == myfile->res)
+		if(strcmp(GB_ItemConstData[i].itemName, itemName) == 0)
 		{
-			f_lseek(&(myfile->file), 0);
-			
-			myfile->res = f_write(&(myfile->file), user, sizeof(User_Type)*MaxUserNum, &(myfile->bw));
-				
-			if((FR_OK == myfile->res)&&(myfile->bw == sizeof(User_Type)*MaxUserNum))
-				statues = My_Pass;
-				
-			f_close(&(myfile->file));
+			memcpy(itemConstData, &GB_ItemConstData[i], sizeof(ItemConstData));
+			return My_Pass;
 		}
 	}
 	
-	MyFree(myfile);
-	
-	return statues;
-}
-
-MyState_TypeDef ReadUserData(User_Type * user)
-{
-	FatfsFileInfo_Def * myfile = NULL;
-	MyState_TypeDef statues = My_Fail;
-	unsigned char i=0;
-	
-	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
-
-	if(myfile && user)
-	{
-		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
-
-		myfile->res = f_open(&(myfile->file), "0:/Testers.ncd", FA_READ);
-		
-		if(FR_OK == myfile->res)
-		{
-			f_lseek(&(myfile->file), 0);
-					
-			for(i=0; i<MaxUserNum; i++)
-			{
-				f_read(&(myfile->file), user, sizeof(User_Type), &(myfile->br));
-				
-				if(user->crc == CalModbusCRC16Fun1(user, sizeof(User_Type)-2))
-					user++;
-			}
-			
-			statues = My_Pass;
-			
-			f_close(&(myfile->file));
-		}
-	}	
-	MyFree(myfile);
-	
-	return statues;
-}
-
-MyState_TypeDef ClearUsers(void)
-{
-	FRESULT res;
-	
-	res = f_unlink("0:/Testers.ncd");
-	
-	if(FR_OK == res)
-		return My_Pass;
-	else
-		return My_Fail;
+	return My_Fail;
 }
 
 /****************************************end of file************************************************/

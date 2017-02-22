@@ -317,7 +317,7 @@ static MyState_TypeDef ShowRecord(unsigned char pageindex)
 		{
 			memset(S_RecordPageBuffer->buf, 0, 300);
 			sprintf(S_RecordPageBuffer->buf, "%5d   %10s%15s  %8.*f %s %02d-%02d-%02d %02d:%02d:%02d %s ", (pageindex-1)*DataShowNumInPage+i+1, S_RecordPageBuffer->tempdata->temperweima.ItemName,
-				S_RecordPageBuffer->tempdata->sampleid, S_RecordPageBuffer->tempdata->temperweima.ItemPoint, S_RecordPageBuffer->tempdata->testline.AdjustResult, S_RecordPageBuffer->tempdata->temperweima.ItemMeasure,
+				S_RecordPageBuffer->tempdata->sampleid, S_RecordPageBuffer->tempdata->temperweima.itemConstData.pointNum, S_RecordPageBuffer->tempdata->testline.AdjustResult, S_RecordPageBuffer->tempdata->temperweima.itemConstData.itemMeasure,
 				S_RecordPageBuffer->tempdata->TestTime.year, S_RecordPageBuffer->tempdata->TestTime.month, S_RecordPageBuffer->tempdata->TestTime.day,
 				S_RecordPageBuffer->tempdata->TestTime.hour, S_RecordPageBuffer->tempdata->TestTime.min, S_RecordPageBuffer->tempdata->TestTime.sec,
 				S_RecordPageBuffer->tempdata->user.user_name);

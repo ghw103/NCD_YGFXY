@@ -76,7 +76,7 @@ static void activityStart(void)
 {
 	if(S_WelcomePageBuffer)
 	{
-		timer_set(&(S_WelcomePageBuffer->timer), 1);
+		timer_set(&(S_WelcomePageBuffer->timer), 2);
 		
 		AddNumOfSongToList(0, 0);
 	}

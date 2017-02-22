@@ -309,7 +309,7 @@ static void InitPageText(void)
 	sprintf(S_TestPageBuffer->buf, "%s", S_TestPageBuffer->currenttestdata->testdata.temperweima.PiHao);
 	DisText(0x1840, S_TestPageBuffer->buf, 30);
 			
-	sprintf(S_TestPageBuffer->buf, "%s", S_TestPageBuffer->currenttestdata->testdata.temperweima.NormalResult);
+	sprintf(S_TestPageBuffer->buf, "%s", S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.normalResult);
 	DisText(0x1860, S_TestPageBuffer->buf, 30);
 			
 	ClearText(0x1850, 30);
@@ -366,12 +366,12 @@ static void RefreshPageText(void)
 	
 	if(S_TestPageBuffer->currenttestdata)
 	{
-		if(S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult <= S_TestPageBuffer->currenttestdata->testdata.temperweima.LowstResult)
-			sprintf(S_TestPageBuffer->buf, "<%.*f %s", S_TestPageBuffer->currenttestdata->testdata.temperweima.ItemPoint , S_TestPageBuffer->currenttestdata->testdata.temperweima.LowstResult, S_TestPageBuffer->currenttestdata->testdata.temperweima.ItemMeasure);
-		else if(S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult >= S_TestPageBuffer->currenttestdata->testdata.temperweima.HighestResult)
-			sprintf(S_TestPageBuffer->buf, ">%.*f %s", S_TestPageBuffer->currenttestdata->testdata.temperweima.ItemPoint , S_TestPageBuffer->currenttestdata->testdata.temperweima.HighestResult, S_TestPageBuffer->currenttestdata->testdata.temperweima.ItemMeasure);
+		if(S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult <= S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.lowstResult)
+			sprintf(S_TestPageBuffer->buf, "<%.*f %s", S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.pointNum , S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.lowstResult, S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.itemMeasure);
+		else if(S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult >= S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.highestResult)
+			sprintf(S_TestPageBuffer->buf, ">%.*f %s", S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.pointNum , S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.highestResult, S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.itemMeasure);
 		else
-			sprintf(S_TestPageBuffer->buf, "%.*f %s", S_TestPageBuffer->currenttestdata->testdata.temperweima.ItemPoint , S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult, S_TestPageBuffer->currenttestdata->testdata.temperweima.ItemMeasure);
+			sprintf(S_TestPageBuffer->buf, "%.*f %s", S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.pointNum , S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult, S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.itemMeasure);
 		DisText(0x1850, S_TestPageBuffer->buf, 30);
 
 	}

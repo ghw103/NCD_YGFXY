@@ -188,35 +188,14 @@ MyState_TypeDef deleteWifi(WIFI_Def * wifi)
 
 MyState_TypeDef ClearWifi(void)
 {
-	FatfsFileInfo_Def * myfile = NULL;
-	char * buf = NULL;
-	MyState_TypeDef statues = My_Fail;
-	unsigned short i=0;
+	FRESULT res;
 	
-	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
-	buf = MyMalloc(255*sizeof(WIFI_Def));
+	res = f_unlink("0:/WifiSet.ncd");
 	
-	if(myfile && buf)
-	{
-		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
-
-		myfile->res = f_open(&(myfile->file), "0:/WifiSet.ncd", FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
-			
-		if(FR_OK == myfile->res)
-		{	
-			f_lseek(&(myfile->file), 0);
-			
-			myfile->res = f_write(&(myfile->file), buf, 255*sizeof(WIFI_Def), &(myfile->bw));
-			if(FR_OK == myfile->res)
-				statues = My_Pass;
-						
-			f_close(&(myfile->file));
-		}
-	}
-	MyFree(buf);
-	MyFree(myfile);
-	
-	return statues;
+	if(FR_OK == res)
+		return My_Pass;
+	else
+		return My_Fail;
 }
 
 /****************************************end of file************************************************/

@@ -96,12 +96,12 @@ void PrintfData(void *data)
 		memset(printfbuf, 0, 100);
 		
 		tempvalue = testd->testline.AdjustResult;
-		if(tempvalue <= testd->temperweima.LowstResult)
-			sprintf(printfbuf, "测试结果: <%.*f %-8.8s\r", testd->temperweima.ItemPoint, testd->temperweima.LowstResult, testd->temperweima.ItemMeasure);
-		else if(tempvalue >= testd->temperweima.HighestResult)
-			sprintf(printfbuf, "测试结果: >%.*f %-8.8s\r", testd->temperweima.ItemPoint, testd->temperweima.HighestResult, testd->temperweima.ItemMeasure);
+		if(tempvalue <= testd->temperweima.itemConstData.lowstResult)
+			sprintf(printfbuf, "测试结果: <%.*f %-8.8s\r", testd->temperweima.itemConstData.pointNum, testd->temperweima.itemConstData.lowstResult, testd->temperweima.itemConstData.itemMeasure);
+		else if(tempvalue >= testd->temperweima.itemConstData.highestResult)
+			sprintf(printfbuf, "测试结果: >%.*f %-8.8s\r", testd->temperweima.itemConstData.pointNum, testd->temperweima.itemConstData.highestResult, testd->temperweima.itemConstData.itemMeasure);
 		else
-			sprintf(printfbuf, "测试结果: %.*f %-8.8s\r", testd->temperweima.ItemPoint, testd->testline.AdjustResult, testd->temperweima.ItemMeasure);
+			sprintf(printfbuf, "测试结果: %.*f %-8.8s\r", testd->temperweima.itemConstData.pointNum, testd->testline.AdjustResult, testd->temperweima.itemConstData.itemMeasure);
 		
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
 		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, NULL, sizeof(unsigned char), 500 / portTICK_RATE_MS, 100 / portTICK_RATE_MS);
