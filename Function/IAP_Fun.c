@@ -16,7 +16,7 @@
 
 #include	"LCD_Driver.h"
 
-#include	"Md5FileDao.h"
+#include	"RemoteSoftDao.h"
 #include	"AppFileDao.h"
 
 #include	"MyMem.h"
@@ -91,21 +91,15 @@ void jumpToUserApplicationProgram(void)
 *Author: xsx
 *Date: 2017年2月20日14:02:35
 ***************************************************************************************************/
-MyState_TypeDef checkMd5(void)
+MyState_TypeDef checkMd5(RemoteSoftInfo * remoteSoftInfo)
 {
-	char originMd5[40];				//原始MD5
-	char currentMd5[40];				//当前MD5
 	
-	//读取文件中的md5
-	memset(originMd5, 0, 40);
-	ReadMd5File(originMd5);
-	
-	//计算更新固件的md5值
+	char currentMd5[40];						//计算的md5
+
 	memset(currentMd5, 0, 40);
 	md5sum(currentMd5);
 	
-	//对比MD5
-	if(true == CheckStrIsSame(originMd5, currentMd5, 32))
+	if(true == CheckStrIsSame(remoteSoftInfo->md5, currentMd5, 32))
 		return My_Pass;
 	else
 		return My_Fail;
@@ -137,7 +131,7 @@ void writeApplicationToFlash(void)
 	if(dataBuf)
 	{
 		//擦除用户区域
-		showIapStatus("Erase old programs !\0");
+		showIapStatus("Erase old programs !");
 		EraseFlashSectors(FLASH_SECTORS[4], FLASH_SECTORS[11]);
 
 		
@@ -160,7 +154,7 @@ void writeApplicationToFlash(void)
 						tempValue *= 100;
 						
 						memset(statusBuf, 0, 50);
-						sprintf(statusBuf, "Update Firmware ---- %.2f%%\0", tempValue);
+						sprintf(statusBuf, "Update Firmware ---- %.2f%%", tempValue);
 						showIapStatus(statusBuf);
 						
 						showIapProgess(tempValue);
@@ -181,20 +175,18 @@ void writeApplicationToFlash(void)
 		
 		if(readSize == 0)
 		{
-			memset(statusBuf, 0, 50);
-			sprintf(statusBuf, "Update success !\0");
-			showIapStatus(statusBuf);
+			showIapStatus("Update success !");
 			delay_ms(500);
 			
-			deleteAppFileIfExist();
+			//deleteAppFileIfExist();
 			
-			jumpToUserApplicationProgram();
+			//jumpToUserApplicationProgram();
 		}
 		else
 		{
-			memset(statusBuf, 0, 50);
-			sprintf(statusBuf, "Update fail, Restarting !\0");
-			showIapStatus(statusBuf);
+			showIapStatus("Update fail, Restarting !");
+			
+			//deleteAppFileIfExist();
 			
 			NVIC_SystemReset();
 		}
@@ -203,9 +195,9 @@ void writeApplicationToFlash(void)
 	//升级失败
 	else
 	{
-		memset(statusBuf, 0, 50);
-		sprintf(statusBuf, "Update fail, Restarting !\0");
-		showIapStatus(statusBuf);
+		showIapStatus("Update fail, Restarting !");
+			
+		//deleteAppFileIfExist();
 			
 		NVIC_SystemReset();
 	}
@@ -213,35 +205,51 @@ void writeApplicationToFlash(void)
 
 void BootLoaderMainFunction(void)
 {
-	//显示更新程序界面
-	SelectPage(0);
-	showIapProgess(0);
+	RemoteSoftInfo * remoteSoftInfo = NULL;		//读取的固件信息
 	
-	//检查是否有新程序
-	if(My_Pass == checkNewAppFileIsExist())
+	remoteSoftInfo = MyMalloc(sizeof(RemoteSoftInfo));
+	if(remoteSoftInfo)
 	{
+		memset(remoteSoftInfo, 0, sizeof(RemoteSoftInfo));
+		//显示更新程序界面
+		showIapProgess(0);
+		delay_ms(50);
+		SetLEDLight(100);
+		delay_ms(50);	
 		
-		showIapStatus("New firmware detected !\0");
-		delay_s(1);
-		
-		showIapStatus("Check file MD5 !\0");
-		delay_ms(500);
-		
-		//如果有新固件，对比MD5
-		if(My_Pass == checkMd5())
+		//检查是否有新程序
+		if(My_Pass == checkNewAppFileIsExist())
 		{
-			writeApplicationToFlash();
-		}
-		else
-		{
-			showIapStatus("MD5 check fail, Not update !\0");
-			delay_ms(500);
+			SelectPage(119);
+			showIapStatus("New firmware detected !");
+			delay_s(1);
 			
-			jumpToUserApplicationProgram();
+			if(My_Pass == ReadRemoteSoftInfo(remoteSoftInfo))
+			{
+				showIapVersion(remoteSoftInfo->RemoteFirmwareVersion);
+				showIapStatus("Check file MD5 !");
+				delay_ms(500);
+				
+				if(My_Pass == checkMd5(remoteSoftInfo))
+				{
+					writeApplicationToFlash();
+				}
+				else
+				{
+					showIapStatus("MD5 check fail, Not update !");
+					delay_ms(500);
+				}
+			}
+			else
+			{
+				showIapStatus("file read fail !");
+			}
 		}
 	}
-	else
-		jumpToUserApplicationProgram();
+	
+	MyFree(remoteSoftInfo);
+	
+	jumpToUserApplicationProgram();
 }
 
 

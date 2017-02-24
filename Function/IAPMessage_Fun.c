@@ -22,7 +22,7 @@
 /***************************************************************************************************/
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
-
+static char buf[300];
 /***************************************************************************************************/
 /**************************************局部函数声明*************************************************/
 /***************************************************************************************************/
@@ -36,17 +36,30 @@
 
 void showIapStatus(char * statusStr)
 {
-	ClearText(0x2a00, 30);
-	DisText(0x2a00, statusStr, strlen(statusStr));
+	char tempbuf[50];
+	
+	memset(tempbuf, 0, 50);
+	sprintf(tempbuf, "%s", statusStr);
+	DisText(0x2a00, tempbuf, strlen(tempbuf));
 }
 
 
 void showIapProgess(unsigned char num)
 {
 	float value = num;
-	value *= 9.3;
+	value *= 3.65;
 	
-	BasicPic(0x2a20, 1, 137, 85, 420, 85+value, 455, 50, 420);
+	BasicPic(0x2a50, 1, 137, 230, 325, 230+value, 365, 390, 380);
+}
+
+void showIapVersion(unsigned short version)
+{
+	char tempbuf[50];
+	
+	memset(tempbuf, 0, 50);
+	sprintf(tempbuf, "%d.%d.%02d", version/1000, version%1000/100, version%100);
+
+	DisText(0x2a60, tempbuf, strlen(tempbuf));
 }
 
 

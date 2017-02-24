@@ -11,7 +11,6 @@
 #include	"Md5.h"
 #include	"MyMem.h"
 #include	"AppFileDao.h"
-#include	"Md5FileDao.h"
 
 #include	"stdio.h"
 #include	"string.h"
@@ -314,7 +313,7 @@ void md5sum(char * md5Buf)
 	for(i=0; i<16; i++)
 	{
 		memset(str, 0, 10);
-		sprintf(str, "%02X", digest[i]);
+		sprintf(str, "%02x", digest[i]);
 		sprintf(md5Buf+2*i, "%.2s", str);
 	}
 }  

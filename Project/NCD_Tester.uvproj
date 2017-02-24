@@ -489,6 +489,13 @@
         </Group>
         <Group>
           <GroupName>DataS</GroupName>
+          <Files>
+            <File>
+              <FileName>RemoteSoft_Data.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\COM\RemoteSoft_Data.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>Daos</GroupName>
@@ -499,9 +506,9 @@
               <FilePath>..\Daos\AppFileDao.c</FilePath>
             </File>
             <File>
-              <FileName>Md5FileDao.c</FileName>
+              <FileName>RemoteSoftDao.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Daos\Md5FileDao.c</FilePath>
+              <FilePath>..\Daos\RemoteSoftDao.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -7,5 +7,6 @@ void showIapStatus(char * statusStr);
 
 void showIapProgess(unsigned char num);
 
+void showIapVersion(unsigned short version);
 #endif
 

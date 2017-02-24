@@ -1,6 +1,6 @@
 /***************************************************************************************************
-*FileName: Md5FileDao
-*Description: 保存新程序文件的MD5值
+*FileName: RemoteSoftDao
+*Description: 固件信息
 *Author: xsx_kair
 *Data: 2017年2月16日15:23:25
 ***************************************************************************************************/
@@ -8,7 +8,7 @@
 /***************************************************************************************************/
 /******************************************Header List********************************************/
 /***************************************************************************************************/
-#include	"Md5FileDao.h"
+#include	"RemoteSoftDao.h"
 
 #include	"CRC16.h"
 #include	"MyMem.h"
@@ -34,32 +34,32 @@
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************
-*FunctionName: WriteMd5File
-*Description: 更新文件的md5
-*Input: md5Str -- md5字符串
+*FunctionName: WriteRemoteSoftInfo
+*Description: 保存更新固件的信息
+*Input: remoteSoftInfo -- 固件信息
 *Output: 
 *Return: 
 *Author: xsx
 *Date: 2017年2月16日15:25:32
 ***************************************************************************************************/
-MyState_TypeDef WriteMd5File(char * md5Str)
+MyState_TypeDef WriteRemoteSoftInfo(RemoteSoftInfo * remoteSoftInfo)
 {
 	FatfsFileInfo_Def * myfile = NULL;
 	MyState_TypeDef statues = My_Fail;
 	
 	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
 	
-	if(myfile && md5Str)
+	if(myfile && remoteSoftInfo)
 	{
 		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
 
-		myfile->res = f_open(&(myfile->file), "0:/MD5.NCD", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
+		myfile->res = f_open(&(myfile->file), "0:/SINFO.NCD", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
 
 		if(FR_OK == myfile->res)
 		{	
 			f_lseek(&(myfile->file), 0);
 			
-			myfile->res = f_write(&(myfile->file), md5Str, 32, &(myfile->bw));
+			myfile->res = f_write(&(myfile->file), remoteSoftInfo, sizeof(RemoteSoftInfo), &(myfile->bw));
 			if(myfile->res == FR_OK)
 				statues = My_Pass;
 			
@@ -73,33 +73,33 @@ MyState_TypeDef WriteMd5File(char * md5Str)
 }
 
 /***************************************************************************************************
-*FunctionName: ReadMd5File
-*Description: 读取文件的md5值
-*Input: md5Str -- 读取缓存
+*FunctionName: ReadRemoteSoftInfo
+*Description: 读取固件信息
+*Input: remoteSoftInfo -- 固件信息
 *Output: 
 *Return: 
 *Author: xsx
 *Date: 2017年2月16日15:25:44
 ***************************************************************************************************/
-MyState_TypeDef ReadMd5File(char * md5Str)
+MyState_TypeDef ReadRemoteSoftInfo(RemoteSoftInfo * remoteSoftInfo)
 {
 	FatfsFileInfo_Def * myfile = NULL;
 	MyState_TypeDef statues = My_Fail;
 	
 	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
 	
-	if(myfile && md5Str)
+	if(myfile && remoteSoftInfo)
 	{
 		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
 
-		myfile->res = f_open(&(myfile->file), "0:/MD5.NCD", FA_OPEN_EXISTING | FA_READ);
+		myfile->res = f_open(&(myfile->file), "0:/SINFO.NCD", FA_OPEN_EXISTING | FA_READ);
 
 		if(FR_OK == myfile->res)
-		{	
+		{
 			f_lseek(&(myfile->file), 0);
 			
-			myfile->res = f_read(&(myfile->file), md5Str, 32, &(myfile->br));
-			if(myfile->res == FR_OK)
+			myfile->res = f_read(&(myfile->file), remoteSoftInfo, sizeof(RemoteSoftInfo), &(myfile->br));
+			if((myfile->res == FR_OK) && (sizeof(RemoteSoftInfo) == myfile->br))
 				statues = My_Pass;
 			
 			f_close(&(myfile->file));
