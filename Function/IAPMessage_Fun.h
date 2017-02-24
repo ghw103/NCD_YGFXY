@@ -3,6 +3,7 @@
 
 #include	"Define.h"
 
+void clearStatusText(void);
 void showIapStatus(char * statusStr);
 
 void showIapProgess(unsigned char num);

@@ -34,13 +34,16 @@ static char buf[300];
 /***************************************************************************************************/
 /***************************************************************************************************/
 
+void clearStatusText(void)
+{
+	memset(buf, 0, 300);
+	DisText(0x2a00, buf, 240);
+}
+
 void showIapStatus(char * statusStr)
 {
-	char tempbuf[50];
-	
-	memset(tempbuf, 0, 50);
-	sprintf(tempbuf, "%s", statusStr);
-	DisText(0x2a00, tempbuf, strlen(tempbuf));
+	strcat(buf, statusStr);
+	DisText(0x2a00, buf, strlen(buf));
 }
 
 

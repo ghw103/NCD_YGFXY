@@ -22,6 +22,7 @@
 #define ADDR_FLASH_SECTOR_11    ((u32)0x080E0000) 	//扇区11起始地址,128 Kbytes  
 
 unsigned short getFlashSector(unsigned int startAddress);
+MyState_TypeDef EraseFlashSector(unsigned int sectorIndex);
 MyState_TypeDef EraseFlashSectors(unsigned int startSectorIndex, unsigned int endSectorIndex);
 MyState_TypeDef writeFlash(unsigned int FlashAddress, void * Data , unsigned int DataLength);
 void readFlash(unsigned int FlashAddress, void * Data , unsigned int DataLength);

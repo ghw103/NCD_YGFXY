@@ -132,6 +132,32 @@ MyState_TypeDef EraseFlashSectors(unsigned int startSectorIndex, unsigned int en
 }
 
 /***************************************************************************************************
+*FunctionName: EraseFlashSector
+*Description: 擦除一个块
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月24日15:28:46
+***************************************************************************************************/
+MyState_TypeDef EraseFlashSector(unsigned int sectorIndex)
+{
+
+	FLASH_Status status = FLASH_COMPLETE;
+	
+	FLASH_Unlock();
+	
+	status = FLASH_EraseSector(sectorIndex, VoltageRange_3);
+
+	FLASH_Lock();
+	
+	if(status == FLASH_COMPLETE)
+		return My_Pass;
+	else
+		return My_Fail;
+}
+
+/***************************************************************************************************
 *FunctionName: writeFlash
 *Description: 写flash
 *Input: 

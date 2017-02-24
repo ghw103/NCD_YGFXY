@@ -131,8 +131,26 @@ void writeApplicationToFlash(void)
 	if(dataBuf)
 	{
 		//擦除用户区域
-		showIapStatus("Erase old programs !");
-		EraseFlashSectors(FLASH_SECTORS[4], FLASH_SECTORS[11]);
+		showIapStatus("Erase       \0");
+		
+		for(i=4; i<12; i++)
+		{
+			if(My_Pass == EraseFlashSector(FLASH_SECTORS[i]))
+			{		
+				if(i == 11)
+					showIapStatus("-  Done ! Programming\0");
+				else
+					showIapStatus("-\0");
+			}
+			else
+			{
+				memset(statusBuf, 0, 50);
+				sprintf(statusBuf, "%.*s\0", 12-i, "--------");
+				strcat(statusBuf, "  Fail ! Programming\0");
+				showIapStatus(statusBuf);
+				break;
+			}
+		}
 
 		
 		for(i=0; i<100; i++)
@@ -153,13 +171,9 @@ void writeApplicationToFlash(void)
 						tempValue /= fileSize;
 						tempValue *= 100;
 						
-						memset(statusBuf, 0, 50);
-						sprintf(statusBuf, "Update Firmware ---- %.2f%%", tempValue);
-						showIapStatus(statusBuf);
-						
 						showIapProgess(tempValue);
 						
-						delay_ms(500);
+						delay_ms(100);
 					}
 					else
 						break;
@@ -175,16 +189,16 @@ void writeApplicationToFlash(void)
 		
 		if(readSize == 0)
 		{
-			showIapStatus("Update success !");
+			showIapStatus(" --------  Done ! Application Running   ...    \0");
 			delay_ms(500);
 			
 			//deleteAppFileIfExist();
 			
-			//jumpToUserApplicationProgram();
+			jumpToUserApplicationProgram();
 		}
 		else
 		{
-			showIapStatus("Update fail, Restarting !");
+			showIapStatus(" --------  Fail ! Restartting ...\0");
 			
 			//deleteAppFileIfExist();
 			
@@ -195,7 +209,7 @@ void writeApplicationToFlash(void)
 	//升级失败
 	else
 	{
-		showIapStatus("Update fail, Restarting !");
+		showIapStatus(" --------  Fail ! Restartting ...\0");
 			
 		//deleteAppFileIfExist();
 			
@@ -211,38 +225,28 @@ void BootLoaderMainFunction(void)
 	if(remoteSoftInfo)
 	{
 		memset(remoteSoftInfo, 0, sizeof(RemoteSoftInfo));
-		//显示更新程序界面
-		showIapProgess(0);
-		delay_ms(50);
-		SetLEDLight(100);
-		delay_ms(50);	
-		
+
 		//检查是否有新程序
 		if(My_Pass == checkNewAppFileIsExist())
 		{
+			delay_ms(50);
+			clearStatusText();		
+			delay_ms(500);
 			SelectPage(119);
-			showIapStatus("New firmware detected !");
-			delay_s(1);
 			
-			if(My_Pass == ReadRemoteSoftInfo(remoteSoftInfo))
+			showIapStatus("New Firmware Detected !      Check MD5\0");
+
+			delay_ms(100);
+			if((My_Pass == ReadRemoteSoftInfo(remoteSoftInfo)) && (My_Pass == checkMd5(remoteSoftInfo)))
 			{
 				showIapVersion(remoteSoftInfo->RemoteFirmwareVersion);
-				showIapStatus("Check file MD5 !");
-				delay_ms(500);
-				
-				if(My_Pass == checkMd5(remoteSoftInfo))
-				{
-					writeApplicationToFlash();
-				}
-				else
-				{
-					showIapStatus("MD5 check fail, Not update !");
-					delay_ms(500);
-				}
+
+				showIapStatus("   --------  OK !   \0");
+				writeApplicationToFlash();
 			}
 			else
 			{
-				showIapStatus("file read fail !");
+				showIapStatus("   --------  Fail ! \0");
 			}
 		}
 	}
