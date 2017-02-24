@@ -11,7 +11,6 @@
 #include	"Md5.h"
 #include	"MyMem.h"
 #include	"AppFileDao.h"
-#include	"Md5FileDao.h"
 
 #include	"stdio.h"
 #include	"string.h"
@@ -292,7 +291,7 @@ void md5sum(char * md5Buf)
 	{
 		for(i=0; i<100; i++)
 		{
-			if(My_Pass == ReadAppFile(startAddr, dataBuf, 40*1024, &readSize, NULL))
+			if(My_Pass == ReadAppFile(startAddr, dataBuf, 20*1024, &readSize, NULL))
 			{				
 				if(readSize != 0)
 				{

@@ -14,7 +14,7 @@
 #include	"SystemSet_Dao.h"
 #include	"NetInfo_Data.h"
 #include	"System_Data.h"
-#include	"Md5FileDao.h"
+#include	"RemoteSoftDao.h"
 #include	"RemoteSoft_Data.h"
 
 #include	"MyMem.h"
@@ -279,25 +279,28 @@ static void readRemoteFirmwareVersion(void)
 			upLoadDeviceDataBuffer->recvBuf, SERVERRECVBUFLEN, "POST"))
 		{
 			//解析最新固件版本
-			upLoadDeviceDataBuffer->tempValue = strtol(upLoadDeviceDataBuffer->recvBuf+16, NULL, 10);
+			upLoadDeviceDataBuffer->remoteSoftInfo.RemoteFirmwareVersion = strtol(upLoadDeviceDataBuffer->recvBuf+16, NULL, 10);
 			
 			//如果读取到的版本，大于当前版本，且大于当前保存的最新远程版本，则此次读取的是最新的
-			if((upLoadDeviceDataBuffer->tempValue > GB_SoftVersion) &&(upLoadDeviceDataBuffer->tempValue > getGbRemoteFirmwareVersion()))
+			if((upLoadDeviceDataBuffer->remoteSoftInfo.RemoteFirmwareVersion > GB_SoftVersion) &&
+				(upLoadDeviceDataBuffer->remoteSoftInfo.RemoteFirmwareVersion > getGbRemoteFirmwareVersion()))
 			{
 				//解析最新固件MD5
 				upLoadDeviceDataBuffer->tempP = strtok(upLoadDeviceDataBuffer->recvBuf, "#");
 				if(upLoadDeviceDataBuffer->tempP)
 				{
 					upLoadDeviceDataBuffer->tempP = strtok(NULL, "#");
-					memcpy(upLoadDeviceDataBuffer->tempBuf, upLoadDeviceDataBuffer->tempP+4, 32);
-					setGbRemoteFirmwareMd5(upLoadDeviceDataBuffer->tempBuf);
 					
-					WriteMd5File(upLoadDeviceDataBuffer->tempBuf);
+					memcpy(upLoadDeviceDataBuffer->remoteSoftInfo.md5, upLoadDeviceDataBuffer->tempP+4, 32);
 					
-					//md5保存成功后，才更新最新版本号，保存最新固件版本
-					setGbRemoteFirmwareVersion(upLoadDeviceDataBuffer->tempValue);
-					
-					setIsSuccessDownloadFirmware(false);
+					if(My_Pass == WriteRemoteSoftInfo(&(upLoadDeviceDataBuffer->remoteSoftInfo)))
+					{
+						//md5保存成功后，才更新最新版本号，保存最新固件版本
+						setGbRemoteFirmwareVersion(upLoadDeviceDataBuffer->remoteSoftInfo.RemoteFirmwareVersion);
+						setGbRemoteFirmwareMd5(upLoadDeviceDataBuffer->remoteSoftInfo.md5);
+						
+						setIsSuccessDownloadFirmware(false);
+					}
 				}
 			}	
 		}

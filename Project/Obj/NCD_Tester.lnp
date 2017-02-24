@@ -102,7 +102,7 @@
 ".\obj\appfiledao.o"
 ".\obj\userdao.o"
 ".\obj\wifidao.o"
-".\obj\md5filedao.o"
+".\obj\remotesoftdao.o"
 ".\obj\ethernetif.o"
 ".\obj\sys_arch.o"
 ".\obj\etharp.o"

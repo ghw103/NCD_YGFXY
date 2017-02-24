@@ -1,11 +1,12 @@
 /****************************************file start****************************************************/
-#ifndef _MD5FILE_D_H
-#define	_MD5FILE_D_H
+#ifndef _REMOTESOFT_D_H
+#define	_REMOTESOFT_D_HS
 
 #include	"Define.h"
+#include	"RemoteSoft_Data.h"
 
-MyState_TypeDef WriteMd5File(char * md5Str);
-MyState_TypeDef ReadMd5File(char * md5Str);
+MyState_TypeDef WriteRemoteSoftInfo(RemoteSoftInfo * remoteSoftInfo);
+MyState_TypeDef ReadRemoteSoftInfo(RemoteSoftInfo * remoteSoftInfo);
 
 #endif
 

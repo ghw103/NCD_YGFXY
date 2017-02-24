@@ -11,8 +11,10 @@
 /***************************************************************************************************/
 #include	"IAP_Fun.h"
 
-#include	"Md5FileDao.h"
+#include	"RemoteSoftDao.h"
 #include	"AppFileDao.h"
+
+#include	"RemoteSoft_Data.h"
 
 #include	"MyMem.h"
 #include	"Md5.h"
@@ -50,20 +52,27 @@
 ***************************************************************************************************/
 MyState_TypeDef checkMd5(void)
 {
-	char originMd5[40];				//原始MD5
+	RemoteSoftInfo * remoteSoftInfo = NULL;		//读取的固件信息
 	char currentMd5[40];				//当前MD5
 	
-	//读取文件中的md5
-	memset(originMd5, 0, 40);
-	if(My_Fail == ReadMd5File(originMd5))
+	remoteSoftInfo = MyMalloc(sizeof(RemoteSoftInfo));
+	if(remoteSoftInfo)
+	{
+		//读取文件中的md5
+		memset(remoteSoftInfo, 0, sizeof(RemoteSoftInfo));
+		if(My_Fail == ReadRemoteSoftInfo(remoteSoftInfo))
+			return My_Fail;
+	}
+	else
 		return My_Fail;
+	
 	
 	//计算更新固件的md5值
 	memset(currentMd5, 0, 40);
 	md5sum(currentMd5);
 	
 	//对比MD5
-	if(true == CheckStrIsSame(originMd5, currentMd5, 32))
+	if(true == CheckStrIsSame(remoteSoftInfo->md5, currentMd5, 32))
 		return My_Pass;
 	else
 		return My_Fail;

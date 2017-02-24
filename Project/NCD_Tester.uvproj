@@ -308,8 +308,8 @@
               </OCR_RVCT3>
               <OCR_RVCT4>
                 <Type>1</Type>
-                <StartAddress>0x8000000</StartAddress>
-                <Size>0x100000</Size>
+                <StartAddress>0x8010000</StartAddress>
+                <Size>0xf0000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -953,9 +953,9 @@
               <FilePath>..\Daos\WifiDao.c</FilePath>
             </File>
             <File>
-              <FileName>Md5FileDao.c</FileName>
+              <FileName>RemoteSoftDao.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Daos\Md5FileDao.c</FilePath>
+              <FilePath>..\Daos\RemoteSoftDao.c</FilePath>
             </File>
           </Files>
         </Group>

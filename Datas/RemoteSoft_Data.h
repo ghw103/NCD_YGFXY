@@ -4,6 +4,7 @@
 
 #include	"Define.h"
 
+#pragma pack(1)
 typedef struct
 {
 	unsigned short RemoteFirmwareVersion;
@@ -11,6 +12,7 @@ typedef struct
 	char desc[200];
 	bool isSuccessDownloadFirmware;
 }RemoteSoftInfo; 
+#pragma pack()
 
 void setGbRemoteFirmwareVersion(unsigned short version);
 unsigned short getGbRemoteFirmwareVersion(void);
