@@ -131,7 +131,7 @@ void CommunicateWithServerByWifi(MyServerData * myServerData)
 		{
 			//接收数据
 			while(pdPASS == ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4Mutex(), myServerData->recvBuf, 1000, 
-				&readSize, 1, 1000 / portTICK_RATE_MS, 10 / portTICK_RATE_MS))
+				&readSize, 1, 10 / portTICK_RATE_MS, 10 / portTICK_RATE_MS))
 			{
 				//如果发生的是GET请求，则说明是下载固件，需要保存
 				if(strstr(myServerData->sendBuf, "GET"))
