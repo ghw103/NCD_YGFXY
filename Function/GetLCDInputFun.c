@@ -17,8 +17,6 @@
 #include	"Define.h"
 #include	"CRC16.h"
 
-#include 	"usbd_cdc_vcp.h"
-
 #include 	"FreeRTOS.h"
 #include 	"task.h"
 #include 	"queue.h"

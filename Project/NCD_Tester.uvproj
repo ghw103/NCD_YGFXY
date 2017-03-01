@@ -364,7 +364,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F4XX,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\AppLunch;..\COM;..\Datas;..\Function;..\HardwareDriver;..\Libraries\CMSIS\Device\ST\STM32F4xx\Include;..\Libraries\STM32F4x7_ETH_Driver\inc;..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\Task;..\ThirdParty\Fatfs\src;..\ThirdParty\lwip-1.4.1\src\include;..\ThirdParty\lwip-1.4.1\src\include\ipv4;..\ThirdParty\lwip-1.4.1\src\include\netif;..\ThirdParty\lwip-1.4.1\src\include\lwip;..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS;..\ThirdParty\lwip-1.4.1\port\STM32F4x7;..\ThirdParty\lwip-1.4.1\User;..\ThirdParty\USB\USB_User;..\ThirdParty\USB\STM32_USB_Device_Library\Core\inc;..\ThirdParty\cJSON-master;..\UI;..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\inc;..\ThirdParty\USB\STM32_USB_OTG_Driver\inc;..\ThirdParty\FreeRTOS\inc;..\Daos</IncludePath>
+              <IncludePath>..\AppLunch;..\COM;..\Datas;..\Function;..\HardwareDriver;..\Libraries\CMSIS\Device\ST\STM32F4xx\Include;..\Libraries\STM32F4x7_ETH_Driver\inc;..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\Task;..\ThirdParty\Fatfs\src;..\ThirdParty\lwip-1.4.1\src\include;..\ThirdParty\lwip-1.4.1\src\include\ipv4;..\ThirdParty\lwip-1.4.1\src\include\netif;..\ThirdParty\lwip-1.4.1\src\include\lwip;..\ThirdParty\lwip-1.4.1\port\STM32F4x7\FreeRTOS;..\ThirdParty\lwip-1.4.1\port\STM32F4x7;..\ThirdParty\lwip-1.4.1\User;..\ThirdParty\cJSON-master;..\UI;..\ThirdParty\FreeRTOS\inc;..\Daos</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -995,31 +995,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>USB_User</GroupName>
-          <Files>
-            <File>
-              <FileName>usb_bsp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\USB\USB_User\usb_bsp.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_cdc_vcp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\USB\USB_User\usbd_cdc_vcp.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_desc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\USB\USB_User\usbd_desc.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_usr.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\USB\USB_User\usbd_usr.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>COM</GroupName>
           <Files>
             <File>
@@ -1421,51 +1396,6 @@
               <FileName>README.txt</FileName>
               <FileType>5</FileType>
               <FilePath>..\DOC\README.txt</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>STM32_USB_Device_Library</GroupName>
-          <Files>
-            <File>
-              <FileName>usbd_core.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\USB\STM32_USB_Device_Library\Core\src\usbd_core.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_ioreq.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\USB\STM32_USB_Device_Library\Core\src\usbd_ioreq.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_req.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\USB\STM32_USB_Device_Library\Core\src\usbd_req.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_cdc_core.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\USB\STM32_USB_Device_Library\Class\cdc\src\usbd_cdc_core.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>STM32_USB_OTG_Driver</GroupName>
-          <Files>
-            <File>
-              <FileName>usb_core.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\USB\STM32_USB_OTG_Driver\src\usb_core.c</FilePath>
-            </File>
-            <File>
-              <FileName>usb_dcd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\USB\STM32_USB_OTG_Driver\src\usb_dcd.c</FilePath>
-            </File>
-            <File>
-              <FileName>usb_dcd_int.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ThirdParty\USB\STM32_USB_OTG_Driver\src\usb_dcd_int.c</FilePath>
             </File>
           </Files>
         </Group>

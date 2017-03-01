@@ -285,7 +285,7 @@ void md5sum(char * md5Buf)
 	char str[10];
   
     MD5Init(&ctx);  
-    dataBuf = MyMalloc(40*1024);
+    dataBuf = MyMalloc(20*1024);
 	
 	if(dataBuf)
 	{

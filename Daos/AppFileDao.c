@@ -178,7 +178,7 @@ MyState_TypeDef deleteAppFileIfExist(void)
 	
 	res = f_unlink("0:/UPDATE.BIN");
 	
-	if(FR_OK == res)
+	if((FR_OK == res) || (FR_NO_FILE == res))
 		return My_Pass;
 	else
 		return My_Fail;

@@ -75,6 +75,9 @@ static void activityStart(void)
 {
 	if(S_AdjustLedPageBuffer)
 	{
+		//获取最新的系统参数
+		copyGBSystemSetData(&(S_AdjustLedPageBuffer->systemSetData));
+		
 		clearPageText();
 		dspTestStatus("Waitting\0");
 		
@@ -228,6 +231,9 @@ static void clearPageText(void)
 	DspNum(0x2603, 0, 2);
 	DspNum(0x2604, 0, 2);
 	DspNum(0x2605, 0, 2);
+	
+	//显示当前校准值
+	DspNum(0x2609, S_AdjustLedPageBuffer->systemSetData.testLedLightIntensity, 2);
 }
 
 static void dspTestStatus(char * str)
@@ -276,7 +282,7 @@ static void analysisTestData(void)
 			S_AdjustLedPageBuffer->itemData.ledLight += 10;
 			S_AdjustLedPageBuffer->testCnt++;
 			
-			if(S_AdjustLedPageBuffer->testCnt <= 10)
+			if(S_AdjustLedPageBuffer->testCnt <= 11)
 			{
 				DspNum(0x2605, S_AdjustLedPageBuffer->testCnt, 2);
 				DspNum(0x2604, S_AdjustLedPageBuffer->itemData.ledLight, 2);

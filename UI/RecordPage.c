@@ -316,12 +316,30 @@ static MyState_TypeDef ShowRecord(unsigned char pageindex)
 		for(i=0; i<S_RecordPageBuffer->page.ElementsSize; i++)
 		{
 			memset(S_RecordPageBuffer->buf, 0, 300);
-			sprintf(S_RecordPageBuffer->buf, "%5d   %10s%15s  %8.*f %s %02d-%02d-%02d %02d:%02d:%02d %s ", (pageindex-1)*DataShowNumInPage+i+1, S_RecordPageBuffer->tempdata->temperweima.ItemName,
-				S_RecordPageBuffer->tempdata->sampleid, S_RecordPageBuffer->tempdata->temperweima.itemConstData.pointNum, S_RecordPageBuffer->tempdata->testline.AdjustResult, S_RecordPageBuffer->tempdata->temperweima.itemConstData.itemMeasure,
-				S_RecordPageBuffer->tempdata->TestTime.year, S_RecordPageBuffer->tempdata->TestTime.month, S_RecordPageBuffer->tempdata->TestTime.day,
+			sprintf(S_RecordPageBuffer->buf, "%5d   %10s%15s  ", (pageindex-1)*DataShowNumInPage+i+1, S_RecordPageBuffer->tempdata->temperweima.ItemName,
+				S_RecordPageBuffer->tempdata->sampleid);
+			
+			memset(S_RecordPageBuffer->tempBuf, 0, 100);
+			if(IsShowRealValue() == true)
+				sprintf(S_RecordPageBuffer->tempBuf, "%8.*f %s", S_RecordPageBuffer->tempdata->temperweima.itemConstData.pointNum, 
+					S_RecordPageBuffer->tempdata->testline.AdjustResult, S_RecordPageBuffer->tempdata->temperweima.itemConstData.itemMeasure);
+			else if(S_RecordPageBuffer->tempdata->testline.AdjustResult <= S_RecordPageBuffer->tempdata->temperweima.itemConstData.lowstResult)
+				sprintf(S_RecordPageBuffer->tempBuf, "<%8.*f %s", S_RecordPageBuffer->tempdata->temperweima.itemConstData.pointNum, 
+					S_RecordPageBuffer->tempdata->temperweima.itemConstData.lowstResult, S_RecordPageBuffer->tempdata->temperweima.itemConstData.itemMeasure);
+			else if(S_RecordPageBuffer->tempdata->testline.AdjustResult >= S_RecordPageBuffer->tempdata->temperweima.itemConstData.highestResult)
+				sprintf(S_RecordPageBuffer->tempBuf, ">%8.*f %s", S_RecordPageBuffer->tempdata->temperweima.itemConstData.pointNum, 
+					S_RecordPageBuffer->tempdata->temperweima.itemConstData.highestResult, S_RecordPageBuffer->tempdata->temperweima.itemConstData.itemMeasure);
+			else
+				sprintf(S_RecordPageBuffer->tempBuf, "%8.*f %s", S_RecordPageBuffer->tempdata->temperweima.itemConstData.pointNum, 
+					S_RecordPageBuffer->tempdata->testline.AdjustResult, S_RecordPageBuffer->tempdata->temperweima.itemConstData.itemMeasure);
+			strcat(S_RecordPageBuffer->buf, S_RecordPageBuffer->tempBuf);
+			
+			memset(S_RecordPageBuffer->tempBuf, 0, 100);
+			sprintf(S_RecordPageBuffer->tempBuf, " %02d-%02d-%02d %02d:%02d:%02d %s ", S_RecordPageBuffer->tempdata->TestTime.year, S_RecordPageBuffer->tempdata->TestTime.month, S_RecordPageBuffer->tempdata->TestTime.day,
 				S_RecordPageBuffer->tempdata->TestTime.hour, S_RecordPageBuffer->tempdata->TestTime.min, S_RecordPageBuffer->tempdata->TestTime.sec,
 				S_RecordPageBuffer->tempdata->user.user_name);
-				
+			strcat(S_RecordPageBuffer->buf, S_RecordPageBuffer->tempBuf);
+		
 			DisText(0x2030+(i)*0x40, S_RecordPageBuffer->buf, 120);
 			
 			S_RecordPageBuffer->tempdata--;

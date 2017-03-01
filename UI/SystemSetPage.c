@@ -175,11 +175,16 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 					else
 						SendKeyCode(1);
 				}
+				else if(pdPASS == CheckStrIsSame(&pbuf[7] , ChangeValueShowTypePassWord ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
+				{
+					setIsShowRealValue(true);
+					SendKeyCode(2);
+				}
 				else
 					SendKeyCode(1);
 			}
 			else
-					SendKeyCode(1);
+				SendKeyCode(1);
 		}
 		//ÆäËûÉèÖÃ
 		else if(S_SysSetPageBuffer->lcdinput[0] == 0x1904)

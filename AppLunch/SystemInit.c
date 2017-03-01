@@ -18,7 +18,6 @@
 #include	"Ads8325_Driver.h"
 #include	"DRV8825_Driver.h"
 #include	"CodeScanner_Driver.h"
-#include	"usbd_cdc_vcp.h"
 #include	"user_fatfs.h"
 #include 	"MLX90614_Driver.h"
 #include	"RTC_Driver.h"
@@ -104,9 +103,6 @@ void MySystemBSPInit(void)
 	CodeScanner_GPIOInit();				//二维码初始化
 	delay_ms(1);
 	
-	My_USBInit();						//USB端口初始化
-	delay_ms(1);
-	
 	SMBus_Init();						//温度检测初始化
 	delay_ms(1);
 	
@@ -128,13 +124,13 @@ void MySystemBSPInit(void)
 	
 	LEDCheck_Init();					//检测发光模块的发光二极管状态初始化
 	delay_ms(1);
-	
+
 	DS18B20_Init();						//初始化18b20
 	delay_ms(1);
 	
 	FatfsInit();						//文件系统初始化
 	
-	IWDG_Init(3, 2000);					//看门狗初始化,超时时间2S
+	IWDG_Init(3, 3000);					//看门狗初始化,超时时间2S
 	delay_ms(1);
 }
 

@@ -37,53 +37,72 @@
 MyState_TypeDef SaveWifiData(WIFI_Def * wifi)
 {
 	FatfsFileInfo_Def * myfile = NULL;
-	WIFI_Def * tempwifi = NULL;
+	WIFI_Def * wifiBuf = NULL;
 	MyState_TypeDef statues = My_Fail;
 	unsigned char i=0;
 	
 	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
-	tempwifi = MyMalloc(sizeof(WIFI_Def));
-	if(myfile && tempwifi && wifi)
+	wifiBuf = MyMalloc(sizeof(WIFI_Def) * MaxSaveWifiNum);
+	if(myfile && wifiBuf && wifi)
 	{
 		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
-		memset(tempwifi, 0, sizeof(WIFI_Def));
+		memset(wifiBuf, 0, sizeof(WIFI_Def) * MaxSaveWifiNum);
 
 		myfile->res = f_open(&(myfile->file), "0:/WifiSet.ncd", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
 			
 		if(FR_OK == myfile->res)
 		{
-			myfile->size = f_size(&(myfile->file));
 			f_lseek(&(myfile->file), 0);
 			
-			for(i=0; i<255; i++)
+			//读出所有保存的wifi
+			myfile->res = f_read(&(myfile->file), wifiBuf, sizeof(WIFI_Def) * MaxSaveWifiNum, &(myfile->br));
+			if(FR_OK == myfile->res)
 			{
-				memset(tempwifi, 0, sizeof(WIFI_Def));
-				myfile->res = f_read(&(myfile->file), tempwifi, sizeof(WIFI_Def), &(myfile->br));
-				
-				if(FR_OK == myfile->res)
+				//查找是否存在待保存的wifi
+				for(i=0; i<MaxSaveWifiNum; i++)
 				{
-					if(tempwifi->crc == CalModbusCRC16Fun1(tempwifi, sizeof(WIFI_Def)-2))
+					if(wifiBuf[i].crc == CalModbusCRC16Fun1(&(wifiBuf[i]), sizeof(WIFI_Def)-2))
 					{
-						if(pdPASS == CheckStrIsSame(wifi->ssid, tempwifi->ssid, MaxSSIDLen))
+						//如果找到以保存的数据，则替换
+						if(pdPASS == CheckStrIsSame(wifi->ssid, wifiBuf[i].ssid, MaxSSIDLen))
 						{
-							f_lseek(&(myfile->file), i*sizeof(WIFI_Def));
 							wifi->crc = CalModbusCRC16Fun1(wifi, sizeof(WIFI_Def)-2);
-							myfile->res = f_write(&(myfile->file), wifi, sizeof(WIFI_Def), &(myfile->bw));
-							if((FR_OK == myfile->res)&&(myfile->bw == sizeof(WIFI_Def)))
+							memcpy(&(wifiBuf[i]), wifi, sizeof(WIFI_Def));
+							
+							myfile->res = f_write(&(myfile->file), wifiBuf, sizeof(WIFI_Def) * MaxSaveWifiNum, &(myfile->bw));
+							if(FR_OK == myfile->res)
 								statues = My_Pass;
 							
 							break;
 						}
 					}
 				}
-				else
-					break;
+				
+				//如果当前待保存wifi不存在，需新建
+				if(i >= MaxSaveWifiNum)
+				{
+					//查找空位置，保存当前wifi
+					for(i=0; i<MaxSaveWifiNum; i++)
+					{
+						if(wifiBuf[i].crc != CalModbusCRC16Fun1(&(wifiBuf[i]), sizeof(WIFI_Def)-2))
+						{
+							wifi->crc = CalModbusCRC16Fun1(wifi, sizeof(WIFI_Def)-2);
+							memcpy(&(wifiBuf[i]), wifi, sizeof(WIFI_Def));
+							
+							myfile->res = f_write(&(myfile->file), wifiBuf, sizeof(WIFI_Def) * MaxSaveWifiNum, &(myfile->bw));
+							if(FR_OK == myfile->res)
+								statues = My_Pass;
+							
+							break;
+						}
+					}
+				}
 			}
-
 			f_close(&(myfile->file));
 		}
 	}
-	MyFree(tempwifi);
+	
+	MyFree(wifiBuf);
 	MyFree(myfile);
 	
 	return statues;
@@ -92,37 +111,38 @@ MyState_TypeDef SaveWifiData(WIFI_Def * wifi)
 MyState_TypeDef ReadWifiData(WIFI_Def * wifi)
 {
 	FatfsFileInfo_Def * myfile = NULL;
+	WIFI_Def * wifiBuf = NULL;
 	MyState_TypeDef statues = My_Fail;
-	unsigned char i = 0;
-	WIFI_Def * tempwifi = NULL;
+	unsigned char i=0;
 	
 	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
-	tempwifi = MyMalloc(sizeof(WIFI_Def));
+	wifiBuf = MyMalloc(sizeof(WIFI_Def) * MaxSaveWifiNum);
 	
-	if(myfile && tempwifi)
+	if(myfile && wifiBuf && wifi)
 	{
 		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
-		memset(tempwifi, 0, sizeof(WIFI_Def));
+		memset(wifiBuf, 0, sizeof(WIFI_Def) * MaxSaveWifiNum);
 		
 		myfile->res = f_open(&(myfile->file), "0:/WifiSet.ncd", FA_READ);
 		
 		if(FR_OK == myfile->res)
 		{
-			myfile->size = f_size(&(myfile->file));
-			
-			for(i=0; i<(myfile->size / sizeof(WIFI_Def)); i++)
+			//读出所有保存的wifi
+			myfile->res = f_read(&(myfile->file), wifiBuf, sizeof(WIFI_Def) * MaxSaveWifiNum, &(myfile->br));
+			if(FR_OK == myfile->res)
 			{
-				f_lseek(&(myfile->file), i*sizeof(WIFI_Def));
-				
-				memset(tempwifi, 0, sizeof(WIFI_Def));
-				myfile->res = f_read(&(myfile->file), tempwifi, sizeof(WIFI_Def), &(myfile->br));
-				if((FR_OK == myfile->res)&&(myfile->br == sizeof(WIFI_Def)))
+				//查找是否存在待保存的wifi
+				for(i=0; i<MaxSaveWifiNum; i++)
 				{
-					if((tempwifi->crc == CalModbusCRC16Fun1(tempwifi, sizeof(WIFI_Def)-2))&&(pdPASS == CheckStrIsSame(wifi->ssid, tempwifi->ssid, MaxSSIDLen)))
+					if(wifiBuf[i].crc == CalModbusCRC16Fun1(&(wifiBuf[i]), sizeof(WIFI_Def)-2))
 					{
-						memcpy(wifi->key, tempwifi->key, MaxKEYLen);
-						statues = My_Pass;
-						break;
+						//如果找到以保存的数据，则读取
+						if(pdPASS == CheckStrIsSame(wifi->ssid, wifiBuf[i].ssid, MaxSSIDLen))
+						{
+							memcpy(wifi->key, wifiBuf[i].key, MaxKEYLen);
+							statues = My_Pass;
+							break;
+						}
 					}
 				}
 			}
@@ -131,7 +151,7 @@ MyState_TypeDef ReadWifiData(WIFI_Def * wifi)
 		}
 	}
 	
-	MyFree(tempwifi);
+	MyFree(wifiBuf);
 	MyFree(myfile);
 	
 	return statues;
@@ -140,59 +160,74 @@ MyState_TypeDef ReadWifiData(WIFI_Def * wifi)
 MyState_TypeDef deleteWifi(WIFI_Def * wifi)
 {
 	FatfsFileInfo_Def * myfile = NULL;
-	WIFI_Def * tempwifi = NULL;
+	WIFI_Def * wifiBuf = NULL;
 	MyState_TypeDef statues = My_Fail;
-	unsigned short i=0;
+	unsigned char i=0;
 	
 	myfile = MyMalloc(sizeof(FatfsFileInfo_Def));
-	tempwifi = MyMalloc(sizeof(WIFI_Def));
+	wifiBuf = MyMalloc(sizeof(WIFI_Def) * MaxSaveWifiNum);
 	
-	if(myfile && tempwifi)
+	if(myfile && wifiBuf && wifi)
 	{
 		memset(myfile, 0, sizeof(FatfsFileInfo_Def));
-		memset(tempwifi, 0, sizeof(WIFI_Def));
-
+		memset(wifiBuf, 0, sizeof(WIFI_Def) * MaxSaveWifiNum);
+		
 		myfile->res = f_open(&(myfile->file), "0:/WifiSet.ncd", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
-			
+		
 		if(FR_OK == myfile->res)
 		{
-			myfile->size = f_size(&(myfile->file));
-			
-			for(i=0; i<(myfile->size / sizeof(WIFI_Def)); i++)
+			//读出所有保存的wifi
+			myfile->res = f_read(&(myfile->file), wifiBuf, sizeof(WIFI_Def) * MaxSaveWifiNum, &(myfile->br));
+			if(FR_OK == myfile->res)
 			{
-				f_lseek(&(myfile->file), i*sizeof(WIFI_Def));
-				
-				memset(tempwifi, 0, sizeof(WIFI_Def));
-				myfile->res = f_read(&(myfile->file), tempwifi, sizeof(WIFI_Def), &(myfile->br));
-				if((FR_OK == myfile->res)&&(myfile->br == sizeof(WIFI_Def)))
+				//查找是否存在待保存的wifi
+				for(i=0; i<MaxSaveWifiNum; i++)
 				{
-					if((tempwifi->crc == CalModbusCRC16Fun1(tempwifi, sizeof(WIFI_Def)-2))&&(pdPASS == CheckStrIsSame(wifi->ssid, tempwifi->ssid, MaxSSIDLen)))
+					if(wifiBuf[i].crc == CalModbusCRC16Fun1(&(wifiBuf[i]), sizeof(WIFI_Def)-2))
 					{
-						tempwifi->crc = 0;
-						myfile->res = f_write(&(myfile->file), tempwifi, sizeof(WIFI_Def), &(myfile->bw));
-						if((FR_OK == myfile->res)&&(myfile->bw == sizeof(WIFI_Def)))
-							statues = My_Pass;
-						break;
+						//如果找到以保存的数据，则删除
+						if(pdPASS == CheckStrIsSame(wifi->ssid, wifiBuf[i].ssid, MaxSSIDLen))
+						{
+							memset(&(wifiBuf[i]), 0, sizeof(WIFI_Def));
+							
+							myfile->res = f_write(&(myfile->file), wifiBuf, sizeof(WIFI_Def) * MaxSaveWifiNum, &(myfile->bw));
+							if(FR_OK == myfile->res)
+								statues = My_Pass;
+							
+							break;
+						}
 					}
 				}
+				
+				//没找到，则返回删除成功
+				if(i >= MaxSaveWifiNum)
+					statues = My_Pass;
 			}
 
 			f_close(&(myfile->file));
 		}
 	}
-	MyFree(tempwifi);
-	MyFree(myfile);
 	
-	return statues;
+	MyFree(wifiBuf);
+	MyFree(myfile);
 }
 
+/***************************************************************************************************
+*FunctionName: ClearWifi
+*Description: 删除wifi数据
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年3月1日09:59:32
+***************************************************************************************************/
 MyState_TypeDef ClearWifi(void)
 {
 	FRESULT res;
 	
 	res = f_unlink("0:/WifiSet.ncd");
 	
-	if(FR_OK == res)
+	if((FR_OK == res) || (FR_NO_FILE == res))
 		return My_Pass;
 	else
 		return My_Fail;

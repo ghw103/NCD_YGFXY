@@ -265,9 +265,26 @@ static void RefreshText(void)
 				
 		sprintf(S_ShowPageBuffer->tempbuf, "%s", S_ShowPageBuffer->testdata.temperweima.PiHao);
 		DisText(0x2340, S_ShowPageBuffer->tempbuf, 30);
-				
-		sprintf(S_ShowPageBuffer->tempbuf, "%.2f", S_ShowPageBuffer->testdata.testline.AdjustResult);
+		
+		
+		if(IsShowRealValue() == true)
+			sprintf(S_ShowPageBuffer->tempbuf, "%.*f %s", S_ShowPageBuffer->testdata.temperweima.itemConstData.pointNum,
+				S_ShowPageBuffer->testdata.testline.AdjustResult, S_ShowPageBuffer->testdata.temperweima.itemConstData.itemMeasure);
+		else if(S_ShowPageBuffer->testdata.testline.AdjustResult <= S_ShowPageBuffer->testdata.temperweima.itemConstData.lowstResult)
+			sprintf(S_ShowPageBuffer->tempbuf, "<%.*f %s", S_ShowPageBuffer->testdata.temperweima.itemConstData.pointNum, 
+				S_ShowPageBuffer->testdata.temperweima.itemConstData.lowstResult, S_ShowPageBuffer->testdata.temperweima.itemConstData.itemMeasure);
+		else if(S_ShowPageBuffer->testdata.testline.AdjustResult >= S_ShowPageBuffer->testdata.temperweima.itemConstData.highestResult)
+			sprintf(S_ShowPageBuffer->tempbuf, ">%.*f %s", S_ShowPageBuffer->testdata.temperweima.itemConstData.pointNum, 
+				S_ShowPageBuffer->testdata.temperweima.itemConstData.highestResult, S_ShowPageBuffer->testdata.temperweima.itemConstData.itemMeasure);
+		else
+			sprintf(S_ShowPageBuffer->tempbuf, "%.*f %s", S_ShowPageBuffer->testdata.temperweima.itemConstData.pointNum, 
+				S_ShowPageBuffer->testdata.testline.AdjustResult,S_ShowPageBuffer->testdata.temperweima.itemConstData.itemMeasure);
+
 		DisText(0x2350, S_ShowPageBuffer->tempbuf, 30);
+		
+		sprintf(S_ShowPageBuffer->tempbuf, "%s", S_ShowPageBuffer->testdata.temperweima.itemConstData.normalResult);
+
+		DisText(0x2360, S_ShowPageBuffer->tempbuf, 30);
 
 	}
 }

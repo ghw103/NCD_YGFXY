@@ -12,7 +12,6 @@
 #include	"QueueUnits.h"
 #include	"System_Data.h"
 #include 	"Usart4_Driver.h"
-#include 	"usbd_cdc_vcp.h"
 #include	"SystemSet_Data.h"
 #include	"AppFileDao.h"
 #include	"IAP_Fun.h"
@@ -98,6 +97,8 @@ void CommunicateWithServerByLineNet(MyServerData * myServerData)
 				p = p->next;
 				WriteAppFile(p->payload, p->len, false);
 			}
+			
+			vTaskDelay(10 / portTICK_RATE_MS);
 		}
 		else
 		{
@@ -122,16 +123,23 @@ void CommunicateWithServerByWifi(MyServerData * myServerData)
 {
 	unsigned short i = 0;
 	unsigned short readSize = 0;
+	portTickType queueBlockTime;
 	
 	if(isWifiUseable() == true)
 	{
+		//清空队列数据
+		while(pdPASS == ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4Mutex(), myServerData->recvBuf, 1000, 
+				&readSize, 1, 10 / portTICK_RATE_MS, 1 / portTICK_RATE_MS));
+		
 		//发送数据
 		if(My_Pass == SendDataToQueue(GetUsart4TXQueue(), GetUsart4Mutex(), myServerData->sendBuf, myServerData->sendDataLen,
 			1, 1000 / portTICK_RATE_MS, 10 / portTICK_RATE_MS, EnableUsart4TXInterrupt))
 		{
-			//接收数据
+			
+			//接收数据,最好等待1s
+			
 			while(pdPASS == ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4Mutex(), myServerData->recvBuf, 1000, 
-				&readSize, 1, 10 / portTICK_RATE_MS, 10 / portTICK_RATE_MS))
+				&readSize, 1, 1000 / portTICK_RATE_MS, 1000 / portTICK_RATE_MS))
 			{
 				//如果发生的是GET请求，则说明是下载固件，需要保存
 				if(strstr(myServerData->sendBuf, "GET"))
@@ -146,6 +154,8 @@ void CommunicateWithServerByWifi(MyServerData * myServerData)
 					
 					myServerData->recvDataLen += readSize;
 				}
+				
+				vTaskDelay(10 / portTICK_RATE_MS);
 			}
 		}
 	}

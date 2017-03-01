@@ -41,23 +41,18 @@ static NetInfo_Type GB_NetInfo;												//系统实时网络信息
 ***************************************************************************************************/
 void GetGB_NetInfo(NetInfo_Type * netinfo)
 {
-	vTaskSuspendAll();
-	
 	memcpy(netinfo, &GB_NetInfo, sizeof(NetInfo_Type));
-	
-	xTaskResumeAll();
+
 }
 
 void SetGB_LineNetIP(unsigned int ip)
 {
-	vTaskSuspendAll();
-	
+
 	GB_NetInfo.LineIP.ip_4 = (ip >> 24)&0xff;
 	GB_NetInfo.LineIP.ip_3 = (ip >> 16)&0xff;
 	GB_NetInfo.LineIP.ip_2 = (ip >> 8)&0xff;
 	GB_NetInfo.LineIP.ip_1 = (ip >> 0)&0xff;
-	
-	xTaskResumeAll();
+
 }
 
 void SetGB_LineNetMac(unsigned char * mac)
@@ -71,11 +66,9 @@ void SetGB_LineNetMac(unsigned char * mac)
 
 void SetGB_LineNetStatus(unsigned char status)
 {
-	vTaskSuspendAll();
-	
+
 	GB_NetInfo.LineStatus = status;
-	
-	xTaskResumeAll();
+
 }
 
 /****************************************end of file************************************************/

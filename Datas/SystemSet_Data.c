@@ -23,6 +23,8 @@ static SystemSetData GB_SystemSetData;								//系统参数
 static bool wifiIsUseable = true;									//wifi是否可用于传输数据，
 																	//由于无需持久化，所以不放在系统参数中
 																	//设置wifi的时候不能提交数据
+
+static bool isShowRealValue = false;								//是否显示真实数据
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -437,5 +439,24 @@ void setWifiIsUseable(bool isUseable)
 bool isWifiUseable(void)
 {
 	return wifiIsUseable;
+}
+
+/***************************************************************************************************
+*FunctionName: setIsShowRealValue, IsShowRealValue
+*Description: 是否显示真实值
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年2月27日14:04:02
+***************************************************************************************************/
+void setIsShowRealValue(bool isShow)
+{
+	isShowRealValue = isShow;
+}
+
+bool IsShowRealValue(void)
+{
+	return isShowRealValue;
 }
 /****************************************end of file************************************************/

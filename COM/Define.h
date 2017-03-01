@@ -5,20 +5,13 @@
 #include 	"FreeRTOS.h"
 #include	"ff.h"
 
-#define		NormalCode	0											//正常程序
-#define		LabCode	1											//测试程序
-	
-#define		CodeType	LabCode									//程序分类
-
-#define		AdminPassWord		"123456"								//管理员密码，用于修改设备id
-#define		AdjustPassWord		"111111"								//校准密码
-#define		TestPassWord		"222222"								//老化测试密码
-#define		CheckQRPassWord		"333333"								//测试二维码密码
-#define		AdjLedPassWord		"444444"								//校准led密码
-#define		FactoryResetPassWord	"555555"							//恢复出厂设置密码
-
-#define		MY_SUCCESS	1
-#define		MY_FALSE	0
+#define		AdminPassWord		"123456\0"								//管理员密码，用于修改设备id
+#define		AdjustPassWord		"111111\0"								//校准密码
+#define		TestPassWord		"222222\0"								//老化测试密码
+#define		CheckQRPassWord		"333333\0"								//测试二维码密码
+#define		AdjLedPassWord		"444444\0"								//校准led密码
+#define		FactoryResetPassWord	"555555\0"							//恢复出厂设置密码
+#define		ChangeValueShowTypePassWord	"666666\0"						//切换结果显示模式，是否显示真实值
 
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -27,7 +20,7 @@
 /***************************************************************************************************/
 /*V1.0.03*/
 #define	GB_SoftVersion	(unsigned short)1003
-#define	GB_SoftVersion_Build	"Build17021001\0"
+#define	GB_SoftVersion_Build	"Build17030101\0"
 
 /*服务器信息*/
 #define	GB_ServerIp_1		116
@@ -325,6 +318,7 @@ typedef struct ip_Tag
 }IP_Def;
 #pragma pack()
 
+#define	MaxSaveWifiNum	50												//最多保存50个热点
 #define	MaxWifiListNum	20												//最多显示20个热点
 #define	PageWifiNum		10
 #define	MaxSSIDLen		50

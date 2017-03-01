@@ -10,7 +10,7 @@
 /***************************************************************************************************/
 #include	"Printf_Fun.h"
 #include 	"Usart3_Driver.h"
-
+#include	"SystemSet_Data.h"
 #include	"System_Data.h"
 #include	"QueueUnits.h"
 #include	"MyMem.h"
@@ -96,7 +96,9 @@ void PrintfData(void *data)
 		memset(printfbuf, 0, 100);
 		
 		tempvalue = testd->testline.AdjustResult;
-		if(tempvalue <= testd->temperweima.itemConstData.lowstResult)
+		if(IsShowRealValue() == true)
+			sprintf(printfbuf, "测试结果: %.*f %-8.8s\r", testd->temperweima.itemConstData.pointNum, testd->testline.AdjustResult, testd->temperweima.itemConstData.itemMeasure);
+		else if(tempvalue <= testd->temperweima.itemConstData.lowstResult)
 			sprintf(printfbuf, "测试结果: <%.*f %-8.8s\r", testd->temperweima.itemConstData.pointNum, testd->temperweima.itemConstData.lowstResult, testd->temperweima.itemConstData.itemMeasure);
 		else if(tempvalue >= testd->temperweima.itemConstData.highestResult)
 			sprintf(printfbuf, "测试结果: >%.*f %-8.8s\r", testd->temperweima.itemConstData.pointNum, testd->temperweima.itemConstData.highestResult, testd->temperweima.itemConstData.itemMeasure);
@@ -120,6 +122,12 @@ void PrintfData(void *data)
 		
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
 		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, NULL, sizeof(unsigned char), 500 / portTICK_RATE_MS, 100 / portTICK_RATE_MS);
+		
+		memset(printfbuf, 0, 100);
+		sprintf(printfbuf, "声明：本结果仅对本标本负责！\r");
+		
+		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
+		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, NULL, sizeof(unsigned char), 5000 / portTICK_RATE_MS, 100 / portTICK_RATE_MS);
 		
 		memset(printfbuf, 0, 100);
 		sprintf(printfbuf, "\r------------------------\r\r\r\r\r\r");

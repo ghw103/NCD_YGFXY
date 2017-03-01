@@ -16,6 +16,7 @@ typedef struct Record_tag {
 	Page page;
 	
 	char buf[300];										//临时缓冲区
+	char tempBuf[100];										//临时缓冲区
 	unsigned int tempvalue1;
 	unsigned int tempvalue2;
 	TestData *tempdata;

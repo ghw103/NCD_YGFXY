@@ -25,35 +25,35 @@ const ItemConstData GB_ItemConstData[4]=
 		.pointNum = 0,
 		.lowstResult = 20,
 		.highestResult = 30000,
-		.normalResult = "<75Ëê,<125pg/mL\r\n>=75Ëê,<450pg/mL\0",
+		.normalResult = "<75Ëê,<125pg/mL£»>=75Ëê,<450pg/mL\0",
 		.itemMeasure = "pg/mL\0"
 	},
 	{
 		.itemName = "CK-MB\0",
 		.icoIndex = 1,
 		.pointNum = 2,
-		.lowstResult = 0.5,
-		.highestResult = 1000,
-		.normalResult = {"xsx\0"},
-		.itemMeasure = {"xsx\0"}
+		.lowstResult = 0,
+		.highestResult = 80,
+		.normalResult = {"<=3.8ng/mL\0"},
+		.itemMeasure = {"ng/mL\0"}
 	},
 	{
 		.itemName = "cTnI\0",
 		.icoIndex = 2,
 		.pointNum = 2,
-		.lowstResult = 0,
-		.highestResult = 1000,
-		.normalResult = {"xsx\0"},
-		.itemMeasure = {"xsx\0"}
+		.lowstResult = 0.1,
+		.highestResult = 30,
+		.normalResult = {"<=0.3ng/mL\0"},
+		.itemMeasure = {"ng/mL\0"}
 	},
 	{
 		.itemName = "Myo\0",
 		.icoIndex = 3,
 		.pointNum = 2,
-		.lowstResult = 0,
-		.highestResult = 1000,
-		.normalResult = {"xsx\0"},
-		.itemMeasure = {"xsx\0"}
+		.lowstResult = 2.5,
+		.highestResult = 350,
+		.normalResult = {"<=99.3ng/mL\0"},
+		.itemMeasure = {"ng/mL\0"}
 	},
 };
 /***************************************************************************************************/

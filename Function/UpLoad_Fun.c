@@ -192,11 +192,19 @@ static void UpLoadTestData(void)
 				//上传测试数据
 				memset(upLoadTestDataBuffer->sendBuf, 0, UPLOADSENDBUFLEN);
 				
-				sprintf(upLoadTestDataBuffer->sendBuf, "cnum=%s&card.cid=%s&device.did=%s&t_name=%s&sid=%s&testtime=20%d-%d-%d %d:%d:%d&e_t=%.1f&o_t=%.1f&outt=%d&c_l=%d&t_l=%d&b_l=%d&t_c_v=%.3f&a_p=%.3f&b_v=%.3f&a_v=%.3f&t_re=%s",
-					upLoadTestDataBuffer->testData->temperweima.piNum, upLoadTestDataBuffer->testData->temperweima.PiHao, upLoadTestDataBuffer->systemSetData.deviceInfo.deviceid, upLoadTestDataBuffer->testData->user.user_name, upLoadTestDataBuffer->testData->sampleid,
-					upLoadTestDataBuffer->testData->TestTime.year, upLoadTestDataBuffer->testData->TestTime.month, upLoadTestDataBuffer->testData->TestTime.day, upLoadTestDataBuffer->testData->TestTime.hour, upLoadTestDataBuffer->testData->TestTime.min, upLoadTestDataBuffer->testData->TestTime.sec,
-					upLoadTestDataBuffer->testData->TestTemp.E_Temperature, upLoadTestDataBuffer->testData->TestTemp.O_Temperature, upLoadTestDataBuffer->testData->time, upLoadTestDataBuffer->testData->testline.C_Point[1], upLoadTestDataBuffer->testData->testline.T_Point[1],
-					upLoadTestDataBuffer->testData->testline.B_Point[1], upLoadTestDataBuffer->testData->testline.BasicBili, upLoadTestDataBuffer->testData->tempadjust.parm, upLoadTestDataBuffer->testData->testline.BasicResult, upLoadTestDataBuffer->testData->testline.AdjustResult,
+				sprintf(upLoadTestDataBuffer->sendBuf, "cnum=%s&cid=%s&did=%s&t_name=%s&sid=%s&testtime=20%d-%d-%d %d:%d:%d&e_t=%.1f&o_t=%.1f&outt=%d&c_l=%d&t_l=%d&b_l=%d&t_c_v=%.3f&a_p=%.3f&b_v=%.*f&a_v=%.*f&t_re=%s",
+					upLoadTestDataBuffer->testData->temperweima.piNum, upLoadTestDataBuffer->testData->temperweima.PiHao, 
+					upLoadTestDataBuffer->systemSetData.deviceInfo.deviceid, upLoadTestDataBuffer->testData->user.user_name, 
+					upLoadTestDataBuffer->testData->sampleid, upLoadTestDataBuffer->testData->TestTime.year, 
+					upLoadTestDataBuffer->testData->TestTime.month, upLoadTestDataBuffer->testData->TestTime.day, 
+					upLoadTestDataBuffer->testData->TestTime.hour, upLoadTestDataBuffer->testData->TestTime.min, 
+					upLoadTestDataBuffer->testData->TestTime.sec, upLoadTestDataBuffer->testData->TestTemp.E_Temperature, 
+					upLoadTestDataBuffer->testData->TestTemp.O_Temperature, upLoadTestDataBuffer->testData->time, 
+					upLoadTestDataBuffer->testData->testline.C_Point[1], upLoadTestDataBuffer->testData->testline.T_Point[1],
+					upLoadTestDataBuffer->testData->testline.B_Point[1], upLoadTestDataBuffer->testData->testline.BasicBili, 
+					upLoadTestDataBuffer->testData->tempadjust.parm, upLoadTestDataBuffer->testData->temperweima.itemConstData.pointNum, 
+					upLoadTestDataBuffer->testData->testline.BasicResult, upLoadTestDataBuffer->testData->temperweima.itemConstData.pointNum, 
+					upLoadTestDataBuffer->testData->testline.AdjustResult,
 					"ok");
 
 				if(My_Pass != UpLoadData("/NCD_Server/up_testdata", upLoadTestDataBuffer->sendBuf, strlen(upLoadTestDataBuffer->sendBuf), 
@@ -207,7 +215,7 @@ static void UpLoadTestData(void)
 				for(upLoadTestDataBuffer->i=0; upLoadTestDataBuffer->i<3; upLoadTestDataBuffer->i++)
 				{
 					memset(upLoadTestDataBuffer->sendBuf, 0, UPLOADSENDBUFLEN);
-					sprintf(upLoadTestDataBuffer->sendBuf, "cnum=%s&card.cid=%s&", upLoadTestDataBuffer->testData->temperweima.piNum, upLoadTestDataBuffer->testData->temperweima.PiHao);
+					sprintf(upLoadTestDataBuffer->sendBuf, "cnum=%s&cid=%s&", upLoadTestDataBuffer->testData->temperweima.piNum, upLoadTestDataBuffer->testData->temperweima.PiHao);
 					
 					memset(upLoadTestDataBuffer->tempBuf, 0, UPLOADTEMPBUFLEN);
 					if(upLoadTestDataBuffer->i == 0)
@@ -231,16 +239,18 @@ static void UpLoadTestData(void)
 					sprintf(upLoadTestDataBuffer->tempBuf, "]");
 					strcat(upLoadTestDataBuffer->sendBuf, upLoadTestDataBuffer->tempBuf);
 					
-
 					if(My_Pass != UpLoadData("/NCD_Server/up_series", upLoadTestDataBuffer->sendBuf, strlen(upLoadTestDataBuffer->sendBuf),
 						upLoadTestDataBuffer->recvBuf, UPLOADRECVBUFLEN, "POST"))
-						break;
+						goto END1;
 				}
 			}
 			
 			upLoadTestDataBuffer->systemSetData.upLoadIndex++;
 			upLoadTestDataBuffer->testData++;
 		}
+		
+		//上传曲线失败，则跳到此处，当前数据下次重新上传
+		END1:
 		
 		//更新系统设置数据中的上传索引数据
 		setUpLoadIndex(upLoadTestDataBuffer->systemSetData.upLoadIndex);
