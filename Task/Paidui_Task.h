@@ -2,7 +2,7 @@
 #ifndef PAIDUI_T_H
 #define PAIDUI_T_H
 
-void StartPaiduiTask(void);
+char StartPaiduiTask(void);
 
 #endif
 

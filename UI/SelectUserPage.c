@@ -9,6 +9,7 @@
 #include	"CRC16.h"
 #include	"PlaySong_Task.h"
 #include	"UserDao.h"
+#include	"UserMPage.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -179,6 +180,11 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			S_UserPageBuffer->selectindex = S_UserPageBuffer->lcdinput[0] - 0x1205+1;
 			SelectUser(S_UserPageBuffer->selectindex);
 		}
+		//编辑操作人
+		if(S_UserPageBuffer->lcdinput[0] == 0x120a)
+		{
+			startActivity(createUserManagerActivity, NULL);
+		}
 	}
 }
 
@@ -221,6 +227,19 @@ static void activityHide(void)
 ***************************************************************************************************/
 static void activityResume(void)
 {
+	if(S_UserPageBuffer)
+	{	
+		/*读取所有操作人*/
+		ReadUserData(S_UserPageBuffer->user);
+	
+		S_UserPageBuffer->pageindex = 1;
+		S_UserPageBuffer->selectindex = 0;
+	
+		ShowList();
+		SelectUser(S_UserPageBuffer->selectindex);
+	
+		AddNumOfSongToList(9, 0);
+	}
 	
 	SelectPage(84);
 }

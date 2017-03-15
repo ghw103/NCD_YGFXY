@@ -84,9 +84,7 @@ static void activityStart(void)
 	{
 		//读取系统设置
 		copyGBSystemSetData(&(S_RecordPageBuffer->systemSetData));
-		
-		timer_set(&(S_RecordPageBuffer->timer), S_RecordPageBuffer->systemSetData.ledSleepTime);
-		
+
 		S_RecordPageBuffer->selectindex = 0;
 		S_RecordPageBuffer->pageindex = 1;
 		ShowRecord(S_RecordPageBuffer->pageindex);
@@ -111,8 +109,6 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*命令*/
 		S_RecordPageBuffer->lcdinput[0] = pbuf[4];
 		S_RecordPageBuffer->lcdinput[0] = (S_RecordPageBuffer->lcdinput[0]<<8) + pbuf[5];
-		
-		timer_restart(&(S_RecordPageBuffer->timer));
 		
 		/*返回*/
 		if(S_RecordPageBuffer->lcdinput[0] == 0x2000)
@@ -153,7 +149,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			if(S_RecordPageBuffer->tempvalue1 <= S_RecordPageBuffer->page.ElementsSize)
 			{
 				S_RecordPageBuffer->selectindex = (S_RecordPageBuffer->lcdinput[0] - 0x2004 + 1);
-				BasicPic(0x2020, 1, 137, 83, 417, 1012, 454, 36, 148+(S_RecordPageBuffer->selectindex - 1)*39);
+				BasicPic(0x2020, 1, 137, 83, 417, 1012, 454, 38, 149+(S_RecordPageBuffer->selectindex - 1)*40);
 			}
 		}
 		//跳页
@@ -183,11 +179,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void activityFresh(void)
 {
-	if(S_RecordPageBuffer)
-	{
-		if(TimeOut == timer_expired(&(S_RecordPageBuffer->timer)))
-			startActivity(createSleepActivity, NULL);
-	}
+
 }
 
 /***************************************************************************************************
@@ -217,7 +209,7 @@ static void activityResume(void)
 {
 	if(S_RecordPageBuffer)
 	{
-		timer_restart(&(S_RecordPageBuffer->timer));
+
 	}
 	
 	SelectPage(114);
@@ -290,69 +282,84 @@ static MyState_TypeDef ShowRecord(unsigned char pageindex)
 {
 	unsigned short i=0;
 	
-	if(S_RecordPageBuffer)
+	
+	memset(&(S_RecordPageBuffer->page), 0, sizeof(Page));
+		
+	//设置分页读取信息
+	S_RecordPageBuffer->tempvalue1 = pageindex-1;
+	S_RecordPageBuffer->tempvalue1 *= DataShowNumInPage;
+	S_RecordPageBuffer->pageRequest.startElementIndex = S_RecordPageBuffer->tempvalue1;
+	S_RecordPageBuffer->pageRequest.pageSize = DataShowNumInPage;
+	S_RecordPageBuffer->pageRequest.orderType = ASC;
+		
+	//再次读取系统设置数据，主要是为了读取数据总数
+	copyGBSystemSetData(&(S_RecordPageBuffer->systemSetData));
+		
+	//读取数据
+	ReadTestData(&(S_RecordPageBuffer->pageRequest), &(S_RecordPageBuffer->page), &(S_RecordPageBuffer->systemSetData));
+	
+	S_RecordPageBuffer->maxpagenum = ((S_RecordPageBuffer->systemSetData.testDataNum % DataShowNumInPage) == 0)?(S_RecordPageBuffer->systemSetData.testDataNum / DataShowNumInPage):
+	((S_RecordPageBuffer->systemSetData.testDataNum / DataShowNumInPage)+1);
+		
+	BasicPic(0x2020, 0, 100, 39, 522, 968, 556, 39, 140+(S_RecordPageBuffer->selectindex)*36);
+	
+	vTaskDelay(10 / portTICK_RATE_MS);
+	
+	S_RecordPageBuffer->tempdata = &(S_RecordPageBuffer->page.testData[S_RecordPageBuffer->page.ElementsSize-1]);
+	for(i=0; i<S_RecordPageBuffer->page.ElementsSize; i++)
 	{
-		memset(&(S_RecordPageBuffer->page), 0, sizeof(Page));
+		//显示索引
+		sprintf(S_RecordPageBuffer->buf, "%d\0", (pageindex-1)*DataShowNumInPage+i+1);
+		DisText(0x2030+(i)*0x40, S_RecordPageBuffer->buf, strlen(S_RecordPageBuffer->buf)+1);
 		
-		//设置分页读取信息
-		S_RecordPageBuffer->tempvalue1 = pageindex-1;
-		S_RecordPageBuffer->tempvalue1 *= DataShowNumInPage;
-		S_RecordPageBuffer->pageRequest.startElementIndex = S_RecordPageBuffer->tempvalue1;
-		S_RecordPageBuffer->pageRequest.pageSize = DataShowNumInPage;
-		S_RecordPageBuffer->pageRequest.orderType = ASC;
+		//显示项目
+		sprintf(S_RecordPageBuffer->buf, "%.11s\0", S_RecordPageBuffer->tempdata->temperweima.ItemName);
+		DisText(0x2036+(i)*0x40, S_RecordPageBuffer->buf, strlen(S_RecordPageBuffer->buf)+1);
 		
-		//再次读取系统设置数据，主要是为了读取数据总数
-		copyGBSystemSetData(&(S_RecordPageBuffer->systemSetData));
+		//显示样品编号
+		sprintf(S_RecordPageBuffer->buf, "%.15s\0", S_RecordPageBuffer->tempdata->sampleid);
+		DisText(0x2040+(i)*0x40, S_RecordPageBuffer->buf, strlen(S_RecordPageBuffer->buf)+1);
 		
-		//读取数据
-		ReadTestData(&(S_RecordPageBuffer->pageRequest), &(S_RecordPageBuffer->page), &(S_RecordPageBuffer->systemSetData));
+		//显示结果
+		if(IsShowRealValue() == true)
+			sprintf(S_RecordPageBuffer->buf, "%.*f %s\0", S_RecordPageBuffer->tempdata->temperweima.itemConstData.pointNum, 
+				S_RecordPageBuffer->tempdata->testline.AdjustResult, S_RecordPageBuffer->tempdata->temperweima.itemConstData.itemMeasure);
+		else if(S_RecordPageBuffer->tempdata->testline.AdjustResult <= S_RecordPageBuffer->tempdata->temperweima.itemConstData.lowstResult)
+			sprintf(S_RecordPageBuffer->buf, "<%.*f %s\0", S_RecordPageBuffer->tempdata->temperweima.itemConstData.pointNum, 
+				S_RecordPageBuffer->tempdata->temperweima.itemConstData.lowstResult, S_RecordPageBuffer->tempdata->temperweima.itemConstData.itemMeasure);
+		else if(S_RecordPageBuffer->tempdata->testline.AdjustResult >= S_RecordPageBuffer->tempdata->temperweima.itemConstData.highestResult)
+			sprintf(S_RecordPageBuffer->buf, ">%.*f %s\0", S_RecordPageBuffer->tempdata->temperweima.itemConstData.pointNum, 
+				S_RecordPageBuffer->tempdata->temperweima.itemConstData.highestResult, S_RecordPageBuffer->tempdata->temperweima.itemConstData.itemMeasure);
+		else
+			sprintf(S_RecordPageBuffer->buf, "%.*f %s\0", S_RecordPageBuffer->tempdata->temperweima.itemConstData.pointNum, 
+				S_RecordPageBuffer->tempdata->testline.AdjustResult, S_RecordPageBuffer->tempdata->temperweima.itemConstData.itemMeasure);
+		DisText(0x204C+(i)*0x40, S_RecordPageBuffer->buf, strlen(S_RecordPageBuffer->buf)+1);
 		
-		S_RecordPageBuffer->maxpagenum = ((S_RecordPageBuffer->systemSetData.testDataNum % DataShowNumInPage) == 0)?(S_RecordPageBuffer->systemSetData.testDataNum / DataShowNumInPage):
-		((S_RecordPageBuffer->systemSetData.testDataNum / DataShowNumInPage)+1);
 		
-		BasicPic(0x2020, 0, 100, 39, 522, 968, 556, 39, 140+(S_RecordPageBuffer->selectindex)*36);
+		//显示时间
+		sprintf(S_RecordPageBuffer->buf, "%02d-%02d-%02d %02d:%02d:%02d\0", S_RecordPageBuffer->tempdata->TestTime.year, S_RecordPageBuffer->tempdata->TestTime.month, S_RecordPageBuffer->tempdata->TestTime.day,
+			S_RecordPageBuffer->tempdata->TestTime.hour, S_RecordPageBuffer->tempdata->TestTime.min, S_RecordPageBuffer->tempdata->TestTime.sec);
+		DisText(0x2058+(i)*0x40, S_RecordPageBuffer->buf, strlen(S_RecordPageBuffer->buf)+1);
 		
-		S_RecordPageBuffer->tempdata = &(S_RecordPageBuffer->page.testData[S_RecordPageBuffer->page.ElementsSize-1]);
-		for(i=0; i<S_RecordPageBuffer->page.ElementsSize; i++)
-		{
-			memset(S_RecordPageBuffer->buf, 0, 300);
-			sprintf(S_RecordPageBuffer->buf, "%5d   %10s%15s  ", (pageindex-1)*DataShowNumInPage+i+1, S_RecordPageBuffer->tempdata->temperweima.ItemName,
-				S_RecordPageBuffer->tempdata->sampleid);
-			
-			memset(S_RecordPageBuffer->tempBuf, 0, 100);
-			if(IsShowRealValue() == true)
-				sprintf(S_RecordPageBuffer->tempBuf, "%8.*f %s", S_RecordPageBuffer->tempdata->temperweima.itemConstData.pointNum, 
-					S_RecordPageBuffer->tempdata->testline.AdjustResult, S_RecordPageBuffer->tempdata->temperweima.itemConstData.itemMeasure);
-			else if(S_RecordPageBuffer->tempdata->testline.AdjustResult <= S_RecordPageBuffer->tempdata->temperweima.itemConstData.lowstResult)
-				sprintf(S_RecordPageBuffer->tempBuf, "<%8.*f %s", S_RecordPageBuffer->tempdata->temperweima.itemConstData.pointNum, 
-					S_RecordPageBuffer->tempdata->temperweima.itemConstData.lowstResult, S_RecordPageBuffer->tempdata->temperweima.itemConstData.itemMeasure);
-			else if(S_RecordPageBuffer->tempdata->testline.AdjustResult >= S_RecordPageBuffer->tempdata->temperweima.itemConstData.highestResult)
-				sprintf(S_RecordPageBuffer->tempBuf, ">%8.*f %s", S_RecordPageBuffer->tempdata->temperweima.itemConstData.pointNum, 
-					S_RecordPageBuffer->tempdata->temperweima.itemConstData.highestResult, S_RecordPageBuffer->tempdata->temperweima.itemConstData.itemMeasure);
-			else
-				sprintf(S_RecordPageBuffer->tempBuf, "%8.*f %s", S_RecordPageBuffer->tempdata->temperweima.itemConstData.pointNum, 
-					S_RecordPageBuffer->tempdata->testline.AdjustResult, S_RecordPageBuffer->tempdata->temperweima.itemConstData.itemMeasure);
-			strcat(S_RecordPageBuffer->buf, S_RecordPageBuffer->tempBuf);
-			
-			memset(S_RecordPageBuffer->tempBuf, 0, 100);
-			sprintf(S_RecordPageBuffer->tempBuf, " %02d-%02d-%02d %02d:%02d:%02d %s ", S_RecordPageBuffer->tempdata->TestTime.year, S_RecordPageBuffer->tempdata->TestTime.month, S_RecordPageBuffer->tempdata->TestTime.day,
-				S_RecordPageBuffer->tempdata->TestTime.hour, S_RecordPageBuffer->tempdata->TestTime.min, S_RecordPageBuffer->tempdata->TestTime.sec,
-				S_RecordPageBuffer->tempdata->user.user_name);
-			strcat(S_RecordPageBuffer->buf, S_RecordPageBuffer->tempBuf);
+		//显示操作人
+		sprintf(S_RecordPageBuffer->buf, "%s\0", S_RecordPageBuffer->tempdata->user.user_name);
+		DisText(0x2065+(i)*0x40, S_RecordPageBuffer->buf, strlen(S_RecordPageBuffer->buf)+1);
 		
-			DisText(0x2030+(i)*0x40, S_RecordPageBuffer->buf, 120);
-			
-			S_RecordPageBuffer->tempdata--;
-		}
-		
-		for(i=S_RecordPageBuffer->page.ElementsSize; i<DataShowNumInPage; i++)
-		{
-			ClearText(0x2030+(i)*0x40, 100);
-		}
-		
-		return My_Pass;
+		S_RecordPageBuffer->tempdata--;
+		vTaskDelay(10 / portTICK_RATE_MS);
 	}
 	
-	return My_Fail;
+	for(i=S_RecordPageBuffer->page.ElementsSize; i<DataShowNumInPage; i++)
+	{
+		ClearText(0x2030+(i)*0x40, 10);
+		ClearText(0x2036+(i)*0x40, 16);
+		ClearText(0x2040+(i)*0x40, 20);
+		ClearText(0x204c+(i)*0x40, 16);
+		ClearText(0x2058+(i)*0x40, 20);
+		ClearText(0x2065+(i)*0x40, 16);
+		vTaskDelay(10 / portTICK_RATE_MS);
+	}
+	
+	return My_Pass;
 }
 

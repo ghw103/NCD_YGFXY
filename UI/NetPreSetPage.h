@@ -6,8 +6,6 @@
 
 typedef struct NetPrePageBuffer_tag {
 	unsigned short lcdinput[100];
-	SystemSetData systemSetData;
-	Timer timer;
 }NetPrePageBuffer;
 
 

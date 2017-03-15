@@ -23,7 +23,7 @@ void ClearLine(unsigned char Command);
 void BasicUI(unsigned short addr , unsigned short cmd, unsigned short datapacknum, void *data , unsigned short len);
 void SetLEDLight(unsigned char num);
 void WriteVarIcoNum(unsigned short addr, unsigned short num);
-
+void unLockLCDOneTime(void);
 #endif
 
 

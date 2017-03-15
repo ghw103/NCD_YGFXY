@@ -83,9 +83,7 @@ static void activityStart(void)
 	if(S_OtherSetPageBuffer)
 	{
 		copyGBSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
-		
-		timer_set(&(S_OtherSetPageBuffer->timer), S_OtherSetPageBuffer->systemSetData.ledSleepTime);
-		
+
 		showPrintfIco();
 		showMuteIco();
 		showLcdLightNum();
@@ -111,9 +109,6 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*命令*/
 		S_OtherSetPageBuffer->lcdinput[0] = pbuf[4];
 		S_OtherSetPageBuffer->lcdinput[0] = (S_OtherSetPageBuffer->lcdinput[0]<<8) + pbuf[5];
-		
-		//重置休眠时间
-		timer_restart(&(S_OtherSetPageBuffer->timer));
 		
 		/*重启*/
 		if(S_OtherSetPageBuffer->lcdinput[0] == 0x2400)
@@ -195,9 +190,6 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 				SendKeyCode(1);
 				//保存成功，更新内存中的数据
 				setSystemSetData(&(S_OtherSetPageBuffer->systemSetData));
-				
-				//重新设置当前页面的休眠时间
-				timer_set(&(S_OtherSetPageBuffer->timer), S_OtherSetPageBuffer->systemSetData.ledSleepTime);
 			}
 			else
 			{
@@ -243,8 +235,7 @@ static void activityFresh(void)
 {
 	if(S_OtherSetPageBuffer)
 	{
-		if(TimeOut == timer_expired(&(S_OtherSetPageBuffer->timer)))
-			startActivity(createSleepActivity, NULL);
+
 	}
 }
 
@@ -275,7 +266,7 @@ static void activityResume(void)
 {
 	if(S_OtherSetPageBuffer)
 	{
-		timer_restart(&(S_OtherSetPageBuffer->timer));
+
 	}
 	
 	SelectPage(122);

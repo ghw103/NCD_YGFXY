@@ -77,11 +77,7 @@ static void activityStart(void)
 {
 	if(S_AboutUsPageBuffer)
 	{
-		//读取系统设置
-		copyGBSystemSetData(&(S_AboutUsPageBuffer->systemSetData));
-		
-		timer_set(&(S_AboutUsPageBuffer->timer), S_AboutUsPageBuffer->systemSetData.ledSleepTime);
-		
+
 		dspPageText();
 	}
 		
@@ -105,9 +101,6 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		S_AboutUsPageBuffer->lcdinput[0] = pbuf[4];
 		S_AboutUsPageBuffer->lcdinput[0] = (S_AboutUsPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
-		//重置休眠时间
-		timer_restart(&(S_AboutUsPageBuffer->timer));
-		
 		//返回
 		if(S_AboutUsPageBuffer->lcdinput[0] == 0x2900)
 		{
@@ -129,8 +122,7 @@ static void activityFresh(void)
 {
 	if(S_AboutUsPageBuffer)
 	{
-		if(TimeOut == timer_expired(&(S_AboutUsPageBuffer->timer)))
-			startActivity(createSleepActivity, NULL);
+
 	}
 }
 
@@ -160,9 +152,7 @@ static void activityHide(void)
 static void activityResume(void)
 {
 	if(S_AboutUsPageBuffer)
-	{
-		timer_restart(&(S_AboutUsPageBuffer->timer));
-		
+	{	
 		dspPageText();
 	}
 	
@@ -228,28 +218,17 @@ static void activityBufferFree(void)
 
 static void dspPageText(void)
 {
-	ClearText(0x2910, 30);
-	ClearText(0x2920, 30);
-	ClearText(0x2930, 30);
-	
-	memset(S_AboutUsPageBuffer->buf, 0, 100);
-	
 	if((getIsSuccessDownloadFirmware() == true) && (getGbRemoteFirmwareVersion() > GB_SoftVersion))
 	{
 		S_AboutUsPageBuffer->tempV = getGbRemoteFirmwareVersion();
-		sprintf(S_AboutUsPageBuffer->buf, "V%d.%d.%02d (新版本V%d.%d.%02d)", GB_SoftVersion/1000, GB_SoftVersion%1000/100, GB_SoftVersion%100,
+		sprintf(S_AboutUsPageBuffer->buf, "V%d.%d.%02d (新版本V%d.%d.%02d)\0", GB_SoftVersion/1000, GB_SoftVersion%1000/100, GB_SoftVersion%100,
 			S_AboutUsPageBuffer->tempV/1000, S_AboutUsPageBuffer->tempV%1000/100, S_AboutUsPageBuffer->tempV%100);
 	}
 	else
-		sprintf(S_AboutUsPageBuffer->buf, "V%d.%d.%02d", GB_SoftVersion/1000, GB_SoftVersion%1000/100, GB_SoftVersion%100);
-	DisText(0x2910, S_AboutUsPageBuffer->buf, strlen(S_AboutUsPageBuffer->buf));
-	
-	memset(S_AboutUsPageBuffer->buf, 0, 30);
-	sprintf(S_AboutUsPageBuffer->buf, "%s", GB_SoftVersion_Build);
-	DisText(0x2920, S_AboutUsPageBuffer->buf, strlen(S_AboutUsPageBuffer->buf));
-	
-	memset(S_AboutUsPageBuffer->buf, 0, 30);
-	sprintf(S_AboutUsPageBuffer->buf, "鄂1234567890");
-	DisText(0x2930, S_AboutUsPageBuffer->buf, strlen(S_AboutUsPageBuffer->buf));
+		sprintf(S_AboutUsPageBuffer->buf, "V%d.%d.%02d\0", GB_SoftVersion/1000, GB_SoftVersion%1000/100, GB_SoftVersion%100);
+	DisText(0x2910, S_AboutUsPageBuffer->buf, strlen(S_AboutUsPageBuffer->buf)+1);
+
+	sprintf(S_AboutUsPageBuffer->buf, "%s\0", GB_SoftVersion_Build);
+	DisText(0x2920, S_AboutUsPageBuffer->buf, strlen(S_AboutUsPageBuffer->buf)+1);
 }
 

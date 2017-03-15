@@ -8,12 +8,13 @@
 
 typedef struct TestPageBuffer_tag {
 	ItemData * currenttestdata;
-	ResultState cardpretestresult;				//测试结果
+	ResultState cardpretestresult;						//测试结果
 	Basic_ICO myico[3];
 	LineInfo line;
 	unsigned short lcdinput[100];
 	unsigned char testisover;
 	char buf[100];
+	TestData testDataForPrintf;							//复制一份测试数据，给打印用
 	unsigned char isPrintfData;							//是否正在打印
 }TestPageBuffer;
 

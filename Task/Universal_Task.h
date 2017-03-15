@@ -3,7 +3,7 @@
 
 
 
-void StartvUniversalTask(void);
+char StartvUniversalTask(void);
 
 #endif
 

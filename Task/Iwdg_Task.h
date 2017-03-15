@@ -2,8 +2,7 @@
 #define __IWDG_T_H__
 
 
-
-void StartvIwdgTask(void);
+char StartvIwdgTask(void);
 
 #endif
 

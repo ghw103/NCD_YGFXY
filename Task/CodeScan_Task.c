@@ -45,7 +45,7 @@ static void vCodeScanTask( void *pvParameters );
 ** 时  间:  
 ** 作  者：xsx                                                 
 ************************************************************************/
-MyState_TypeDef StartCodeScanTask(void)
+char StartCodeScanTask(void)
 {
 	if(xStartScanQueue == NULL)
 		xStartScanQueue = xQueueCreate(1, sizeof(void *));
@@ -59,9 +59,7 @@ MyState_TypeDef StartCodeScanTask(void)
 	if(xScanResultQueue == NULL)
 		return My_Fail;
 	
-	xTaskCreate( vCodeScanTask, CodeScanTaskName, configMINIMAL_STACK_SIZE+100, NULL, vCodeScanTask_PRIORITY, NULL );
-	
-	return My_Pass;
+	return xTaskCreate( vCodeScanTask, CodeScanTaskName, configMINIMAL_STACK_SIZE+100, NULL, vCodeScanTask_PRIORITY, NULL );
 }
 
 /************************************************************************
@@ -80,12 +78,12 @@ static void vCodeScanTask( void *pvParameters )
 	{
 		if(pdPASS == xQueueReceive( xStartScanQueue, &cardQR, portMAX_DELAY))
 		{
-			TakeScanQRCodeResult(&scanresult);
-			vTaskDelay(1000 * portTICK_RATE_MS);
+			clearScanQRCodeResult();
+			vTaskDelay(10 / portTICK_RATE_MS);
 			
 			scanresult = ScanCodeFun(cardQR);										//读取二维码
 			
-			vTaskDelay(10 * portTICK_RATE_MS);
+			vTaskDelay(10 / portTICK_RATE_MS);
 			
 			/*发送测试结果*/
 			xQueueSend( xScanResultQueue, &scanresult, 100/portTICK_RATE_MS );
@@ -116,5 +114,11 @@ MyState_TypeDef TakeScanQRCodeResult(ScanCodeResult *scanresult)
 		return My_Pass;
 	else
 		return My_Fail;
+}
+
+void clearScanQRCodeResult(void)
+{
+	while(pdPASS == TakeScanQRCodeResult(&scanresult))
+		;
 }
 

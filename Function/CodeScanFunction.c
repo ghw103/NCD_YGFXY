@@ -65,7 +65,7 @@ ScanCodeResult ScanCodeFun(QRCode * parm)
 		
 	OpenCodeScanner();
 	
-	while(pdPASS == ReceiveDataFromQueue(GetUsart2RXQueue(), GetUsart2RXMutex(), readQRCodeBuffer->originalcode , MAX_QR_CODE_LENGHT, NULL, 1, 50 * portTICK_RATE_MS, 100 / portTICK_RATE_MS))
+	while(pdPASS == xQueueReceive(GetUsart2RXQueue(), readQRCodeBuffer->originalcode , 10/portTICK_RATE_MS))
 		;
 
 	readQRCodeBuffer->scanresult = CardCodeScanning;
@@ -124,10 +124,9 @@ static void ReadBasicCodeData(ReadQRCodeBuffer * readQRCodeBuffer)
 	if(readQRCodeBuffer == NULL)
 		return;
 	
-	while(pdPASS == ReceiveDataFromQueue(GetUsart2RXQueue(), GetUsart2RXMutex(), readQRCodeBuffer->originalcode , MAX_QR_CODE_LENGHT, NULL, 1, 10 / portTICK_RATE_MS, 10 / portTICK_RATE_MS))	
-		;
-	
-	readQRCodeBuffer->originalCodeLen = strlen(readQRCodeBuffer->originalcode);
+	memset(readQRCodeBuffer->originalcode, 0, MAX_QR_CODE_LENGHT+1);
+	ReceiveDataFromQueue(GetUsart2RXQueue(), GetUsart2RXMutex(), readQRCodeBuffer->originalcode , MAX_QR_CODE_LENGHT, 
+		&(readQRCodeBuffer->originalCodeLen), 1, 10 / portTICK_RATE_MS, 10 / portTICK_RATE_MS);
 	
 	if(readQRCodeBuffer->originalCodeLen > 0)
 	{

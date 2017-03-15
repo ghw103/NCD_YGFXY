@@ -13,6 +13,7 @@
 #include	"SystemUI_Task.h"
 #include	"Iwdg_Task.h"
 #include	"Universal_Task.h"
+#include	"LcdInput_Task.h"
 #include	"PlaySong_Task.h"
 #include	"user_fatfs.h"
 #include	"WelcomePage.h"
@@ -75,6 +76,9 @@ static void vSystemStartTask( void *pvParameters )
 	
 	/*系统界面控制任务*/
 	StartvSystemUITask();
+	
+	/*按键输入*/
+	StartvLcdInputTask();
 	
 	/*开始自检*/
 	SelfTest_Function();

@@ -56,6 +56,20 @@ void timer_set(Timer *t, unsigned int interval)
 }
 
 /***************************************************************************************************
+*FunctionName: timer_stop
+*Description: 停止定时器
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年3月10日09:36:03
+***************************************************************************************************/
+void timer_stop(Timer *t)
+{
+  t->start = 0;
+}
+
+/***************************************************************************************************
 *FunctionName：timer_reset
 *Description：重置定时器
 *Input：None
@@ -138,10 +152,7 @@ unsigned int timer_used(Timer *t)
 {
 	if(t)
 	{
-		if(timer_expired(t) == TimeNotTo)
-			return (GB_ClockTime - t->start);
-		else
-			return t->interval;
+		return (GB_ClockTime - t->start);
 	}
 	else
 		return 0;

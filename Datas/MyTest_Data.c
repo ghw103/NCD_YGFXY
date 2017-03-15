@@ -187,7 +187,6 @@ ItemData * GetCurrentTestItem(void)
 ***************************************************************************************************/
 MyState_TypeDef DeleteCurrentTest(void)
 {
-
 	if(GB_TestBuffer.CurrentTestDataBuffer)
 	{
 		if(GB_TestBuffer.CurrentTestDataBuffer->testlocation == 0)

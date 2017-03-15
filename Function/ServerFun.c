@@ -13,10 +13,11 @@
 #include	"System_Data.h"
 #include 	"Usart4_Driver.h"
 #include	"SystemSet_Data.h"
+#include	"NetInfo_Data.h"
 #include	"AppFileDao.h"
 #include	"IAP_Fun.h"
 #include	"RemoteSoft_Data.h"
-
+#include	"WifiFunction.h"
 #include	"MyMem.h"
 
 #include	"FreeRTOS.h"
@@ -48,6 +49,8 @@ void CommunicateWithServerByLineNet(MyServerData * myServerData)
 	struct pbuf *p = NULL;
 	unsigned char i=0;
 	
+	SetGB_LineNetStatus(0);
+	
 	IP4_ADDR(&myServerData->server_ipaddr,GB_ServerIp_1, GB_ServerIp_2, GB_ServerIp_3, GB_ServerIp_4);
 
 	//创建连接
@@ -69,7 +72,7 @@ void CommunicateWithServerByLineNet(MyServerData * myServerData)
 		goto END2;
 		
 	//设置接收数据超时时间100MS
-	myServerData->clientconn->recv_timeout = 500;
+	myServerData->clientconn->recv_timeout = 1000;
 		
 		//发送数据
 	err = netconn_write(myServerData->clientconn, myServerData->sendBuf, myServerData->sendDataLen, NETCONN_COPY );
@@ -80,6 +83,7 @@ void CommunicateWithServerByLineNet(MyServerData * myServerData)
 	//接收数据
 	while(ERR_OK == netconn_recv(myServerData->clientconn, &myServerData->recvbuf))
 	{
+		SetGB_LineNetStatus(1);
 		//如果发生的是GET请求，则说明是下载固件，需要保存
 		if(strstr(myServerData->sendBuf, "GET"))
 		{
@@ -125,20 +129,20 @@ void CommunicateWithServerByWifi(MyServerData * myServerData)
 	unsigned short readSize = 0;
 	portTickType queueBlockTime;
 	
-	if(isWifiUseable() == true)
+	if(My_Pass == takeWifiMutex(1000 / portTICK_RATE_MS))
 	{
 		//清空队列数据
-		while(pdPASS == ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4Mutex(), myServerData->recvBuf, 1000, 
+		while(pdPASS == ReceiveDataFromQueue(GetUsart4RXQueue(), NULL, myServerData->recvBuf, 1000, 
 				&readSize, 1, 10 / portTICK_RATE_MS, 1 / portTICK_RATE_MS));
 		
 		//发送数据
-		if(My_Pass == SendDataToQueue(GetUsart4TXQueue(), GetUsart4Mutex(), myServerData->sendBuf, myServerData->sendDataLen,
+		if(My_Pass == SendDataToQueue(GetUsart4TXQueue(), NULL, myServerData->sendBuf, myServerData->sendDataLen,
 			1, 1000 / portTICK_RATE_MS, 10 / portTICK_RATE_MS, EnableUsart4TXInterrupt))
 		{
 			
 			//接收数据,最好等待1s
 			
-			while(pdPASS == ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4Mutex(), myServerData->recvBuf, 1000, 
+			while(pdPASS == ReceiveDataFromQueue(GetUsart4RXQueue(), NULL, myServerData->recvBuf, 1000, 
 				&readSize, 1, 1000 / portTICK_RATE_MS, 1000 / portTICK_RATE_MS))
 			{
 				//如果发生的是GET请求，则说明是下载固件，需要保存
@@ -154,10 +158,10 @@ void CommunicateWithServerByWifi(MyServerData * myServerData)
 					
 					myServerData->recvDataLen += readSize;
 				}
-				
-				vTaskDelay(10 / portTICK_RATE_MS);
 			}
 		}
+		
+		giveWifixMutex();
 	}
 }
 
@@ -196,6 +200,7 @@ MyState_TypeDef UpLoadData(char *URL, void * sendBuf, unsigned short sendLen, vo
 				{
 					memset(recvBuf, 0, recvLen);
 					memcpy(recvBuf, myServerData->myp, recvLen);
+
 					statues = My_Pass;
 					goto END1;
 				}

@@ -23,6 +23,6 @@
 void RTC_BSPInit(void);
 MyState_TypeDef RTC_SetTimeData(MyTime_Def * data);
 MyState_TypeDef RTC_SetTimeData2(char * buf);
-void RTC_GetTimeData(MyTime_Def * time);
+MyState_TypeDef RTC_GetTimeData(MyTime_Def * time);
 #endif
 

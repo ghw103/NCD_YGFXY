@@ -123,5 +123,19 @@ void SetDRVDir(DRVDir_Type value)
 	SetGB_MotorDir(value);
 }
 
+/***************************************************************************************************
+*FunctionName: motorDisable
+*Description: 失能电机
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年3月10日10:39:34
+***************************************************************************************************/
+void motorDisable(void)
+{
+	GPIO_ResetBits(DRV_Sleep_Group, DRV_Sleep_Pin);
+}
+
 
 

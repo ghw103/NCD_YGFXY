@@ -14,8 +14,6 @@ typedef struct UserMPageBuffer_tag {
 	User_Type * tempuser;
 	User_Type tempnewuser;
 	unsigned short lcdinput[100];
-	SystemSetData systemSetData;
-	Timer timer;
 }UserMPageBuffer;
 
 MyState_TypeDef createUserManagerActivity(Activity * thizActivity, Intent * pram);

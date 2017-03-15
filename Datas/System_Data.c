@@ -76,12 +76,16 @@ unsigned char GetTestStatusFlorLab(void)
 
 void GetGB_Time(void * time)
 {
+	vTaskSuspendAll();
 	memcpy(time, &GB_Time, sizeof(MyTime_Def));
+	xTaskResumeAll();
 }
 
 void SetGB_Time(void * time)
 {	
+	vTaskSuspendAll();
 	memcpy(&GB_Time, time, sizeof(MyTime_Def));
+	xTaskResumeAll();
 }
 
 /*********************************************************************************************/

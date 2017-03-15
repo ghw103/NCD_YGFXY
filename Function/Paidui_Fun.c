@@ -221,11 +221,10 @@ void PaiDuiHandler(void)
 								timer_restart(&(temp->timer3));
 								AddNumOfSongToList(index+30, 0);
 							}
-							
 						}
 					}
 				}
-				else if(tempvalue <= 60)
+				else if(tempvalue <= 40)
 				{
 					//如果正在倒计时，则切换界面到排队界面
 					if((temp->statues == statues5) && (GetCurrentTestItem() == NULL))
@@ -243,7 +242,7 @@ void PaiDuiHandler(void)
 			if(timerIsStartted(&(temp->timer2)))
 			{
 				//如果有卡倒计时小于60S，则中断此超时卡的测试
-				if(GetMinWaitTime() < 60)
+				if(GetMinWaitTime() < 40)
 				{
 					if(temp->statues == statues3)
 					{

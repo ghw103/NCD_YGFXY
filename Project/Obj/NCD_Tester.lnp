@@ -59,6 +59,7 @@
 ".\obj\lwipserverforlab_task.o"
 ".\obj\systemstart_task.o"
 ".\obj\paidui_task.o"
+".\obj\lcdinput_task.o"
 ".\obj\welcomepage.o"
 ".\obj\lunchpage.o"
 ".\obj\sleeppage.o"

@@ -78,20 +78,10 @@ MyState_TypeDef createNetInfoActivity(Activity * thizActivity, Intent * pram)
 static void activityStart(void)
 {
 	if(S_NetInfoPageBuffer)
-	{
-		//设置wifi处于不能上传数据模式
-		setWifiIsUseable(false);
-		
-		//读取系统设置
-		copyGBSystemSetData(&(S_NetInfoPageBuffer->systemSetData));
-		
-		timer_set(&(S_NetInfoPageBuffer->timer2), S_NetInfoPageBuffer->systemSetData.ledSleepTime);
-		
-		timer_set(&(S_NetInfoPageBuffer->timer), 2);
+	{		
+		timer_set(&(S_NetInfoPageBuffer->timer), 10);
 	
 		SelectPage(145);
-		
-		SetWifiWorkInAT(AT_Mode);
 		
 		ReadNetInfo();
 		
@@ -116,8 +106,6 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*命令*/
 		S_NetInfoPageBuffer->lcdinput[0] = pbuf[4];
 		S_NetInfoPageBuffer->lcdinput[0] = (S_NetInfoPageBuffer->lcdinput[0]<<8) + pbuf[5];
-		
-		timer_restart(&(S_NetInfoPageBuffer->timer2));
 		
 		//返回
 		if(S_NetInfoPageBuffer->lcdinput[0] == 0x1ca0)
@@ -148,11 +136,7 @@ static void activityFresh(void)
 			ShowNetInfo();
 			timer_restart(&(S_NetInfoPageBuffer->timer));
 		}
-		
-		if(TimeOut == timer_expired(&(S_NetInfoPageBuffer->timer2)))
-		{
-			startActivity(createSleepActivity, NULL);
-		}
+
 	}
 }
 
@@ -183,7 +167,6 @@ static void activityResume(void)
 {
 	if(S_NetInfoPageBuffer)
 	{
-		timer_restart(&(S_NetInfoPageBuffer->timer2));
 		timer_restart(&(S_NetInfoPageBuffer->timer));
 	}
 	
@@ -203,8 +186,7 @@ static void activityDestroy(void)
 {
 	activityBufferFree();
 	
-	//设置wifi处于能上传数据模式
-	setWifiIsUseable(true);
+	giveWifixMutex();
 }
 
 /***************************************************************************************************
@@ -268,7 +250,7 @@ static void activityBufferFree(void)
 static void ReadNetInfo(void)
 {
 	S_NetInfoPageBuffer->wifiico.ICO_ID = 32;
-	S_NetInfoPageBuffer->wifiico.X = 186;
+	S_NetInfoPageBuffer->wifiico.X = 189;
 	S_NetInfoPageBuffer->wifiico.Y = 315;
 	
 	memset(&(S_NetInfoPageBuffer->WifiIP), 0, sizeof(IP_Def));
@@ -276,6 +258,15 @@ static void ReadNetInfo(void)
 		
 	memset(S_NetInfoPageBuffer->WifiMAC, 0, 13);
 	
+	if(S_NetInfoPageBuffer->isGetWifiControl == false)
+	{
+		if(My_Fail == takeWifiMutex(1000 / portTICK_RATE_MS))
+		{
+			goto END;
+		}
+		else
+			S_NetInfoPageBuffer->isGetWifiControl = true;
+	}
 	/*如果不是at模式，则进入at模式*/
 	SetWifiWorkInAT(AT_Mode);
 	
@@ -304,19 +295,34 @@ static void ReadNetInfo(void)
 		//显示ssid
 		memset(S_NetInfoPageBuffer->tempbuffer1, 0, 100);
 		sprintf(S_NetInfoPageBuffer->tempbuffer1, "%s", S_NetInfoPageBuffer->WifiSSID);
-		DisText(0x1Cf0, S_NetInfoPageBuffer->tempbuffer1, strlen(S_NetInfoPageBuffer->tempbuffer1));
+		DisText(0x1Cf0, S_NetInfoPageBuffer->tempbuffer1, 30);
 		
 		//显示ip
-		memset(S_NetInfoPageBuffer->tempbuffer1, 0, 100);
-		sprintf(S_NetInfoPageBuffer->tempbuffer1, "%03d.%03d.%03d.%03d", S_NetInfoPageBuffer->WifiIP.ip_1, S_NetInfoPageBuffer->WifiIP.ip_2, 
+		sprintf(S_NetInfoPageBuffer->tempbuffer1, "%03d.%03d.%03d.%03d\0", S_NetInfoPageBuffer->WifiIP.ip_1, S_NetInfoPageBuffer->WifiIP.ip_2, 
 			S_NetInfoPageBuffer->WifiIP.ip_3, S_NetInfoPageBuffer->WifiIP.ip_4);
-		DisText(0x1CC8, S_NetInfoPageBuffer->tempbuffer1, strlen(S_NetInfoPageBuffer->tempbuffer1));
+		DisText(0x1CC8, S_NetInfoPageBuffer->tempbuffer1, 15);
 		//显示mac
-		memset(S_NetInfoPageBuffer->tempbuffer1, 0, 100);
-		sprintf(S_NetInfoPageBuffer->tempbuffer1, "%.2s-%.2s-%.2s-%.2s-%.2s-%.2s", S_NetInfoPageBuffer->WifiMAC, &(S_NetInfoPageBuffer->WifiMAC[2]), &(S_NetInfoPageBuffer->WifiMAC[4]),
+		sprintf(S_NetInfoPageBuffer->tempbuffer1, "%.2s-%.2s-%.2s-%.2s-%.2s-%.2s\0", S_NetInfoPageBuffer->WifiMAC, &(S_NetInfoPageBuffer->WifiMAC[2]), &(S_NetInfoPageBuffer->WifiMAC[4]),
 			&(S_NetInfoPageBuffer->WifiMAC[6]), &(S_NetInfoPageBuffer->WifiMAC[8]), &(S_NetInfoPageBuffer->WifiMAC[10]));
 		DisText(0x1Ce0, S_NetInfoPageBuffer->tempbuffer1, 20);
+		
+		return;
 	}
+	
+	END:
+		//显示wifi状态图标
+		BasicUI(0x1CB8 ,0x1807 , 0, &(S_NetInfoPageBuffer->wifiico) , sizeof(Basic_ICO));
+		//显示ssid
+		memset(S_NetInfoPageBuffer->tempbuffer1, 0, 100);
+		sprintf(S_NetInfoPageBuffer->tempbuffer1, "Disconnected\0");
+		DisText(0x1Cf0, S_NetInfoPageBuffer->tempbuffer1, 30);
+			
+		//显示ip
+		sprintf(S_NetInfoPageBuffer->tempbuffer1, "000.000.000.000\0");
+		DisText(0x1CC8, S_NetInfoPageBuffer->tempbuffer1, 15);
+		//显示mac
+		sprintf(S_NetInfoPageBuffer->tempbuffer1, "00-00-00-00-00-00\0");
+		DisText(0x1Ce0, S_NetInfoPageBuffer->tempbuffer1, 20);
 }
 
 /***************************************************************************************************
@@ -333,19 +339,20 @@ static void ShowNetInfo(void)
 	GetGB_NetInfo(&(S_NetInfoPageBuffer->netinfo));
 	
 	//显示有线网信息
-	if(S_NetInfoPageBuffer->netinfo.LineStatus == 0)
-		S_NetInfoPageBuffer->lineico.ICO_ID = 30;
-	else
-		S_NetInfoPageBuffer->lineico.ICO_ID = 31;
-	S_NetInfoPageBuffer->lineico.X = 185;
+	
+	S_NetInfoPageBuffer->lineico.ICO_ID = 31;
+	S_NetInfoPageBuffer->lineico.X = 189;
 	S_NetInfoPageBuffer->lineico.Y = 130;
 	
-	BasicUI(0x1CB0 ,0x1807 , 1, &(S_NetInfoPageBuffer->lineico) , sizeof(Basic_ICO));
+	if(S_NetInfoPageBuffer->netinfo.LineStatus == 0)
+		BasicUI(0x1CB0 ,0x1807 , 0, &(S_NetInfoPageBuffer->lineico) , sizeof(Basic_ICO));
+	else
+		BasicUI(0x1CB0 ,0x1807 , 1, &(S_NetInfoPageBuffer->lineico) , sizeof(Basic_ICO));
 	
 	memset(S_NetInfoPageBuffer->tempbuffer1, 0, 100);
 	sprintf(S_NetInfoPageBuffer->tempbuffer1, "%03d.%03d.%03d.%03d", S_NetInfoPageBuffer->netinfo.LineIP.ip_1, S_NetInfoPageBuffer->netinfo.LineIP.ip_2, 
 		S_NetInfoPageBuffer->netinfo.LineIP.ip_3, S_NetInfoPageBuffer->netinfo.LineIP.ip_4);
-	DisText(0x1CC0, S_NetInfoPageBuffer->tempbuffer1, strlen(S_NetInfoPageBuffer->tempbuffer1));
+	DisText(0x1CC0, S_NetInfoPageBuffer->tempbuffer1, 15);
 	
 	memset(S_NetInfoPageBuffer->tempbuffer1, 0, 100);
 	sprintf(S_NetInfoPageBuffer->tempbuffer1, "%02X-%02X-%02X-%02X-%02X-%02X", S_NetInfoPageBuffer->netinfo.LineMAC[0], S_NetInfoPageBuffer->netinfo.LineMAC[1], 

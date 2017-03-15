@@ -23,7 +23,7 @@
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
-#define TestTask_PRIORITY			2
+#define TestTask_PRIORITY			3
 const char * TestTaskName = "vTestTask";
 
 static xQueueHandle xStartTestQueue = NULL ;						//扫卡数据空间队列，并用于启动扫卡任务
@@ -42,7 +42,7 @@ static void vTestTask( void *pvParameters );
 /***************************************************************************************************/
 /***************************************************************************************************/
 
-MyState_TypeDef StartvTestTask(void)
+char StartvTestTask(void)
 {
 	//创建任务数据队列，同时用于任务启动
 	if(xStartTestQueue == NULL)
@@ -58,10 +58,7 @@ MyState_TypeDef StartvTestTask(void)
 	if(xTestResultQueue == NULL)
 		return My_Fail;
 	
-	if(pdFAIL == xTaskCreate( vTestTask, TestTaskName, configMINIMAL_STACK_SIZE, NULL, TestTask_PRIORITY, NULL ))
-		return My_Fail;
-	else
-		return My_Pass;
+	return xTaskCreate( vTestTask, TestTaskName, configMINIMAL_STACK_SIZE, NULL, TestTask_PRIORITY, NULL );
 }
 
 
@@ -71,8 +68,8 @@ static void vTestTask( void *pvParameters )
 	{
 		if(pdPASS == xQueueReceive( xStartTestQueue, &testdata, portMAX_DELAY))
 		{
-			while(pdPASS == TakeTestResult(&resultstatues))
-				;
+			clearTestResult();
+			
 			SetTestStatusFlorLab(1);
 
 			resultstatues = TestFunction(testdata);
@@ -101,6 +98,12 @@ MyState_TypeDef TakeTestResult(ResultState *testsult)
 		return My_Pass;
 	else
 		return My_Fail;
+}
+
+void clearTestResult(void)
+{
+	while(pdPASS == TakeTestResult(&resultstatues))
+		;
 }
 
 /****************************************end of file************************************************/

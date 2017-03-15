@@ -342,7 +342,7 @@ static unsigned char HEX2BCD(unsigned char hex_data)
     unsigned char temp; 
     temp=((hex_data/10)<<4) + (hex_data%10);
     return temp; 	
-}  
+}
 
 
 /***************************************************************************************************
@@ -427,18 +427,50 @@ MyState_TypeDef RTC_SetTimeData2(char * buf)
 		return status;
 }
 
-void RTC_GetTimeData(MyTime_Def * time)
+MyState_TypeDef RTC_GetTimeData(MyTime_Def * time)
 {
 	unsigned char buf[7];
+	unsigned char tempV = 0;
 	
 	RX8025_Read(0, buf, 7);
 	
-	time->year = BCD2HEX(buf[6]);
-    time->month = BCD2HEX(buf[5]);
-    time->day = BCD2HEX(buf[4]);
-    time->hour = BCD2HEX(buf[2]);
-    time->min = BCD2HEX(buf[1]);
-    time->sec = BCD2HEX(buf[0]);	
+	tempV = BCD2HEX(buf[6]);
+	if((tempV >= 16) && (tempV <= 100))
+		time->year = tempV;  
+	else
+		return My_Fail;
+	
+	tempV = BCD2HEX(buf[5]);
+	if((tempV >= 1) && (tempV <= 12))
+		time->month = tempV;
+	else
+		return My_Fail;
+	
+	tempV = BCD2HEX(buf[4]);
+	if((tempV >= 1) && (tempV <= 31))
+		time->day = tempV;
+	else
+		return My_Fail;
+	
+	tempV = BCD2HEX(buf[2]);
+	if(tempV <= 23)
+		time->hour = tempV;
+	else
+		return My_Fail;
+	
+	tempV = BCD2HEX(buf[1]);
+	if(tempV <= 59)
+		time->min = tempV;
+	else
+		return My_Fail;
+	
+	tempV = BCD2HEX(buf[0]);
+	if(tempV <= 59)
+		time->sec = tempV;
+	else
+		return My_Fail;
+	
+	return My_Pass;
 }
 
 

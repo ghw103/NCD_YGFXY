@@ -55,16 +55,14 @@ void CheckCardStatues(void)
 		SetCardState(CardIN);
 	else
 		SetCardState(NoCard);
-
 }
 
 void UpDateGB_Time(void)
 {
 	MyTime_Def time ;
 	
-	RTC_GetTimeData(&time);
-
-	SetGB_Time(&time);	
+	if(My_Pass == RTC_GetTimeData(&time))
+		SetGB_Time(&time);
 }
 
 void ReadEnvironmentTemperature(void)

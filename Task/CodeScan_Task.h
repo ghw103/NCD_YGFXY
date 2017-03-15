@@ -3,9 +3,10 @@
 
 #include	"Define.h"
 
-MyState_TypeDef StartCodeScanTask(void);
+char StartCodeScanTask(void);
 MyState_TypeDef StartScanQRCode(void * parm);
 MyState_TypeDef TakeScanQRCodeResult(ScanCodeResult *scanresult);
+void clearScanQRCodeResult(void);
 
 #endif
 

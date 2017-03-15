@@ -14,6 +14,8 @@ typedef enum
 
 MyState_TypeDef WIFIInit(void);
 
+MyState_TypeDef takeWifiMutex(portTickType xBlockTime);
+void giveWifixMutex(void);
 WIFI_WorkMode_DefType GetWifiWorkMode(void);
 MyState_TypeDef SetWifiWorkInAT(WIFI_WorkMode_DefType mode);
 MyState_TypeDef ScanApList(WIFI_Def *wifis);

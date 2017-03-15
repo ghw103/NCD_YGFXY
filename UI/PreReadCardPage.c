@@ -100,6 +100,9 @@ static void activityStart(void)
 		
 		showTemperature();
 		
+		clearScanQRCodeResult();
+		clearTestResult();
+		
 		StartScanQRCode(&(S_PreReadPageBuffer->temperweima));
 	}
 	
@@ -124,7 +127,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		S_PreReadPageBuffer->lcdinput[0] = (S_PreReadPageBuffer->lcdinput[0]<<8) + pbuf[5];
 		
 		/*二维码读取失败，过期，已使用*/
-		if((S_PreReadPageBuffer->lcdinput[0] >= 0x1400) && (S_PreReadPageBuffer->lcdinput[0] <= 0x1404))
+		if((S_PreReadPageBuffer->lcdinput[0] >= 0x1400) && (S_PreReadPageBuffer->lcdinput[0] <= 0x1405))
 		{
 			/*数据*/
 			S_PreReadPageBuffer->lcdinput[1] = pbuf[7];
@@ -260,13 +263,12 @@ static void CheckQRCode(void)
 {
 	if(My_Pass == TakeScanQRCodeResult(&(S_PreReadPageBuffer->scancode)))
 	{	
-		//二维码读取失败
-		if((S_PreReadPageBuffer->scancode == CardCodeScanFail) || (S_PreReadPageBuffer->scancode == CardCodeCardOut) ||
-			(S_PreReadPageBuffer->scancode == CardCodeScanTimeOut) || (S_PreReadPageBuffer->scancode == CardCodeCRCError))
+		//不支持的品种
+		if(S_PreReadPageBuffer->scancode == CardUnsupported)
 		{
-			SendKeyCode(1);
+			SendKeyCode(6);
 			MotorMoveTo(MaxLocation, 1);
-			AddNumOfSongToList(12, 0);
+			AddNumOfSongToList(56, 0);
 		}
 		//过期
 		else if(S_PreReadPageBuffer->scancode == CardCodeTimeOut)
@@ -312,6 +314,13 @@ static void CheckQRCode(void)
 				}
 			}
 		}
+		/*其他错误：CardCodeScanFail, CardCodeCardOut, CardCodeScanTimeOut, CardCodeCRCError*/
+		else
+		{
+			SendKeyCode(1);
+			MotorMoveTo(MaxLocation, 1);
+			AddNumOfSongToList(12, 0);
+		}
 	}
 }
 
@@ -326,7 +335,7 @@ static void CheckPreTestCard(void)
 		{
 			//未加样重测3次，第三次未加样则表明真的未加样
 			S_PreReadPageBuffer->preTestErrorCount++;
-			if(S_PreReadPageBuffer->preTestErrorCount < 5)
+			if(S_PreReadPageBuffer->preTestErrorCount < 8)
 			{	
 				StartTest(S_PreReadPageBuffer->currenttestdata);
 			}
@@ -377,20 +386,16 @@ static void clearPageText(void)
 
 static void ShowCardInfo(void)
 {
-	memset(S_PreReadPageBuffer->buf, 0, 50);
-	sprintf(S_PreReadPageBuffer->buf, "%s", S_PreReadPageBuffer->temperweima.ItemName);
+	sprintf(S_PreReadPageBuffer->buf, "%s\0", S_PreReadPageBuffer->temperweima.ItemName);
 	DisText(0x1420, S_PreReadPageBuffer->buf, 30);
-	
-	memset(S_PreReadPageBuffer->buf, 0, 50);	
-	sprintf(S_PreReadPageBuffer->buf, "%s-%s", S_PreReadPageBuffer->temperweima.PiHao, S_PreReadPageBuffer->temperweima.piNum);
+		
+	sprintf(S_PreReadPageBuffer->buf, "%s-%s\0", S_PreReadPageBuffer->temperweima.PiHao, S_PreReadPageBuffer->temperweima.piNum);
 	DisText(0x1430, S_PreReadPageBuffer->buf, 30);
 	
-	memset(S_PreReadPageBuffer->buf, 0, 50);
-	sprintf(S_PreReadPageBuffer->buf, "%d S", S_PreReadPageBuffer->temperweima.CardWaitTime*60);
+	sprintf(S_PreReadPageBuffer->buf, "%d S\0", S_PreReadPageBuffer->temperweima.CardWaitTime*60);
 	DisText(0x1440, S_PreReadPageBuffer->buf, 10);
 		
-	memset(S_PreReadPageBuffer->buf, 0, 50);
-	sprintf(S_PreReadPageBuffer->buf, "20%02d年%02d月%02d日", S_PreReadPageBuffer->temperweima.CardBaoZhiQi.year, 
+	sprintf(S_PreReadPageBuffer->buf, "20%02d年%02d月%02d日\0", S_PreReadPageBuffer->temperweima.CardBaoZhiQi.year, 
 		S_PreReadPageBuffer->temperweima.CardBaoZhiQi.month, S_PreReadPageBuffer->temperweima.CardBaoZhiQi.day);
 	DisText(0x1450, S_PreReadPageBuffer->buf, 30);
 }
@@ -401,12 +406,10 @@ static void showTemperature(void)
 	S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.O_Temperature = GetCardTemperature();
 	S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.E_Temperature = GetGB_EnTemperature();
 	
-	memset(S_PreReadPageBuffer->buf, 0, 50);
-	sprintf(S_PreReadPageBuffer->buf, "%2.1f ℃", S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.O_Temperature);
+	sprintf(S_PreReadPageBuffer->buf, "%2.1f ℃\0", S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.O_Temperature);
 	DisText(0x1460, S_PreReadPageBuffer->buf, 20);
 	
-	memset(S_PreReadPageBuffer->buf, 0, 50);
-	sprintf(S_PreReadPageBuffer->buf, "%2.1f ℃",S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.E_Temperature);
+	sprintf(S_PreReadPageBuffer->buf, "%2.1f ℃\0",S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.E_Temperature);
 	DisText(0x1470, S_PreReadPageBuffer->buf, 20);
 }
 

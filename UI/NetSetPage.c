@@ -80,8 +80,6 @@ static void activityStart(void)
 		
 		memcpy(&(S_NetSetPageBuffer->myNetSet), &(S_NetSetPageBuffer->systemSetData), sizeof(NetSet));
 		
-		timer_set(&(S_NetSetPageBuffer->timer), S_NetSetPageBuffer->systemSetData.ledSleepTime);
-		
 		UpPageValue();
 	}
 	
@@ -104,9 +102,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*命令*/
 		S_NetSetPageBuffer->lcdinput[0] = pbuf[4];
 		S_NetSetPageBuffer->lcdinput[0] = (S_NetSetPageBuffer->lcdinput[0]<<8) + pbuf[5];
-		
-		timer_restart(&(S_NetSetPageBuffer->timer));
-		
+
 		/*有线网的ip获取模式*/
 		if(S_NetSetPageBuffer->lcdinput[0] == 0x1E09)
 		{
@@ -169,8 +165,7 @@ static void activityFresh(void)
 {
 	if(S_NetSetPageBuffer)
 	{
-		if(TimeOut == timer_expired(&(S_NetSetPageBuffer->timer)))
-			startActivity(createSleepActivity, NULL);
+
 	}
 }
 
@@ -201,7 +196,7 @@ static void activityResume(void)
 {
 	if(S_NetSetPageBuffer)
 	{
-		timer_restart(&(S_NetSetPageBuffer->timer));
+
 	}
 	
 	SelectPage(110);

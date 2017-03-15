@@ -75,9 +75,7 @@ static void activityStart(void)
 	if(S_ShowDeviceInfoPageBuffer)
 	{
 		copyGBSystemSetData(&(S_ShowDeviceInfoPageBuffer->systemSetData));
-		
-		timer_set(&(S_ShowDeviceInfoPageBuffer->timer), S_ShowDeviceInfoPageBuffer->systemSetData.ledSleepTime);
-		
+
 		showDeviceInfo();
 	}
 	
@@ -100,9 +98,6 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*命令*/
 		S_ShowDeviceInfoPageBuffer->lcdinput[0] = pbuf[4];
 		S_ShowDeviceInfoPageBuffer->lcdinput[0] = (S_ShowDeviceInfoPageBuffer->lcdinput[0]<<8) + pbuf[5];
-		
-		//重置休眠时间
-		timer_restart(&(S_ShowDeviceInfoPageBuffer->timer));
 		
 		/*基本信息*/
 		if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1a03)
@@ -152,8 +147,7 @@ static void activityFresh(void)
 {
 	if(S_ShowDeviceInfoPageBuffer)
 	{
-		if(TimeOut == timer_expired(&(S_ShowDeviceInfoPageBuffer->timer)))
-			startActivity(createSleepActivity, NULL);
+
 	}
 }
 
@@ -185,9 +179,7 @@ static void activityResume(void)
 	if(S_ShowDeviceInfoPageBuffer)
 	{
 		copyGBSystemSetData(&(S_ShowDeviceInfoPageBuffer->systemSetData));
-		
-		timer_restart(&(S_ShowDeviceInfoPageBuffer->timer));
-		
+
 		showDeviceInfo();
 	}
 	

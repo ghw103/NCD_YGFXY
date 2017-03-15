@@ -184,7 +184,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void activityFresh(void)
 {
-	if( S_LunchPageBuffer && (TimeOut == timer_expired(&(S_LunchPageBuffer->timer))))
+	if(TimeOut == timer_expired(&(S_LunchPageBuffer->timer)))
 	{
 		startActivity(createSleepActivity, NULL);
 	}

@@ -130,12 +130,6 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		{
 			if(S_TestPageBuffer->cardpretestresult != NoResult)
 			{
-				if(CardPinIn)
-				{
-					SendKeyCode(5);
-					return;
-				}
-				
 				//删除当前测试
 				DeleteCurrentTest();
 				
@@ -170,21 +164,28 @@ static void activityFresh(void)
 {
 	if(S_TestPageBuffer)
 	{
-		RefreshCurve();
-		
-		//如果打印完毕，且卡拔出，则退出
-		if(S_TestPageBuffer->cardpretestresult != NoResult) 
+		if(S_TestPageBuffer->cardpretestresult == NoResult)
+			RefreshCurve();
+		else
 		{
-			if((S_TestPageBuffer->isPrintfData == 0) && (GetCardState() == NoCard) &&(MaxLocation == GetGB_MotorLocation()))
+			//如果打印完毕，且卡拔出，则退出
+			if((S_TestPageBuffer->isPrintfData == 0) &&(MaxLocation == GetGB_MotorLocation()))
 			{
 				//删除当前测试
-				DeleteCurrentTest();
-					
-				backToActivity(lunchActivityName);
-					
-				//如果还有卡在排队，则直接跳到排队界面
-				if(IsPaiDuiTestting())
-					startActivity(createPaiDuiActivity, NULL);
+				if(S_TestPageBuffer->currenttestdata != NULL)
+				{
+					DeleteCurrentTest();
+					S_TestPageBuffer->currenttestdata = NULL;
+				}
+				
+				if(GetCardState() == NoCard)
+				{
+					backToActivity(lunchActivityName);
+						
+					//如果还有卡在排队，则直接跳到排队界面
+					if(IsPaiDuiTestting())
+						startActivity(createPaiDuiActivity, NULL);
+				}
 			}
 		}
 	}
@@ -295,24 +296,23 @@ static void InitCurve(void)
 
 static void InitPageText(void)
 {
-	memset(S_TestPageBuffer->buf, 0, 100);
-	sprintf(S_TestPageBuffer->buf, "%s", S_TestPageBuffer->currenttestdata->testdata.temperweima.ItemName);
-	DisText(0x1810, S_TestPageBuffer->buf, 20);
+	sprintf(S_TestPageBuffer->buf, "%s\0", S_TestPageBuffer->currenttestdata->testdata.temperweima.ItemName);
+	DisText(0x1810, S_TestPageBuffer->buf, strlen(S_TestPageBuffer->buf)+1);
 			
-	memset(S_TestPageBuffer->buf, 0, 100);
 	memcpy(S_TestPageBuffer->buf, S_TestPageBuffer->currenttestdata->testdata.sampleid, MaxSampleIDLen);
-	DisText(0x1820, S_TestPageBuffer->buf, 20);
+	DisText(0x1820, S_TestPageBuffer->buf, strlen(S_TestPageBuffer->buf)+1);
 			
-	sprintf(S_TestPageBuffer->buf, "%2.1f", S_TestPageBuffer->currenttestdata->testdata.TestTemp.O_Temperature);
-	DisText(0x1830, S_TestPageBuffer->buf, 8);
+	sprintf(S_TestPageBuffer->buf, "%2.1f ℃\0", S_TestPageBuffer->currenttestdata->testdata.TestTemp.O_Temperature);
+	DisText(0x1830, S_TestPageBuffer->buf, strlen(S_TestPageBuffer->buf)+1);
 			
-	sprintf(S_TestPageBuffer->buf, "%s", S_TestPageBuffer->currenttestdata->testdata.temperweima.PiHao);
-	DisText(0x1840, S_TestPageBuffer->buf, 30);
+	sprintf(S_TestPageBuffer->buf, "%s-%s\0", S_TestPageBuffer->currenttestdata->testdata.temperweima.PiHao, 
+		S_TestPageBuffer->currenttestdata->testdata.temperweima.piNum);
+	DisText(0x1840, S_TestPageBuffer->buf, strlen(S_TestPageBuffer->buf)+1);
 			
-	sprintf(S_TestPageBuffer->buf, "%s", S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.normalResult);
-	DisText(0x1860, S_TestPageBuffer->buf, 30);
+	sprintf(S_TestPageBuffer->buf, "%s\0", S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.normalResult);
+	DisText(0x1850, S_TestPageBuffer->buf, strlen(S_TestPageBuffer->buf)+1);
 			
-	ClearText(0x1850, 30);
+	ClearText(0x1838, 15);
 }
 
 /*更新数据*/
@@ -330,16 +330,11 @@ static void RefreshCurve(void)
 	 
 	if(My_Pass == TakeTestResult(&(S_TestPageBuffer->cardpretestresult)))
 	{
-		GetGB_Time(&(GetCurrentTestItem()->testdata.TestTime));
-		
-		//保存数据
-		WriteTestData(&(GetCurrentTestItem()->testdata), getTestDataTotalNum());
-		//测试数目+1
-		plusTestDataTotalNum(1);
-		//保存测试数目
-		SaveSystemSetData(getGBSystemSetData());
-		
+		GetGB_Time(&(S_TestPageBuffer->currenttestdata->testdata.TestTime));
 		MotorMoveTo(MaxLocation, 1);
+		
+		//保留一份数据给打印机打印
+		memcpy(&(S_TestPageBuffer->testDataForPrintf), &(S_TestPageBuffer->currenttestdata->testdata), sizeof(TestData));
 		
 		if(S_TestPageBuffer->cardpretestresult == ResultIsOK)
 		{
@@ -357,6 +352,13 @@ static void RefreshCurve(void)
 		{
 			SendKeyCode(1);			
 		}
+		
+		//保存数据
+		WriteTestData(&(S_TestPageBuffer->currenttestdata->testdata), getTestDataTotalNum());
+		//测试数目+1
+		plusTestDataTotalNum(1);
+		//保存测试数目
+		SaveSystemSetData(getGBSystemSetData());
 	}
 }
 
@@ -367,50 +369,62 @@ static void RefreshPageText(void)
 	if(S_TestPageBuffer->currenttestdata)
 	{
 		if(IsShowRealValue() == true)
-			sprintf(S_TestPageBuffer->buf, "%.*f %s", S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.pointNum,
+			sprintf(S_TestPageBuffer->buf, "%.*f %s\0", S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.pointNum,
 				S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult, S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.itemMeasure);
 		else if(S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult <= S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.lowstResult)
-			sprintf(S_TestPageBuffer->buf, "<%.*f %s", S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.pointNum, 
+			sprintf(S_TestPageBuffer->buf, "<%.*f %s\0", S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.pointNum, 
 				S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.lowstResult, S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.itemMeasure);
 		else if(S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult >= S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.highestResult)
-			sprintf(S_TestPageBuffer->buf, ">%.*f %s", S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.pointNum, 
+			sprintf(S_TestPageBuffer->buf, ">%.*f %s\0", S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.pointNum, 
 				S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.highestResult, S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.itemMeasure);
 		else
-			sprintf(S_TestPageBuffer->buf, "%.*f %s", S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.pointNum, 
+			sprintf(S_TestPageBuffer->buf, "%.*f %s\0", S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.pointNum, 
 				S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult, S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.itemMeasure);
 		
-		DisText(0x1850, S_TestPageBuffer->buf, 30);
+		DisText(0x1838, S_TestPageBuffer->buf, strlen(S_TestPageBuffer->buf)+1);
 	}
 	
 	if(S_TestPageBuffer->cardpretestresult == ResultIsOK)
 	{
 		//在曲线上标记出T,C,基线
 		S_TestPageBuffer->myico[0].ICO_ID = 22;
-		S_TestPageBuffer->myico[0].X = 505+S_TestPageBuffer->currenttestdata->testdata.testline.T_Point[1]-5;
+		S_TestPageBuffer->myico[0].X = S_TestPageBuffer->currenttestdata->testdata.testline.T_Point[1];
+		S_TestPageBuffer->myico[0].X *= 2;
+		S_TestPageBuffer->myico[0].X += 505;
+		S_TestPageBuffer->myico[0].X -= 114;
+		S_TestPageBuffer->myico[0].X -= 12;
 		tempvalue = S_TestPageBuffer->currenttestdata->testdata.testline.T_Point[0];
 		tempvalue /= S_TestPageBuffer->line.Y_Scale*2;
 		tempvalue = 1-tempvalue;
 		tempvalue *= 302;										//曲线窗口宽度
 		tempvalue += 139;										//曲线窗口起始y
-		S_TestPageBuffer->myico[0].Y = (unsigned short)tempvalue - 5;
+		S_TestPageBuffer->myico[0].Y = (unsigned short)tempvalue - 11;
 		
 		S_TestPageBuffer->myico[1].ICO_ID = 22;
-		S_TestPageBuffer->myico[1].X = 505+S_TestPageBuffer->currenttestdata->testdata.testline.C_Point[1]-5;
+		S_TestPageBuffer->myico[1].X = S_TestPageBuffer->currenttestdata->testdata.testline.C_Point[1];
+		S_TestPageBuffer->myico[1].X *= 2;
+		S_TestPageBuffer->myico[1].X += 505;
+		S_TestPageBuffer->myico[1].X -= 114;
+		S_TestPageBuffer->myico[1].X -= 12;
 		tempvalue = S_TestPageBuffer->currenttestdata->testdata.testline.C_Point[0];
 		tempvalue /= S_TestPageBuffer->line.Y_Scale*2;
 		tempvalue = 1-tempvalue;
 		tempvalue *= 302;										//曲线窗口宽度
 		tempvalue += 139;										//曲线窗口起始y
-		S_TestPageBuffer->myico[1].Y = (unsigned short)tempvalue - 5;
+		S_TestPageBuffer->myico[1].Y = (unsigned short)tempvalue - 11;
 		
 		S_TestPageBuffer->myico[2].ICO_ID = 22;
-		S_TestPageBuffer->myico[2].X = 505+S_TestPageBuffer->currenttestdata->testdata.testline.B_Point[1]-5;
+		S_TestPageBuffer->myico[2].X = S_TestPageBuffer->currenttestdata->testdata.testline.B_Point[1];
+		S_TestPageBuffer->myico[2].X *= 2;
+		S_TestPageBuffer->myico[2].X += 505;
+		S_TestPageBuffer->myico[2].X -= 114;
+		S_TestPageBuffer->myico[2].X -= 12;
 		tempvalue = S_TestPageBuffer->currenttestdata->testdata.testline.B_Point[0];
 		tempvalue /= S_TestPageBuffer->line.Y_Scale*2;
 		tempvalue = 1-tempvalue;
 		tempvalue *= 302;										//曲线窗口宽度
 		tempvalue += 139;										//曲线窗口起始y
-		S_TestPageBuffer->myico[2].Y = (unsigned short)tempvalue - 5;
+		S_TestPageBuffer->myico[2].Y = (unsigned short)tempvalue - 11;
 		
 		BasicUI(0x1880 ,0x1807 , 3, &(S_TestPageBuffer->myico[0]) , sizeof(Basic_ICO)*3);
 	}
@@ -475,7 +489,7 @@ static void printfTestData(void)
 	{
 		S_TestPageBuffer->isPrintfData = 1;
 		SendKeyCode(6);
-		PrintfData(&(S_TestPageBuffer->currenttestdata->testdata));
+		PrintfData(&(S_TestPageBuffer->testDataForPrintf));
 		SendKeyCode(16);
 		S_TestPageBuffer->isPrintfData = 0;
 	}

@@ -1,19 +1,24 @@
 /***************************************************************************************************
-*FileName: Paidui_Task
-*Description: 控制排队流程
+*FileName: logsDao
+*Description: 保存系统日志
 *Author: xsx_kair
-*Data: 2016年12月13日11:44:32
+*Data: 2017年3月9日09:10:04
 ***************************************************************************************************/
 
 /***************************************************************************************************/
 /******************************************Header List********************************************/
 /***************************************************************************************************/
-#include	"Paidui_Task.h"
 
-#include	"Paidui_Fun.h"
+#include	"logsDao.h"
+#include	"System_Data.h"
 
-#include 	"FreeRTOS.h"
-#include 	"task.h"
+#include	"MyMem.h"
+
+#include	<string.h>
+#include	"stdio.h"
+#include 	"stdlib.h"
+	
+#if LogsEnable
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -21,7 +26,7 @@
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
-static void PaiduiTask(void * parm);
+
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -29,19 +34,45 @@ static void PaiduiTask(void * parm);
 /***************************************************************************************************/
 /***************************************************************************************************/
 
-char StartPaiduiTask(void)
+MyState_TypeDef log_Write(void * data, char errCode)
 {
-	return xTaskCreate( PaiduiTask, "PaiduiTask", configMINIMAL_STACK_SIZE, NULL, ( ( unsigned portBASE_TYPE ) 2U ), NULL );
-}
-
-static void PaiduiTask(void * parm)
-{
-	while(1)
+	Logs * logs = NULL;
+	MyState_TypeDef status = My_Fail;
+	
+	logs = MyMalloc(sizeof(Logs));
+	
+	if(logs && data)
 	{
-		PaiDuiHandler();
+		memset(logs, 0, sizeof(Logs));
+
+		//加载数据
+		logs->dataBuf = (char *)data;
 		
-		vTaskDelay(500 / portTICK_RATE_MS);
+		//读取时间
+		GetGB_Time(&(logs->time));
+		
+		sprintf(logs->writeBuf, "----------------------------------------20%02d-%02d-%02d %02d:%02d:%02d\r\n%s:%d\r\n\n\n", 
+			logs->time.year, logs->time.month, logs->time.day, logs->time.hour, logs->time.min, logs->time.sec, logs->dataBuf,
+			errCode);
+		
+		logs->myfile.res = f_open(&(logs->myfile.file), "0:/logs.txt", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
+			
+		if(FR_OK == logs->myfile.res)
+		{
+			logs->myfile.res = f_write(&(logs->myfile.file), logs->writeBuf, strlen(logs->writeBuf), &(logs->myfile.bw));
+			
+			//如果写入成功，则更新内存中的设备信息
+			if(FR_OK == logs->myfile.res)
+				status = My_Pass;
+				
+			f_close(&(logs->myfile.file));
+		}
 	}
+	
+	MyFree(logs);
+	
+	return status;
 }
 
+#endif /*end if LogsEnable*/
 /****************************************end of file************************************************/

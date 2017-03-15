@@ -113,7 +113,7 @@ static void activityFresh(void)
 {
 	if(S_TimeDownPageData)
 	{
-		if(S_TimeDownPageData->count % 25 == 0)
+		if(S_TimeDownPageData->count % 3 == 0)
 		{
 			RefreshTimeText();
 			if(TimeOut == timer_expired(S_TimeDownPageData->S_Timer))

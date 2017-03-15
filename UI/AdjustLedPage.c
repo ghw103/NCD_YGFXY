@@ -242,7 +242,7 @@ static void dspTestStatus(char * str)
 	
 	sprintf(S_AdjustLedPageBuffer->buf, "%-15s", str);
 	
-	DisText(0x2620, S_AdjustLedPageBuffer->buf, strlen(S_AdjustLedPageBuffer->buf));
+	DisText(0x2620, S_AdjustLedPageBuffer->buf, 20);
 }
 
 static void DspPageText(void)
@@ -273,6 +273,8 @@ static void analysisTestData(void)
 	{
 		dspTestStatus("Success\0");
 		S_AdjustLedPageBuffer->isTestting = false;
+		MotorMoveTo(MaxLocation, 1);
+		return;
 	}
 	else if(S_AdjustLedPageBuffer->targetValue > S_AdjustLedPageBuffer->maxPoint[0])
 	{
@@ -291,16 +293,6 @@ static void analysisTestData(void)
 				
 				return;
 			}
-			else
-			{
-				dspTestStatus("Fail\0");
-				S_AdjustLedPageBuffer->isTestting = false;
-			}
-		}
-		else
-		{
-			dspTestStatus("Fail\0");
-			S_AdjustLedPageBuffer->isTestting = false;
 		}
 	}
 	else
@@ -320,18 +312,13 @@ static void analysisTestData(void)
 				
 				return;
 			}
-			else
-			{
-				dspTestStatus("Fail\0");
-				S_AdjustLedPageBuffer->isTestting = false;
-			}
-		}
-		else
-		{
-			dspTestStatus("Fail\0");
-			S_AdjustLedPageBuffer->isTestting = false;
 		}
 	}
+	
+	memset(S_AdjustLedPageBuffer->buf, 0, 20);
+	sprintf(S_AdjustLedPageBuffer->buf, "Fail - %d", S_AdjustLedPageBuffer->cardpretestresult);
+	DisText(0x2620, S_AdjustLedPageBuffer->buf, strlen(S_AdjustLedPageBuffer->buf));
+	S_AdjustLedPageBuffer->isTestting = false;
 	
 	MotorMoveTo(MaxLocation, 1);
 }

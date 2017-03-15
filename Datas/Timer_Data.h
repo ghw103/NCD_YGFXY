@@ -6,6 +6,7 @@
 void ResetGBClockTime(void);
 void timer_set(Timer *t, unsigned int interval);
 void timer_reset(Timer *t);
+void timer_stop(Timer *t);
 void timer_restart(Timer *t);
 TimerState_Def timer_expired(Timer *t);
 unsigned int timer_surplus(Timer *t);

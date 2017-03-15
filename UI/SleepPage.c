@@ -32,7 +32,6 @@ static void activityDestroy(void);
 static MyState_TypeDef activityBufferMalloc(void);
 static void activityBufferFree(void);
 
-static void DspPageText(void);
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -92,13 +91,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 }
 static void activityFresh(void)
 {
-	if(S_SleepPageBuffer)
-	{
-		if((S_SleepPageBuffer->count % 10) == 0)
-			DspPageText();
-		
-		S_SleepPageBuffer->count++;
-	}
+
 }
 static void activityHide(void)
 {
@@ -144,16 +137,3 @@ static void activityBufferFree(void)
 /***************************************************************************************************/
 /***************************************************************************************************/
 
-static void DspPageText(void)
-{
-/*	if(S_SleepPageBuffer)
-	{
-		GetGB_Time(&(S_SleepPageBuffer->time));
-		
-		memset(S_SleepPageBuffer->buf, 0, 50);
-		sprintf(S_SleepPageBuffer->buf, "20%02d-%02d-%02d %02d:%02d:%02d ", S_SleepPageBuffer->time.year, S_SleepPageBuffer->time.month, S_SleepPageBuffer->time.day,
-			S_SleepPageBuffer->time.hour, S_SleepPageBuffer->time.min, S_SleepPageBuffer->time.sec);
-	
-		DisText(0x2f20, S_SleepPageBuffer->buf, strlen(S_SleepPageBuffer->buf));
-	}*/
-}

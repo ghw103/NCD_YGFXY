@@ -3,7 +3,7 @@
 
 
 
-void StartvNormalUpLoadTask(void);
+char StartvNormalUpLoadTask(void);
 
 #endif
 

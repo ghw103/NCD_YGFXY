@@ -45,9 +45,9 @@ static void vSystemUITask( void *pvParameters );	//看门狗任务
 *Author：xsx
 *Data：2015年8月26日16:58:13
 ***************************************************************************************************/
-void StartvSystemUITask(void)
+char StartvSystemUITask(void)
 {
-	xTaskCreate( vSystemUITask, SystemUITaskName, configMINIMAL_STACK_SIZE*2, NULL, SystemUITask_PRIORITY, NULL );
+	return xTaskCreate( vSystemUITask, SystemUITaskName, configMINIMAL_STACK_SIZE*2, NULL, SystemUITask_PRIORITY, NULL );
 }
 
 /***************************************************************************************************
@@ -64,8 +64,6 @@ static void vSystemUITask( void *pvParameters )
 	
 	while(1)
 	{
-		GetLCDInputData();
-		
 		activityFreshFunction();
 		
 		/*500ms更新一次时间和环境温度*/
@@ -73,6 +71,7 @@ static void vSystemUITask( void *pvParameters )
 			DspTimeAndTempData();
 		
 		count++;
-
+		
+		vTaskDelay(100 / portTICK_RATE_MS);
 	}
 }

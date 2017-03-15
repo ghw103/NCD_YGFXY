@@ -3,7 +3,7 @@
 
 #include	"Define.h"
 
-void StartvPlaySongTask(void);
+char StartvPlaySongTask(void);
 unsigned char AddNumOfSongToList(unsigned char num, unsigned char mode);
 void stopPlay(void);
 unsigned char getPlayStatus(void);

@@ -12,7 +12,6 @@
 #include	"ServerFun.h"
 #include	"RTC_Driver.h"
 #include	"SystemSet_Dao.h"
-#include	"NetInfo_Data.h"
 #include	"System_Data.h"
 #include	"RemoteSoftDao.h"
 #include	"RemoteSoft_Data.h"
@@ -51,11 +50,6 @@ void UpLoadFunction(void)
 {
 	while(1)
 	{
-/*		if(My_Pass == DownLoadSoftWare())
-			vTaskDelay(100000 / portTICK_RATE_MS);
-		else
-			vTaskDelay(1000 / portTICK_RATE_MS);*/
-		
 		if(My_Pass == ReadTime())
 		{
 			vTaskDelay(1000 / portTICK_RATE_MS);
@@ -70,10 +64,10 @@ void UpLoadFunction(void)
 			vTaskDelay(1000 / portTICK_RATE_MS);
 				
 			UpLoadTestData();	
-			vTaskDelay(10000 / portTICK_RATE_MS);
+			vTaskDelay(1000 / portTICK_RATE_MS);
 		}
-		else
-			vTaskDelay(10000 / portTICK_RATE_MS);
+
+		vTaskDelay(60000 / portTICK_RATE_MS);
 	}
 }
 
@@ -98,7 +92,7 @@ static MyState_TypeDef ReadTime(void)
 				upLoadDeviceDataBuffer->recvBuf, SERVERRECVBUFLEN, "POST"))
 			{
 				RTC_SetTimeData2(upLoadDeviceDataBuffer->recvBuf+7);
-				SetGB_LineNetStatus(1);
+				
 				status = My_Pass;
 			}
 		}
@@ -126,8 +120,8 @@ static void UpLoadDeviceInfo(void)
 			{
 				memset(upLoadDeviceDataBuffer->sendBuf, 0, UPLOADTEMPBUFLEN);
 
-				sprintf(upLoadDeviceDataBuffer->sendBuf, "did=%s&addr=%s&name=%s&age=%s&sex=%s&phone=%s&job=%s&dsc=%s&status=ok",
-					upLoadDeviceDataBuffer->systemSetData.deviceInfo.deviceid,  upLoadDeviceDataBuffer->systemSetData.deviceInfo.deviceunit, 
+				sprintf(upLoadDeviceDataBuffer->sendBuf, "did=%s&dversion=%d&addr=%s&name=%s&age=%s&sex=%s&phone=%s&job=%s&dsc=%s&status=ok",
+					upLoadDeviceDataBuffer->systemSetData.deviceInfo.deviceid,  GB_SoftVersion, upLoadDeviceDataBuffer->systemSetData.deviceInfo.deviceunit, 
 					upLoadDeviceDataBuffer->systemSetData.deviceInfo.deviceuser.user_name, upLoadDeviceDataBuffer->systemSetData.deviceInfo.deviceuser.user_age, 
 					upLoadDeviceDataBuffer->systemSetData.deviceInfo.deviceuser.user_sex,	upLoadDeviceDataBuffer->systemSetData.deviceInfo.deviceuser.user_phone, 
 					upLoadDeviceDataBuffer->systemSetData.deviceInfo.deviceuser.user_job, upLoadDeviceDataBuffer->systemSetData.deviceInfo.deviceuser.user_desc);

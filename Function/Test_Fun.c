@@ -62,7 +62,7 @@ MyState_TypeDef InitTestFunData(void)
 {
 	/*ÇúÏß¶ÓÁÐ*/
 	if(xTestCurveQueue == NULL)
-		xTestCurveQueue = xQueueCreate( 500, ( unsigned portBASE_TYPE ) sizeof( unsigned short ) );
+		xTestCurveQueue = xQueueCreate( 310, ( unsigned portBASE_TYPE ) sizeof( unsigned short ) );
 	
 	if(xTestCurveQueue == NULL)
 		return My_Fail;

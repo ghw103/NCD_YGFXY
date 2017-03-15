@@ -30,7 +30,7 @@
 /***************************************************************************************************/
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
-
+static xSemaphoreHandle xWifiMutex = NULL;									//WIFI互斥量
 
 /***************************************************************************************************/
 /**************************************局部函数声明*************************************************/
@@ -47,20 +47,53 @@ static MyState_TypeDef SetWifiWorkInSTAMode(void);
 /***************************************************************************************************/
 /***************************************************************************************************/
 
+/***************************************************************************************************
+*FunctionName: takeWifiMutex, giveWifixMutex
+*Description: 
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年3月7日09:41:10
+***************************************************************************************************/
+MyState_TypeDef takeWifiMutex(portTickType xBlockTime)
+{
+	if(pdPASS == xSemaphoreTake(xWifiMutex, xBlockTime))
+		return My_Pass;
+	else
+		return My_Fail;
+}
+void giveWifixMutex(void)
+{
+	xSemaphoreGive(xWifiMutex);
+}
+
+/***************************************************************************************************
+*FunctionName: ComWithWIFI与wifi模块通信
+*Description: 
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年3月7日09:41:31
+***************************************************************************************************/
 static MyState_TypeDef ComWithWIFI(char * cmd, const char *strcmp, char *buf, unsigned short buflen, portTickType xBlockTime)
 {
 	MyState_TypeDef statues = My_Pass;
 	unsigned char errorCnt = 0;
 	
+	//清空队列数据
+	while(pdPASS == ReceiveDataFromQueue(GetUsart4RXQueue(), NULL, buf, buflen, NULL, 1, 10 / portTICK_RATE_MS, 1 / portTICK_RATE_MS));
+	
 	for(errorCnt = 0; errorCnt < 3; errorCnt++)
 	{
-		if(pdPASS == SendDataToQueue(GetUsart4TXQueue(), GetUsart4Mutex(), cmd, strlen(cmd), 1, 50 * portTICK_RATE_MS, 1000 / portTICK_RATE_MS, EnableUsart4TXInterrupt))
+		if(pdPASS == SendDataToQueue(GetUsart4TXQueue(), NULL, cmd, strlen(cmd), 1, 500 * portTICK_RATE_MS, 0, EnableUsart4TXInterrupt))
 		{
 			if(buf)
 			{
 				memset(buf, 0, buflen);
 					
-				ReceiveDataFromQueue(GetUsart4RXQueue(), GetUsart4Mutex(), buf, buflen, NULL, 1, xBlockTime, 1000 / portTICK_RATE_MS);
+				ReceiveDataFromQueue(GetUsart4RXQueue(), NULL, buf, buflen, NULL, 1, xBlockTime, 0);
 
 				if(strcmp)
 				{
@@ -83,6 +116,8 @@ static MyState_TypeDef ComWithWIFI(char * cmd, const char *strcmp, char *buf, un
 MyState_TypeDef WIFIInit(void)
 {
 	MyState_TypeDef statues = My_Fail;
+	
+	vSemaphoreCreateBinary(xWifiMutex);
 	
 	SetWifiWorkInAT(AT_Mode);
 
@@ -195,7 +230,7 @@ MyState_TypeDef ScanApList(WIFI_Def *wifis)
 	txbuf = MyMalloc(1000);
 	if(txbuf)
 	{
-		if(My_Pass == ComWithWIFI("AT+WSCAN\r", NULL, txbuf, 900, 1000 / portTICK_RATE_MS))
+		if(My_Pass == ComWithWIFI("AT+WSCAN\r", NULL, txbuf, 900, 5000 / portTICK_RATE_MS))
 			ProgressWifiListData(wifis, txbuf);
 		
 		MyFree(txbuf);
@@ -209,7 +244,6 @@ static void ProgressWifiListData(WIFI_Def *wifis, char *buf)
 	static char *tempbuf, *tempbuf2, *tempbuf3;
 	static char * (wifistr[MaxWifiListNum]);
 	unsigned char i,j;
-	static char buff[100];
 	
 	tempbuf = strstr(buf, "\r\n");
 
@@ -242,36 +276,36 @@ static void ProgressWifiListData(WIFI_Def *wifis, char *buf)
 				if(tempbuf2)
 				{
 					if(j == 1)
-						memcpy(wifis[i].ssid, tempbuf2, strlen(tempbuf2)) ;
+						memcpy(wifis->ssid, tempbuf2, strlen(tempbuf2)) ;
 					else if(j == 3)
 					{
 						if(strstr(tempbuf2, "OPEN"))
-							memcpy(wifis[i].auth, "OPEN", 4);
+							memcpy(wifis->auth, "OPEN", 4);
 						else if(strstr(tempbuf2, "SHARED"))
-							memcpy(wifis[i].auth, "SHARED", 6);
+							memcpy(wifis->auth, "SHARED", 6);
 						else if(strstr(tempbuf2, "WPAPSK"))
-							memcpy(wifis[i].auth, "WPAPSK", 6);
+							memcpy(wifis->auth, "WPAPSK", 6);
 						else if(strstr(tempbuf2, "WPA2PSK"))
-							memcpy(wifis[i].auth, "WPA2PSK", 7);
+							memcpy(wifis->auth, "WPA2PSK", 7);
 							
 						if(strstr(tempbuf2, "NONE"))
-							memcpy(wifis[i].encry, "NONE", 4);
+							memcpy(wifis->encry, "NONE", 4);
 						else if(strstr(tempbuf2, "WEP-H"))
-							memcpy(wifis[i].encry, "WEP-H", 5);
+							memcpy(wifis->encry, "WEP-H", 5);
 						else if(strstr(tempbuf2, "WEP-A"))
-							memcpy(wifis[i].encry, "WEP-A", 5);
+							memcpy(wifis->encry, "WEP-A", 5);
 						else if(strstr(tempbuf2, "TKIP"))
-							memcpy(wifis[i].encry, "TKIP", 4);
+							memcpy(wifis->encry, "TKIP", 4);
 						else if(strstr(tempbuf2, "AES"))
-							memcpy(wifis[i].encry, "AES", 3);
+							memcpy(wifis->encry, "AES", 3);
 					}
 					else if(j == 4)
-						wifis[i].indicator = strtol(tempbuf2 , NULL , 10);
-						
-/*					if(j == 4)
 					{
-						sprintf(buff, "ssid:%s security:%s,%s xinhao:%d\r\n", wifis[i].ssid, wifis[i].auth, wifis[i].encry, wifis[i].indicator);
-					}*/
+						wifis->indicator = strtol(tempbuf2 , NULL , 10);
+						
+						if(wifis->indicator > 10)
+							wifis++;
+					}
 				}
 			}				
 		}
@@ -282,7 +316,8 @@ static void ProgressWifiListData(WIFI_Def *wifis, char *buf)
 
 MyState_TypeDef ConnectWifi(WIFI_Def *wifis)
 {
-	char *txbuf = NULL; 
+	char *txbuf = NULL;
+	unsigned char i=0;
 	MyState_TypeDef statues = My_Fail;
 	
 	/*发送数据缓冲区*/
@@ -292,12 +327,34 @@ MyState_TypeDef ConnectWifi(WIFI_Def *wifis)
 		/*设置ssid*/
 		memset(txbuf, 0, 100);
 		sprintf(txbuf, (const char *)"AT+WSSSID=%s\r", wifis->ssid);
-		if(My_Pass == ComWithWIFI(txbuf, "+ok", txbuf, 100, 10000 * portTICK_RATE_MS))
+		if(My_Pass == ComWithWIFI(txbuf, "+ok", txbuf, 100, 1000 * portTICK_RATE_MS))
 		{
 			memset(txbuf, 0, 100);
 			sprintf(txbuf, (const char *)"AT+WSKEY=%s,%s,%s\r", wifis->auth, wifis->encry, wifis->key);
-			if(My_Pass == ComWithWIFI(txbuf, "+ok", txbuf, 100, 10000* portTICK_RATE_MS))
-				statues = My_Pass;
+			if(My_Pass == ComWithWIFI(txbuf, "+ok", txbuf, 100, 1000* portTICK_RATE_MS))
+			{
+				//重启
+				RestartWifi();
+				
+				vTaskDelay(8000 / portTICK_RATE_MS);
+				
+				for(i=0; i<3; i++)
+				{
+					if(My_Pass == SetWifiWorkInAT(AT_Mode))
+					{
+						memset(txbuf, 0, 100);
+						if(My_Pass == WifiIsConnectted(txbuf))
+						{
+							if(strstr(txbuf, wifis->ssid) != NULL)
+								statues = My_Pass;
+						}
+						
+						break;
+					}
+					
+					vTaskDelay(1000 / portTICK_RATE_MS);
+				}
+			}
 		}
 	}
 
@@ -385,7 +442,7 @@ MyState_TypeDef WifiIsConnectted(char * ssid)
 	{
 		if(My_Pass == ComWithWIFI("AT+WSLK\r", "+ok", txbuf, 100, 50 / portTICK_RATE_MS))
 		{
-			if(!((strstr(txbuf, "DisConnected")) || (strstr(txbuf, "RF Off"))))
+			if(!((strstr(txbuf, "Disconnected")) || (strstr(txbuf, "RF Off"))))
 			{
 				//总长度
 				len = strlen(txbuf);

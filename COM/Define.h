@@ -5,13 +5,15 @@
 #include 	"FreeRTOS.h"
 #include	"ff.h"
 
-#define		AdminPassWord		"123456\0"								//管理员密码，用于修改设备id
-#define		AdjustPassWord		"111111\0"								//校准密码
-#define		TestPassWord		"222222\0"								//老化测试密码
-#define		CheckQRPassWord		"333333\0"								//测试二维码密码
-#define		AdjLedPassWord		"444444\0"								//校准led密码
-#define		FactoryResetPassWord	"555555\0"							//恢复出厂设置密码
-#define		ChangeValueShowTypePassWord	"666666\0"						//切换结果显示模式，是否显示真实值
+
+#define		AdminPassWord		"201300\0"								//管理员密码，用于修改设备id
+#define		AdjustPassWord		"201301\0"								//校准密码
+#define		TestPassWord		"201302\0"								//老化测试密码
+#define		CheckQRPassWord		"201303\0"								//测试二维码密码
+#define		AdjLedPassWord		"201304\0"								//校准led密码
+#define		FactoryResetPassWord	"201305\0"							//恢复出厂设置密码
+#define		ChangeValueShowTypePassWord	"201306\0"						//切换结果显示模式，是否显示真实值
+#define		UnlockLCDPassWord	"201307\0"								//解锁屏幕一次
 
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -19,8 +21,8 @@
 /***************************************************************************************************/
 /***************************************************************************************************/
 /*V1.0.03*/
-#define	GB_SoftVersion	(unsigned short)1003
-#define	GB_SoftVersion_Build	"Build17030101\0"
+#define	GB_SoftVersion	(unsigned short)1036
+#define	GB_SoftVersion_Build	"Build17030301\0"
 
 /*服务器信息*/
 #define	GB_ServerIp_1		116
@@ -320,7 +322,7 @@ typedef struct ip_Tag
 
 #define	MaxSaveWifiNum	50												//最多保存50个热点
 #define	MaxWifiListNum	20												//最多显示20个热点
-#define	PageWifiNum		10
+#define	PageWifiNum		8
 #define	MaxSSIDLen		50
 #define	MaxKEYLen		20
 
@@ -481,7 +483,8 @@ typedef struct ReTestData_tag{
 	unsigned int retestcount;								//总次数
 	unsigned short retestsurpluscount;						//剩余测试次数
 	unsigned short retestedcount;							//已经测试次数
-	unsigned char reteststatus;								//老化测试状态，0停止，1等待插卡，2读二维码，3测试
+	unsigned char reteststatus;								//老化测试状态，0停止，非0测试
+	unsigned char retestStep;								//测试步骤，1等待插卡，2读二维码，3读卡
 	Timer retesttimer;										//老化测试计时器
 	Timer oneretesttimer;									//一次老化测试计时器
 	ItemData itemData;

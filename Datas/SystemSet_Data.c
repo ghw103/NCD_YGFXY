@@ -20,9 +20,6 @@
 /***************************************************************************************************/
 static SystemSetData GB_SystemSetData;								//系统参数
 
-static bool wifiIsUseable = true;									//wifi是否可用于传输数据，
-																	//由于无需持久化，所以不放在系统参数中
-																	//设置wifi的时候不能提交数据
 
 static bool isShowRealValue = false;								//是否显示真实数据
 /***************************************************************************************************/
@@ -49,13 +46,14 @@ void setDefaultSystemSetData(SystemSetData * systemSetData)
 {
 	if(systemSetData)
 	{
-		systemSetData->isAutoPrint = false;
+		systemSetData->isAutoPrint = true;
 		systemSetData->isMute = false;
 		systemSetData->ledLightIntensity = 100;
 		systemSetData->ledSleepTime = 60;
 		
 		memset(&(systemSetData->deviceInfo), 0, sizeof(DeviceInfo));
 		sprintf(systemSetData->deviceInfo.deviceid, "ncd-device");
+		systemSetData->deviceInfo.isnew = true;
 		systemSetData->deviceInfo.crc = CalModbusCRC16Fun1(&(systemSetData->deviceInfo), sizeof(DeviceInfo) - 2);
 		
 		memset(&(systemSetData->netSet), 0, sizeof(NetSet));
@@ -423,23 +421,30 @@ void getAdjPram(SystemSetData * systemSetData, AdjustData * adjData)
 }
 
 /***************************************************************************************************
-*FunctionName: setWifiIsUseable, isWifiUseable
-*Description: 
+*FunctionName: getAllAdjPram
+*Description: 读取所有校准参数
 *Input: 
 *Output: 
 *Return: 
 *Author: xsx
-*Date: 2017年2月9日10:43:25
+*Date: 2017年3月14日15:35:09
 ***************************************************************************************************/
-void setWifiIsUseable(bool isUseable)
+void getAllAdjPram(SystemSetData * systemSetData, AdjustData * adjData)
 {
-	wifiIsUseable = isUseable;
+	if(adjData == NULL)
+		return;
+	
+	if(systemSetData == NULL)
+		return;
+	
+	if(systemSetData->crc != CalModbusCRC16Fun1(systemSetData, sizeof(SystemSetData) - 2))
+		setDefaultSystemSetData(systemSetData);
+	
+	memcpy(adjData, systemSetData->adjustData, sizeof(AdjustData)*MaxAdjDataNum);
+	
+	systemSetData->crc = CalModbusCRC16Fun1(systemSetData, sizeof(SystemSetData) - 2);
 }
 
-bool isWifiUseable(void)
-{
-	return wifiIsUseable;
-}
 
 /***************************************************************************************************
 *FunctionName: setIsShowRealValue, IsShowRealValue

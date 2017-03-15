@@ -722,6 +722,11 @@
               <FileType>1</FileType>
               <FilePath>..\Task\Paidui_Task.c</FilePath>
             </File>
+            <File>
+              <FileName>LcdInput_Task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Task\LcdInput_Task.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

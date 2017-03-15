@@ -51,9 +51,9 @@ static void vUniversalTask( void *pvParameters );	//看门狗任务
 *Author：xsx
 *Data：2015年8月26日16:58:13
 ***************************************************************************************************/
-void StartvUniversalTask(void)
+char StartvUniversalTask(void)
 {
-	xTaskCreate( vUniversalTask, UniversalTaskName, configMINIMAL_STACK_SIZE, NULL, UniversalTask_PRIORITY, NULL );
+	return xTaskCreate( vUniversalTask, UniversalTaskName, configMINIMAL_STACK_SIZE, NULL, UniversalTask_PRIORITY, NULL );
 }
 
 /***************************************************************************************************
@@ -69,9 +69,9 @@ static void vUniversalTask( void *pvParameters )
 	static unsigned int count = 0;
 	
 	while(1)
-	{		
+	{
 		/*读取时间，500ms采集一次*/
-		if(count % 1 == 0)
+		if(count % 5 == 0)
 			UpDateGB_Time();
 		
 		/*检测卡状态，500ms间隔*/

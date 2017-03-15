@@ -16,7 +16,7 @@
 #include	"stdio.h"
 /******************************************************************************************/
 /*****************************************局部变量声明*************************************/
-const char wavfilename[56][20]=
+const char wavfilename[57][20]=
 {
 	"0:/Audio/n1.wav\0",
 	"0:/Audio/n2.wav\0",
@@ -73,7 +73,8 @@ const char wavfilename[56][20]=
 	"0:/Audio/n53.wav\0",
 	"0:/Audio/n54.wav\0",
 	"0:/Audio/n55.wav\0",
-	"0:/Audio/n56.wav\0"
+	"0:/Audio/n56.wav\0",
+	"0:/Audio/n57.wav\0"
 };
 #define vPlaySongTask_PRIORITY			( ( unsigned portBASE_TYPE ) 2U )
 
@@ -102,12 +103,12 @@ static void vPlaySongTask( void *pvParameters );
 ** 时  间: 2015年5月15日 17:04:43 
 ** 作  者：xsx                                                 
 ************************************************************************/
-void StartvPlaySongTask(void)
+char StartvPlaySongTask(void)
 {
 	if(SongListQueue == NULL)
 		SongListQueue = xQueueCreate( SongListSize, ( unsigned portBASE_TYPE ) sizeof( unsigned char ) );
 	
-	xTaskCreate( vPlaySongTask, ( const char * ) "vPlaySongTask ", configMINIMAL_STACK_SIZE*2, NULL, vPlaySongTask_PRIORITY, NULL );
+	return xTaskCreate( vPlaySongTask, ( const char * ) "vPlaySongTask ", configMINIMAL_STACK_SIZE*2, NULL, vPlaySongTask_PRIORITY, NULL );
 }
 
 /************************************************************************

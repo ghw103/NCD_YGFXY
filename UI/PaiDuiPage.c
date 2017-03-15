@@ -192,7 +192,7 @@ static void activityFresh(void)
 		S_PaiDuiPageBuffer->pageisbusy = true;
 
 		//500ms刷新一次界面
-		if(S_PaiDuiPageBuffer->count2 % 50 == 0)
+		if(S_PaiDuiPageBuffer->count2 % 5 == 0)
 		{
 			//如果当前功能处于禁止状态，且电机位置处于最大行程，且卡槽无卡，则启用插卡自动创建功能
 			if((S_PaiDuiPageBuffer->timer0.interval == 65535) && (MaxLocation == GetGB_MotorLocation()) && (!CardPinIn))

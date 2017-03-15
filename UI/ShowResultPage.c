@@ -91,11 +91,7 @@ static void activityStart(void)
 {
 	if(S_ShowPageBuffer)
 	{
-		//读取系统设置
-		copyGBSystemSetData(&(S_ShowPageBuffer->systemSetData));
-		
-		timer_set(&(S_ShowPageBuffer->timer), S_ShowPageBuffer->systemSetData.ledSleepTime);
-		
+
 		RefreshText();
 			
 		DspLine();
@@ -122,8 +118,6 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*命令*/
 		S_ShowPageBuffer->lcdinput[0] = pbuf[4];
 		S_ShowPageBuffer->lcdinput[0] = (S_ShowPageBuffer->lcdinput[0]<<8) + pbuf[5];
-		
-		timer_restart(&(S_ShowPageBuffer->timer));
 		
 		/*退出*/
 		if(0x2301 == S_ShowPageBuffer->lcdinput[0])
@@ -153,8 +147,7 @@ static void activityFresh(void)
 {
 	if(S_ShowPageBuffer)
 	{
-		if(TimeOut == timer_expired(&(S_ShowPageBuffer->timer)))
-			startActivity(createSleepActivity, NULL);
+
 	}
 }
 
@@ -185,7 +178,7 @@ static void activityResume(void)
 {
 	if(S_ShowPageBuffer)
 	{
-		timer_restart(&(S_ShowPageBuffer->timer));
+
 	}
 	
 	SelectPage(147);
@@ -252,19 +245,18 @@ static void RefreshText(void)
 {
 	if(S_ShowPageBuffer)
 	{
-		memset(S_ShowPageBuffer->tempbuf, 0, 100);
-		sprintf(S_ShowPageBuffer->tempbuf, "%s", S_ShowPageBuffer->testdata.temperweima.ItemName);
-		DisText(0x2310, S_ShowPageBuffer->tempbuf, 20);
+		sprintf(S_ShowPageBuffer->tempbuf, "%s\0", S_ShowPageBuffer->testdata.temperweima.ItemName);
+		DisText(0x2310, S_ShowPageBuffer->tempbuf, strlen(S_ShowPageBuffer->tempbuf)+1);
 				
-		memset(S_ShowPageBuffer->tempbuf, 0, 100);
-		sprintf(S_ShowPageBuffer->tempbuf, "%s", S_ShowPageBuffer->testdata.sampleid);
-		DisText(0x2320, S_ShowPageBuffer->tempbuf, 20);
+		sprintf(S_ShowPageBuffer->tempbuf, "%s\0", S_ShowPageBuffer->testdata.sampleid);
+		DisText(0x2320, S_ShowPageBuffer->tempbuf, strlen(S_ShowPageBuffer->tempbuf)+1);
 				
-		sprintf(S_ShowPageBuffer->tempbuf, "%2.1f", S_ShowPageBuffer->testdata.TestTemp.O_Temperature);
-		DisText(0x2330, S_ShowPageBuffer->tempbuf, 8);
-				
-		sprintf(S_ShowPageBuffer->tempbuf, "%s", S_ShowPageBuffer->testdata.temperweima.PiHao);
-		DisText(0x2340, S_ShowPageBuffer->tempbuf, 30);
+		sprintf(S_ShowPageBuffer->tempbuf, "%2.1f ℃\0", S_ShowPageBuffer->testdata.TestTemp.O_Temperature);
+		DisText(0x2330, S_ShowPageBuffer->tempbuf, strlen(S_ShowPageBuffer->tempbuf)+1);
+		
+		sprintf(S_ShowPageBuffer->tempbuf, "%s-%s\0", S_ShowPageBuffer->testdata.temperweima.PiHao,
+			S_ShowPageBuffer->testdata.temperweima.piNum);
+		DisText(0x2340, S_ShowPageBuffer->tempbuf, strlen(S_ShowPageBuffer->tempbuf)+1);
 		
 		
 		if(IsShowRealValue() == true)
@@ -280,11 +272,11 @@ static void RefreshText(void)
 			sprintf(S_ShowPageBuffer->tempbuf, "%.*f %s", S_ShowPageBuffer->testdata.temperweima.itemConstData.pointNum, 
 				S_ShowPageBuffer->testdata.testline.AdjustResult,S_ShowPageBuffer->testdata.temperweima.itemConstData.itemMeasure);
 
-		DisText(0x2350, S_ShowPageBuffer->tempbuf, 30);
+		DisText(0x2338, S_ShowPageBuffer->tempbuf, strlen(S_ShowPageBuffer->tempbuf));
 		
 		sprintf(S_ShowPageBuffer->tempbuf, "%s", S_ShowPageBuffer->testdata.temperweima.itemConstData.normalResult);
 
-		DisText(0x2360, S_ShowPageBuffer->tempbuf, 30);
+		DisText(0x2350, S_ShowPageBuffer->tempbuf, strlen(S_ShowPageBuffer->tempbuf));
 
 	}
 }
@@ -299,14 +291,14 @@ static void DspLine(void)
 	unsigned short *p = NULL;
 
 	ClearLine(0x57);
-	vTaskDelay(10 / portTICK_RATE_MS);
+	vTaskDelay(200 / portTICK_RATE_MS);
 	for(i=0; i<MaxPointLen;i++)
 	{
 		if(i%50 == 0)
 		{
 			p = &(S_ShowPageBuffer->testdata.testline.TestPoint[i]);
 			DisPlayLine(1 , p , 50);
-			vTaskDelay(10 / portTICK_RATE_MS);
+			vTaskDelay(2 / portTICK_RATE_MS);
 		}
 		
 		if(S_ShowPageBuffer->lineinfo.MaxData <= S_ShowPageBuffer->testdata.testline.TestPoint[i])
@@ -345,31 +337,43 @@ static void dspIco(void)
 	{
 		//在曲线上标记出T,C,基线
 		S_ShowPageBuffer->myico[0].ICO_ID = 22;
-		S_ShowPageBuffer->myico[0].X = 505+S_ShowPageBuffer->testdata.testline.T_Point[1]-5;
+		S_ShowPageBuffer->myico[0].X = S_ShowPageBuffer->testdata.testline.T_Point[1];
+		S_ShowPageBuffer->myico[0].X *= 2;
+		S_ShowPageBuffer->myico[0].X += 505;
+		S_ShowPageBuffer->myico[0].X -= 114;
+		S_ShowPageBuffer->myico[0].X -= 12;
 		tempvalue = S_ShowPageBuffer->testdata.testline.T_Point[0];
 		tempvalue /= S_ShowPageBuffer->lineinfo.Y_Scale*2;
 		tempvalue = 1-tempvalue;
 		tempvalue *= 302;										//曲线窗口宽度
 		tempvalue += 139;										//曲线窗口起始y
-		S_ShowPageBuffer->myico[0].Y = (unsigned short)tempvalue - 5;
+		S_ShowPageBuffer->myico[0].Y = (unsigned short)tempvalue - 11;
 		
 		S_ShowPageBuffer->myico[1].ICO_ID = 22;
-		S_ShowPageBuffer->myico[1].X = 505+S_ShowPageBuffer->testdata.testline.C_Point[1]-5;
+		S_ShowPageBuffer->myico[1].X = S_ShowPageBuffer->testdata.testline.C_Point[1];
+		S_ShowPageBuffer->myico[1].X *= 2;
+		S_ShowPageBuffer->myico[1].X += 505;
+		S_ShowPageBuffer->myico[1].X -= 114;
+		S_ShowPageBuffer->myico[1].X -= 12;
 		tempvalue = S_ShowPageBuffer->testdata.testline.C_Point[0];
 		tempvalue /= S_ShowPageBuffer->lineinfo.Y_Scale*2;
 		tempvalue = 1-tempvalue;
 		tempvalue *= 302;										//曲线窗口宽度
 		tempvalue += 139;										//曲线窗口起始y
-		S_ShowPageBuffer->myico[1].Y = (unsigned short)tempvalue - 5;
+		S_ShowPageBuffer->myico[1].Y = (unsigned short)tempvalue - 11;
 		
 		S_ShowPageBuffer->myico[2].ICO_ID = 22;
-		S_ShowPageBuffer->myico[2].X = 505+S_ShowPageBuffer->testdata.testline.B_Point[1]-5;
+		S_ShowPageBuffer->myico[2].X = S_ShowPageBuffer->testdata.testline.B_Point[1];
+		S_ShowPageBuffer->myico[2].X *= 2;
+		S_ShowPageBuffer->myico[2].X += 505;
+		S_ShowPageBuffer->myico[2].X -= 114;
+		S_ShowPageBuffer->myico[2].X -= 12;
 		tempvalue = S_ShowPageBuffer->testdata.testline.B_Point[0];
 		tempvalue /= S_ShowPageBuffer->lineinfo.Y_Scale*2;
 		tempvalue = 1-tempvalue;
 		tempvalue *= 302;										//曲线窗口宽度
 		tempvalue += 139;										//曲线窗口起始y
-		S_ShowPageBuffer->myico[2].Y = (unsigned short)tempvalue - 5;
+		S_ShowPageBuffer->myico[2].Y = (unsigned short)tempvalue - 11;
 		
 		BasicUI(0x2380 ,0x1807 , 3, &(S_ShowPageBuffer->myico[0]) , sizeof(Basic_ICO)*3);
 	}

@@ -140,7 +140,7 @@ void SelfTest_Function(void)
 		sendSelfTestStatus(Erweima_ERROR);
 		return;
 	}*/
-	
+
 	//测试传动模块
 	if(My_Pass == testMotol())
 		sendSelfTestStatus(Motol_OK);
@@ -192,6 +192,8 @@ static MyState_TypeDef loadSystemData(void)
 		}
 		else
 		{
+			//开机上传一次设备信息
+			systemSetData->deviceInfo.isnew = true;
 			setSystemSetData(systemSetData);
 			status = My_Pass;
 		}

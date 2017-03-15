@@ -39,9 +39,9 @@ static void vIwdgTask( void *pvParameters );
 ** 时  间: 2015年5月15日 17:04:43 
 ** 作  者：xsx                                                 
 ************************************************************************/
-void StartvIwdgTask(void)
+char StartvIwdgTask(void)
 {
-	xTaskCreate( vIwdgTask, IwdgTaskName, configMINIMAL_STACK_SIZE, NULL, vIwdgTask_PRIORITY, NULL );
+	return xTaskCreate( vIwdgTask, IwdgTaskName, configMINIMAL_STACK_SIZE, NULL, vIwdgTask_PRIORITY, NULL );
 }
 
 /************************************************************************

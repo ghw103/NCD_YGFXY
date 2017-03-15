@@ -5,8 +5,6 @@
 #include	"SystemSet_Data.h"
 
 typedef struct AboutUsPageBuffer_tag {
-	SystemSetData systemSetData;
-	Timer timer;
 	unsigned short lcdinput[20];
 	char buf[100];
 	unsigned short tempV;

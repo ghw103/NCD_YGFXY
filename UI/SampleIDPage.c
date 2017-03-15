@@ -86,9 +86,9 @@ static void activityStart(void)
 	{
 		S_SampleIDPage->currenttestdata = GetCurrentTestItem();
 	
-		RefreshSampleID();
-
 		AddNumOfSongToList(10, 0);
+		
+		RefreshSampleID();
 	}
 	
 	SelectPage(86);
@@ -194,6 +194,8 @@ static void activityResume(void)
 {
 	if(S_SampleIDPage)
 	{		
+		AddNumOfSongToList(10, 0);
+		
 		RefreshSampleID();
 	}
 	
@@ -261,8 +263,5 @@ static void activityBufferFree(void)
 
 static void RefreshSampleID(void)
 {
-	if(S_SampleIDPage)
-	{
-		DisText(0x1310, S_SampleIDPage->currenttestdata->testdata.sampleid, MaxSampleIDLen);
-	}
+	DisText(0x1310, S_SampleIDPage->currenttestdata->testdata.sampleid, MaxSampleIDLen);
 }

@@ -4,9 +4,8 @@
 #include	"Define.h"
 
 #define	MAX_QR_CODE_LENGHT	300					//二维码最大长度
-#define	MAX_SCAN_QR_TIME	7					//扫描二维码时间
+#define	MAX_SCAN_QR_TIME	10					//扫描二维码时间
 
-#pragma pack(1)
 typedef struct ReadQRCodeBuffer_tag {
 	char originalcode[MAX_QR_CODE_LENGHT+1];						//原始的二维码
 	unsigned short originalCodeLen;									//原始数据长度
@@ -22,7 +21,6 @@ typedef struct ReadQRCodeBuffer_tag {
 	unsigned char tempV1;
 	ScanCodeResult scanresult;
 }ReadQRCodeBuffer;
-#pragma pack()
 
 ScanCodeResult ScanCodeFun(QRCode * parm);
 

@@ -11,8 +11,6 @@ typedef struct ShowPageBuffer_tag {
 	TestData testdata;
 	LineInfo lineinfo;
 	unsigned short lcdinput[100];
-	SystemSetData systemSetData;
-	Timer timer;
 }ShowPageBuffer;
 
 MyState_TypeDef createShowResultActivity(Activity * thizActivity, Intent * pram);

@@ -75,10 +75,7 @@ static void activityStart(void)
 {
 	if(S_NetPrePageBuffer)
 	{
-		//读取系统设置
-		copyGBSystemSetData(&(S_NetPrePageBuffer->systemSetData));
-		
-		timer_set(&(S_NetPrePageBuffer->timer), S_NetPrePageBuffer->systemSetData.ledSleepTime);
+
 	}
 	
 	SelectPage(108);
@@ -100,8 +97,6 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*命令*/
 		S_NetPrePageBuffer->lcdinput[0] = pbuf[4];
 		S_NetPrePageBuffer->lcdinput[0] = (S_NetPrePageBuffer->lcdinput[0]<<8) + pbuf[5];
-
-		timer_restart(&(S_NetPrePageBuffer->timer));
 		
 		/*返回*/
 		if(S_NetPrePageBuffer->lcdinput[0] == 0x1E00)
@@ -140,8 +135,7 @@ static void activityFresh(void)
 {
 	if(S_NetPrePageBuffer)
 	{
-		if(TimeOut == timer_expired(&(S_NetPrePageBuffer->timer)))
-			startActivity(createSleepActivity, NULL);
+
 	}
 }
 
@@ -172,7 +166,7 @@ static void activityResume(void)
 {
 	if(S_NetPrePageBuffer)
 	{
-		timer_restart(&(S_NetPrePageBuffer->timer));
+
 	}
 	
 	SelectPage(108);

@@ -23,6 +23,7 @@ void DRV_Init(void);
 void SetDRVSleepStatues(DRVSleep_Type statues);
 void SetDRVPowerStatues(DRVPower_Type statues);
 void SetDRVDir(DRVDir_Type value);
+void motorDisable(void);
 
 #endif
 

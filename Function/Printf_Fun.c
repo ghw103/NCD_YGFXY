@@ -52,19 +52,18 @@ MyState_TypeDef ConnectPrintter(void)
 	return My_Pass;
 }
 
-void PrintfData(void *data)
+void PrintfData(TestData * testd)
 {
 	char * printfbuf = NULL;
-	TestData * testd = data;
 	MyTime_Def mytime;
 	float tempvalue = 0.0;
 	
 	printfbuf = MyMalloc(100);
 
-	if(printfbuf)
+	if(printfbuf && testd)
 	{
 		memset(printfbuf, 0, 100);
-		sprintf(printfbuf, "------------------------\r");
+		sprintf(printfbuf, "------------------------------\r");
 		
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
 		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, NULL, sizeof(unsigned char), 500 / portTICK_RATE_MS, 100 / portTICK_RATE_MS);
@@ -130,7 +129,7 @@ void PrintfData(void *data)
 		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, NULL, sizeof(unsigned char), 5000 / portTICK_RATE_MS, 100 / portTICK_RATE_MS);
 		
 		memset(printfbuf, 0, 100);
-		sprintf(printfbuf, "\r------------------------\r\r\r\r\r\r");
+		sprintf(printfbuf, "\r------------------------------\r\r\r\r\r\r");
 		
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
 		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, NULL, sizeof(unsigned char), 5000 / portTICK_RATE_MS, 100 / portTICK_RATE_MS);

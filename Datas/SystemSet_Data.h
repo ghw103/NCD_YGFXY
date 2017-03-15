@@ -50,9 +50,7 @@ unsigned short getTestLedLightIntensity(SystemSetData * systemSetData);
 
 MyState_TypeDef addAdjPram(SystemSetData * systemSetData, AdjustData * adjData);
 void getAdjPram(SystemSetData * systemSetData, AdjustData * adjData);
-
-void setWifiIsUseable(bool isUseable);
-bool isWifiUseable(void);
+void getAllAdjPram(SystemSetData * systemSetData, AdjustData * adjData);
 
 void setIsShowRealValue(bool isShow);
 bool IsShowRealValue(void);

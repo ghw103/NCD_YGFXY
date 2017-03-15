@@ -3,7 +3,7 @@
 
 
 
-void StartvSystemUITask(void);
+char StartvSystemUITask(void);
 
 #endif
 

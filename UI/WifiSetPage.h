@@ -13,8 +13,7 @@ typedef struct WifiPageBuffer_tag {
 	unsigned short wifinum;
 	Basic_ICO myico[PageWifiNum];
 	unsigned short lcdinput[100];
-	SystemSetData systemSetData;
-	Timer timer;
+	bool isGetWifiControl;								//是否已获取wifi控制权
 }WifiPageBuffer;
 
 MyState_TypeDef createWifiSetActivity(Activity * thizActivity, Intent * pram);

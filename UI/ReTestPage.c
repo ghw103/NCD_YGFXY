@@ -141,15 +141,15 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*开始老化*/
 		else if(S_ReTestPageBuffer->lcdinput[0] == 0x2800)
 		{
-			if(S_ReTestPageBuffer->reTestData.reteststatus == 0)
-				StartReTest();
-			else
+			if((S_ReTestPageBuffer->reTestData.retestcount == 0) || (S_ReTestPageBuffer->reTestData.reteststatus > 0))
 				SendKeyCode(1);
+			else
+				StartReTest();
 		}
 		/*停止老化*/
 		else if(S_ReTestPageBuffer->lcdinput[0] == 0x2801)
 		{
-			StopReTest();
+			S_ReTestPageBuffer->reTestData.retestsurpluscount = 0;
 		}
 		/*获取老化次数*/
 		else if(S_ReTestPageBuffer->lcdinput[0] == 0x2820)
@@ -170,9 +170,9 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void activityFresh(void)
 {
-	if(S_ReTestPageBuffer)
+	if(S_ReTestPageBuffer->reTestData.reteststatus > 0)
 	{
-		if(S_ReTestPageBuffer->reTestData.reteststatus == 1)
+		if(S_ReTestPageBuffer->reTestData.retestStep == 1)
 		{
 			if(GetCardState() == CardIN)
 			{
@@ -196,43 +196,37 @@ static void activityFresh(void)
 				
 				S_ReTestPageBuffer->reTestData.ledstatus = ReadLEDStatus();
 				
-				S_ReTestPageBuffer->reTestData.reteststatus = 2;
+				S_ReTestPageBuffer->reTestData.retestStep = 2;
 				StartScanQRCode(&(S_ReTestPageBuffer->reTestData.itemData.testdata.temperweima));
 			}
 			else if(TimeOut == timer_expired(&(S_ReTestPageBuffer->timer)))
 			{
 				dspReTestStatus("No Card\0");
 				EndOneReTest("等待检测卡超时\0");
-				StopReTest();
+				S_ReTestPageBuffer->reTestData.retestsurpluscount = 0;
+				S_ReTestPageBuffer->reTestData.retestStep = 0;
 			}
 		}
-		else if(S_ReTestPageBuffer->reTestData.reteststatus == 2)
+		else if(S_ReTestPageBuffer->reTestData.retestStep == 2)
 			CheckQRCode();
-		else if(S_ReTestPageBuffer->reTestData.reteststatus == 3)
+		else if(S_ReTestPageBuffer->reTestData.retestStep == 3)
 			CheckTestCard();
 
-		if(S_ReTestPageBuffer->reTestData.reteststatus > 0)
+		//管理音频测试
+		if(0 == getPlayStatus())
 		{
-			S_ReTestPageBuffer->reTestData.playstatus = getPlayStatus();
-			if(S_ReTestPageBuffer->reTestData.playstatus == 1)
-			{
-				//播放次数+1
-				S_ReTestPageBuffer->reTestData.playcount++;
-						
-				//初始化当前播放时长
-				timer_set(&(S_ReTestPageBuffer->reTestData.oneplaytimer), 999999);
-						
-				GetGB_Time(&(S_ReTestPageBuffer->reTestData.startplayTime));
-			}
-			else if(S_ReTestPageBuffer->reTestData.playstatus == 0)
+			if(timerIsStartted(&(S_ReTestPageBuffer->reTestData.oneplaytimer)))
 			{
 				GetGB_Time(&(S_ReTestPageBuffer->reTestData.endplayTime));
-						
+					
 				//保存当前播放信息
 				if(My_Pass == SavereTestData(&(S_ReTestPageBuffer->reTestData), 1))
 				{
-					if(S_ReTestPageBuffer->reTestData.reteststatus > 0)
-						AddNumOfSongToList(55, 3);
+					timer_stop(&(S_ReTestPageBuffer->reTestData.oneplaytimer));	
+					
+					//如果剩余测试次数等于0，则停止老化测试
+					if(S_ReTestPageBuffer->reTestData.retestsurpluscount == 0)
+						StopReTest();
 				}
 				else
 				{
@@ -240,6 +234,13 @@ static void activityFresh(void)
 
 					StopReTest();
 				}
+			}
+			else
+			{
+				S_ReTestPageBuffer->reTestData.playcount++;
+				GetGB_Time(&(S_ReTestPageBuffer->reTestData.startplayTime));
+				AddNumOfSongToList(55, 3);
+				timer_set(&(S_ReTestPageBuffer->reTestData.oneplaytimer), 999999);
 			}
 		}
 	}
@@ -351,96 +352,88 @@ static void SetReTestCount(char *str, unsigned char len)
 	DisText(0x2820, S_ReTestPageBuffer->buf, strlen(S_ReTestPageBuffer->buf));
 }
 static void StartReTest(void)
-{
-	if(S_ReTestPageBuffer)
-	{
-		if(S_ReTestPageBuffer->reTestData.retestcount == 0)
-			return;
+{	
+	//更新老化工作状态
+	dspReTestStatus("Testting\0");
 		
-		memset(&(S_ReTestPageBuffer->reTestData), 0, sizeof(ReTestData));
-		
-		//更新老化工作状态
-		dspReTestStatus("Testting\0");
-		
-		//更新已老化次数
-		S_ReTestPageBuffer->reTestData.retestedcount = 0;
-		//更新剩余老化次数
-		S_ReTestPageBuffer->reTestData.retestsurpluscount = S_ReTestPageBuffer->reTestData.retestcount - S_ReTestPageBuffer->reTestData.retestedcount;
-		//初始化测试总时长计时器
-		timer_set(&(S_ReTestPageBuffer->reTestData.retesttimer), 999999);
-		
-		dspReTestLogs();
-		
-		//初始化当前测试的时长计时器
-		timer_set(&(S_ReTestPageBuffer->reTestData.oneretesttimer), 999999);
-		
-		S_ReTestPageBuffer->reTestData.reteststatus = 1;
-		
-		for(S_ReTestPageBuffer->buf[0]=0; S_ReTestPageBuffer->buf[0]<PaiDuiWeiNum; S_ReTestPageBuffer->buf[0]++)
-			UpOneModelData(S_ReTestPageBuffer->buf[0], R_ON_G_OFF, 5);
+	//更新已老化次数
+	S_ReTestPageBuffer->reTestData.retestedcount = 0;
+	//更新剩余老化次数
+	S_ReTestPageBuffer->reTestData.retestsurpluscount = S_ReTestPageBuffer->reTestData.retestcount - S_ReTestPageBuffer->reTestData.retestedcount;
+
+	//初始化测试总时长计时器
+	timer_set(&(S_ReTestPageBuffer->reTestData.retesttimer), 999999);	
+	//初始化当前测试的时长计时器
+	timer_set(&(S_ReTestPageBuffer->reTestData.oneretesttimer), 999999);
+	
+	S_ReTestPageBuffer->reTestData.retestStep = 1;
+	
+	dspReTestLogs();
+	
+	//启动排队模块
+	for(S_ReTestPageBuffer->buf[0]=0; S_ReTestPageBuffer->buf[0]<PaiDuiWeiNum; S_ReTestPageBuffer->buf[0]++)
+		UpOneModelData(S_ReTestPageBuffer->buf[0], R_ON_G_OFF, 5);
 			
-		//开始测试音频
-		S_ReTestPageBuffer->reTestData.playcount = 0;
-		AddNumOfSongToList(55, 3);
-		//初始化播放总时长
-		timer_set(&(S_ReTestPageBuffer->reTestData.playtimer), 999999);
-	}
+	//启动音频测试
+	timer_set(&(S_ReTestPageBuffer->reTestData.playtimer), 999999);
+	S_ReTestPageBuffer->reTestData.playcount = 0;
+	
+	//启动所有测试
+	S_ReTestPageBuffer->reTestData.reteststatus = 1;
+	
 }
 
 static void StopReTest(void)
 {
-	S_ReTestPageBuffer->reTestData.reteststatus = 0;
-
-	memset(S_ReTestPageBuffer->buf, 0, 100);
-	sprintf(S_ReTestPageBuffer->buf, "%d", S_ReTestPageBuffer->reTestData.retestcount);
-	DisText(0x2820, S_ReTestPageBuffer->buf, strlen(S_ReTestPageBuffer->buf));
-		
+	//停止排队模块
 	OutModel_Init();
 	
-	MotorMoveTo(MaxLocation, 1);
+	//停止所有测试
+	S_ReTestPageBuffer->reTestData.reteststatus = 0;
 }
 
 
 static void EndOneReTest(char *result)
 {
-	if(S_ReTestPageBuffer)
-	{
-		memset(S_ReTestPageBuffer->reTestData.result, 0, 30);
-		memcpy(S_ReTestPageBuffer->reTestData.result, result, strlen(result));
+	memset(S_ReTestPageBuffer->reTestData.result, 0, 30);
+	memcpy(S_ReTestPageBuffer->reTestData.result, result, strlen(result));
 		
-		//保存当前测试结果
-		if(My_Pass == SavereTestData(&(S_ReTestPageBuffer->reTestData), 0))
-		{
-			//清除上次测试数据
-			memset(&(S_ReTestPageBuffer->reTestData.itemData), 0, sizeof(ItemData));
+	//保存当前测试结果
+	if(My_Pass == SavereTestData(&(S_ReTestPageBuffer->reTestData), 0))
+	{
+		//清除上次测试数据
+		memset(&(S_ReTestPageBuffer->reTestData.itemData), 0, sizeof(ItemData));
 			
-			if(S_ReTestPageBuffer->reTestData.retestedcount < S_ReTestPageBuffer->reTestData.retestcount)
-				S_ReTestPageBuffer->reTestData.retestedcount++;
-			
+		if(S_ReTestPageBuffer->reTestData.retestedcount < S_ReTestPageBuffer->reTestData.retestcount)
+			S_ReTestPageBuffer->reTestData.retestedcount++;
+		
+		if(S_ReTestPageBuffer->reTestData.retestsurpluscount > 0)		
 			S_ReTestPageBuffer->reTestData.retestsurpluscount = S_ReTestPageBuffer->reTestData.retestcount - S_ReTestPageBuffer->reTestData.retestedcount;
+		
 			
-			dspReTestLogs();
+		dspReTestLogs();
 			
-			//测试次数到
-			if(S_ReTestPageBuffer->reTestData.retestsurpluscount == 0)
-			{
-				dspReTestStatus("Success\0");
-			
-				StopReTest();
-			}
-			//初始化当前测试的时长计时器
-			timer_set(&(S_ReTestPageBuffer->reTestData.oneretesttimer), 999999);
-			
-			//初始化插卡计时
-			timer_set(&(S_ReTestPageBuffer->timer), 10);
+		//测试次数到
+		if(S_ReTestPageBuffer->reTestData.retestsurpluscount == 0)
+		{
+			dspReTestStatus("Finish\0");
 		}
 		else
-		{
-			//状态
-			dspReTestStatus("Test Data Save Failed\0");
+			S_ReTestPageBuffer->reTestData.retestStep = 1;
 			
-			StopReTest();
-		}
+		//初始化当前测试的时长计时器
+		timer_restart(&(S_ReTestPageBuffer->reTestData.oneretesttimer));
+			
+		//初始化插卡计时
+		timer_set(&(S_ReTestPageBuffer->timer), 10);
+	}
+	else
+	{
+		//状态
+		dspReTestStatus("Test Data Save Failed\0");
+			
+		S_ReTestPageBuffer->reTestData.retestsurpluscount = 0;
+		S_ReTestPageBuffer->reTestData.retestStep = 4;
 	}
 }
 
@@ -448,19 +441,22 @@ static void CheckQRCode(void)
 {
 	if(My_Pass == TakeScanQRCodeResult(&(S_ReTestPageBuffer->scancode)))
 	{
-		if((S_ReTestPageBuffer->scancode == CardCodeScanFail) || (S_ReTestPageBuffer->scancode == CardCodeCardOut) ||
-			(S_ReTestPageBuffer->scancode == CardCodeScanTimeOut) || (S_ReTestPageBuffer->scancode == CardCodeCRCError))
+		if(S_ReTestPageBuffer->scancode == CardUnsupported)
 		{
-			dspReTestStatus("QR Read Fail\0");
-			EndOneReTest("二维码读取失败\0");
-			StopReTest();
+			dspReTestStatus("Unsupported\0");
+			EndOneReTest("不支持的试剂卡\0");
+			S_ReTestPageBuffer->reTestData.retestsurpluscount = 0;
+			S_ReTestPageBuffer->reTestData.retestStep = 4;
+			MotorMoveTo(MaxLocation, 0);
 		}
 		//过期
 		else if(S_ReTestPageBuffer->scancode == CardCodeTimeOut)
 		{
 			dspReTestStatus("Card Out Date\0");
 			EndOneReTest("二维码读取过期\0");
-			StopReTest();
+			S_ReTestPageBuffer->reTestData.retestsurpluscount = 0;
+			S_ReTestPageBuffer->reTestData.retestStep = 4;
+			MotorMoveTo(MaxLocation, 0);
 		}
 		//读取成功
 		else if(S_ReTestPageBuffer->scancode == CardCodeScanOK)
@@ -469,9 +465,18 @@ static void CheckQRCode(void)
 			memcpy(S_ReTestPageBuffer->reTestData.itemData.testdata.tempadjust.ItemName, S_ReTestPageBuffer->reTestData.itemData.testdata.temperweima.ItemName, AdjItemNameLen);
 			getAdjPram(getGBSystemSetData(), &(S_ReTestPageBuffer->reTestData.itemData.testdata.tempadjust));
 
-			S_ReTestPageBuffer->reTestData.reteststatus = 3;
+			S_ReTestPageBuffer->reTestData.retestStep = 3;
 			S_ReTestPageBuffer->reTestData.itemData.ledLight = getTestLedLightIntensity(getGBSystemSetData());
 			StartTest(&(S_ReTestPageBuffer->reTestData.itemData));
+		}
+		/*其他错误：CardCodeScanFail, CardCodeCardOut, CardCodeScanTimeOut, CardCodeCRCError*/
+		else
+		{
+			dspReTestStatus("QR Read Fail\0");
+			EndOneReTest("二维码读取失败\0");
+			S_ReTestPageBuffer->reTestData.retestsurpluscount = 0;
+			S_ReTestPageBuffer->reTestData.retestStep = 4;
+			MotorMoveTo(MaxLocation, 0);
 		}
 	}
 }
@@ -480,11 +485,8 @@ static void CheckTestCard(void)
 {
 	if(My_Pass == TakeTestResult(&(S_ReTestPageBuffer->cardpretestresult)))
 	{
-		EndOneReTest("测试结束\0");
-		
-		//测试结束，进入下一次测试
-		if(S_ReTestPageBuffer->reTestData.retestsurpluscount > 0)
-			S_ReTestPageBuffer->reTestData.reteststatus = 1;
+		EndOneReTest("测试正常\0");
+		MotorMoveTo(MaxLocation, 0);
 	}
 }
 
