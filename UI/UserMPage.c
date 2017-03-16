@@ -331,11 +331,13 @@ static void ShowList(void)
 	
 	/*显示列表数据*/
 	for(i=0; i<MaxPageShowNum; i++)
-	{
-		ClearText(0x1d10+8*i, 16);
-		
+	{		
 		if(S_UserMPageBuffer->tempuser->crc == CalModbusCRC16Fun1(S_UserMPageBuffer->tempuser, sizeof(User_Type)-2))
-			DisText(0x1d10+8*i, S_UserMPageBuffer->tempuser->user_name, strlen(S_UserMPageBuffer->tempuser->user_name));
+			sprintf(S_UserMPageBuffer->buf, "%s\0", S_UserMPageBuffer->tempuser->user_name);
+		else
+			sprintf(S_UserMPageBuffer->buf, "\0");
+		
+		DisText(0x1d10+8*i, S_UserMPageBuffer->buf, strlen(S_UserMPageBuffer->buf)+1);
 		
 		S_UserMPageBuffer->tempuser++;
 	}
@@ -345,34 +347,39 @@ static void ShowDetail(void)
 {
 	unsigned char i = 0;
 	
-	ClearText(0x1d50, 10);
-	ClearText(0x1d60, 10);
-	ClearText(0x1d70, 10);
-	ClearText(0x1d80, 30);
-	ClearText(0x1d90, 30);
-	ClearText(0x1da0, 30);
-	BasicPic(0x1d40, 0, 140, 506, 402, 798, 470, 364, 142+(S_UserMPageBuffer->selectindex-1)*72);
-	
 	if((S_UserMPageBuffer->selectindex > 0) && (S_UserMPageBuffer->selectindex <= MaxPageShowNum))
 	{
 		i = (S_UserMPageBuffer->pageindex-1)*MaxPageShowNum + S_UserMPageBuffer->selectindex-1;
 	
-		S_UserMPageBuffer->tempuser = &(S_UserMPageBuffer->user[i]);
-		
-		if(S_UserMPageBuffer->tempuser->crc == CalModbusCRC16Fun1(S_UserMPageBuffer->tempuser, sizeof(User_Type)-2))
-		{
-			memcpy(&(S_UserMPageBuffer->tempnewuser), S_UserMPageBuffer->tempuser, sizeof(User_Type));
-			DisText(0x1d50, S_UserMPageBuffer->tempuser->user_name, strlen(S_UserMPageBuffer->tempuser->user_name));
-			DisText(0x1d60, S_UserMPageBuffer->tempuser->user_age, strlen(S_UserMPageBuffer->tempuser->user_age));
-			DisText(0x1d70, S_UserMPageBuffer->tempuser->user_sex, strlen(S_UserMPageBuffer->tempuser->user_sex));
-			DisText(0x1d80, S_UserMPageBuffer->tempuser->user_phone, strlen(S_UserMPageBuffer->tempuser->user_phone));
-			DisText(0x1d90, S_UserMPageBuffer->tempuser->user_job, strlen(S_UserMPageBuffer->tempuser->user_job));
-			DisText(0x1da0, S_UserMPageBuffer->tempuser->user_desc, strlen(S_UserMPageBuffer->tempuser->user_desc));
-			BasicPic(0x1d40, 1, 137, 266, 215, 559, 284, 157, 135+(S_UserMPageBuffer->selectindex-1)*72);	
-		}
+		memcpy(&(S_UserMPageBuffer->tempnewuser), &(S_UserMPageBuffer->user[i]), sizeof(User_Type));
 	}
 	else
 		memset(&(S_UserMPageBuffer->tempnewuser), 0, sizeof(User_Type));
+	
+	if(S_UserMPageBuffer->tempnewuser.crc == CalModbusCRC16Fun1(&(S_UserMPageBuffer->tempnewuser), sizeof(User_Type)-2))
+	{	
+		BasicPic(0x1d40, 1, 137, 266, 215, 559, 284, 157, 135+(S_UserMPageBuffer->selectindex-1)*72);	
+	}
+	else
+		BasicPic(0x1d40, 0, 137, 266, 215, 559, 284, 157, 135+(S_UserMPageBuffer->selectindex-1)*72);
+	
+	sprintf(S_UserMPageBuffer->buf, "%s\0", S_UserMPageBuffer->tempnewuser.user_name);
+	DisText(0x1d50, S_UserMPageBuffer->buf, strlen(S_UserMPageBuffer->buf)+1);
+		
+	sprintf(S_UserMPageBuffer->buf, "%s\0", S_UserMPageBuffer->tempnewuser.user_age);
+	DisText(0x1d60, S_UserMPageBuffer->buf, strlen(S_UserMPageBuffer->buf)+1);
+		
+	sprintf(S_UserMPageBuffer->buf, "%s\0", S_UserMPageBuffer->tempnewuser.user_sex);
+	DisText(0x1d70, S_UserMPageBuffer->buf, strlen(S_UserMPageBuffer->buf)+1);
+		
+	sprintf(S_UserMPageBuffer->buf, "%s\0", S_UserMPageBuffer->tempnewuser.user_phone);
+	DisText(0x1d80, S_UserMPageBuffer->buf, strlen(S_UserMPageBuffer->buf)+1);
+		
+	sprintf(S_UserMPageBuffer->buf, "%s\0", S_UserMPageBuffer->tempnewuser.user_job);
+	DisText(0x1d90, S_UserMPageBuffer->buf, strlen(S_UserMPageBuffer->buf)+1);
+		
+	sprintf(S_UserMPageBuffer->buf, "%s\0", S_UserMPageBuffer->tempnewuser.user_desc);
+	DisText(0x1da0, S_UserMPageBuffer->buf, strlen(S_UserMPageBuffer->buf)+1);
 }
 
 

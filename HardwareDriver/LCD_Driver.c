@@ -238,8 +238,8 @@ void DisText(unsigned short addr, void *data, unsigned short len)
 
 void ClearText(unsigned short addr, unsigned short len)
 {	
-	memset(tempbuf, 0xff, len);
-	DisText(addr, tempbuf, len);
+	memset(tempbuf, 0x0, 10);
+	DisText(addr, tempbuf, 1);
 }
 
 void WriteRadioData(unsigned short addr, void *data, unsigned short len)
@@ -431,3 +431,7 @@ void unLockLCDOneTime(void)
 	WriteLCDData(0x6000, "NEWcando2013\0", 12);
 }
 
+void writeDataToLcd(unsigned short addr, void * data, unsigned char len)
+{
+	WriteLCDData(addr, data, len);
+}

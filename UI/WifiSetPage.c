@@ -22,7 +22,6 @@
 static WifiPageBuffer * S_WifiPageBuffer = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
-static void clearWifiListText(void);
 static void RefreshWifi(void);
 static void DisListText(void);
 static void CheckIsNeedKey(void);
@@ -130,7 +129,6 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			if(S_WifiPageBuffer->pageindex > 0)
 			{
 				S_WifiPageBuffer->pageindex--;
-				clearWifiListText();
 				DisListText();
 			}
 		}
@@ -142,7 +140,6 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 				if(strlen(S_WifiPageBuffer->wifilist[(S_WifiPageBuffer->pageindex+1)*PageWifiNum].ssid) > 0)
 				{
 					S_WifiPageBuffer->pageindex++;
-					clearWifiListText();
 					DisListText();
 				}
 			}
@@ -286,9 +283,7 @@ static void activityBufferFree(void)
 /***************************************************************************************************/
 /***************************************************************************************************/
 static void RefreshWifi(void)
-{
-	clearWifiListText();
-	
+{	
 	vTaskDelay(200 / portTICK_RATE_MS);
 	SendKeyCode(5);
 	
@@ -321,17 +316,6 @@ static void RefreshWifi(void)
 
 }
 
-static void clearWifiListText(void)
-{
-	unsigned char i=0;
-
-	for(i=0; i<PageWifiNum; i++)
-	{
-		ClearText(0x1E80+i*0x10, 30);
-	}
-	
-	BasicUI(0x1F00 ,0x1807 , 0, S_WifiPageBuffer->myico , sizeof(Basic_ICO));
-}
 /*刷新列表数据*/
 static void DisListText(void)
 {
@@ -344,7 +328,7 @@ static void DisListText(void)
 	{
 		if(strlen(S_WifiPageBuffer->wifip->ssid) > 0)
 		{
-			DisText(0x1E80+i*0x10, S_WifiPageBuffer->wifip->ssid, strlen(S_WifiPageBuffer->wifip->ssid));
+			sprintf(S_WifiPageBuffer->buf, "%s\0", S_WifiPageBuffer->wifip->ssid);
 			
 			S_WifiPageBuffer->myico[i].X = 600;
 			S_WifiPageBuffer->myico[i].Y = 142+i*40;
@@ -361,6 +345,10 @@ static void DisListText(void)
 			S_WifiPageBuffer->wifinum = i+1;
 			S_WifiPageBuffer->wifip++;
 		}
+		else
+			sprintf(S_WifiPageBuffer->buf, "\0");
+		
+		DisText(0x1E80+i*0x10, S_WifiPageBuffer->buf, strlen(S_WifiPageBuffer->buf)+1);
 	}
 	
 	BasicUI(0x1F00 ,0x1807 , S_WifiPageBuffer->wifinum, S_WifiPageBuffer->myico , sizeof(Basic_ICO)*S_WifiPageBuffer->wifinum);

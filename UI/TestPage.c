@@ -311,8 +311,9 @@ static void InitPageText(void)
 			
 	sprintf(S_TestPageBuffer->buf, "%s\0", S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.normalResult);
 	DisText(0x1850, S_TestPageBuffer->buf, strlen(S_TestPageBuffer->buf)+1);
-			
-	ClearText(0x1838, 15);
+	
+	sprintf(S_TestPageBuffer->buf, "\0");
+	DisText(0x1838, S_TestPageBuffer->buf, strlen(S_TestPageBuffer->buf)+1);
 }
 
 /*更新数据*/

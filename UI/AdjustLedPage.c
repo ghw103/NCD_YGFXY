@@ -238,17 +238,15 @@ static void clearPageText(void)
 
 static void dspTestStatus(char * str)
 {
-	memset(S_AdjustLedPageBuffer->buf, 0, 20);
+	sprintf(S_AdjustLedPageBuffer->buf, "%-15s\0", str);
 	
-	sprintf(S_AdjustLedPageBuffer->buf, "%-15s", str);
-	
-	DisText(0x2620, S_AdjustLedPageBuffer->buf, 20);
+	DisText(0x2620, S_AdjustLedPageBuffer->buf, strlen(S_AdjustLedPageBuffer->buf)+1);
 }
 
 static void DspPageText(void)
 {
-	sprintf(S_AdjustLedPageBuffer->buf, "%-10d", S_AdjustLedPageBuffer->maxPoint[0]);
-	DisText(0x2630, S_AdjustLedPageBuffer->buf, strlen(S_AdjustLedPageBuffer->buf));
+	sprintf(S_AdjustLedPageBuffer->buf, "%-10d\0", S_AdjustLedPageBuffer->maxPoint[0]);
+	DisText(0x2630, S_AdjustLedPageBuffer->buf, strlen(S_AdjustLedPageBuffer->buf)+1);
 	
 	DspNum(0x2603, S_AdjustLedPageBuffer->maxPoint[1], 2);
 }
@@ -315,9 +313,8 @@ static void analysisTestData(void)
 		}
 	}
 	
-	memset(S_AdjustLedPageBuffer->buf, 0, 20);
-	sprintf(S_AdjustLedPageBuffer->buf, "Fail - %d", S_AdjustLedPageBuffer->cardpretestresult);
-	DisText(0x2620, S_AdjustLedPageBuffer->buf, strlen(S_AdjustLedPageBuffer->buf));
+	sprintf(S_AdjustLedPageBuffer->buf, "Fail - %d\0", S_AdjustLedPageBuffer->cardpretestresult);
+	DisText(0x2620, S_AdjustLedPageBuffer->buf, strlen(S_AdjustLedPageBuffer->buf)+1);
 	S_AdjustLedPageBuffer->isTestting = false;
 	
 	MotorMoveTo(MaxLocation, 1);

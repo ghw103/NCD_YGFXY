@@ -77,7 +77,9 @@ static void activityStart(void)
 {
 	if(S_AboutUsPageBuffer)
 	{
-
+		
+		copyGBSystemSetData(&(S_AboutUsPageBuffer->systemSetData));
+		
 		dspPageText();
 	}
 		
@@ -230,5 +232,18 @@ static void dspPageText(void)
 
 	sprintf(S_AboutUsPageBuffer->buf, "%s\0", GB_SoftVersion_Build);
 	DisText(0x2920, S_AboutUsPageBuffer->buf, strlen(S_AboutUsPageBuffer->buf)+1);
+	
+	//设置二维码x,y,像素点大小
+	S_AboutUsPageBuffer->buf[0] = 0;
+	S_AboutUsPageBuffer->buf[1] = 180;
+	S_AboutUsPageBuffer->buf[2] = 0x01;
+	S_AboutUsPageBuffer->buf[3] = 0x42;
+	S_AboutUsPageBuffer->buf[4] = 0;
+	S_AboutUsPageBuffer->buf[5] = 0x02;
+	writeDataToLcd(0x2941, S_AboutUsPageBuffer->buf, 6);
+
+	//显示二维码
+	sprintf(S_AboutUsPageBuffer->buf, "http://www.whnewcando.com/?%s\0", S_AboutUsPageBuffer->systemSetData.deviceInfo.deviceid);
+	writeDataToLcd(0x2950, S_AboutUsPageBuffer->buf, strlen(S_AboutUsPageBuffer->buf)+1);
 }
 

@@ -260,23 +260,23 @@ static void RefreshText(void)
 		
 		
 		if(IsShowRealValue() == true)
-			sprintf(S_ShowPageBuffer->tempbuf, "%.*f %s", S_ShowPageBuffer->testdata.temperweima.itemConstData.pointNum,
+			sprintf(S_ShowPageBuffer->tempbuf, "%.*f %s\0", S_ShowPageBuffer->testdata.temperweima.itemConstData.pointNum,
 				S_ShowPageBuffer->testdata.testline.AdjustResult, S_ShowPageBuffer->testdata.temperweima.itemConstData.itemMeasure);
 		else if(S_ShowPageBuffer->testdata.testline.AdjustResult <= S_ShowPageBuffer->testdata.temperweima.itemConstData.lowstResult)
-			sprintf(S_ShowPageBuffer->tempbuf, "<%.*f %s", S_ShowPageBuffer->testdata.temperweima.itemConstData.pointNum, 
+			sprintf(S_ShowPageBuffer->tempbuf, "<%.*f %s\0", S_ShowPageBuffer->testdata.temperweima.itemConstData.pointNum, 
 				S_ShowPageBuffer->testdata.temperweima.itemConstData.lowstResult, S_ShowPageBuffer->testdata.temperweima.itemConstData.itemMeasure);
 		else if(S_ShowPageBuffer->testdata.testline.AdjustResult >= S_ShowPageBuffer->testdata.temperweima.itemConstData.highestResult)
-			sprintf(S_ShowPageBuffer->tempbuf, ">%.*f %s", S_ShowPageBuffer->testdata.temperweima.itemConstData.pointNum, 
+			sprintf(S_ShowPageBuffer->tempbuf, ">%.*f %s\0", S_ShowPageBuffer->testdata.temperweima.itemConstData.pointNum, 
 				S_ShowPageBuffer->testdata.temperweima.itemConstData.highestResult, S_ShowPageBuffer->testdata.temperweima.itemConstData.itemMeasure);
 		else
-			sprintf(S_ShowPageBuffer->tempbuf, "%.*f %s", S_ShowPageBuffer->testdata.temperweima.itemConstData.pointNum, 
+			sprintf(S_ShowPageBuffer->tempbuf, "%.*f %s\0", S_ShowPageBuffer->testdata.temperweima.itemConstData.pointNum, 
 				S_ShowPageBuffer->testdata.testline.AdjustResult,S_ShowPageBuffer->testdata.temperweima.itemConstData.itemMeasure);
 
-		DisText(0x2338, S_ShowPageBuffer->tempbuf, strlen(S_ShowPageBuffer->tempbuf));
+		DisText(0x2338, S_ShowPageBuffer->tempbuf, strlen(S_ShowPageBuffer->tempbuf)+1);
 		
-		sprintf(S_ShowPageBuffer->tempbuf, "%s", S_ShowPageBuffer->testdata.temperweima.itemConstData.normalResult);
+		sprintf(S_ShowPageBuffer->tempbuf, "%s\0", S_ShowPageBuffer->testdata.temperweima.itemConstData.normalResult);
 
-		DisText(0x2350, S_ShowPageBuffer->tempbuf, strlen(S_ShowPageBuffer->tempbuf));
+		DisText(0x2350, S_ShowPageBuffer->tempbuf, strlen(S_ShowPageBuffer->tempbuf)+1);
 
 	}
 }

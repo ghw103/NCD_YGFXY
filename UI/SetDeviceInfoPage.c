@@ -286,38 +286,24 @@ static void activityBufferFree(void)
 
 static void showDeviceInfoText(void)
 {
-	ClearText(0x1b10, 10);
-	memset(S_SetDeviceInfoPageBuffer->tempBuf, 0, 100);
-	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->user.user_name);
-	DisText(0x1b10, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf));
+	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s\0", S_SetDeviceInfoPageBuffer->user.user_name);
+	DisText(0x1b10, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf)+1);
+
+	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s\0", S_SetDeviceInfoPageBuffer->user.user_age);
+	DisText(0x1b20, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf)+1);
+
+	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s\0", S_SetDeviceInfoPageBuffer->user.user_sex);
+	DisText(0x1b30, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf)+1);
+
+	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s\0", S_SetDeviceInfoPageBuffer->user.user_phone);
+	DisText(0x1b40, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf)+1);
 	
-	ClearText(0x1b20, 10);
-	memset(S_SetDeviceInfoPageBuffer->tempBuf, 0, 100);
-	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->user.user_age);
-	DisText(0x1b20, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf));
+	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s\0", S_SetDeviceInfoPageBuffer->user.user_job);
+	DisText(0x1b50, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf)+1);
+
+	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s\0", S_SetDeviceInfoPageBuffer->user.user_desc);
+	DisText(0x1b60, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf)+1);
 	
-	ClearText(0x1b30, 10);
-	memset(S_SetDeviceInfoPageBuffer->tempBuf, 0, 100);
-	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->user.user_sex);
-	DisText(0x1b30, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf));
-	
-	ClearText(0x1b40, 16);
-	memset(S_SetDeviceInfoPageBuffer->tempBuf, 0, 100);
-	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->user.user_phone);
-	DisText(0x1b40, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf));
-	
-	ClearText(0x1b50, 16);
-	memset(S_SetDeviceInfoPageBuffer->tempBuf, 0, 100);
-	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->user.user_job);
-	DisText(0x1b50, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf));
-	
-	ClearText(0x1b60, 16);
-	memset(S_SetDeviceInfoPageBuffer->tempBuf, 0, 100);
-	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->user.user_desc);
-	DisText(0x1b60, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf));
-	
-	ClearText(0x1b70, 30);
-	memset(S_SetDeviceInfoPageBuffer->tempBuf, 0, 100);
-	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s", S_SetDeviceInfoPageBuffer->deviceunit);
-	DisText(0x1b70, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf));
+	sprintf(S_SetDeviceInfoPageBuffer->tempBuf, "%s\0", S_SetDeviceInfoPageBuffer->deviceunit);
+	DisText(0x1b70, S_SetDeviceInfoPageBuffer->tempBuf, strlen(S_SetDeviceInfoPageBuffer->tempBuf)+1);
 }

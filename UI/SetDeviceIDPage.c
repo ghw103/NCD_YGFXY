@@ -23,6 +23,8 @@
 static SetDeviceIDPage * S_SetDeviceIDPage = NULL;
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
+static void dspDeviceId(char * idStr);
+
 static void activityStart(void);
 static void activityInput(unsigned char *pbuf , unsigned short len);
 static void activityFresh(void);
@@ -77,8 +79,7 @@ static void activityStart(void)
 	{
 		copyGBSystemSetData(&(S_SetDeviceIDPage->systemSetData));
 		
-		ClearText(0x1c10, 30);
-		DisText(0x1C10, S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid, strlen(S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid));
+		dspDeviceId(S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid);
 	}
 	
 	SelectPage(104);
@@ -160,8 +161,8 @@ static void activityFresh(void)
 		{
 			memcpy(S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid, S_SetDeviceIDPage->tempbuf, MaxDeviceIDLen);
 			
-			DisText(0x1C10, S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid, MaxDeviceIDLen);
-		
+			dspDeviceId(S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid);
+			
 			S_SetDeviceIDPage->ismodify = 1;
 		}
 	}
@@ -252,3 +253,9 @@ static void activityBufferFree(void)
 	S_SetDeviceIDPage = NULL;
 }
 
+
+static void dspDeviceId(char * idStr)
+{
+	sprintf(S_SetDeviceIDPage->tempbuf, "%s\0", idStr);
+	DisText(0x1C10, S_SetDeviceIDPage->tempbuf, strlen(S_SetDeviceIDPage->tempbuf)+1);
+}

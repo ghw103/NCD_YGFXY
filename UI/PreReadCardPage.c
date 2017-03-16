@@ -387,17 +387,17 @@ static void clearPageText(void)
 static void ShowCardInfo(void)
 {
 	sprintf(S_PreReadPageBuffer->buf, "%s\0", S_PreReadPageBuffer->temperweima.ItemName);
-	DisText(0x1420, S_PreReadPageBuffer->buf, 30);
+	DisText(0x1420, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf)+1);
 		
 	sprintf(S_PreReadPageBuffer->buf, "%s-%s\0", S_PreReadPageBuffer->temperweima.PiHao, S_PreReadPageBuffer->temperweima.piNum);
-	DisText(0x1430, S_PreReadPageBuffer->buf, 30);
+	DisText(0x1430, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf)+1);
 	
 	sprintf(S_PreReadPageBuffer->buf, "%d S\0", S_PreReadPageBuffer->temperweima.CardWaitTime*60);
-	DisText(0x1440, S_PreReadPageBuffer->buf, 10);
+	DisText(0x1440, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf)+1);
 		
 	sprintf(S_PreReadPageBuffer->buf, "20%02dÄê%02dÔÂ%02dÈÕ\0", S_PreReadPageBuffer->temperweima.CardBaoZhiQi.year, 
 		S_PreReadPageBuffer->temperweima.CardBaoZhiQi.month, S_PreReadPageBuffer->temperweima.CardBaoZhiQi.day);
-	DisText(0x1450, S_PreReadPageBuffer->buf, 30);
+	DisText(0x1450, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf)+1);
 }
 
 static void showTemperature(void)
@@ -407,9 +407,9 @@ static void showTemperature(void)
 	S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.E_Temperature = GetGB_EnTemperature();
 	
 	sprintf(S_PreReadPageBuffer->buf, "%2.1f ¡æ\0", S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.O_Temperature);
-	DisText(0x1460, S_PreReadPageBuffer->buf, 20);
+	DisText(0x1460, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf)+1);
 	
 	sprintf(S_PreReadPageBuffer->buf, "%2.1f ¡æ\0",S_PreReadPageBuffer->currenttestdata->testdata.TestTemp.E_Temperature);
-	DisText(0x1470, S_PreReadPageBuffer->buf, 20);
+	DisText(0x1470, S_PreReadPageBuffer->buf, strlen(S_PreReadPageBuffer->buf)+1);
 }
 

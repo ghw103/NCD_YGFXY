@@ -492,10 +492,8 @@ static void CheckTestCard(void)
 
 static void dspReTestStatus(char * str)
 {
-	ClearText(0x2828, 30);
-	memset(S_ReTestPageBuffer->buf, 0, 100);
-	sprintf(S_ReTestPageBuffer->buf, "%s", str);
-	DisText(0x2828, S_ReTestPageBuffer->buf, strlen(S_ReTestPageBuffer->buf));
+	sprintf(S_ReTestPageBuffer->buf, "%s\0", str);
+	DisText(0x2828, S_ReTestPageBuffer->buf, strlen(S_ReTestPageBuffer->buf)+1);
 }
 
 static void dspReTestLogs(void)
