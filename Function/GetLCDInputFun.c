@@ -52,7 +52,7 @@ void GetLCDInputData(void)
 {
 	rxcount = 0;
 	
-	ReceiveDataFromQueue(GetUsart6RXQueue(), GetUsart6RXMutex(), buf, 100, &rxcount, 1, 20 / portTICK_RATE_MS, 10 / portTICK_RATE_MS);
+	ReceiveDataFromQueue(GetUsart6RXQueue(), GetUsart6RXMutex(), buf, 100, &rxcount, 1, 10 / portTICK_RATE_MS, 10 / portTICK_RATE_MS);
 	
 	if(rxcount > 0)
 		AnalysisCode(buf, rxcount);

@@ -6,7 +6,7 @@
 #include 	"queue.h"
 #include	"semphr.h"
 
-#define xRxQueue6_Len				100
+#define xRxQueue6_Len				200
 #define xTxQueue6_Len				300
 
 void Usart6_Init(void);

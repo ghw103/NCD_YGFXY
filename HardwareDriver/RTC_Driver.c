@@ -389,7 +389,7 @@ MyState_TypeDef RTC_SetTimeData2(char * buf)
 		memset(tempbuf, 0, 64);
 		memcpy(tempbuf, buf, 4);
 		temp = strtol(tempbuf, NULL, 10);
-		if((temp >= 2000) && (temp < 2100))
+		if((temp >= 2016) && (temp <= 2100))
 			temptime.year = temp-2000;
 		else
 			goto END;
@@ -397,27 +397,42 @@ MyState_TypeDef RTC_SetTimeData2(char * buf)
 		memset(tempbuf, 0, 64);
 		memcpy(tempbuf, buf+4, 2);
 		temp = strtol(tempbuf, NULL, 10);
-		temptime.month = temp;
+		if((temp >= 1) && (temp <= 12))
+			temptime.month = temp;
+		else
+			goto END;
 			
 		memset(tempbuf, 0, 64);
 		memcpy(tempbuf, buf+6, 2);
 		temp = strtol(tempbuf, NULL, 10);
-		temptime.day = temp;
+		if((temp >= 1) && (temp <= 31))
+			temptime.day = temp;
+		else
+			goto END;
 			
 		memset(tempbuf, 0, 64);
 		memcpy(tempbuf, buf+8, 2);
 		temp = strtol(tempbuf, NULL, 10);
-		temptime.hour = temp;
+		if((temp >= 0) && (temp <= 23))
+			temptime.hour = temp;
+		else
+			goto END;
 			
 		memset(tempbuf, 0, 64);
 		memcpy(tempbuf, buf+10, 2);
 		temp = strtol(tempbuf, NULL, 10);
-		temptime.min = temp;
+		if((temp >= 0) && (temp <= 59))
+			temptime.min = temp;
+		else
+			goto END;
 			
 		memset(tempbuf, 0, 64);
 		memcpy(tempbuf, buf+12, 2);
 		temp = strtol(tempbuf, NULL, 10);
-		temptime.sec = temp+2;
+		if((temp >= 0) && (temp <= 59))
+			temptime.sec = temp+2;
+		else
+			goto END;
 		
 		status = RTC_SetTimeData(&temptime);
 	}

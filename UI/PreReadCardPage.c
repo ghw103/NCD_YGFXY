@@ -98,8 +98,6 @@ static void activityStart(void)
 		
 		clearPageText();
 		
-		showTemperature();
-		
 		clearScanQRCodeResult();
 		clearTestResult();
 		
@@ -164,12 +162,9 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void activityFresh(void)
 {
-	if(S_PreReadPageBuffer)
-	{
-		CheckQRCode();
+	CheckQRCode();
 		
-		CheckPreTestCard();
-	}
+	CheckPreTestCard();
 }
 
 /***************************************************************************************************
@@ -266,21 +261,24 @@ static void CheckQRCode(void)
 		//不支持的品种
 		if(S_PreReadPageBuffer->scancode == CardUnsupported)
 		{
-			SendKeyCode(6);
 			MotorMoveTo(MaxLocation, 1);
 			AddNumOfSongToList(56, 0);
+			SendKeyCode(6);
 		}
 		//过期
 		else if(S_PreReadPageBuffer->scancode == CardCodeTimeOut)
 		{
-			SendKeyCode(4);
 			MotorMoveTo(MaxLocation, 1);
 			AddNumOfSongToList(15, 0);
+			SendKeyCode(4);
 		}
 		//读取成功
 		else if(S_PreReadPageBuffer->scancode == CardCodeScanOK)
 		{
 			ShowCardInfo();
+			
+			//读取完二维码后，试剂卡在卡槽内部，此时读取温度比较合适
+			showTemperature();
 			
 			//如果测试数据包中的二维码crc校验错误，则表明是第一次读取二维码
 			if(S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CRC16 == 0)
@@ -308,6 +306,7 @@ static void CheckQRCode(void)
 				//试剂卡变更
 				else
 				{
+					vTaskDelay(100 / portTICK_RATE_MS);
 					SendKeyCode(2);
 					MotorMoveTo(MaxLocation, 1);
 					AddNumOfSongToList(13, 0);
@@ -317,9 +316,9 @@ static void CheckQRCode(void)
 		/*其他错误：CardCodeScanFail, CardCodeCardOut, CardCodeScanTimeOut, CardCodeCRCError*/
 		else
 		{
-			SendKeyCode(1);
 			MotorMoveTo(MaxLocation, 1);
 			AddNumOfSongToList(12, 0);
+			SendKeyCode(1);
 		}
 	}
 }
@@ -339,20 +338,20 @@ static void CheckPreTestCard(void)
 			{	
 				StartTest(S_PreReadPageBuffer->currenttestdata);
 			}
-			else 
+			else
 			{
-				SendKeyCode(5);
 				MotorMoveTo(MaxLocation, 1);
 				AddNumOfSongToList(16, 0);
 				memset(&(S_PreReadPageBuffer->currenttestdata->testdata.temperweima), 0, sizeof(QRCode));
+				SendKeyCode(5);
 			}
 		}
 		else if(S_PreReadPageBuffer->cardpretestresult == ResultIsOK)
 		{
-			SendKeyCode(3);
 			MotorMoveTo(MaxLocation, 1);
 			AddNumOfSongToList(14, 0);
 			memset(&(S_PreReadPageBuffer->currenttestdata->testdata.temperweima), 0, sizeof(QRCode));
+			SendKeyCode(3);
 		}
 		else if(S_PreReadPageBuffer->cardpretestresult == PeakError)
 		{
@@ -376,12 +375,12 @@ static void CheckPreTestCard(void)
 
 static void clearPageText(void)
 {
-	ClearText(0x1420, 30);
-	ClearText(0x1430, 30);
-	ClearText(0x1440, 10);
-	ClearText(0x1450, 30);
-	ClearText(0x1460, 10);
-	ClearText(0x1470, 10);
+	ClearText(0x1420);
+	ClearText(0x1430);
+	ClearText(0x1440);
+	ClearText(0x1450);
+	ClearText(0x1460);
+	ClearText(0x1470);
 }
 
 static void ShowCardInfo(void)

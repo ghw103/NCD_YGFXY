@@ -351,12 +351,12 @@ static MyState_TypeDef ShowRecord(unsigned char pageindex)
 	
 	for(i=S_RecordPageBuffer->page.ElementsSize; i<DataShowNumInPage; i++)
 	{
-		ClearText(0x2030+(i)*0x40, 10);
-		ClearText(0x2036+(i)*0x40, 16);
-		ClearText(0x2040+(i)*0x40, 20);
-		ClearText(0x204c+(i)*0x40, 16);
-		ClearText(0x2058+(i)*0x40, 20);
-		ClearText(0x2065+(i)*0x40, 16);
+		ClearText(0x2030+(i)*0x40);
+		ClearText(0x2036+(i)*0x40);
+		ClearText(0x2040+(i)*0x40);
+		ClearText(0x204c+(i)*0x40);
+		ClearText(0x2058+(i)*0x40);
+		ClearText(0x2065+(i)*0x40);
 		vTaskDelay(10 / portTICK_RATE_MS);
 	}
 	

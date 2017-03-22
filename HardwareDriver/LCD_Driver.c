@@ -232,11 +232,11 @@ void SetLEDLight(unsigned char num)
 *Data£º2016Äê4ÔÂ30ÈÕ17:02:53
 ***************************************************************************************************/
 void DisText(unsigned short addr, void *data, unsigned short len)
-{				
+{
 	WriteLCDData(addr, data, len);
 }
 
-void ClearText(unsigned short addr, unsigned short len)
+void ClearText(unsigned short addr)
 {	
 	memset(tempbuf, 0x0, 10);
 	DisText(addr, tempbuf, 1);

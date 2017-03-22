@@ -200,25 +200,25 @@ static void activityBufferFree(void)
 
 static void clearPageText(void)
 {
-	ClearText(0x2500, 15);
-	ClearText(0x2508, 15);
-	ClearText(0x2510, 15);
-	ClearText(0x2518, 15);
-	ClearText(0x2520, 15);
-	ClearText(0x2528, 15);
-	ClearText(0x2530, 15);
-	ClearText(0x2538, 15);
-	ClearText(0x2540, 15);
-	ClearText(0x2548, 15);
-	ClearText(0x2550, 15);
-	ClearText(0x2558, 15);
-	ClearText(0x2568, 30);
-	ClearText(0x2578, 15);
-	ClearText(0x2580, 30);
-	ClearText(0x2590, 15);
-	ClearText(0x2598, 30);
-	ClearText(0x25b8, 10);
-	ClearText(0x25c0, 10);
+	ClearText(0x2500);
+	ClearText(0x2508);
+	ClearText(0x2510);
+	ClearText(0x2518);
+	ClearText(0x2520);
+	ClearText(0x2528);
+	ClearText(0x2530);
+	ClearText(0x2538);
+	ClearText(0x2540);
+	ClearText(0x2548);
+	ClearText(0x2550);
+	ClearText(0x2558);
+	ClearText(0x2568);
+	ClearText(0x2578);
+	ClearText(0x2580);
+	ClearText(0x2590);
+	ClearText(0x2598);
+	ClearText(0x25b8);
+	ClearText(0x25c0);
 }
 
 static void dspScanStatus(char * str)

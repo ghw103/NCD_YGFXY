@@ -286,7 +286,7 @@ static void UpPageValue(void)
 			DisText(0x1E10, S_NetSetPageBuffer->buf, strlen((S_NetSetPageBuffer->buf)));
 		}
 		else
-			ClearText(0x1E10, 15);
+			ClearText(0x1E10);
 	}
 }
 

@@ -8,6 +8,7 @@
 #include	"System_Data.h"
 #include	"MyMem.h"
 #include	"MyTools.h"
+#include	"MyTest_Data.h"
 
 #include	"PaiDuiPage.h"
 #include	"MyTest_Data.h"
@@ -114,7 +115,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*返回*/
 		if(S_SampleIDPage->lcdinput[0] == 0x1300)
 		{
-			if(CheckStrIsSame(paiduiActivityName, getFatherActivityName(), strlen(paiduiActivityName)))
+			if(checkFatherActivityIs(paiduiActivityName))
 			{
 				MotorMoveTo(MaxLocation, 1);
 				DeleteCurrentTest();
@@ -156,14 +157,19 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void activityFresh(void)
 {
-	if(S_SampleIDPage)
+	//从条码枪读取样品编号
+	if(ReadBarCodeFunction((char *)(S_SampleIDPage->tempbuf), 100) > 0)
 	{
-		if(ReadBarCodeFunction((char *)(S_SampleIDPage->tempbuf), 100) > 0)
-		{
-			memset(S_SampleIDPage->currenttestdata->testdata.sampleid, 0, MaxSampleIDLen);
-			memcpy(S_SampleIDPage->currenttestdata->testdata.sampleid, S_SampleIDPage->tempbuf, MaxSampleIDLen);
-			RefreshSampleID();
-		}
+		memset(S_SampleIDPage->currenttestdata->testdata.sampleid, 0, MaxSampleIDLen);
+		memcpy(S_SampleIDPage->currenttestdata->testdata.sampleid, S_SampleIDPage->tempbuf, MaxSampleIDLen);
+		RefreshSampleID();
+	}
+	
+	//如果排队中，有卡接近测试时间，则删除当前测试创建任务，返回
+	if(GetMinWaitTime() < 40)
+	{
+		MotorMoveTo(MaxLocation, 1);
+		DeleteCurrentTest();
 	}
 }
 

@@ -14,6 +14,7 @@ MyState_TypeDef backToFatherActivity(void);
 void destroyTopActivity(void);
 char * getFatherActivityName(void);
 char * getCurrentActivityName(void);
+bool checkFatherActivityIs(char * pageName);
 
 void InitActivity(Activity * activity, char * activityName, void (* pageStart)(void), 
 	void (* pageInput)(unsigned char *pbuf , unsigned short len), 

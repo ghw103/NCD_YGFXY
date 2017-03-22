@@ -9,7 +9,7 @@ void SelectPage(unsigned short index);
 void ReadCurrentPageId(void);
 void ReadLcdSoftVersion(void);
 void DisText(unsigned short addr, void *data, unsigned short len);
-void ClearText(unsigned short addr, unsigned short len);
+void ClearText(unsigned short addr);
 void WriteRadioData(unsigned short addr, void *data, unsigned short len);
 void BasicPic(unsigned short addr,unsigned short datanum, unsigned short soureid ,unsigned short xs,unsigned short ys ,unsigned short xe,unsigned short ye ,
 	unsigned short txs,unsigned short tys);

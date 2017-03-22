@@ -260,7 +260,7 @@ static void ReadNetInfo(void)
 	
 	if(S_NetInfoPageBuffer->isGetWifiControl == false)
 	{
-		if(My_Fail == takeWifiMutex(1000 / portTICK_RATE_MS))
+		if(My_Fail == takeWifiMutex(200 / portTICK_RATE_MS))
 		{
 			goto END;
 		}
@@ -313,9 +313,8 @@ static void ReadNetInfo(void)
 		//显示wifi状态图标
 		BasicUI(0x1CB8 ,0x1807 , 0, &(S_NetInfoPageBuffer->wifiico) , sizeof(Basic_ICO));
 		//显示ssid
-		memset(S_NetInfoPageBuffer->tempbuffer1, 0, 100);
 		sprintf(S_NetInfoPageBuffer->tempbuffer1, "Disconnected\0");
-		DisText(0x1Cf0, S_NetInfoPageBuffer->tempbuffer1, 30);
+		DisText(0x1Cf0, S_NetInfoPageBuffer->tempbuffer1, strlen(S_NetInfoPageBuffer->tempbuffer1)+1);
 			
 		//显示ip
 		sprintf(S_NetInfoPageBuffer->tempbuffer1, "000.000.000.000\0");
@@ -349,16 +348,14 @@ static void ShowNetInfo(void)
 	else
 		BasicUI(0x1CB0 ,0x1807 , 1, &(S_NetInfoPageBuffer->lineico) , sizeof(Basic_ICO));
 	
-	memset(S_NetInfoPageBuffer->tempbuffer1, 0, 100);
 	sprintf(S_NetInfoPageBuffer->tempbuffer1, "%03d.%03d.%03d.%03d", S_NetInfoPageBuffer->netinfo.LineIP.ip_1, S_NetInfoPageBuffer->netinfo.LineIP.ip_2, 
 		S_NetInfoPageBuffer->netinfo.LineIP.ip_3, S_NetInfoPageBuffer->netinfo.LineIP.ip_4);
 	DisText(0x1CC0, S_NetInfoPageBuffer->tempbuffer1, 15);
 	
-	memset(S_NetInfoPageBuffer->tempbuffer1, 0, 100);
-	sprintf(S_NetInfoPageBuffer->tempbuffer1, "%02X-%02X-%02X-%02X-%02X-%02X", S_NetInfoPageBuffer->netinfo.LineMAC[0], S_NetInfoPageBuffer->netinfo.LineMAC[1], 
+	sprintf(S_NetInfoPageBuffer->tempbuffer1, "%02X-%02X-%02X-%02X-%02X-%02X\0", S_NetInfoPageBuffer->netinfo.LineMAC[0], S_NetInfoPageBuffer->netinfo.LineMAC[1], 
 		S_NetInfoPageBuffer->netinfo.LineMAC[2], S_NetInfoPageBuffer->netinfo.LineMAC[3], S_NetInfoPageBuffer->netinfo.LineMAC[4], 
 		S_NetInfoPageBuffer->netinfo.LineMAC[5]);
-	DisText(0x1CD0, S_NetInfoPageBuffer->tempbuffer1, strlen(S_NetInfoPageBuffer->tempbuffer1));
+	DisText(0x1CD0, S_NetInfoPageBuffer->tempbuffer1, strlen(S_NetInfoPageBuffer->tempbuffer1)+1);
 	
 	//显示wifi信息
 	

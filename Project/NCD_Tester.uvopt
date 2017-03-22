@@ -173,7 +173,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGUARM</Key>
-          <Name></Name>
+          <Name>/</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -190,51 +190,35 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>329</LineNumber>
+          <LineNumber>371</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134301736</Address>
+          <Address>134333354</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\Function\WifiFunction.c</Filename>
+          <Filename>..\UI\WifiSetPage.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>133</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134298798</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\Function\CodeScanFunction.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\NCD_Tester\../Function/CodeScanFunction.c\133</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>pxDelayedTaskList</ItemText>
+          <ItemText>S_PaiDuiPageBuffer</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>S_PreReadPageBuffer</ItemText>
+          <ItemText>GB_ClockTime</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>GB_TestBuffer</ItemText>
+          <ItemText>rxcount</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
@@ -265,7 +249,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
-        <aLwin>0</aLwin>
+        <aLwin>1</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>

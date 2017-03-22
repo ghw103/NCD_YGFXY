@@ -133,7 +133,10 @@ unsigned int timer_surplus(Timer *t)
 	{
 		if(timerIsStartted(t))
 		{
-			return (t->interval - (GB_ClockTime - t->start));
+			if((t->interval + t->start) > GB_ClockTime)
+				return (t->interval - (GB_ClockTime - t->start));
+			else
+				return 0;
 		}
 	}
 	

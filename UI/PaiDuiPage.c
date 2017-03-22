@@ -121,7 +121,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			else if(GetMinWaitTime() < 60)
 			{
 				SendKeyCode(3);
-				AddNumOfSongToList(21, 0);
+				AddNumOfSongToList(20, 0);
 			}
 			else
 			{
@@ -194,58 +194,66 @@ static void activityFresh(void)
 		//500ms刷新一次界面
 		if(S_PaiDuiPageBuffer->count2 % 5 == 0)
 		{
-			//如果当前功能处于禁止状态，且电机位置处于最大行程，且卡槽无卡，则启用插卡自动创建功能
+			//如果当前功能处于禁止状态，且电机位置处于最大行程，且卡槽无卡，且最近的卡大于 则启用插卡自动创建功能
 			if((S_PaiDuiPageBuffer->timer0.interval == 65535) && (MaxLocation == GetGB_MotorLocation()) && (!CardPinIn))
 			{
 				timer_set(&(S_PaiDuiPageBuffer->timer0), 1);
 			}
+
 			
 			//如果当前空闲，且扫描时间到，则检测是否插卡了
 			if(TimeOut == timer_expired(&(S_PaiDuiPageBuffer->timer0)))
 			{
-				//如果当前空闲,且已经插卡
-				if((NULL == GetCurrentTestItem()) && (CardPinIn))
+				if(GetMinWaitTime() > 40)
 				{
-					S_PaiDuiPageBuffer->error = CreateANewTest(PaiDuiTestType);
-					//创建成功
-					if(Error_OK == S_PaiDuiPageBuffer->error)
+					//如果当前空闲,且已经插卡
+					if((NULL == GetCurrentTestItem()) && (CardPinIn))
 					{
-						//创建成功，则使电机远离，防止用户拔卡
-						MotorMoveTo(1000, 1);
-							
-						startActivity(createSampleActivity, NULL);
+						S_PaiDuiPageBuffer->error = CreateANewTest(PaiDuiTestType);
+						//创建成功
+						if(Error_OK == S_PaiDuiPageBuffer->error)
+						{
+							//创建成功，则使电机远离，防止用户拔卡
+							MotorMoveTo(1000, 1);
 								
-						return;
+							startActivity(createSampleActivity, NULL);
+									
+							return;
+						}
+						//排队位置满，不允许
+						else if(Error_PaiduiFull == S_PaiDuiPageBuffer->error)
+						{
+							SendKeyCode(2);
+							AddNumOfSongToList(19, 2);
+						}
+						//创建失败
+						else if(Error_Mem == S_PaiDuiPageBuffer->error)
+						{
+							SendKeyCode(1);
+							AddNumOfSongToList(7, 0);
+						}
+						//有卡即将测试
+						else if(Error_PaiDuiBusy == S_PaiDuiPageBuffer->error)
+						{
+							SendKeyCode(3);
+							AddNumOfSongToList(20, 0);
+						}
+						//测试中禁止添加
+						else if(Error_PaiduiTesting == S_PaiDuiPageBuffer->error)
+						{
+							SendKeyCode(4);
+							AddNumOfSongToList(21, 0);
+						}
+							
+						//定时器设置长时间，表明不在对此卡创建，需要重新拔插才行
+						timer_set(&(S_PaiDuiPageBuffer->timer0), 65535);
 					}
-					//排队位置满，不允许
-					else if(Error_PaiduiFull == S_PaiDuiPageBuffer->error)
-					{
-						SendKeyCode(2);
-						AddNumOfSongToList(19, 0);
-					}
-					//创建失败
-					else if(Error_Mem == S_PaiDuiPageBuffer->error)
-					{
-						SendKeyCode(1);
-						AddNumOfSongToList(7, 0);
-					}
-					//有卡即将测试
-					else if(Error_PaiDuiBusy == S_PaiDuiPageBuffer->error)
-					{
-						SendKeyCode(3);
-						AddNumOfSongToList(20, 0);
-					}
-					//测试中禁止添加
-					else if(Error_PaiduiTesting == S_PaiDuiPageBuffer->error)
-					{
-						SendKeyCode(4);
-						AddNumOfSongToList(21, 0);
-					}
-						
-					//定时器设置长时间，表明不在对此卡创建，需要重新拔插才行
+					timer_restart(&(S_PaiDuiPageBuffer->timer0));
+				}
+				else
+				{
 					timer_set(&(S_PaiDuiPageBuffer->timer0), 65535);
 				}
-				timer_restart(&(S_PaiDuiPageBuffer->timer0));
 			}
 		
 			//更新倒计时数据
@@ -255,6 +263,7 @@ static void activityFresh(void)
 				
 				if(S_PaiDuiPageBuffer->tempd2)
 				{
+					DspNum(0x1506+index, S_PaiDuiPageBuffer->tempd2->statues, 2);
 					//超时
 					if(timerIsStartted(&(S_PaiDuiPageBuffer->tempd2->timer2)))
 					{
@@ -298,8 +307,8 @@ static void activityFresh(void)
 				else
 				{
 					//清除倒计时时间
-					ClearText(0x1610+index*0x08, 10);
-					ClearText(0x1650+index*0x08, 10);
+					ClearText(0x1610+index*0x08);
+					ClearText(0x1650+index*0x08);
 					
 					//显示卡凹槽
 					S_PaiDuiPageBuffer->myico.ICO_ID = 37;
@@ -333,7 +342,8 @@ static void activityFresh(void)
 ***************************************************************************************************/
 static void activityHide(void)
 {
-
+	//清除当前页面的告警弹出框
+	SendKeyCode(16);
 }
 
 /***************************************************************************************************
@@ -367,6 +377,9 @@ static void activityResume(void)
 ***************************************************************************************************/
 static void activityDestroy(void)
 {
+	//清除当前页面的告警弹出框
+	SendKeyCode(16);
+	
 	activityBufferFree();
 }
 

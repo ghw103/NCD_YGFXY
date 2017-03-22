@@ -31,7 +31,7 @@
 /******************************************************************************************/
 /*****************************************局部变量声明*************************************/
 static TestPageBuffer * S_TestPageBuffer = NULL;
-const unsigned int TestLineHigh = 77010;	//此数据与曲线显示区域高度有关，如果界面不改，此数不改
+const unsigned int TestLineHigh = 76500;	//此数据与曲线显示区域高度有关，如果界面不改，此数不改
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 static void InitCurve(void);
@@ -202,7 +202,8 @@ static void activityFresh(void)
 ***************************************************************************************************/
 static void activityHide(void)
 {
-
+	//清除当前页面的告警弹出框
+	SendKeyCode(16);
 }
 
 /***************************************************************************************************
@@ -230,6 +231,9 @@ static void activityResume(void)
 ***************************************************************************************************/
 static void activityDestroy(void)
 {
+	//清除当前页面的告警弹出框
+	SendKeyCode(16);
+	
 	activityBufferFree();
 }
 
@@ -321,7 +325,7 @@ static void RefreshCurve(void)
 {
 	unsigned short temp;
 	
-	if(pdTRUE == TakeTestPointData(&temp))
+	while(pdTRUE == TakeTestPointData(&temp))
 	{
 		if(0xffff == temp)
 			InitCurve();
@@ -389,11 +393,7 @@ static void RefreshPageText(void)
 	{
 		//在曲线上标记出T,C,基线
 		S_TestPageBuffer->myico[0].ICO_ID = 22;
-		S_TestPageBuffer->myico[0].X = S_TestPageBuffer->currenttestdata->testdata.testline.T_Point[1];
-		S_TestPageBuffer->myico[0].X *= 2;
-		S_TestPageBuffer->myico[0].X += 505;
-		S_TestPageBuffer->myico[0].X -= 114;
-		S_TestPageBuffer->myico[0].X -= 12;
+		S_TestPageBuffer->myico[0].X = 574+S_TestPageBuffer->currenttestdata->testdata.testline.T_Point[1]-12;
 		tempvalue = S_TestPageBuffer->currenttestdata->testdata.testline.T_Point[0];
 		tempvalue /= S_TestPageBuffer->line.Y_Scale*2;
 		tempvalue = 1-tempvalue;
@@ -402,11 +402,7 @@ static void RefreshPageText(void)
 		S_TestPageBuffer->myico[0].Y = (unsigned short)tempvalue - 11;
 		
 		S_TestPageBuffer->myico[1].ICO_ID = 22;
-		S_TestPageBuffer->myico[1].X = S_TestPageBuffer->currenttestdata->testdata.testline.C_Point[1];
-		S_TestPageBuffer->myico[1].X *= 2;
-		S_TestPageBuffer->myico[1].X += 505;
-		S_TestPageBuffer->myico[1].X -= 114;
-		S_TestPageBuffer->myico[1].X -= 12;
+		S_TestPageBuffer->myico[1].X = 574+S_TestPageBuffer->currenttestdata->testdata.testline.C_Point[1]-12;
 		tempvalue = S_TestPageBuffer->currenttestdata->testdata.testline.C_Point[0];
 		tempvalue /= S_TestPageBuffer->line.Y_Scale*2;
 		tempvalue = 1-tempvalue;
@@ -415,11 +411,7 @@ static void RefreshPageText(void)
 		S_TestPageBuffer->myico[1].Y = (unsigned short)tempvalue - 11;
 		
 		S_TestPageBuffer->myico[2].ICO_ID = 22;
-		S_TestPageBuffer->myico[2].X = S_TestPageBuffer->currenttestdata->testdata.testline.B_Point[1];
-		S_TestPageBuffer->myico[2].X *= 2;
-		S_TestPageBuffer->myico[2].X += 505;
-		S_TestPageBuffer->myico[2].X -= 114;
-		S_TestPageBuffer->myico[2].X -= 12;
+		S_TestPageBuffer->myico[2].X = 574+S_TestPageBuffer->currenttestdata->testdata.testline.B_Point[1]-12;
 		tempvalue = S_TestPageBuffer->currenttestdata->testdata.testline.B_Point[0];
 		tempvalue /= S_TestPageBuffer->line.Y_Scale*2;
 		tempvalue = 1-tempvalue;

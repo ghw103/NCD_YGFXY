@@ -370,7 +370,7 @@ static void ShowDetail(void)
 	DisText(0x1d60, S_UserMPageBuffer->buf, strlen(S_UserMPageBuffer->buf)+1);
 		
 	sprintf(S_UserMPageBuffer->buf, "%s\0", S_UserMPageBuffer->tempnewuser.user_sex);
-	DisText(0x1d70, S_UserMPageBuffer->buf, strlen(S_UserMPageBuffer->buf)+1);
+	DisText(0x1d70, S_UserMPageBuffer->buf, MaxSexLen);
 		
 	sprintf(S_UserMPageBuffer->buf, "%s\0", S_UserMPageBuffer->tempnewuser.user_phone);
 	DisText(0x1d80, S_UserMPageBuffer->buf, strlen(S_UserMPageBuffer->buf)+1);

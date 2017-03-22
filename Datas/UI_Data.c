@@ -13,6 +13,7 @@
 #include	"UI_Data.h"
 
 #include	"MyMem.h"
+#include	"MyTools.h"
 
 #include	<string.h>
 #include	"stdio.h"
@@ -177,6 +178,32 @@ char * getCurrentActivityName(void)
 	
 	return NULL;
 }
+
+/***************************************************************************************************
+*FunctionName:  checkFatherActivityIs
+*Description:  检查父页面是不是pageName
+*Input:  pageName -- 父页面名字
+*Output:  
+*Return:  
+*Author:  xsx
+*Date: 09:27:19
+***************************************************************************************************/
+bool checkFatherActivityIs(char * pageName)
+{
+	char * fatherActivityName = NULL;
+	
+	if((GB_ActivityLinkStack.top) && (GB_ActivityLinkStack.top->lastStackNode) && (GB_ActivityLinkStack.top->lastStackNode->activity))
+		fatherActivityName = GB_ActivityLinkStack.top->lastStackNode->activity->pageName;
+	
+	if(fatherActivityName && pageName)
+	{
+		if(CheckStrIsSame(fatherActivityName, pageName, strlen(pageName)))
+			return true;
+	}
+	
+	return false;
+}
+
 /***************************************************************************************************
 *FunctionName: destroyTopActivity
 *Description: 销毁栈顶页面

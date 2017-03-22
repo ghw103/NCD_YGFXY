@@ -224,9 +224,9 @@ static void activityBufferFree(void)
 
 static void clearPageText(void)
 {
-	ClearText(0x2610, 15);
-	ClearText(0x2630, 15);
-	ClearText(0x2640, 15);
+	ClearText(0x2610);
+	ClearText(0x2630);
+	ClearText(0x2640);
 	
 	DspNum(0x2603, 0, 2);
 	DspNum(0x2604, 0, 2);

@@ -133,23 +133,19 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void activityFresh(void)
 {
-	if(S_WaitPageData)
+	/*是否插卡*/
+	if(GetCardState() == CardIN)
 	{
-		/*是否插卡*/
-		if(GetCardState() == CardIN)
+		startActivity(createPreReadCardActivity, NULL);	
+	}
+	/*时间到，未插卡，返回*/
+	else 
+	{
+		/*提示插卡*/
+		if(TimeOut == timer_expired(&(S_WaitPageData->timer2)))
 		{
-			startActivity(createPreReadCardActivity, NULL);
-			
-		}
-		/*时间到，未插卡，返回*/
-		else 
-		{
-			/*提示插卡*/
-			if(TimeOut == timer_expired(&(S_WaitPageData->timer2)))
-			{
-				AddNumOfSongToList(11, 0);
-				timer_restart(&(S_WaitPageData->timer2));
-			}
+			AddNumOfSongToList(11, 0);
+			timer_restart(&(S_WaitPageData->timer2));
 		}
 	}
 }
