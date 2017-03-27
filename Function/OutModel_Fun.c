@@ -10,6 +10,7 @@
 /***************************************************************************************************/
 
 #include	"OutModel_Fun.h"
+#include	"System_Data.h"
 #include	"MyMem.h"
 
 
@@ -86,9 +87,10 @@ static ModelData_DefType GB_S_ModelData =
 *Author：xsx
 *Data：2016年3月17日17:31:54
 ***************************************************************************************************/
-void UpOneModelData(unsigned char modelindex, TM1623_LED_State ledstatues, unsigned char time)
+void UpOneModelData(unsigned char modelindex, TM1623_LED_State ledstatues, TM1623_LED_State ledOffStatues, unsigned char time)
 {
 	GB_S_ModelData.OneModel_Data[modelindex].LED_Statues = ledstatues;
+	GB_S_ModelData.OneModel_Data[modelindex].LEN_OffStatus = ledOffStatues;
 	GB_S_ModelData.OneModel_Data[modelindex].Time = time;
 }
 
@@ -123,7 +125,7 @@ void OutModel_Init(void)
 	unsigned char i=0;
 	for(i=0; i<9; i++)
 	{
-		UpOneModelData(i, R_OFF_G_ON, 0);
+		UpOneModelData(i, R_OFF_G_ON, R_OFF_G_OFF, 0);
 	}
 	GB_S_ModelData.T_Count = 1;
 }
@@ -139,11 +141,11 @@ void OutModel_Init(void)
 void ToggleLedStatues(unsigned char ledindex)
 {
 	if(GB_S_ModelData.OneModel_Data[ledindex].LED_Statues == GetLedStatues(ledindex))
-		ChangeTM1623LedStatues(ledindex, R_OFF_G_OFF);		//灭
+		ChangeTM1623LedStatues(ledindex, GB_S_ModelData.OneModel_Data[ledindex].LEN_OffStatus);		//灭
 	else
 		ChangeTM1623LedStatues(ledindex, GB_S_ModelData.OneModel_Data[ledindex].LED_Statues);		//亮
 }
-	
+
 /***************************************************************************************************
 *FunctionName：
 *Description：
@@ -159,13 +161,23 @@ void ChangeOutModelStatues(void)
 	/*读取按键状态*/
 	TM1623_ReadKey();
 	
+	if(0xff == getTM1623KeyData(4))
+		setPaiduiModuleStatus(Connect_Error);
+	else
+		setPaiduiModuleStatus(Connect_Ok);
+	
 	/*更改led状态*/
 	for(i=0; i<8; i++)
 	{
 		if(GB_S_ModelData.OneModel_Data[i].Time == 0)
 			ChangeTM1623LedStatues(i, GB_S_ModelData.OneModel_Data[i].LED_Statues);
 		else if((GB_S_ModelData.T_Count % GB_S_ModelData.OneModel_Data[i].Time) == 0)
-			ToggleLedStatues(i);
+		{
+			if((GB_S_ModelData.T_Count % 2) == 0)
+				ChangeTM1623LedStatues(i, GB_S_ModelData.OneModel_Data[i].LEN_OffStatus);
+			else
+				ChangeTM1623LedStatues(i, GB_S_ModelData.OneModel_Data[i].LED_Statues);
+		}
 		
 		GB_S_ModelData.OneModel_Data[i].Key_Statues = GetTheKeyStatues(i);
 	}

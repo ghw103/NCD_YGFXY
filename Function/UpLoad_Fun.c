@@ -86,7 +86,7 @@ static MyState_TypeDef ReadTime(void)
 		
 		if(upLoadDeviceDataBuffer->systemSetData.crc == CalModbusCRC16Fun1(&(upLoadDeviceDataBuffer->systemSetData), sizeof(SystemSetData) - 2))
 		{
-			sprintf(upLoadDeviceDataBuffer->sendBuf, "did=%s", upLoadDeviceDataBuffer->systemSetData.deviceInfo.deviceid);
+			sprintf(upLoadDeviceDataBuffer->sendBuf, "did=%s\0", upLoadDeviceDataBuffer->systemSetData.deviceInfo.deviceid);
 		
 			if(My_Pass == UpLoadData("/NCD_Server/up_dtime", upLoadDeviceDataBuffer->sendBuf, strlen(upLoadDeviceDataBuffer->sendBuf),
 				upLoadDeviceDataBuffer->recvBuf, SERVERRECVBUFLEN, "POST"))
@@ -118,9 +118,7 @@ static void UpLoadDeviceInfo(void)
 		{
 			if(upLoadDeviceDataBuffer->systemSetData.deviceInfo.isnew)
 			{
-				memset(upLoadDeviceDataBuffer->sendBuf, 0, UPLOADTEMPBUFLEN);
-
-				sprintf(upLoadDeviceDataBuffer->sendBuf, "did=%s&dversion=%d&addr=%s&name=%s&age=%s&sex=%s&phone=%s&job=%s&dsc=%s&status=ok",
+				sprintf(upLoadDeviceDataBuffer->sendBuf, "did=%s&dversion=%d&addr=%s&name=%s&age=%s&sex=%s&phone=%s&job=%s&dsc=%s&status=ok\0",
 					upLoadDeviceDataBuffer->systemSetData.deviceInfo.deviceid,  GB_SoftVersion, upLoadDeviceDataBuffer->systemSetData.deviceInfo.deviceunit, 
 					upLoadDeviceDataBuffer->systemSetData.deviceInfo.deviceuser.user_name, upLoadDeviceDataBuffer->systemSetData.deviceInfo.deviceuser.user_age, 
 					upLoadDeviceDataBuffer->systemSetData.deviceInfo.deviceuser.user_sex,	upLoadDeviceDataBuffer->systemSetData.deviceInfo.deviceuser.user_phone, 
@@ -184,9 +182,12 @@ static void UpLoadTestData(void)
 			if(upLoadTestDataBuffer->testData->crc == CalModbusCRC16Fun1(upLoadTestDataBuffer->testData, sizeof(TestData)-2))
 			{
 				//上传测试数据
-				memset(upLoadTestDataBuffer->sendBuf, 0, UPLOADSENDBUFLEN);
+				if(upLoadTestDataBuffer->testData->testResultDesc != ResultIsOK)
+					sprintf(upLoadTestDataBuffer->tempBuf, "Error\0");
+				else
+					sprintf(upLoadTestDataBuffer->tempBuf, "Ok\0");
 				
-				sprintf(upLoadTestDataBuffer->sendBuf, "cnum=%s&cid=%s&did=%s&t_name=%s&sid=%s&testtime=20%d-%d-%d %d:%d:%d&e_t=%.1f&o_t=%.1f&outt=%d&c_l=%d&t_l=%d&b_l=%d&t_c_v=%.3f&a_p=%.3f&b_v=%.*f&a_v=%.*f&t_re=%s",
+				sprintf(upLoadTestDataBuffer->sendBuf, "cnum=%s&cid=%s&did=%s&t_name=%s&sid=%s&testtime=20%d-%d-%d %d:%d:%d&e_t=%.1f&o_t=%.1f&outt=%d&c_l=%d&t_l=%d&b_l=%d&t_c_v=%.3f&a_p=%.3f&b_v=%.*f&a_v=%.*f&t_re=%s\0",
 					upLoadTestDataBuffer->testData->temperweima.piNum, upLoadTestDataBuffer->testData->temperweima.PiHao, 
 					upLoadTestDataBuffer->systemSetData.deviceInfo.deviceid, upLoadTestDataBuffer->testData->user.user_name, 
 					upLoadTestDataBuffer->testData->sampleid, upLoadTestDataBuffer->testData->TestTime.year, 
@@ -198,8 +199,7 @@ static void UpLoadTestData(void)
 					upLoadTestDataBuffer->testData->testline.B_Point[1], upLoadTestDataBuffer->testData->testline.BasicBili, 
 					upLoadTestDataBuffer->testData->tempadjust.parm, upLoadTestDataBuffer->testData->temperweima.itemConstData.pointNum, 
 					upLoadTestDataBuffer->testData->testline.BasicResult, upLoadTestDataBuffer->testData->temperweima.itemConstData.pointNum, 
-					upLoadTestDataBuffer->testData->testline.AdjustResult,
-					"ok");
+					upLoadTestDataBuffer->testData->testline.AdjustResult, upLoadTestDataBuffer->tempBuf);
 
 				if(My_Pass != UpLoadData("/NCD_Server/up_testdata", upLoadTestDataBuffer->sendBuf, strlen(upLoadTestDataBuffer->sendBuf), 
 					upLoadTestDataBuffer->recvBuf, UPLOADRECVBUFLEN, "POST"))

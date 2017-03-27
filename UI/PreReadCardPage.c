@@ -134,18 +134,27 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			/*更换检测卡*/
 			if(S_PreReadPageBuffer->lcdinput[1] == 0x0001)
 			{
+				//如果是排队中的再次预读，则返回排队界面，状态切换回之前的状态
+				if(S_PreReadPageBuffer->currenttestdata->statues == status_prereadagain_n)
+					S_PreReadPageBuffer->currenttestdata->statues = status_incard_n;
+				else if(S_PreReadPageBuffer->currenttestdata->statues == status_prereadagain_o)
+					S_PreReadPageBuffer->currenttestdata->statues = status_incard_o;
+				//如果是第一次预读
+				else if(S_PreReadPageBuffer->currenttestdata->statues == status_wait1)
+					S_PreReadPageBuffer->currenttestdata->statues = status_wait1;
+				
 				backToFatherActivity();
 			}
-			/*退出*/
+			//取消测试
 			else if(S_PreReadPageBuffer->lcdinput[1] == 0x0000)
 			{
 				DeleteCurrentTest();
 				
-				backToActivity(lunchActivityName);
-				
-				//如果还有卡在排队，则直接跳到排队界面
+				//如果还有卡在排队，说明这个界面是从排队界面过来的，只需返回到排队界面
 				if(IsPaiDuiTestting())
-					startActivity(createPaiDuiActivity, NULL);
+					backToActivity(paiduiActivityName);	
+				else
+					backToActivity(lunchActivityName);
 			}
 		}
 	}
@@ -280,8 +289,8 @@ static void CheckQRCode(void)
 			//读取完二维码后，试剂卡在卡槽内部，此时读取温度比较合适
 			showTemperature();
 			
-			//如果测试数据包中的二维码crc校验错误，则表明是第一次读取二维码
-			if(S_PreReadPageBuffer->currenttestdata->testdata.temperweima.CRC16 == 0)
+			//如果是第一次读取二维码
+			if(S_PreReadPageBuffer->currenttestdata->statues == status_preread)
 			{
 				//将读取的二维码数据拷贝到测试数据包中
 				memcpy(&(S_PreReadPageBuffer->currenttestdata->testdata.temperweima), &(S_PreReadPageBuffer->temperweima), sizeof(QRCode));
@@ -293,6 +302,7 @@ static void CheckQRCode(void)
 				memcpy(S_PreReadPageBuffer->currenttestdata->testdata.tempadjust.ItemName, S_PreReadPageBuffer->currenttestdata->testdata.temperweima.ItemName, AdjItemNameLen);
 				getAdjPram(getGBSystemSetData(), &(S_PreReadPageBuffer->currenttestdata->testdata.tempadjust));
 				
+				S_PreReadPageBuffer->preTestErrorCount = 0;
 				StartTest(S_PreReadPageBuffer->currenttestdata);
 			}
 			else
@@ -307,9 +317,9 @@ static void CheckQRCode(void)
 				else
 				{
 					vTaskDelay(100 / portTICK_RATE_MS);
-					SendKeyCode(2);
 					MotorMoveTo(MaxLocation, 1);
 					AddNumOfSongToList(13, 0);
+					SendKeyCode(2);
 				}
 			}
 		}
@@ -342,7 +352,6 @@ static void CheckPreTestCard(void)
 			{
 				MotorMoveTo(MaxLocation, 1);
 				AddNumOfSongToList(16, 0);
-				memset(&(S_PreReadPageBuffer->currenttestdata->testdata.temperweima), 0, sizeof(QRCode));
 				SendKeyCode(5);
 			}
 		}
@@ -350,7 +359,6 @@ static void CheckPreTestCard(void)
 		{
 			MotorMoveTo(MaxLocation, 1);
 			AddNumOfSongToList(14, 0);
-			memset(&(S_PreReadPageBuffer->currenttestdata->testdata.temperweima), 0, sizeof(QRCode));
 			SendKeyCode(3);
 		}
 		else if(S_PreReadPageBuffer->cardpretestresult == PeakError)
@@ -360,7 +368,7 @@ static void CheckPreTestCard(void)
 			{
 				MotorMoveTo(MaxLocation, 1);
 				
-				S_PreReadPageBuffer->currenttestdata->statues = startpaidui;
+				S_PreReadPageBuffer->currenttestdata->statues = status_start;
 
 				startActivity(createPaiDuiActivity, NULL);
 			}

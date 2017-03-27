@@ -8,7 +8,6 @@
 
 typedef struct TestPageBuffer_tag {
 	ItemData * currenttestdata;
-	ResultState cardpretestresult;						//²âÊÔ½á¹û
 	Basic_ICO myico[3];
 	LineInfo line;
 	unsigned short lcdinput[100];

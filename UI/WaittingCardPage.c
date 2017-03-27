@@ -82,6 +82,7 @@ static void activityStart(void)
 		MotorMoveTo(WaittingCardLocation, 1);
 		
 		S_WaitPageData->currenttestdata = GetCurrentTestItem();
+		S_WaitPageData->currenttestdata->statues = status_wait1;
 		
 		/*间隔一段时间提示插卡*/
 		timer_set(&(S_WaitPageData->timer2), 20);
@@ -114,9 +115,8 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*返回*/
 		if(S_WaitPageData->lcdinput[0] == 0x1303)
 		{
-			if(S_WaitPageData->currenttestdata->statues == statues7)
-				S_WaitPageData->currenttestdata->statues = statues4;
-			
+			S_WaitPageData->currenttestdata->statues = status_sample;
+			stopPlay();
 			backToFatherActivity();
 		}
 	}
@@ -136,6 +136,8 @@ static void activityFresh(void)
 	/*是否插卡*/
 	if(GetCardState() == CardIN)
 	{
+		stopPlay();
+		S_WaitPageData->currenttestdata->statues = status_preread;
 		startActivity(createPreReadCardActivity, NULL);	
 	}
 	/*时间到，未插卡，返回*/
@@ -147,6 +149,16 @@ static void activityFresh(void)
 			AddNumOfSongToList(11, 0);
 			timer_restart(&(S_WaitPageData->timer2));
 		}
+	}
+	
+	//如果排队中，有卡接近测试时间，则删除当前测试创建任务，返回
+	if(GetMinWaitTime() < 40)
+	{
+		stopPlay();
+		MotorMoveTo(MaxLocation, 1);
+		DeleteCurrentTest();
+		
+		backToActivity(paiduiActivityName);
 	}
 }
 

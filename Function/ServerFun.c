@@ -72,7 +72,7 @@ void CommunicateWithServerByLineNet(MyServerData * myServerData)
 		goto END2;
 		
 	//设置接收数据超时时间100MS
-	myServerData->clientconn->recv_timeout = 1000;
+	myServerData->clientconn->recv_timeout = 2000;
 		
 		//发送数据
 	err = netconn_write(myServerData->clientconn, myServerData->sendBuf, myServerData->sendDataLen, NETCONN_COPY );

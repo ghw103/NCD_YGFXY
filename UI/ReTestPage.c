@@ -372,7 +372,7 @@ static void StartReTest(void)
 	
 	//Æô¶¯ÅÅ¶ÓÄ£¿é
 	for(S_ReTestPageBuffer->buf[0]=0; S_ReTestPageBuffer->buf[0]<PaiDuiWeiNum; S_ReTestPageBuffer->buf[0]++)
-		UpOneModelData(S_ReTestPageBuffer->buf[0], R_ON_G_OFF, 5);
+		UpOneModelData(S_ReTestPageBuffer->buf[0], R_ON_G_OFF, R_OFF_G_ON, 5);
 			
 	//Æô¶¯ÒôÆµ²âÊÔ
 	timer_set(&(S_ReTestPageBuffer->reTestData.playtimer), 999999);

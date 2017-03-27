@@ -16,7 +16,7 @@
 #include	"stdio.h"
 /******************************************************************************************/
 /*****************************************局部变量声明*************************************/
-const char wavfilename[57][20]=
+const char wavfilename[59][20]=
 {
 	"0:/Audio/n1.wav\0",
 	"0:/Audio/n2.wav\0",
@@ -74,7 +74,9 @@ const char wavfilename[57][20]=
 	"0:/Audio/n54.wav\0",
 	"0:/Audio/n55.wav\0",
 	"0:/Audio/n56.wav\0",
-	"0:/Audio/n57.wav\0"
+	"0:/Audio/n57.wav\0",
+	"0:/Audio/n58.wav\0",
+	"0:/Audio/n59.wav\0"
 };
 #define vPlaySongTask_PRIORITY			( ( unsigned portBASE_TYPE ) 2U )
 
@@ -167,12 +169,18 @@ unsigned char AddNumOfSongToList(unsigned char num, unsigned char mode)
 	{
 		return pdPASS;
 	}
-	/*模式3，无论什么状态，都添加新音频，等待播放*/
+	/*模式3，清空剩余的播放*/
 	else if(mode == 2)
 	{
-
+		while(pdPASS == xQueueReceive( SongListQueue, &songnum, 0 ));
+	}
+	//模式4，无论什么状态，都添加新音频，等待播放*/
+	else
+	{
+		
 	}
 	
+	songnum = num;
 	if( xQueueSend( SongListQueue, &songnum, 0 ) != pdPASS )
 	{
 		return pdFAIL;

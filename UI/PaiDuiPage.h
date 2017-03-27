@@ -9,7 +9,8 @@ typedef struct PaiDuiPageBuffer_tag {
 	TestData tempd;
 	ItemData *tempd2;
 	Basic_ICO myico;
-	Timer timer0;
+	Timer timer0;								//检测插卡计时器
+	Timer timer1;								//检测排队模块失联计时器
 	unsigned short tarindex;
 	float tempvalue;
 	unsigned int tempvalue1;

@@ -85,15 +85,25 @@ typedef struct
 #define	PaiDuiWeiNum	8							//排队位置数目
 typedef enum
 {
-	statuesNull = 0,								//没开始,卡在卡槽
-	statues1 = 1,									//等待从卡槽拔出
-	statues2 = 2,									//等待插入排队位
-	statues3 = 3,									//等待拔出排队位
-	statues4 = 4,									//等待插入卡槽
-	statues5 = 5,									//倒计时中
-	statues6 = 6,									//超时计时中
-	statues7 = 7,									//排队结束
-	startpaidui = 100								//启动排队
+	statusNull = 0,									//没开始,默认状态
+	status_user = 1,								//选择操作人状态
+	status_sample = 2,								//获取样品ID状态
+	status_wait1 = 3,								//等待插卡1
+	status_preread = 4,								//预读卡状态
+	status_start = 5,								//启动排队
+	status_outcard = 6,								//等待从卡槽拔出
+	status_in_n = 7,								//倒计时状态 -- 等待插入排队位
+	status_out_n = 8,								//倒计时状态 -- 等待拔出排队位
+	status_incard_n = 9,							//倒计时状态 -- 等待插入卡槽
+	status_timedown = 10,							//倒计时状态
+	status_prereadagain_n = 11,						//倒计时状态 -- 再次预读卡，主要检测卡变更
+	status_in_o = 12,								//超时状态 -- 等待插入排队位
+	status_out_o = 13,								//超时状态 -- 等待拔出排队位
+	status_incard_o = 14,							//超时状态 -- 等待插入卡槽
+	status_timeup = 15,								//超时状态
+	status_prereadagain_o = 16,						//超时状态 -- 再次预读卡，主要检测卡变更
+	status_timedownagain = 17,						//倒计时界面
+	status_test = 18,								//测试
 }MyPaiDuiStatues;
 
 /**********************************************************************************************************/
@@ -451,9 +461,10 @@ typedef struct TestData_tag {
 	float cv3;									//正式测试的cv值
 	unsigned char chanelIndex[5];				//正式测时的通道*/
 	TestLine testline;
-	MyTime_Def TestTime;					//测试时间
-	MyTemp_Def TestTemp;					//测试温度
-	unsigned short time;					//超时时间
+	MyTime_Def TestTime;						//测试时间
+	MyTemp_Def TestTemp;						//测试温度
+	unsigned short time;						//超时时间
+	ResultState testResultDesc;					//测试结果状态
 	unsigned short crc;
 }TestData;
 #pragma pack()

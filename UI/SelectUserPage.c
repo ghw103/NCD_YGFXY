@@ -82,6 +82,7 @@ static void activityStart(void)
 	{	
 		/*获取当前测试的数据指针*/
 		S_UserPageBuffer->currenttestdata = GetCurrentTestItem();
+		S_UserPageBuffer->currenttestdata->statues = status_user;
 	
 		/*读取所有操作人*/
 		ReadUserData(S_UserPageBuffer->user);

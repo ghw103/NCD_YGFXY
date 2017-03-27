@@ -1,7 +1,8 @@
 #ifndef __DS18B20_H_
 #define __DS18B20_H_
 
-#include  "stm32f4xx.h"
+#include	"stm32f4xx.h"
+#include	"Define.h"
 
 #define DS18B20_HIGH  1
 #define DS18B20_LOW   0
@@ -22,7 +23,7 @@
 
 
 void DS18B20_Init(void);
-float DS18B20_Get_Temp(void);
+float readDS18B20Temp(void);
 void DS18B20_ReadId ( uint8_t * ds18b20_id );					
 																	 
 #endif //__DS18B20_H_

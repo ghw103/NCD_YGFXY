@@ -190,35 +190,51 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>371</LineNumber>
+          <LineNumber>478</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134333354</Address>
+          <Address>134313582</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\UI\WifiSetPage.c</Filename>
+          <Filename>..\Function\Paidui_Fun.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression></Expression>
+          <Expression>\\NCD_Tester\../Function/Paidui_Fun.c\478</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>66</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134311782</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\Function\Paidui_Fun.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\NCD_Tester\../Function/Paidui_Fun.c\66</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>S_PaiDuiPageBuffer</ItemText>
+          <ItemText>GB_S_TM1623KEYState</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>GB_ClockTime</ItemText>
+          <ItemText>GB_TestBuffer</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>rxcount</ItemText>
+          <ItemText>S_TimeDownPageData</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
@@ -239,8 +255,8 @@
       <MemoryWindow1>
         <Mm>
           <WinNumber>1</WinNumber>
-          <SubType>8</SubType>
-          <ItemText>0x20004a48</ItemText>
+          <SubType>0</SubType>
+          <ItemText>0x20009F84</ItemText>
         </Mm>
       </MemoryWindow1>
       <Tracepoint>
@@ -1700,7 +1716,7 @@
 
   <Group>
     <GroupName>LwipUser</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1963,7 +1979,7 @@
 
   <Group>
     <GroupName>FreertOS</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2299,7 +2315,7 @@
 
   <Group>
     <GroupName>Fatfs</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

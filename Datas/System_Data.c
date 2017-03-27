@@ -27,6 +27,7 @@ static MyTime_Def GB_Time;											//系统时间
 
 static float GB_EnTemperature = 0;
 
+static PaiduiStatus paiduiModuleStatus = Connect_Ok;			//排队模块连接状态
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -103,6 +104,25 @@ void SetGB_EnTemperature(float temp)
 {	
 	GB_EnTemperature = temp;
 }
+
+/***************************************************************************************************
+*FunctionName: setPaiduiModuleStatus,  getPaiduiModuleStatus
+*Description:  排队模块连接状态
+*Input:  
+*Output:  
+*Return:  
+*Author:  xsx
+*Date: 2017年3月27日 09:15:40
+***************************************************************************************************/
+void setPaiduiModuleStatus(PaiduiStatus paiduiStatus)
+{
+	paiduiModuleStatus = paiduiStatus;
+}
+PaiduiStatus getPaiduiModuleStatus(void)
+{
+	return paiduiModuleStatus;
+}
+
 
 
 

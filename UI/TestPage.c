@@ -95,6 +95,7 @@ static void activityStart(void)
 	{
 		/*获取当前测试数据的地址*/
 		S_TestPageBuffer->currenttestdata = GetCurrentTestItem();
+		S_TestPageBuffer->currenttestdata->statues = status_test;
 		
 		InitCurve();
 		
@@ -128,7 +129,7 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*退出*/
 		if(0x1801 == S_TestPageBuffer->lcdinput[0])
 		{
-			if(S_TestPageBuffer->cardpretestresult != NoResult)
+			if(S_TestPageBuffer->currenttestdata->testdata.testResultDesc != NoResult)
 			{
 				//删除当前测试
 				DeleteCurrentTest();
@@ -137,7 +138,9 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 				
 				//如果还有卡在排队，则直接跳到排队界面
 				if(IsPaiDuiTestting())
-					startActivity(createPaiDuiActivity, NULL);
+					backToActivity(paiduiActivityName);
+				else
+					backToActivity(lunchActivityName);
 			}
 			//正在测试不允许退出
 			else
@@ -164,7 +167,7 @@ static void activityFresh(void)
 {
 	if(S_TestPageBuffer)
 	{
-		if(S_TestPageBuffer->cardpretestresult == NoResult)
+		if(S_TestPageBuffer->currenttestdata->testdata.testResultDesc == NoResult)
 			RefreshCurve();
 		else
 		{
@@ -172,19 +175,17 @@ static void activityFresh(void)
 			if((S_TestPageBuffer->isPrintfData == 0) &&(MaxLocation == GetGB_MotorLocation()))
 			{
 				//删除当前测试
-				if(S_TestPageBuffer->currenttestdata != NULL)
+				if(S_TestPageBuffer->currenttestdata)
 				{
 					DeleteCurrentTest();
 					S_TestPageBuffer->currenttestdata = NULL;
 				}
-				
-				if(GetCardState() == NoCard)
+				else if(GetCardState() == NoCard)
 				{
-					backToActivity(lunchActivityName);
-						
-					//如果还有卡在排队，则直接跳到排队界面
 					if(IsPaiDuiTestting())
-						startActivity(createPaiDuiActivity, NULL);
+						backToActivity(paiduiActivityName);
+					else
+						backToActivity(lunchActivityName);
 				}
 			}
 		}
@@ -333,29 +334,29 @@ static void RefreshCurve(void)
 			AddDataToLine(temp);
 	}
 	 
-	if(My_Pass == TakeTestResult(&(S_TestPageBuffer->cardpretestresult)))
+	if(My_Pass == TakeTestResult(&(S_TestPageBuffer->currenttestdata->testdata.testResultDesc)))
 	{
 		GetGB_Time(&(S_TestPageBuffer->currenttestdata->testdata.TestTime));
 		MotorMoveTo(MaxLocation, 1);
-		
+
 		//保留一份数据给打印机打印
 		memcpy(&(S_TestPageBuffer->testDataForPrintf), &(S_TestPageBuffer->currenttestdata->testdata), sizeof(TestData));
 		
-		if(S_TestPageBuffer->cardpretestresult == ResultIsOK)
+		RefreshPageText();
+		
+		if(S_TestPageBuffer->currenttestdata->testdata.testResultDesc == ResultIsOK)
 		{
-			RefreshPageText();
-			
 			if(isAutoPrint() == true)
 				printfTestData();
 		}
-		else if(S_TestPageBuffer->cardpretestresult == PeakError)
+		else if(S_TestPageBuffer->currenttestdata->testdata.testResultDesc == PeakError)
 		{
 			/*测试失败*/
 			SendKeyCode(2);
 		}
 		else
 		{
-			SendKeyCode(1);			
+			SendKeyCode(1);		
 		}
 		
 		//保存数据
@@ -373,7 +374,9 @@ static void RefreshPageText(void)
 	
 	if(S_TestPageBuffer->currenttestdata)
 	{
-		if(IsShowRealValue() == true)
+		if(S_TestPageBuffer->currenttestdata->testdata.testResultDesc != ResultIsOK)
+			sprintf(S_TestPageBuffer->buf, "Error\0");
+		else if(IsShowRealValue() == true)
 			sprintf(S_TestPageBuffer->buf, "%.*f %s\0", S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.pointNum,
 				S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult, S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.itemMeasure);
 		else if(S_TestPageBuffer->currenttestdata->testdata.testline.AdjustResult <= S_TestPageBuffer->currenttestdata->testdata.temperweima.itemConstData.lowstResult)
@@ -389,7 +392,7 @@ static void RefreshPageText(void)
 		DisText(0x1838, S_TestPageBuffer->buf, strlen(S_TestPageBuffer->buf)+1);
 	}
 	
-	if(S_TestPageBuffer->cardpretestresult == ResultIsOK)
+	if(S_TestPageBuffer->currenttestdata->testdata.testResultDesc == ResultIsOK)
 	{
 		//在曲线上标记出T,C,基线
 		S_TestPageBuffer->myico[0].ICO_ID = 22;
@@ -423,7 +426,6 @@ static void RefreshPageText(void)
 	}
 	else
 	{
-		memset(S_TestPageBuffer->myico, 0, sizeof(Basic_ICO)*3);
 		BasicUI(0x1880 ,0x1807 , 0, &S_TestPageBuffer->myico[0] , sizeof(Basic_ICO)*3);
 	}
 }
@@ -462,7 +464,6 @@ static void AddDataToLine(unsigned short data)
 
 		DspNum(0x180B , S_TestPageBuffer->line.Y_Scale, 2);
 		DspNum(0x180A , S_TestPageBuffer->line.Y_Scale*2, 2);
-
 	}
 	DisPlayLine(0 , &tempdata , 1);
 }
@@ -478,13 +479,10 @@ static void AddDataToLine(unsigned short data)
 ***************************************************************************************************/
 static void printfTestData(void)
 {
-	if(S_TestPageBuffer->cardpretestresult == ResultIsOK)
-	{
-		S_TestPageBuffer->isPrintfData = 1;
-		SendKeyCode(6);
-		PrintfData(&(S_TestPageBuffer->testDataForPrintf));
-		SendKeyCode(16);
-		S_TestPageBuffer->isPrintfData = 0;
-	}
+	S_TestPageBuffer->isPrintfData = 1;
+	SendKeyCode(6);
+	PrintfData(&(S_TestPageBuffer->testDataForPrintf));
+	SendKeyCode(16);
+	S_TestPageBuffer->isPrintfData = 0;
 }
 

@@ -260,7 +260,7 @@ static void ReadNetInfo(void)
 	
 	if(S_NetInfoPageBuffer->isGetWifiControl == false)
 	{
-		if(My_Fail == takeWifiMutex(200 / portTICK_RATE_MS))
+		if(My_Fail == takeWifiMutex(100 / portTICK_RATE_MS))
 		{
 			goto END;
 		}

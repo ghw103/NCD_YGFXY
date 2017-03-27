@@ -389,19 +389,21 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 				
 		if(S_TempCalData->itemData->testdata.testline.BasicResult < 0)
 			S_TempCalData->itemData->testdata.testline.BasicResult = 0;
-			
-		S_TempCalData->itemData->testdata.testline.AdjustResult =  S_TempCalData->itemData->testdata.testline.BasicResult * S_TempCalData->itemData->testdata.tempadjust.parm;
-		
+
 		if(S_TempCalData->CV1 < 0.01)
 		{
 			S_TempCalData->resultstatues = NoSample;
+			S_TempCalData->itemData->testdata.testline.BasicResult = 0;
 		}
 		else if(S_TempCalData->CV2 < 0.01)
 		{
 			S_TempCalData->resultstatues = PeakError;
+			S_TempCalData->itemData->testdata.testline.BasicResult = 0;
 		}
 		else
 			S_TempCalData->resultstatues = ResultIsOK;
+		
+		S_TempCalData->itemData->testdata.testline.AdjustResult =  S_TempCalData->itemData->testdata.testline.BasicResult * S_TempCalData->itemData->testdata.tempadjust.parm;
 	}		
 }
 

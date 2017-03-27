@@ -68,9 +68,7 @@ void UpDateGB_Time(void)
 void ReadEnvironmentTemperature(void)
 {
 	float tempv = 0;
-	
-	tempv = DS18B20_Get_Temp();
-	
-	if(tempv > -200)
-		SetGB_EnTemperature(tempv);
+
+	tempv = readDS18B20Temp();
+	SetGB_EnTemperature(tempv);
 }

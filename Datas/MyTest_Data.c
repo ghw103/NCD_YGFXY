@@ -10,6 +10,7 @@
 /***************************************************************************************************/
 #include	"MyTest_Data.h"
 #include	"SystemSet_Data.h"
+#include	"System_Data.h"
 #include	"Timer_Data.h"
 
 #include	"MyMem.h"
@@ -93,7 +94,10 @@ CreateTestErrorType CreateANewTest(TestType testtype)
 	}
 	else
 	{
-		if(60 > GetMinWaitTime())
+		if(Connect_Error == getPaiduiModuleStatus())
+			return Error_PaiduiDisconnect;
+		
+		if(40 > GetMinWaitTime())
 			return Error_PaiDuiBusy;
 		
 		for(i=0; i<PaiDuiWeiNum; i++)
@@ -117,6 +121,8 @@ CreateTestErrorType CreateANewTest(TestType testtype)
 					
 					//从系统设置数据中获取测试时led的亮度值
 					GB_TestBuffer.CurrentTestDataBuffer->ledLight = getTestLedLightIntensity(getGBSystemSetData());
+					//进入获取操作人状态
+					GB_TestBuffer.CurrentTestDataBuffer->statues = status_user;
 					
 					return Error_OK;
 				}
@@ -145,8 +151,8 @@ unsigned short GetMinWaitTime(void)
 	for(index = 0; index < PaiDuiWeiNum; index++)
 	{
 		if((GB_TestBuffer.PaiduiTestDataBuffer[index])&&
-			(timerIsStartted(&(GB_TestBuffer.PaiduiTestDataBuffer[index]->timer)))&&
-			(false == timerIsStartted(&(GB_TestBuffer.PaiduiTestDataBuffer[index]->timer2))))
+			(GB_TestBuffer.PaiduiTestDataBuffer[index]->statues >= status_outcard)&&
+			(GB_TestBuffer.PaiduiTestDataBuffer[index]->statues <= status_timedown))
 		{
 			temp = timer_surplus(&(GB_TestBuffer.PaiduiTestDataBuffer[index]->timer));
 			if(temp < min)
@@ -157,6 +163,22 @@ unsigned short GetMinWaitTime(void)
 	return min;
 }
 
+/***************************************************************************************************
+*FunctionName:  isInTimeOutStatus
+*Description:  判断是不是超时阶段
+*Input:  
+*Output:  
+*Return:  
+*Author:  xsx
+*Date: 2017年3月22日 11:31:48
+***************************************************************************************************/
+bool isInTimeOutStatus(ItemData * itemData)
+{
+	if(itemData && (itemData->timer2.start != 0))
+		return true;
+	else
+		return false;
+}
 
 /***************************************************************************************************
 *FunctionName: SetCurrentTestItem, GetCurrentTestItem

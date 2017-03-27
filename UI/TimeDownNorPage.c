@@ -78,6 +78,7 @@ static void activityStart(void)
 	if(S_TimeDownPageData)
 	{
 		S_TimeDownPageData->currenttestdata = GetCurrentTestItem();
+		S_TimeDownPageData->currenttestdata->statues = status_timedownagain;
 	
 		S_TimeDownPageData->S_Timer = &(S_TimeDownPageData->currenttestdata->timer);
 	}
@@ -111,20 +112,16 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void activityFresh(void)
 {
-	if(S_TimeDownPageData)
+	if(S_TimeDownPageData->count % 3 == 0)
 	{
-		if(S_TimeDownPageData->count % 3 == 0)
+		RefreshTimeText();
+		if(TimeOut == timer_expired(S_TimeDownPageData->S_Timer))
 		{
-			RefreshTimeText();
-			if(TimeOut == timer_expired(S_TimeDownPageData->S_Timer))
-			{
-				startActivity(createTestActivity, NULL);
-			}
+			startActivity(createTestActivity, NULL);
 		}
-	
-		S_TimeDownPageData->count++;
 	}
-
+	
+	S_TimeDownPageData->count++;
 }
 
 /***************************************************************************************************
@@ -216,11 +213,8 @@ static void activityBufferFree(void)
 
 static void RefreshTimeText(void)
 {
-	if(S_TimeDownPageData)
-	{
-		S_TimeDownPageData->time = timer_surplus(S_TimeDownPageData->S_Timer);
-		DspNum(0x1700 , S_TimeDownPageData->time, 2);
-	}
+	S_TimeDownPageData->time = timer_surplus(S_TimeDownPageData->S_Timer);
+	DspNum(0x1700 , S_TimeDownPageData->time, 2);
 }
 
 

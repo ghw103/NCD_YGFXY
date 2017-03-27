@@ -148,8 +148,9 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			S_RecordPageBuffer->tempvalue1 = S_RecordPageBuffer->lcdinput[0] - 0x2004 + 1;
 			if(S_RecordPageBuffer->tempvalue1 <= S_RecordPageBuffer->page.ElementsSize)
 			{
-				S_RecordPageBuffer->selectindex = (S_RecordPageBuffer->lcdinput[0] - 0x2004 + 1);
+				S_RecordPageBuffer->selectindex = S_RecordPageBuffer->tempvalue1;
 				BasicPic(0x2020, 1, 137, 83, 417, 1012, 454, 38, 149+(S_RecordPageBuffer->selectindex - 1)*40);
+				startActivity(createShowResultActivity, createIntent(&S_RecordPageBuffer->page.testData[S_RecordPageBuffer->page.ElementsSize - S_RecordPageBuffer->selectindex], sizeof(TestData)));
 			}
 		}
 		//跳页
@@ -321,7 +322,11 @@ static MyState_TypeDef ShowRecord(unsigned char pageindex)
 		DisText(0x2040+(i)*0x40, S_RecordPageBuffer->buf, strlen(S_RecordPageBuffer->buf)+1);
 		
 		//显示结果
-		if(IsShowRealValue() == true)
+		if(S_RecordPageBuffer->tempdata->testResultDesc != ResultIsOK)
+		{
+			sprintf(S_RecordPageBuffer->buf, "Error\0");
+		}
+		else if(IsShowRealValue() == true)
 			sprintf(S_RecordPageBuffer->buf, "%.*f %s\0", S_RecordPageBuffer->tempdata->temperweima.itemConstData.pointNum, 
 				S_RecordPageBuffer->tempdata->testline.AdjustResult, S_RecordPageBuffer->tempdata->temperweima.itemConstData.itemMeasure);
 		else if(S_RecordPageBuffer->tempdata->testline.AdjustResult <= S_RecordPageBuffer->tempdata->temperweima.itemConstData.lowstResult)
@@ -334,7 +339,6 @@ static MyState_TypeDef ShowRecord(unsigned char pageindex)
 			sprintf(S_RecordPageBuffer->buf, "%.*f %s\0", S_RecordPageBuffer->tempdata->temperweima.itemConstData.pointNum, 
 				S_RecordPageBuffer->tempdata->testline.AdjustResult, S_RecordPageBuffer->tempdata->temperweima.itemConstData.itemMeasure);
 		DisText(0x204C+(i)*0x40, S_RecordPageBuffer->buf, strlen(S_RecordPageBuffer->buf)+1);
-		
 		
 		//显示时间
 		sprintf(S_RecordPageBuffer->buf, "%02d-%02d-%02d %02d:%02d:%02d\0", S_RecordPageBuffer->tempdata->TestTime.year, S_RecordPageBuffer->tempdata->TestTime.month, S_RecordPageBuffer->tempdata->TestTime.day,

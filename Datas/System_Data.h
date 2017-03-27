@@ -4,6 +4,11 @@
 
 #include	"Define.h"
 
+typedef enum
+{
+	Connect_Ok = 1,
+	Connect_Error = 0
+}PaiduiStatus;
 
 void * GetTestDataForLab(void);
 void SetTestStatusFlorLab(unsigned char status);
@@ -17,6 +22,9 @@ void SetGB_Time(void * time);
 float GetGB_EnTemperature(void);
 void SetGB_EnTemperature(float temp);
 
+//排队模块连接状态
+void setPaiduiModuleStatus(PaiduiStatus paiduiStatus);
+PaiduiStatus getPaiduiModuleStatus(void);
 	
 #endif
 

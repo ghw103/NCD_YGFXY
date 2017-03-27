@@ -86,6 +86,7 @@ static void activityStart(void)
 	if(S_SampleIDPage)
 	{
 		S_SampleIDPage->currenttestdata = GetCurrentTestItem();
+		S_SampleIDPage->currenttestdata->statues = status_sample;
 	
 		AddNumOfSongToList(10, 0);
 		
@@ -120,6 +121,8 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 				MotorMoveTo(MaxLocation, 1);
 				DeleteCurrentTest();
 			}
+			else
+				S_SampleIDPage->currenttestdata->statues = status_user;
 			
 			backToFatherActivity();
 		}
@@ -160,7 +163,6 @@ static void activityFresh(void)
 	//从条码枪读取样品编号
 	if(ReadBarCodeFunction((char *)(S_SampleIDPage->tempbuf), 100) > 0)
 	{
-		memset(S_SampleIDPage->currenttestdata->testdata.sampleid, 0, MaxSampleIDLen);
 		memcpy(S_SampleIDPage->currenttestdata->testdata.sampleid, S_SampleIDPage->tempbuf, MaxSampleIDLen);
 		RefreshSampleID();
 	}
@@ -170,6 +172,8 @@ static void activityFresh(void)
 	{
 		MotorMoveTo(MaxLocation, 1);
 		DeleteCurrentTest();
+		
+		backToFatherActivity();
 	}
 }
 

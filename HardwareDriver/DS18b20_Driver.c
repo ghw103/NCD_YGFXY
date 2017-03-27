@@ -15,15 +15,36 @@
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
-
+const static unsigned char CrcTable[256] =
+{
+	  0,  94, 188, 226,  97,  63, 221, 131, 194, 156, 126,  32, 163, 253,  31,  65,
+	157, 195,  33, 127, 252, 162,  64,  30,  95,   1, 227, 189,  62,  96, 130, 220,
+	 35, 125, 159, 193,  66,  28, 254, 160, 225, 191,  93,   3, 128, 222,  60,  98,
+	190, 224,   2,  92, 223, 129,  99,  61, 124,  34, 192, 158,  29,  67, 161, 255,
+	 70,  24, 250, 164,  39, 121, 155, 197, 132, 218,  56, 102, 229, 187,  89,   7,
+	219, 133, 103,  57, 186, 228,   6,  88,  25,  71, 165, 251, 120,  38, 196, 154,
+	101,  59, 217, 135,   4,  90, 184, 230, 167, 249,  27,  69, 198, 152, 122,  36,
+	248, 166,  68,  26, 153, 199,  37, 123,  58, 100, 134, 216,  91,   5, 231, 185,
+	140, 210,  48, 110, 237, 179,  81,  15,  78,  16, 242, 172,  47, 113, 147, 205,
+	 17,  79, 173, 243, 112,  46, 204, 146, 211, 141, 111,  49, 178, 236,  14,  80,
+	175, 241,  19,  77, 206, 144, 114,  44, 109,  51, 209, 143,  12,  82, 176, 238,
+	 50, 108, 142, 208,  83,  13, 239, 177, 240, 174,  76,  18, 145, 207,  45, 115,
+	202, 148, 118,  40, 171, 245,  23,  73,   8,  86, 180, 234, 105,  55, 213, 139,
+	 87,   9, 235, 181,  54, 104, 138, 212, 149, 203,  41, 119, 244, 170,  72,  22,
+	233, 183,  85,  11, 136, 214,  52, 106,  43, 117, 151, 201,  74,  20, 246, 168,
+	116,  42, 200, 150,  21,  75, 169, 247, 182, 232,  10,  84, 215, 137, 107,  53,
+};
 /***************************************************************************************************/
 /***************************************************************************************************/
 /***************************************************************************************************/
 static void DS18B20_GPIO_Config(void);
+static void DS18B20_Config(void);
 static void DS18B20_Mode_IPU(void);
 static void DS18B20_Mode_Out_PP(void);
-static void DS18B20_Rst(void);
-static uint8_t DS18B20_Presence(void);
+static bool DS18B20_Rst(void);
+static void DS18B20_Write_Byte(const unsigned char dat);
+static unsigned char DS18B20_Read_Byte(void);
+static void DS18B20_Read_Bytes(unsigned char *buf, unsigned char len);
 static unsigned char CRC8(unsigned char * buf);
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -43,8 +64,9 @@ static unsigned char CRC8(unsigned char * buf);
 ***************************************************************************************************/
 void DS18B20_Init(void)
 {
-	
 	DS18B20_GPIO_Config();
+	
+	DS18B20_Config();
 }
 
 /***************************************************************************************************
@@ -114,7 +136,6 @@ static void DS18B20_Mode_Out_PP(void)
 	GPIO_Init(DS18B20_PORT, &GPIO_InitStructure);	 	 
 }
 
-
 /***************************************************************************************************
 *FunctionName: DS18B20_Rst
 *Description: 复位18b20
@@ -124,37 +145,21 @@ static void DS18B20_Mode_Out_PP(void)
 *Author: xsx
 *Date: 2017年1月18日11:10:32
 ***************************************************************************************************/
-static void DS18B20_Rst(void)
+static bool DS18B20_Rst(void)
 {
+	uint8_t pulse_time = 0;
+	
 	/* 主机设置为推挽输出 */
 	DS18B20_Mode_Out_PP();
 	
 	DS18B20_DATA_OUT(DS18B20_LOW);
-	
 	/* 主机至少产生480us的低电平复位信号 */
-	delay_us(750);
-
+	delay_us(600);
 	/* 主机在产生复位信号后，需将总线拉高 */
 	DS18B20_DATA_OUT(DS18B20_HIGH);
 	
 	/*从机接收到主机的复位信号后，会在15~60us后给主机发一个存在脉冲*/
-	delay_us(15);
-}
-
-/***************************************************************************************************
-*FunctionName: DS18B20_Presence
-*Description: 检测从机给主机返回的存在脉冲
-*Input: 
-*Output: 
-*Return: 
- * 0：成功
- * 1：失败
-*Author: xsx
-*Date: 2017年1月18日11:11:08
-***************************************************************************************************/
-static uint8_t DS18B20_Presence(void)
-{
-	uint8_t pulse_time = 0;
+	delay_us(20);
 	
 	/* 主机设置为上拉输入 */
 	DS18B20_Mode_IPU();
@@ -166,80 +171,16 @@ static uint8_t DS18B20_Presence(void)
 	{
 		pulse_time++;
 		delay_us(1);
-	}	
-	/* 经过100us后，存在脉冲都还没有到来*/
-	if( pulse_time >=200 )
-		return 1;
-	else
-		pulse_time = 0;
-	
-	/* 存在脉冲到来，且存在的时间不能超过240us */
-	while( !DS18B20_DATA_IN() && pulse_time<240 )
-	{
-		pulse_time++;
-		delay_us(1);
-	}	
-	if( pulse_time >=240 )
-		return 1;
-	else
-		return 0;
-}
-
-/***************************************************************************************************
-*FunctionName: DS18B20_Read_Bit
-*Description: 读取1bit
-*Input: 
-*Output: 
-*Return: 
-*Author: xsx
-*Date: 2017年1月18日11:11:37
-***************************************************************************************************/
-static uint8_t DS18B20_Read_Bit(void)
-{
-	uint8_t dat;
-	
-	/* 读0和读1的时间至少要大于60us */	
-	DS18B20_Mode_Out_PP();
-	/* 读时间的起始：必须由主机产生 >1us <15us 的低电平信号 */
-	DS18B20_DATA_OUT(DS18B20_LOW);
-	delay_us(5);
-	
-	/* 设置成输入，释放总线，由外部上拉电阻将总线拉高 */
-	DS18B20_DATA_OUT(DS18B20_HIGH);
-	DS18B20_Mode_IPU();
-	delay_us(12);
-	
-	if( DS18B20_DATA_IN() == SET )
-		dat = 1;
-	else
-		dat = 0;
-	
-	/* 这个延时参数请参考时序图 */
-	delay_us(45);
-	
-	return dat;
-}
-
-/***************************************************************************************************
-*FunctionName: DS18B20_Read_Byte
-*Description: 从DS18B20读一个字节，低位先行
-*Input: 
-*Output: 
-*Return: 
-*Author: xsx
-*Date: 2017年1月18日11:12:04
-***************************************************************************************************/
-uint8_t DS18B20_Read_Byte(void)
-{
-	uint8_t i, j, dat = 0;	
-	
-	for(i=0; i<8; i++) 
-	{
-		j = DS18B20_Read_Bit();		
-		dat = (dat) | (j<<i);
 	}
 	
-	return dat;
+	/* 经过100us后，存在脉冲都还没有到来*/
+	if( pulse_time >=200 )
+		return false;
+	else
+	{
+		delay_us(240);
+		return true;
+	}
 }
 
 /***************************************************************************************************
@@ -251,38 +192,129 @@ uint8_t DS18B20_Read_Byte(void)
 *Author: xsx
 *Date: 2017年1月18日11:12:39
 ***************************************************************************************************/
-void DS18B20_Write_Byte(uint8_t dat)
+static void DS18B20_Write_Byte(const unsigned char dat)
 {
-	uint8_t i, testb;
+	unsigned char i;
 	DS18B20_Mode_Out_PP();
 	
 	for( i=0; i<8; i++ )
 	{
-		testb = dat&0x01;
-		dat = dat>>1;		
-		/* 写0和写1的时间至少要大于60us */
-		if (testb)
-		{			
-			DS18B20_DATA_OUT(DS18B20_LOW);
-			/* 1us < 这个延时 < 15us */
-			delay_us(8);
-			
+		DS18B20_DATA_OUT(DS18B20_LOW);
+		delay_us(8);
+		
+		if(dat & (1<<i))
+		{
 			DS18B20_DATA_OUT(DS18B20_HIGH);
 			delay_us(58);
-		}		
+		}
 		else
-		{			
-			DS18B20_DATA_OUT(DS18B20_LOW);
-			/* 60us < Tx 0 < 120us */
-			delay_us(70);
-			
-			DS18B20_DATA_OUT(DS18B20_HIGH);			
-			/* 1us < Trec(恢复时间) < 无穷大*/
+		{
+			delay_us(60);
+		
+			DS18B20_DATA_OUT(DS18B20_HIGH);
 			delay_us(2);
 		}
+		
 	}
 }
 
+/***************************************************************************************************
+*FunctionName: DS18B20_Read_Byte
+*Description: 从DS18B20读一个字节，低位先行
+*Input: 
+*Output: 
+*Return: 
+*Author: xsx
+*Date: 2017年1月18日11:12:04
+***************************************************************************************************/
+static unsigned char DS18B20_Read_Byte(void)
+{
+	unsigned char i, dat = 0;	
+	
+	
+	for(i=0; i<8; i++) 
+	{
+		DS18B20_Mode_Out_PP();		
+		DS18B20_DATA_OUT(DS18B20_LOW);
+		delay_us(5);
+		
+		/* 设置成输入，释放总线，由外部上拉电阻将总线拉高 */
+		DS18B20_DATA_OUT(DS18B20_HIGH);
+		DS18B20_Mode_IPU();
+		delay_us(12);
+		
+		if( DS18B20_DATA_IN() == SET )
+			dat |= (1<<i);
+		delay_us(45);
+	}
+	
+	return dat;
+}
+
+/***************************************************************************************************
+*FunctionName:  DS18B20_Read_Bytes
+*Description:  读取多个字节
+*Input:  
+*Output:  
+*Return:  
+*Author:  xsx
+*Date: 2017年3月23日 16:24:55
+***************************************************************************************************/
+static void DS18B20_Read_Bytes(unsigned char *buf, unsigned char len)
+{
+	unsigned char i = 0;
+	
+	for(i=0; i<len; i++)
+	{
+		*buf = DS18B20_Read_Byte();
+		buf++;
+	}
+}
+
+/***************************************************************************************************
+*FunctionName:  DS18B20_CRC
+*Description:  对18b20读取的数据校验
+*Input:  
+*Output:  
+*Return:  
+*Author:  xsx
+*Date: 2017年3月23日 16:29:39
+***************************************************************************************************/
+static unsigned char DS18B20_CRC(const unsigned char *buf, unsigned char len)
+{
+	unsigned char crc_data = 0, i = 0;
+	for(i=0; i<len; i++)						//查表校验
+		crc_data = CrcTable[crc_data^buf[i]];
+	
+	return crc_data;
+}
+
+/***************************************************************************************************
+*FunctionName:  DS18B20_Config
+*Description:  配置18B20
+*Input:  
+*Output:  
+*Return:  
+*Author:  xsx
+*Date: 2017年3月23日 16:32:05
+***************************************************************************************************/
+static void DS18B20_Config(void)
+{
+	DS18B20_Rst();	
+	DS18B20_Write_Byte(0xcc);
+	DS18B20_Write_Byte(0x4e);
+	DS18B20_Write_Byte(0x19);
+	DS18B20_Write_Byte(0x1a);
+	DS18B20_Write_Byte(0x3f);		//9bit模式，0.5摄氏度
+	
+	DS18B20_Rst();	
+	DS18B20_Write_Byte(0xcc);
+	DS18B20_Write_Byte(0x48);
+	
+	DS18B20_Rst();	
+	DS18B20_Write_Byte(0xcc);
+	DS18B20_Write_Byte(0xb8);
+}
 
 /*
  * 存储的温度是16 位的带符号扩展的二进制补码形式
@@ -298,29 +330,26 @@ void DS18B20_Write_Byte(uint8_t dat)
  * 
  * 温度 = 符号位 + 整数 + 小数*0.0625
  */
-float DS18B20_Get_Temp(void)
+float readDS18B20Temp(void)
 {
 	uint8_t value[9], i=0;
 	
 	short s_tem;
-	float f_tem;
-	
-	DS18B20_Rst();	   
-	DS18B20_Presence();	 
-	DS18B20_Write_Byte(0XCC);				/* 跳过 ROM */
-	DS18B20_Write_Byte(0X44);				/* 开始转换 */
+	float f_tem = 0;
 	
 	DS18B20_Rst();
-	DS18B20_Presence();
+	DS18B20_Write_Byte(0XCC);				/* 跳过 ROM */
+	DS18B20_Write_Byte(0X44);				/* 开始转换 */
+	vTaskDelay( 200 / portTICK_RATE_MS );
+	
+	DS18B20_Rst();
 	DS18B20_Write_Byte(0XCC);				/* 跳过 ROM */
 	DS18B20_Write_Byte(0XBE);				/* 读温度值 */
 	
-	for(i=0; i<9; i++)
-		value[i] = DS18B20_Read_Byte();
+	DS18B20_Read_Bytes(value, 9);
 	
-	if(value[8] == CRC8(value))
+	if(0 == DS18B20_CRC(value, 9))
 	{
-		
 		s_tem = value[1]<<8;
 		s_tem = s_tem | value[0];
 		
@@ -329,8 +358,6 @@ float DS18B20_Get_Temp(void)
 		else
 			f_tem = s_tem * 0.0625;
 	}
-	else
-		f_tem = -200;							//如果crc错误，将温度设置成-200，表明读取失败，18b20的最低温度为-55
 	
 	return f_tem; 	
 }
@@ -352,38 +379,6 @@ void DS18B20_ReadId ( uint8_t * ds18b20_id )
 	
 }
 
-static unsigned char CRC8(unsigned char * buf)
-{     
-	unsigned char i,x; 
-	unsigned char crcbuff;  
-
-	unsigned char crc=0;  
-
-	for(x = 0; x <8; x++)  
-	{  
-		crcbuff = buf[x];  
-
-		for(i = 0; i < 8; i++)   
-		{   
-			if(((crc ^ crcbuff)&0x01)==0)   
-				crc >>= 1;   
-			else 
-			{   
-				crc ^= 0x18;   //CRC=X8+X5+X4+1  
-
-				crc >>= 1;   
-
-				crc |= 0x80;   
-
-			}           
-		
-			crcbuff >>= 1;         
-
-		}
-	}  
-
-	return crc; 
-} 
 /****************************************end of file************************************************/
 
 

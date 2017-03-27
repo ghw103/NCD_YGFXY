@@ -39,6 +39,7 @@ void ChangeTM1623LedStatues(unsigned char ledindex, TM1623_LED_State statues);
 TM1623_LED_State GetLedStatues(unsigned char ledindex);
 
 TM1623_KEY_State GetTheKeyStatues(unsigned char keyindex);
+unsigned char getTM1623KeyData(unsigned char index);
 #endif
 
 

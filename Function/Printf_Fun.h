@@ -4,7 +4,6 @@
 
 #include	"Define.h"
 
-MyState_TypeDef ConnectPrintter(void);
 void PrintfData(TestData * testd);
 
 #endif

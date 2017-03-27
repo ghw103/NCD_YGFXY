@@ -12,11 +12,6 @@
 #include	"TM1623_Driver.h"
 #include 	"delay.h"
 
-#include	"stdio.h"
-#include	"string.h"
-
-#include	"QueueUnits.h"
-
 /***************************************************************************************************/
 /**************************************局部变量声明*************************************************/
 /***************************************************************************************************/
@@ -196,7 +191,7 @@ void TM1623_ReadKey(void)
 		data = 0;
 		
 		for(i=0; i<8; i++)
-		{	
+		{
 			data = data >> 1;
 			GPIO_ResetBits(TM1623_SCK_Group, TM1623_SCK_Pin);
 			delay_us(5);
@@ -290,6 +285,20 @@ TM1623_KEY_State GetTheKeyStatues(unsigned char keyindex)
 	tempkeydata = tempkeydata&0x01;
 	
 	return (TM1623_KEY_State)tempkeydata;
+}
+
+/***************************************************************************************************
+*FunctionName:  getTM1623KeyData
+*Description:  获取从1623读取的数据
+*Input:  
+*Output:  
+*Return:  
+*Author:  xsx
+*Date: 2017年3月27日 15:00:19
+***************************************************************************************************/
+unsigned char getTM1623KeyData(unsigned char index)
+{
+	return GB_S_TM1623KEYState[index];
 }
 
 

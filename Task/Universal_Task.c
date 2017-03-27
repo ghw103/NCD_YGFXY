@@ -75,18 +75,17 @@ static void vUniversalTask( void *pvParameters )
 			UpDateGB_Time();
 		
 		/*检测卡状态，500ms间隔*/
-		if(count % 1 == 0)
+		if(count % 5 == 0)
 			CheckCardStatues();
 		
 		/*系统状态灯*/
-		if(count % 1 == 0)
-			LedToggle();
+		LedToggle();
 		
 		//读取环境温度
-		if(count % 10 == 0)
+		if(count % 20 == 0)
 			ReadEnvironmentTemperature();
 		
-		/*控制排队模块状态*/
+		//控制排队模块状态
 		ChangeOutModelStatues();
 		
 		count++;

@@ -168,6 +168,12 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 					SendKeyCode(2);
 					AddNumOfSongToList(7, 0);
 				}
+				//ÅÅ¶ÓÄ£¿éÊ§Áª
+				else if(Error_PaiduiDisconnect == S_LunchPageBuffer->error)
+				{
+					SendKeyCode(3);
+					AddNumOfSongToList(58, 0);
+				}
 			}
 		}
 	}

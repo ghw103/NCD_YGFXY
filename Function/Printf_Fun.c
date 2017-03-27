@@ -36,22 +36,6 @@
 /***************************************************************************************************/
 /***************************************************************************************************/
 
-MyState_TypeDef ConnectPrintter(void)
-{
-/*	unsigned char txbuf[4] = {0x1b, 0x20, 0x02, 0x0d};
-	
-	if(pdPASS == SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), txbuf, 4, sizeof(unsigned char), 50 / portTICK_RATE_MS, EnableUsart3TXInterrupt))
-	{
-		if(pdPASS == ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), txbuf, 2, sizeof(unsigned char), 2000 / portTICK_RATE_MS))
-		{
-			if(txbuf[0] == 0x11)
-				return My_Pass;
-		}
-	}*/
-	
-	return My_Pass;
-}
-
 void PrintfData(TestData * testd)
 {
 	char * printfbuf = NULL;
@@ -62,77 +46,49 @@ void PrintfData(TestData * testd)
 
 	if(printfbuf && testd)
 	{
-		memset(printfbuf, 0, 100);
-		sprintf(printfbuf, "------------------------------\r");
-		
+		sprintf(printfbuf, "------------------------------\r\0");
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, NULL, sizeof(unsigned char), 500 / portTICK_RATE_MS, 100 / portTICK_RATE_MS);
-		
-		memset(printfbuf, 0, 100);
-		sprintf(printfbuf, "武汉纽康度生物科技股份有限公司\r\r");
-		
+
+		sprintf(printfbuf, "武汉纽康度生物科技股份有限公司\r\r\0");
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, NULL, sizeof(unsigned char), 500 / portTICK_RATE_MS, 100 / portTICK_RATE_MS);
 		
-		memset(printfbuf, 0, 100);
-		sprintf(printfbuf, "测试人: %s\r", testd->user.user_name);
-		
+		sprintf(printfbuf, "测试人: %s\r\0", testd->user.user_name);
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, NULL, sizeof(unsigned char), 500 / portTICK_RATE_MS, 100 / portTICK_RATE_MS);
-		
-		memset(printfbuf, 0, 100);
-		sprintf(printfbuf, "样品编号: %s\r", testd->sampleid);
-		
+	
+		sprintf(printfbuf, "样品编号: %s\r\0", testd->sampleid);
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, NULL, sizeof(unsigned char), 500 / portTICK_RATE_MS, 100 / portTICK_RATE_MS);
-		
-		memset(printfbuf, 0, 100);
-		sprintf(printfbuf, "测试项目: %s\r", testd->temperweima.ItemName);
-		
+	
+		sprintf(printfbuf, "测试项目: %s\r\0", testd->temperweima.ItemName);
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, NULL, sizeof(unsigned char), 500 / portTICK_RATE_MS, 100 / portTICK_RATE_MS);
-		
-		memset(printfbuf, 0, 100);
-		
+
 		tempvalue = testd->testline.AdjustResult;
-		if(IsShowRealValue() == true)
-			sprintf(printfbuf, "测试结果: %.*f %-8.8s\r", testd->temperweima.itemConstData.pointNum, testd->testline.AdjustResult, testd->temperweima.itemConstData.itemMeasure);
+		if(testd->testResultDesc != ResultIsOK)
+			sprintf(printfbuf, "测试结果: ERROR\r\0");
+		else if(IsShowRealValue() == true)
+			sprintf(printfbuf, "测试结果: %.*f %-8.8s\r\0", testd->temperweima.itemConstData.pointNum, testd->testline.AdjustResult, testd->temperweima.itemConstData.itemMeasure);
 		else if(tempvalue <= testd->temperweima.itemConstData.lowstResult)
-			sprintf(printfbuf, "测试结果: <%.*f %-8.8s\r", testd->temperweima.itemConstData.pointNum, testd->temperweima.itemConstData.lowstResult, testd->temperweima.itemConstData.itemMeasure);
+			sprintf(printfbuf, "测试结果: <%.*f %-8.8s\r\0", testd->temperweima.itemConstData.pointNum, testd->temperweima.itemConstData.lowstResult, testd->temperweima.itemConstData.itemMeasure);
 		else if(tempvalue >= testd->temperweima.itemConstData.highestResult)
-			sprintf(printfbuf, "测试结果: >%.*f %-8.8s\r", testd->temperweima.itemConstData.pointNum, testd->temperweima.itemConstData.highestResult, testd->temperweima.itemConstData.itemMeasure);
+			sprintf(printfbuf, "测试结果: >%.*f %-8.8s\r\0", testd->temperweima.itemConstData.pointNum, testd->temperweima.itemConstData.highestResult, testd->temperweima.itemConstData.itemMeasure);
 		else
-			sprintf(printfbuf, "测试结果: %.*f %-8.8s\r", testd->temperweima.itemConstData.pointNum, testd->testline.AdjustResult, testd->temperweima.itemConstData.itemMeasure);
+			sprintf(printfbuf, "测试结果: %.*f %-8.8s\r\0", testd->temperweima.itemConstData.pointNum, testd->testline.AdjustResult, testd->temperweima.itemConstData.itemMeasure);
 		
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, NULL, sizeof(unsigned char), 500 / portTICK_RATE_MS, 100 / portTICK_RATE_MS);
-		
-		memset(printfbuf, 0, 100);
-		sprintf(printfbuf, "测试时间: 20%02d-%02d-%02d %02d:%02d:%02d\r", testd->TestTime.year, testd->TestTime.month, testd->TestTime.day
+
+		sprintf(printfbuf, "测试时间: 20%02d-%02d-%02d %02d:%02d:%02d\r\0", testd->TestTime.year, testd->TestTime.month, testd->TestTime.day
 			, testd->TestTime.hour, testd->TestTime.min, testd->TestTime.sec);
-		
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, NULL, sizeof(unsigned char), 500 / portTICK_RATE_MS, 100 / portTICK_RATE_MS);
-		
-		memset(printfbuf, 0, 100);
+
 		GetGB_Time(&mytime);
-		sprintf(printfbuf, "打印时间: 20%02d-%02d-%02d %02d:%02d:%02d\r", mytime.year, mytime.month, mytime.day
+		sprintf(printfbuf, "打印时间: 20%02d-%02d-%02d %02d:%02d:%02d\r\0", mytime.year, mytime.month, mytime.day
 			, mytime.hour, mytime.min, mytime.sec);
-		
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, NULL, sizeof(unsigned char), 500 / portTICK_RATE_MS, 100 / portTICK_RATE_MS);
-		
-		memset(printfbuf, 0, 100);
-		sprintf(printfbuf, "声明：本结果仅对本标本负责！\r");
-		
+
+		sprintf(printfbuf, "声明：本结果仅对本标本负责！\r\0");
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, NULL, sizeof(unsigned char), 5000 / portTICK_RATE_MS, 100 / portTICK_RATE_MS);
-		
-		memset(printfbuf, 0, 100);
-		sprintf(printfbuf, "\r------------------------------\r\r\r\r\r\r");
-		
+
+		sprintf(printfbuf, "\r------------------------------\r\r\r\r\r\r\0");
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-		ReceiveDataFromQueue(GetUsart3RXQueue(), GetUsart3Mutex(), printfbuf, 10, NULL, sizeof(unsigned char), 5000 / portTICK_RATE_MS, 100 / portTICK_RATE_MS);
 	}
 	
 	MyFree(printfbuf);

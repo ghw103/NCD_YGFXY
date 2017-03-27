@@ -258,8 +258,9 @@ static void RefreshText(void)
 			S_ShowPageBuffer->testdata.temperweima.piNum);
 		DisText(0x2340, S_ShowPageBuffer->tempbuf, strlen(S_ShowPageBuffer->tempbuf)+1);
 		
-		
-		if(IsShowRealValue() == true)
+		if(S_ShowPageBuffer->testdata.testResultDesc != ResultIsOK)
+			sprintf(S_ShowPageBuffer->tempbuf, "Error\0");
+		else if(IsShowRealValue() == true)
 			sprintf(S_ShowPageBuffer->tempbuf, "%.*f %s\0", S_ShowPageBuffer->testdata.temperweima.itemConstData.pointNum,
 				S_ShowPageBuffer->testdata.testline.AdjustResult, S_ShowPageBuffer->testdata.temperweima.itemConstData.itemMeasure);
 		else if(S_ShowPageBuffer->testdata.testline.AdjustResult <= S_ShowPageBuffer->testdata.temperweima.itemConstData.lowstResult)
