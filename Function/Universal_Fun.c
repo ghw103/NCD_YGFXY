@@ -67,8 +67,19 @@ void UpDateGB_Time(void)
 
 void ReadEnvironmentTemperature(void)
 {
+	static unsigned char index = 0;
 	float tempv = 0;
 
-	tempv = readDS18B20Temp();
-	SetGB_EnTemperature(tempv);
+	if(index % 2 == 0)
+	{
+		startDS18B20();
+	}
+	else
+	{
+		tempv = readDS18B20Temp();
+		if(tempv != 300)
+			SetGB_EnTemperature(tempv);
+	}
+	
+	index++;
 }

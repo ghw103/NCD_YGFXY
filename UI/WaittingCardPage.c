@@ -85,7 +85,7 @@ static void activityStart(void)
 		S_WaitPageData->currenttestdata->statues = status_wait1;
 		
 		/*间隔一段时间提示插卡*/
-		timer_set(&(S_WaitPageData->timer2), 20);
+		timer_set(&(S_WaitPageData->timer2), 30);
 		
 		//如果无卡，提示插卡
 		if(GetCardState() == NoCard)
@@ -138,7 +138,8 @@ static void activityFresh(void)
 	{
 		stopPlay();
 		S_WaitPageData->currenttestdata->statues = status_preread;
-		startActivity(createPreReadCardActivity, NULL);	
+		startActivity(createPreReadCardActivity, NULL);
+		return;
 	}
 	/*时间到，未插卡，返回*/
 	else 

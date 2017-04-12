@@ -325,8 +325,7 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 		S_TempCalData->stdev = sqrt(S_TempCalData->stdev);
 		
 		//计算变异系数
-		S_TempCalData->CV2 = S_TempCalData->stdev / S_TempCalData->average;		
-	
+		S_TempCalData->CV2 = S_TempCalData->stdev / S_TempCalData->average;
 	
 		//找T线
 		S_TempCalData->itemData->testdata.testline.T_Point[0] = 0;

@@ -23,6 +23,7 @@
 
 
 void DS18B20_Init(void);
+void startDS18B20(void);
 float readDS18B20Temp(void);
 void DS18B20_ReadId ( uint8_t * ds18b20_id );					
 																	 

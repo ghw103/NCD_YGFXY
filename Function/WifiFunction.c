@@ -266,6 +266,7 @@ static void ProgressWifiListData(WIFI_Def *wifis, char *buf)
 		tempbuf3 = wifistr[i];
 		if(tempbuf3)
 		{
+			memset(wifis, 0, sizeof(WIFI_Def));
 			for(j=0; j<5; j++)
 			{
 				if(j == 0)

@@ -79,6 +79,8 @@ static void activityStart(void)
 	{
 		copyGBSystemSetData(&(S_SetDeviceIDPage->systemSetData));
 		
+		while(ReadBarCodeFunction((char *)(S_SetDeviceIDPage->tempbuf), 100) > 0)
+			;
 		dspDeviceId(S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid);
 	}
 	
@@ -154,17 +156,14 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 ***************************************************************************************************/
 static void activityFresh(void)
 {
-	if(S_SetDeviceIDPage)
+	//读取设备id条码
+	if(ReadBarCodeFunction((char *)(S_SetDeviceIDPage->tempbuf), 100) > 0)
 	{
-		//读取设备id条码
-		if(ReadBarCodeFunction((char *)(S_SetDeviceIDPage->tempbuf), 100) > 0)
-		{
-			memcpy(S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid, S_SetDeviceIDPage->tempbuf, MaxDeviceIDLen);
+		memcpy(S_SetDeviceIDPage->deviceId, S_SetDeviceIDPage->tempbuf, MaxDeviceIDLen);
 			
-			dspDeviceId(S_SetDeviceIDPage->systemSetData.deviceInfo.deviceid);
+		dspDeviceId(S_SetDeviceIDPage->deviceId);
 			
-			S_SetDeviceIDPage->ismodify = 1;
-		}
+		S_SetDeviceIDPage->ismodify = 1;
 	}
 }
 

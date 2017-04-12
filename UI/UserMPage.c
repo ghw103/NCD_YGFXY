@@ -154,7 +154,10 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*修改或者添加*/
 		else if(S_UserMPageBuffer->lcdinput[0] == 0x1d02)
 		{
-			AddANewUser();
+			if(strlen(S_UserMPageBuffer->tempnewuser.user_name) > 0)
+				AddANewUser();
+			else
+				SendKeyCode(2);
 		}
 		/*选择操作人*/
 		else if((S_UserMPageBuffer->lcdinput[0] >= 0x1d07)&&(S_UserMPageBuffer->lcdinput[0] <= 0x1d0B))

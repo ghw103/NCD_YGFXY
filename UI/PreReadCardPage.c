@@ -101,6 +101,7 @@ static void activityStart(void)
 		clearScanQRCodeResult();
 		clearTestResult();
 		
+		vTaskDelay(500 / portTICK_RATE_MS);
 		StartScanQRCode(&(S_PreReadPageBuffer->temperweima));
 	}
 	

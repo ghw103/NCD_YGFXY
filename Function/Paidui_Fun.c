@@ -244,6 +244,15 @@ void PaiDuiHandler(void)
 								AddNumOfSongToList(index+30, 0);
 							}
 						}
+						
+						//如果拔出排队位
+						if(KEY_NoPressed == GetKeyStatues(index))
+						{
+							temp->statues = status_in_n;
+							UpOneModelData(index, R_ON_G_OFF, R_OFF_G_ON, 5);
+							AddNumOfSongToList(index+22, 0);
+							timer_restart(&(temp->timer3));
+						}
 					}
 				}
 				//时间>30秒
@@ -304,15 +313,15 @@ void PaiDuiHandler(void)
 							AddNumOfSongToList(index+22, 0);
 							timer_restart(&(temp->timer3));
 						}
-						
-						if((tempvalue <= 40) && (GetCurrentTestItem() == NULL))
-						{
-							if(false == CheckStrIsSame(paiduiActivityName, getCurrentActivityName(), strlen(paiduiActivityName)))
-							{
-								backToActivity(lunchActivityName);
-								startActivity(createPaiDuiActivity, NULL);
-							}
-						}
+					}
+				}
+				
+				if((tempvalue <= 40) && (GetCurrentTestItem() == NULL))
+				{
+					if(false == CheckStrIsSame(paiduiActivityName, getCurrentActivityName(), strlen(paiduiActivityName)))
+					{
+						backToActivity(lunchActivityName);
+						startActivity(createPaiDuiActivity, NULL);
 					}
 				}
 			}
@@ -463,6 +472,15 @@ void PaiDuiHandler(void)
 							timer_restart(&(temp->timer3));		
 							AddNumOfSongToList(index+22, 0);
 						}
+					}
+				}
+				
+				if((tempvalue > 40) && (GetCurrentTestItem() == NULL))
+				{
+					if(false == CheckStrIsSame(paiduiActivityName, getCurrentActivityName(), strlen(paiduiActivityName)))
+					{
+						backToActivity(lunchActivityName);
+						startActivity(createPaiDuiActivity, NULL);
 					}
 				}
 			}

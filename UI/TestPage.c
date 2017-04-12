@@ -132,15 +132,16 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 			if(S_TestPageBuffer->currenttestdata->testdata.testResultDesc != NoResult)
 			{
 				//删除当前测试
-				DeleteCurrentTest();
+				if(S_TestPageBuffer->currenttestdata)
+				{
+					DeleteCurrentTest();
+					S_TestPageBuffer->currenttestdata = NULL;
+				}
 				
 				backToActivity(lunchActivityName);
 				
-				//如果还有卡在排队，则直接跳到排队界面
 				if(IsPaiDuiTestting())
-					backToActivity(paiduiActivityName);
-				else
-					backToActivity(lunchActivityName);
+					startActivity(createPaiDuiActivity, NULL);					
 			}
 			//正在测试不允许退出
 			else
@@ -182,10 +183,10 @@ static void activityFresh(void)
 				}
 				else if(GetCardState() == NoCard)
 				{
+					backToActivity(lunchActivityName);
+				
 					if(IsPaiDuiTestting())
-						backToActivity(paiduiActivityName);
-					else
-						backToActivity(lunchActivityName);
+						startActivity(createPaiDuiActivity, NULL);
 				}
 			}
 		}

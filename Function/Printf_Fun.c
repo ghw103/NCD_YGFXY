@@ -48,19 +48,24 @@ void PrintfData(TestData * testd)
 	{
 		sprintf(printfbuf, "------------------------------\r\0");
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-
+		vTaskDelay(1000 / portTICK_RATE_MS);
+		
 		sprintf(printfbuf, "武汉纽康度生物科技股份有限公司\r\r\0");
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
+		vTaskDelay(1200 / portTICK_RATE_MS);
 		
 		sprintf(printfbuf, "测试人: %s\r\0", testd->user.user_name);
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-	
+		vTaskDelay(1200 / portTICK_RATE_MS);
+		
 		sprintf(printfbuf, "样品编号: %s\r\0", testd->sampleid);
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-	
+		vTaskDelay(1200 / portTICK_RATE_MS);
+		
 		sprintf(printfbuf, "测试项目: %s\r\0", testd->temperweima.ItemName);
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-
+		vTaskDelay(1200 / portTICK_RATE_MS);
+		
 		tempvalue = testd->testline.AdjustResult;
 		if(testd->testResultDesc != ResultIsOK)
 			sprintf(printfbuf, "测试结果: ERROR\r\0");
@@ -74,21 +79,26 @@ void PrintfData(TestData * testd)
 			sprintf(printfbuf, "测试结果: %.*f %-8.8s\r\0", testd->temperweima.itemConstData.pointNum, testd->testline.AdjustResult, testd->temperweima.itemConstData.itemMeasure);
 		
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-
+		vTaskDelay(1200 / portTICK_RATE_MS);
+		
 		sprintf(printfbuf, "测试时间: 20%02d-%02d-%02d %02d:%02d:%02d\r\0", testd->TestTime.year, testd->TestTime.month, testd->TestTime.day
 			, testd->TestTime.hour, testd->TestTime.min, testd->TestTime.sec);
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-
+		vTaskDelay(1200 / portTICK_RATE_MS);
+		
 		GetGB_Time(&mytime);
 		sprintf(printfbuf, "打印时间: 20%02d-%02d-%02d %02d:%02d:%02d\r\0", mytime.year, mytime.month, mytime.day
 			, mytime.hour, mytime.min, mytime.sec);
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-
+		vTaskDelay(1200 / portTICK_RATE_MS);
+		
 		sprintf(printfbuf, "声明：本结果仅对本标本负责！\r\0");
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
-
-		sprintf(printfbuf, "\r------------------------------\r\r\r\r\r\r\0");
+		vTaskDelay(1500 / portTICK_RATE_MS);
+		
+		sprintf(printfbuf, "\r------------------------------\r\r\r\r\r\n\n\r\n\0");
 		SendDataToQueue(GetUsart3TXQueue(), GetUsart3Mutex(), printfbuf, strlen(printfbuf), sizeof(unsigned char), 50 / portTICK_RATE_MS, 100 / portTICK_RATE_MS, EnableUsart3TXInterrupt);
+		vTaskDelay(2000 / portTICK_RATE_MS);
 	}
 	
 	MyFree(printfbuf);

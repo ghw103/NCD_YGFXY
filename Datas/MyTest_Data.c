@@ -100,6 +100,9 @@ CreateTestErrorType CreateANewTest(TestType testtype)
 		if(40 > GetMinWaitTime())
 			return Error_PaiDuiBusy;
 		
+		if(true == isSomePaiduiInOutTimeStatus())
+			return Error_PaiDuiBusy;
+		
 		for(i=0; i<PaiDuiWeiNum; i++)
 		{
 			if(GB_TestBuffer.PaiduiTestDataBuffer[i] == NULL)
@@ -133,14 +136,35 @@ CreateTestErrorType CreateANewTest(TestType testtype)
 	}
 }
 
-
-
-
 ItemData * GetTestItemByIndex(unsigned char index)
 {
 	return GB_TestBuffer.PaiduiTestDataBuffer[index];
 }
 
+/***************************************************************************************************
+*FunctionName:  isSomePaiduiInOutTimeStatus
+*Description:  判断是否有卡处于超时阶段
+*Input:  
+*Output:  
+*Return:  
+*Author:  xsx
+*Date: 16:20:57
+***************************************************************************************************/
+bool isSomePaiduiInOutTimeStatus(void)
+{
+	unsigned char index = 0;
+	
+	for(index = 0; index < PaiDuiWeiNum; index++)
+	{
+		if((GB_TestBuffer.PaiduiTestDataBuffer[index])&&
+			(GB_TestBuffer.PaiduiTestDataBuffer[index]->timer2.start != 0))
+		{
+			return true;
+		}
+	}
+	
+	return false;
+}
 
 unsigned short GetMinWaitTime(void)
 {
@@ -159,7 +183,6 @@ unsigned short GetMinWaitTime(void)
 				min = temp;
 		}
 	}
-	
 	return min;
 }
 

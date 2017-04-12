@@ -114,7 +114,8 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 		/*»ñÈ¡ÃÜÂë*/
 		else if(S_ShowDeviceInfoPageBuffer->lcdinput[0] == 0x1a10)
 		{
-			if(pdPASS == CheckStrIsSame(&pbuf[7] , AdminPassWord ,GetBufLen(&pbuf[7] , 2*pbuf[6])))
+			S_ShowDeviceInfoPageBuffer->tempValue = GetBufLen(&pbuf[7] , 2*pbuf[6]);
+			if((S_ShowDeviceInfoPageBuffer->tempValue == 6) && ( pdPASS == CheckStrIsSame(&pbuf[7], AdminPassWord, 6)))
 			{
 				startActivity(createSetDeviceIDActivity, NULL);
 			}

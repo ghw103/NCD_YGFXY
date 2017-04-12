@@ -122,7 +122,12 @@ static void activityInput(unsigned char *pbuf , unsigned short len)
 				AddNumOfSongToList(21, 0);
 			}
 			//即将测试，不允许返回
-			else if(GetMinWaitTime() < 60)
+			else if(GetMinWaitTime() < 40)
+			{
+				SendKeyCode(3);
+				AddNumOfSongToList(20, 0);
+			}
+			else if(true == isSomePaiduiInOutTimeStatus())
 			{
 				SendKeyCode(3);
 				AddNumOfSongToList(20, 0);
@@ -232,6 +237,7 @@ static void activityFresh(void)
 					//创建成功
 					if(Error_OK == S_PaiDuiPageBuffer->error)
 					{
+						vTaskDelay(1000 / portTICK_RATE_MS);
 						//创建成功，则使电机远离，防止用户拔卡
 						MotorMoveTo(1000, 1);			
 						startActivity(createSampleActivity, NULL);		

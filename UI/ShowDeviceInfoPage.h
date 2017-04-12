@@ -7,6 +7,7 @@
 typedef struct ShowDeviceInfoPageBuffer_Tag
 {
 	unsigned char presscount;
+	unsigned char tempValue;
 	SystemSetData systemSetData;
 	unsigned short lcdinput[100];
 }ShowDeviceInfoPageBuffer;

@@ -28,6 +28,7 @@ CreateTestErrorType CreateANewTest(TestType testtype);
 MyState_TypeDef DeleteCurrentTest(void);
 ItemData * GetTestItemByIndex(unsigned char index);
 unsigned short GetMinWaitTime(void);
+bool isSomePaiduiInOutTimeStatus(void);
 bool isInTimeOutStatus(ItemData * itemData);
 void SetCurrentTestItem(ItemData * s_itemdata);
 ItemData * GetCurrentTestItem(void);

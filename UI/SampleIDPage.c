@@ -88,6 +88,9 @@ static void activityStart(void)
 		S_SampleIDPage->currenttestdata = GetCurrentTestItem();
 		S_SampleIDPage->currenttestdata->statues = status_sample;
 	
+		while(ReadBarCodeFunction((char *)(S_SampleIDPage->tempbuf), 100) > 0)
+			;
+		
 		AddNumOfSongToList(10, 0);
 		
 		RefreshSampleID();

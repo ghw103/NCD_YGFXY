@@ -231,7 +231,6 @@ static unsigned char DS18B20_Read_Byte(void)
 {
 	unsigned char i, dat = 0;	
 	
-	
 	for(i=0; i<8; i++) 
 	{
 		DS18B20_Mode_Out_PP();		
@@ -305,7 +304,7 @@ static void DS18B20_Config(void)
 	DS18B20_Write_Byte(0x4e);
 	DS18B20_Write_Byte(0x19);
 	DS18B20_Write_Byte(0x1a);
-	DS18B20_Write_Byte(0x3f);		//9bit模式，0.5摄氏度
+	DS18B20_Write_Byte(0x1f);		//9bit模式，0.5摄氏度
 	
 	DS18B20_Rst();	
 	DS18B20_Write_Byte(0xcc);
@@ -316,6 +315,12 @@ static void DS18B20_Config(void)
 	DS18B20_Write_Byte(0xb8);
 }
 
+void startDS18B20(void)
+{
+	DS18B20_Rst();
+	DS18B20_Write_Byte(0XCC);				/* 跳过 ROM */
+	DS18B20_Write_Byte(0X44);				/* 开始转换 */
+}
 /*
  * 存储的温度是16 位的带符号扩展的二进制补码形式
  * 当工作在12位分辨率时，其中5个符号位，7个整数位，4个小数位
@@ -335,12 +340,7 @@ float readDS18B20Temp(void)
 	uint8_t value[9], i=0;
 	
 	short s_tem;
-	float f_tem = 0;
-	
-	DS18B20_Rst();
-	DS18B20_Write_Byte(0XCC);				/* 跳过 ROM */
-	DS18B20_Write_Byte(0X44);				/* 开始转换 */
-	vTaskDelay( 200 / portTICK_RATE_MS );
+	float f_tem = 300;
 	
 	DS18B20_Rst();
 	DS18B20_Write_Byte(0XCC);				/* 跳过 ROM */

@@ -79,7 +79,7 @@ static void vCodeScanTask( void *pvParameters )
 		if(pdPASS == xQueueReceive( xStartScanQueue, &cardQR, portMAX_DELAY))
 		{
 			clearScanQRCodeResult();
-			vTaskDelay(10 / portTICK_RATE_MS);
+			vTaskDelay(50 / portTICK_RATE_MS);
 			
 			scanresult = ScanCodeFun(cardQR);										//¶ÁÈ¡¶þÎ¬Âë
 			

@@ -50,6 +50,8 @@ MyState_TypeDef SystemReset(void)
 	{
 		//恢复默认
 		setDefaultSystemSetData(systemSetData);
+		//保留设备信息
+		getDeviceInfo(&(systemSetData->deviceInfo));
 		//保留已校准的led值
 		systemSetData->testLedLightIntensity = getTestLedLightIntensity(getGBSystemSetData());
 		//保留已校准的校准参数

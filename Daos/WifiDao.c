@@ -69,6 +69,7 @@ MyState_TypeDef SaveWifiData(WIFI_Def * wifi)
 							wifi->crc = CalModbusCRC16Fun1(wifi, sizeof(WIFI_Def)-2);
 							memcpy(&(wifiBuf[i]), wifi, sizeof(WIFI_Def));
 							
+							f_lseek(&(myfile->file), 0);
 							myfile->res = f_write(&(myfile->file), wifiBuf, sizeof(WIFI_Def) * MaxSaveWifiNum, &(myfile->bw));
 							if(FR_OK == myfile->res)
 								statues = My_Pass;
@@ -89,6 +90,7 @@ MyState_TypeDef SaveWifiData(WIFI_Def * wifi)
 							wifi->crc = CalModbusCRC16Fun1(wifi, sizeof(WIFI_Def)-2);
 							memcpy(&(wifiBuf[i]), wifi, sizeof(WIFI_Def));
 							
+							f_lseek(&(myfile->file), 0);
 							myfile->res = f_write(&(myfile->file), wifiBuf, sizeof(WIFI_Def) * MaxSaveWifiNum, &(myfile->bw));
 							if(FR_OK == myfile->res)
 								statues = My_Pass;
@@ -128,6 +130,7 @@ MyState_TypeDef ReadWifiData(WIFI_Def * wifi)
 		if(FR_OK == myfile->res)
 		{
 			//读出所有保存的wifi
+			f_lseek(&(myfile->file), 0);
 			myfile->res = f_read(&(myfile->file), wifiBuf, sizeof(WIFI_Def) * MaxSaveWifiNum, &(myfile->br));
 			if(FR_OK == myfile->res)
 			{
@@ -177,6 +180,7 @@ MyState_TypeDef deleteWifi(WIFI_Def * wifi)
 		if(FR_OK == myfile->res)
 		{
 			//读出所有保存的wifi
+			f_lseek(&(myfile->file), 0);
 			myfile->res = f_read(&(myfile->file), wifiBuf, sizeof(WIFI_Def) * MaxSaveWifiNum, &(myfile->br));
 			if(FR_OK == myfile->res)
 			{
@@ -190,6 +194,7 @@ MyState_TypeDef deleteWifi(WIFI_Def * wifi)
 						{
 							memset(&(wifiBuf[i]), 0, sizeof(WIFI_Def));
 							
+							f_lseek(&(myfile->file), 0);
 							myfile->res = f_write(&(myfile->file), wifiBuf, sizeof(WIFI_Def) * MaxSaveWifiNum, &(myfile->bw));
 							if(FR_OK == myfile->res)
 								statues = My_Pass;
