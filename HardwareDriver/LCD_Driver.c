@@ -337,14 +337,13 @@ void DspTimeAndTempData(void)
 	
 	if(buftime && time)
 	{
-		memset(buftime, 0, 200);
 		memset(time, 0, sizeof(MyTime_Def));
 		
 		/*获取当前时间*/
 		GetGB_Time(time);
 		
 		/*显示时间*/
-		sprintf(buftime, "         20%02d-%02d-%02d %02d:%02d:%02d \0", time->year, time->month, time->day,
+		sprintf(buftime, "       20%02d-%02d-%02d %02d:%02d:%02d \0", time->year, time->month, time->day,
 			time->hour, time->min, time->sec);
 		
 		DisText(0x1000, buftime, strlen(buftime)+1);

@@ -87,7 +87,7 @@ static void DS18B20_GPIO_Config(void)
   	GPIO_InitStructure.GPIO_Pin = DS18B20_PIN;	
   	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;   
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;  
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;  
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; 
 
 	GPIO_Init(DS18B20_PORT, &GPIO_InitStructure); 
@@ -108,8 +108,8 @@ static void DS18B20_Mode_IPU(void)
 
 	GPIO_InitStructure.GPIO_Pin = DS18B20_PIN;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN ; 
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;  
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; 
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	
 	GPIO_Init(DS18B20_PORT, &GPIO_InitStructure);	 
 }
@@ -130,7 +130,7 @@ static void DS18B20_Mode_Out_PP(void)
 	GPIO_InitStructure.GPIO_Pin = DS18B20_PIN;	
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;   
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; 
 
 	GPIO_Init(DS18B20_PORT, &GPIO_InitStructure);	 	 
@@ -157,30 +157,37 @@ static bool DS18B20_Rst(void)
 	delay_us(600);
 	/* 主机在产生复位信号后，需将总线拉高 */
 	DS18B20_DATA_OUT(DS18B20_HIGH);
-	
-	/*从机接收到主机的复位信号后，会在15~60us后给主机发一个存在脉冲*/
-	delay_us(20);
-	
 	/* 主机设置为上拉输入 */
 	DS18B20_Mode_IPU();
+	/*从机接收到主机的复位信号后，会在15~60us后给主机发一个存在脉冲*/
+	delay_us(120);
 	
+	pulse_time = DS18B20_DATA_IN();
+	
+
+	delay_us(300);
+	
+	if(pulse_time == 0)
+		return true;
+	else
+		return false;
 	/* 等待存在脉冲的到来，存在脉冲为一个60~240us的低电平信号 
 	 * 如果存在脉冲没有来则做超时处理，从机接收到主机的复位信号后，会在15~60us后给主机发一个存在脉冲
 	 */
-	while( DS18B20_DATA_IN() && pulse_time<200 )
+/*	while( DS18B20_DATA_IN() && pulse_time < 200 )
 	{
 		pulse_time++;
 		delay_us(1);
 	}
-	
+	*/
 	/* 经过100us后，存在脉冲都还没有到来*/
-	if( pulse_time >=200 )
+/*	if( pulse_time >= 200 )
 		return false;
 	else
 	{
 		delay_us(240);
 		return true;
-	}
+	}*/
 }
 
 /***************************************************************************************************
@@ -230,21 +237,24 @@ static void DS18B20_Write_Byte(const unsigned char dat)
 static unsigned char DS18B20_Read_Byte(void)
 {
 	unsigned char i, dat = 0;	
-	
+
 	for(i=0; i<8; i++) 
 	{
 		DS18B20_Mode_Out_PP();		
+		DS18B20_DATA_OUT(DS18B20_HIGH);
+		delay_us(2);
+				
 		DS18B20_DATA_OUT(DS18B20_LOW);
 		delay_us(5);
 		
 		/* 设置成输入，释放总线，由外部上拉电阻将总线拉高 */
 		DS18B20_DATA_OUT(DS18B20_HIGH);
 		DS18B20_Mode_IPU();
-		delay_us(12);
+		delay_us(5);
 		
 		if( DS18B20_DATA_IN() == SET )
 			dat |= (1<<i);
-		delay_us(45);
+		delay_us(55);
 	}
 	
 	return dat;

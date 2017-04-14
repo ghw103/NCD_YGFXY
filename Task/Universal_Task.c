@@ -82,7 +82,7 @@ static void vUniversalTask( void *pvParameters )
 		LedToggle();
 		
 		//读取环境温度
-		if(count % 5 == 0)
+		if(count % 2 == 0)
 			ReadEnvironmentTemperature();
 		
 		//控制排队模块状态

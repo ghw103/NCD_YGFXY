@@ -347,7 +347,7 @@ static void RefreshCurve(void)
 		
 		if(S_TestPageBuffer->currenttestdata->testdata.testResultDesc == ResultIsOK)
 		{
-			if(isAutoPrint() == true)
+			if((isAutoPrint() == true) && (S_TestPageBuffer->isPrintfData == 0))
 				printfTestData();
 		}
 		else if(S_TestPageBuffer->currenttestdata->testdata.testResultDesc == PeakError)
@@ -480,10 +480,18 @@ static void AddDataToLine(unsigned short data)
 ***************************************************************************************************/
 static void printfTestData(void)
 {
-	S_TestPageBuffer->isPrintfData = 1;
-	SendKeyCode(6);
-	PrintfData(&(S_TestPageBuffer->testDataForPrintf));
-	SendKeyCode(16);
-	S_TestPageBuffer->isPrintfData = 0;
+	if(S_TestPageBuffer->testDataForPrintf.testResultDesc != NoResult)
+	{
+		if(S_TestPageBuffer->isPrintfData == 0)
+		{
+			S_TestPageBuffer->isPrintfData = 1;
+			SendKeyCode(6);
+			PrintfData(&(S_TestPageBuffer->testDataForPrintf));
+			SendKeyCode(16);
+			S_TestPageBuffer->isPrintfData = 0;
+		}
+	}
+	else
+		SendKeyCode(4);
 }
 
