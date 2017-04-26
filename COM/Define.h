@@ -21,8 +21,8 @@
 /***************************************************************************************************/
 /***************************************************************************************************/
 /*V1.0.03*/
-#define	GB_SoftVersion	(unsigned short)1040
-#define	GB_SoftVersion_Build	"Build17041401\0"
+#define	GB_SoftVersion	(unsigned short)1042
+#define	GB_SoftVersion_Build	"Build17042401\0"
 
 /*服务器信息*/
 #define	GB_ServerIp_1		116

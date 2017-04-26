@@ -394,7 +394,7 @@ static void AnalysisTestData(TempCalData * S_TempCalData)
 			S_TempCalData->resultstatues = NoSample;
 			S_TempCalData->itemData->testdata.testline.BasicResult = 0;
 		}
-		else if(S_TempCalData->CV2 < 0.01)
+		else if(S_TempCalData->CV2 < 0.05)
 		{
 			S_TempCalData->resultstatues = PeakError;
 			S_TempCalData->itemData->testdata.testline.BasicResult = 0;

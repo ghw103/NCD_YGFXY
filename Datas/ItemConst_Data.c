@@ -25,7 +25,7 @@ const ItemConstData GB_ItemConstData[4]=
 		.pointNum = 0,
 		.lowstResult = 20,
 		.highestResult = 30000,
-		.normalResult = "<75Ëê,<125 pg/mL        >=75Ëê,<450 pg/mL\0",
+		.normalResult = "<75Ëê,<125 pg/mL,>=75Ëê,<450 pg/mL\0",
 		.itemMeasure = "pg/mL\0"
 	},
 	{

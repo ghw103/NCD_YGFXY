@@ -78,7 +78,7 @@ static void activityStart(void)
 	{
 		timer_set(&(S_WelcomePageBuffer->timer), 2);
 		
-		AddNumOfSongToList(0, 0);
+		//AddNumOfSongToList(0, 0);
 	}
 
 	SelectPage(1);

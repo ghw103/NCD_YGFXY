@@ -91,9 +91,9 @@ static void activityStart(void)
 		while(ReadBarCodeFunction((char *)(S_SampleIDPage->tempbuf), 100) > 0)
 			;
 		
-		AddNumOfSongToList(10, 0);
-		
 		RefreshSampleID();
+		
+		AddNumOfSongToList(10, 0);
 	}
 	
 	SelectPage(86);
@@ -206,7 +206,7 @@ static void activityHide(void)
 static void activityResume(void)
 {
 	if(S_SampleIDPage)
-	{		
+	{
 		AddNumOfSongToList(10, 0);
 		
 		RefreshSampleID();

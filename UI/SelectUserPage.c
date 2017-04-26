@@ -92,7 +92,7 @@ static void activityStart(void)
 	
 		ShowList();
 		SelectUser(S_UserPageBuffer->selectindex);
-	
+		
 		AddNumOfSongToList(9, 0);
 	}
 	
@@ -238,7 +238,7 @@ static void activityResume(void)
 	
 		ShowList();
 		SelectUser(S_UserPageBuffer->selectindex);
-	
+		
 		AddNumOfSongToList(9, 0);
 	}
 	

@@ -9,6 +9,7 @@
 #include	"PlaySong_Function.h"
 #include	"QueueUnits.h"
 #include	"SystemSet_Data.h"
+#include	"System_Data.h"
 
 #include 	"FreeRTOS.h"
 #include 	"task.h"
@@ -83,6 +84,7 @@ const char wavfilename[59][20]=
 #define	SongListSize	20							//播放列表可保持100个音频
 static xQueueHandle SongListQueue = NULL;			//播放音频的队列
 static unsigned char S_PlayStatus = 0;
+static MyTime_Def tempTime;							//系统时间
 /******************************************************************************************/
 /*****************************************局部函数声明*************************************/
 
@@ -152,6 +154,11 @@ static void vPlaySongTask( void *pvParameters )
 unsigned char AddNumOfSongToList(unsigned char num, unsigned char mode)
 {
 	unsigned char songnum = num;
+	
+	GetGB_Time(&tempTime);
+	
+	if((tempTime.hour < 8) || (tempTime.hour >= 17))
+		return pdPASS;
 	
 	if(isMute())
 		return pdPASS;
